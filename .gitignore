@@ -1,0 +1,21 @@
+# Notas de trabajo fuera del repositorio
+skills/
+
+# Python / Django
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.sqlite3
+.env
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
