@@ -1,6 +1,6 @@
 # Reglas de negocio — M05 Existencias
 
-> Ubicación en el código: `apps/existencias/models.py` y `apps/existencias/services.py`.
+> Ubicación en el código: `apps/existencias/models/` y `apps/existencias/services/`.
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|

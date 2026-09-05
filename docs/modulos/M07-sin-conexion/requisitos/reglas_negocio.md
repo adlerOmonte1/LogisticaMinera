@@ -1,6 +1,6 @@
 # Reglas de negocio — M07 Captura sin conexión
 
-> Estas reglas se aplican en el servidor (`apps/sincronizacion/services.py`). El cliente replica algunas por conveniencia, pero la validación autoritativa es la del servidor (decisión D-08).
+> Estas reglas se aplican en el servidor (`apps/sincronizacion/services/`). El cliente replica algunas por conveniencia, pero la validación autoritativa es la del servidor (decisión D-08).
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|

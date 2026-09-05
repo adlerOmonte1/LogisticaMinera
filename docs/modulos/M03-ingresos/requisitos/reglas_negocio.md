@@ -1,6 +1,6 @@
 # Reglas de negocio — M03 Registro de ingresos
 
-> Ubicación en el código: `apps/ingresos/models.py` (invariantes de la entidad) y `apps/ingresos/services.py` (reglas de proceso). Ninguna de estas reglas vive en `views.py` ni en un componente Angular.
+> Ubicación en el código: `apps/ingresos/models/` (invariantes de la entidad) y `apps/ingresos/services/` (reglas de proceso). Ninguna de estas reglas vive en `views/` ni en un componente Angular.
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|

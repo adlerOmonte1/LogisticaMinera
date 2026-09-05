@@ -60,23 +60,56 @@ backend/
     sincronizacion/ M07   endpoints de la cola offline
     auditoria/      M08   registro de eventos
     busqueda/       M09   búsqueda por criterios
-  common/                 utilidades transversales, excepciones de dominio
+  utils/                  utilidades transversales, excepciones de dominio
+  manage.py
+  .env.example            versionado; .env nunca se versiona
 ```
+
+`utils/` es el paquete transversal: `excepciones.py` (dominio), `manejador_errores.py` (cuerpo
+uniforme de error), `paginacion.py`, `query_builder.py`, `serializer_mixin.py`, `throttles.py` y
+`modelos.py` (`ModeloBase`). Nada entra ahí sin ser consumido por al menos dos módulos; de lo
+contrario pertenece a la app que lo usa.
 
 ### 3.1 Capas dentro de cada app
 
 ```
 apps/ingresos/
-    models.py         Entidades y reglas de negocio invariantes (RN-*)
-    services.py       Casos de uso (RS-*): orquestan, no contienen reglas
-    selectors.py      Consultas de lectura (separadas de la escritura)
-    serializers.py    Traducción entre dominio y JSON
-    views.py          Controladores REST (RF-*): solo entrada/salida HTTP
-    permissions.py    Autorización por rol (consume M01)
+    migrations/       incluye los índices del modelo ER desde la PRIMERA migración
+    models/           Entidades e invariantes del dominio (RN-*)
+    repositories/     Consultas de LECTURA. No escriben nunca
+    services/         Casos de uso (RS-*): orquestan, no contienen reglas
+    serializers/      Traducción entre dominio y JSON
+    views/            Controladores REST (RF-*): solo entrada/salida HTTP
+    permissions.py    Autorización por acción, no por objeto monolítico (ISP)
+    filters.py        django-filter: alimenta los indicadores I2 e I5
+    urls.py
+    apps.py           verbose_name = "M03 — Registro de ingresos"
     tests/
 ```
 
-Regla de asignación: **una regla de negocio nunca vive en `views.py`**. Si una validación puede enunciarse sin mencionar HTTP, pertenece a `models.py` o a `services.py`.
+`models`, `repositories`, `services`, `serializers` y `views` son **paquetes**, no archivos sueltos:
+`catalogo` sostiene cuatro entidades y `reportes` un exportador por formato. Cada paquete reexporta
+sus nombres en el `__init__.py`:
+
+```python
+# apps/catalogo/models/__init__.py
+from .producto import Producto
+from .vehiculo import Vehiculo
+from .transportista import Transportista
+from .cliente import Cliente
+
+__all__ = ["Producto", "Vehiculo", "Transportista", "Cliente"]
+```
+
+Sin la reexportación, mover un archivo rompe las migraciones y las referencias por cadena
+(`"catalogo.Vehiculo"`).
+
+Regla de asignación: **una regla de negocio nunca vive en `views/`**. Si una validación puede
+enunciarse sin mencionar HTTP, pertenece a `models/` o a `services/`.
+
+`repositories/` es el lado de lectura, no una abstracción sobre el ORM: una clase concreta por
+entidad, sin interfaz y sin segunda implementación (ver D-09). Lo que la separación protege es el
+indicador I3 — poder optimizar las consultas de saldo sin tocar la lógica de escritura.
 
 ## 4. Organización del frontend (Angular)
 
@@ -105,9 +138,9 @@ La separación de requisitos por tipo dentro de cada módulo (`requisitos/`) exi
 
 | Tipo de requisito | Capa Django | Capa Angular | Principio que sostiene |
 |---|---|---|---|
-| Reglas de negocio (RN) | `models.py`, validadores de dominio | — (nunca se replican en el cliente como fuente de verdad) | SRP |
-| Requisitos de sistema (RS) | `services.py` | servicio del feature | SRP, DIP |
-| Requisitos funcionales (RF) | `views.py` + `serializers.py` | componentes y rutas | ISP |
+| Reglas de negocio (RN) | `models/`, validadores de dominio | — (nunca se replican en el cliente como fuente de verdad) | SRP |
+| Requisitos de sistema (RS) | `services/` | servicio del feature | SRP, DIP |
+| Requisitos funcionales (RF) | `views/` + `serializers/` | componentes y rutas | ISP |
 | Requisitos no funcionales (RNF) | configuración, índices, caché, middleware | service worker, estrategias de caché | OCP |
 
 **S — Responsabilidad única.** Una vista REST solo traduce HTTP; un servicio solo orquesta un caso de uso; un modelo solo protege sus invariantes. La validación "la hora de pesaje no puede ser posterior a la hora de registro" vive en el modelo `Ingreso`, no en el formulario Angular ni en el controlador.

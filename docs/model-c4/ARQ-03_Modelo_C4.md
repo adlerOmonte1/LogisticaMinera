@@ -155,13 +155,13 @@ correspondencia requisito-capa de ARQ-02 §5.
 ```mermaid
 flowchart TB
     subgraph APIC["Contenedor API REST"]
-        V["views.py - entrada y salida HTTP - RF"]
+        V["views/ - entrada y salida HTTP - RF"]
         PE["permissions.py - autorizacion por accion"]
         SE["serializers.py - traduccion dominio y JSON"]
-        SV["services.py - casos de uso - RS"]
-        SL["selectors.py - consultas de lectura"]
-        MO["models.py - invariantes del dominio - RN"]
-        EX["common - excepciones de dominio"]
+        SV["services/ - casos de uso - RS"]
+        SL["repositories/ - consultas de lectura"]
+        MO["models/ - invariantes del dominio - RN"]
+        EX["utils - excepciones de dominio"]
     end
     DB[("PostgreSQL")]
 
@@ -178,20 +178,20 @@ flowchart TB
 
 | Componente | Responsabilidad única | Principio |
 |---|---|---|
-| `views.py` | Traducir HTTP y nada más | SRP |
+| `views/` | Traducir HTTP y nada más | SRP |
 | `permissions.py` | Autorizar por acción, no por objeto monolítico de usuario | ISP |
-| `serializers.py` | Traducir dominio ↔ JSON; no valida reglas de negocio | SRP |
-| `services.py` | Orquestar un caso de uso; invoca reglas, no las contiene | SRP, DIP |
-| `selectors.py` | Consultar para leer, separado de la escritura | SRP |
-| `models.py` | Proteger las invariantes de la entidad | SRP |
-| `common/` | Excepciones de dominio, traducidas a HTTP en el borde | DIP |
+| `serializers/` | Traducir dominio ↔ JSON; no valida reglas de negocio | SRP |
+| `services/` | Orquestar un caso de uso; invoca reglas, no las contiene | SRP, DIP |
+| `repositories/` | Consultar para leer, separado de la escritura | SRP |
+| `models/` | Proteger las invariantes de la entidad | SRP |
+| `utils/` | Excepciones de dominio, traducidas a HTTP en el borde | DIP |
 
-**La flecha que no existe es la que más importa:** `models.py` y `services.py` no dependen de
+**La flecha que no existe es la que más importa:** `models/` y `services/` no dependen de
 `rest_framework`. Si lo hicieran, la regla de negocio quedaría atada al transporte HTTP y la cola de
 sincronización de M07 —que no llega por una petición de formulario— no podría reutilizarla. Ese es el
 motivo concreto, no una preferencia de diseño.
 
-La separación entre `selectors.py` y `services.py` tampoco es ceremonial: las consultas de lectura son
+La separación entre `repositories/` y `services/` tampoco es ceremonial: las consultas de lectura son
 las que sostienen el indicador I3, y deben poder optimizarse sin tocar la lógica de escritura.
 
 ### 4.2 Componentes de M03 — Registro de ingresos
@@ -339,7 +339,7 @@ classDiagram
 | 2 | PostgreSQL con transacciones | M03, M05 | I3, I4 | D-02 |
 | 3 | `GeneradorCorrelativo` inyectado | M03, M07 | — | D-02 |
 | 3 | Formulario reutilizado en M07 | M07 | I1 | D-03 |
-| 3 | `selectors.py` separado | M05, M09 | I3, I5 | — |
+| 3 | `repositories/` separado | M05, M09 | I3, I5 | — |
 | 4 | `Reloj` inyectado | M03 | I1 | D-01 |
 
 ---

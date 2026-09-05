@@ -1,6 +1,6 @@
 # Reglas de negocio — M06 Consolidados y reportes
 
-> Ubicación en el código: `apps/reportes/services.py` y `apps/reportes/selectors.py`.
+> Ubicación en el código: `apps/reportes/services/` y `apps/reportes/repositories/`.
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|

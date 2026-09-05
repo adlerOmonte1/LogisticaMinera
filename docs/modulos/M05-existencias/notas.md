@@ -7,7 +7,7 @@
 - `MovimientoStock` es la única tabla de escritura. No existe una tabla `Stock` con un campo actualizable: el saldo vive denormalizado en `saldo_resultante_tn` de cada movimiento, y la consulta lee el del último.
 - Todos los campos de cantidad son `DecimalField(max_digits=10, decimal_places=2)`, nunca `FloatField` (RNF-M05-04).
 - La generación del movimiento usa `select_for_update()` sobre el último movimiento del producto para calcular el saldo resultante bajo concurrencia. Sin ese bloqueo, dos ingresos simultáneos del mismo producto producen saldos denormalizados inconsistentes.
-- `selectors.py` concentra las consultas de lectura (saldos, kardex) y `services.py` las de escritura (generación y reversión de movimientos). La separación no es ceremonial: las consultas de lectura son las que sostienen el indicador I3 y deben poder optimizarse sin tocar la lógica de escritura.
+- `repositories/` concentra las consultas de lectura (saldos, kardex) y `services/` las de escritura (generación y reversión de movimientos). La separación no es ceremonial: las consultas de lectura son las que sostienen el indicador I3 y deben poder optimizarse sin tocar la lógica de escritura.
 - La rutina de verificación de consistencia (A-M05-03) se implementa como comando de gestión de Django (`python manage.py verificar_saldos`), no como endpoint. Se ejecuta manualmente y su salida se archiva.
 
 ## Frontend (Angular)

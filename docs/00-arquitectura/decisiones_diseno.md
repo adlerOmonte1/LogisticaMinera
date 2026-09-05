@@ -11,7 +11,7 @@
 
 La hora de pesaje la ingresa el usuario copiándola del ticket de balanza. La hora de registro la asigna el servidor automáticamente al persistir. La diferencia entre ambas **es** el indicador I1.
 
-Si se colapsan en un solo campo, el indicador desaparece y la dimensión D1 de la variable dependiente queda sin medición. En el código, `hora_registro` es `auto_now_add` y no es editable por ningún rol.
+Si se colapsan en un solo campo, el indicador desaparece y la dimensión D1 de la variable dependiente queda sin medición. En el código, `hora_registro` es `editable=False` y la asigna **el servicio**, no el ORM. `auto_now_add` sería incorrecto: fija la hora de inserción en la base, y para un ingreso capturado sin conexión el valor correcto es la hora de captura local que envía el cliente (ver D-03). Ningún rol puede modificarla.
 
 ## D-02. El correlativo lo asigna el servidor, nunca el dispositivo
 
@@ -62,6 +62,31 @@ Un ingreso registrado no se elimina físicamente. Se marca como anulado, con mot
 **Módulos afectados:** todos
 
 Angular puede validar en el formulario para mejorar la experiencia, pero la validación autoritativa está en el backend. Un registro que llega por la cola de sincronización de M07 no pasa por el formulario y debe someterse a las mismas reglas.
+
+## D-09. `repositories/` es el lado de lectura, no una abstracción sobre el ORM
+
+**Módulos afectados:** todos
+**Indicadores en juego:** I3, I5
+
+Cada app separa la lectura (`repositories/`) de la escritura (`services/`). La razón es de rendimiento
+con consecuencia metodológica: I3 mide el tiempo de determinación del stock e I5 el de recuperación de
+un ingreso. Ambas son consultas que habrá que optimizar —`select_related`, índices, agregados— y esa
+optimización no debe obligar a tocar la lógica de escritura ni a rehacer sus pruebas.
+
+Lo que **no** es: el patrón Repository clásico, pensado para aislar un ORM que se quiere poder
+sustituir. Django ORM ya es la capa de acceso a datos, y envolverlo en una interfaz con una sola
+implementación es ceremonia que en sustentación se defiende peor que su ausencia. En consecuencia:
+
+- Una clase concreta por entidad (`RepositorioIngreso`), sin `Protocol` ni clase base abstracta.
+- No escribe: ni `save()`, ni `create()`, ni `update()`, ni `delete()`.
+- Devuelve entidades o `QuerySet`, nunca diccionarios listos para la respuesta HTTP: eso es trabajo
+  del serializer.
+- La abstracción se crea solo cuando exista una segunda implementación real o una prueba que exija
+  sustituirla — el generador de correlativo (D-02), el reloj y los exportadores de M06 la exigen; un
+  repositorio de productos, no.
+
+Pregunta previsible en sustentación: «¿por qué repositorios sobre un ORM que ya abstrae la base?».
+La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
 
 ## Pendientes que bloquean decisiones
 

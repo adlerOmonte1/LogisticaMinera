@@ -38,9 +38,10 @@ No es formalismo académico: cada tipo aterriza en una capa distinta del código
 
 **Backend (Django, snake_case):**
 ```
-apps/ingresos/models.py      class Ingreso, class TicketBalanza
-apps/ingresos/services.py    def registrar_ingreso(...)
-apps/ingresos/views.py       class IngresoViewSet
+apps/ingresos/models/ingreso.py            class Ingreso, class TicketBalanza
+apps/ingresos/repositories/ingreso.py      class RepositorioIngreso
+apps/ingresos/services/registrar_ingreso.py  def registrar_ingreso(...)
+apps/ingresos/views/ingreso.py             class IngresoViewSet
 ```
 
 **Frontend (Angular, kebab-case en archivos, PascalCase en clases):**

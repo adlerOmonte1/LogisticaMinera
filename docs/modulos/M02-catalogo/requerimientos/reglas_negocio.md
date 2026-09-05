@@ -1,6 +1,6 @@
 # Reglas de negocio — M02 Catálogo maestro
 
-> Ubicación en el código: `apps/catalogo/models.py` y validadores asociados.
+> Ubicación en el código: `apps/catalogo/models/` y validadores asociados.
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|

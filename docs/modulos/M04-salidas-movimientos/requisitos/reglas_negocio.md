@@ -1,6 +1,6 @@
 # Reglas de negocio — M04 Salidas y movimientos
 
-> Ubicación en el código: `apps/salidas/models.py` y `apps/salidas/services.py`.
+> Ubicación en el código: `apps/salidas/models/` y `apps/salidas/services/`.
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
