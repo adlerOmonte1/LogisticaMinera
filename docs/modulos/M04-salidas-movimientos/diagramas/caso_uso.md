@@ -37,4 +37,4 @@ flowchart LR
 | Consultar salidas | HU-M04-03 | Los tres roles | Sesión activa |
 | Anular salida | HU-M04-03 | Administrativo, Administrador | Salida en estado REGISTRADO |
 
-El Supervisor aparece únicamente en la consulta, coherente con la matriz de permisos de `../requisitos/funcionales.md`.
+El Supervisor aparece únicamente en la consulta, coherente con la matriz de permisos de `../requerimientos/funcionales.md`.

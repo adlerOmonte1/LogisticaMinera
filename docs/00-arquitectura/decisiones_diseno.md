@@ -88,6 +88,70 @@ implementación es ceremonia que en sustentación se defiende peor que su ausenc
 Pregunta previsible en sustentación: «¿por qué repositorios sobre un ORM que ya abstrae la base?».
 La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
 
+## D-10. M06 y M09 son apps de lectura: no tienen `models/` ni `migrations/`
+
+**Módulos afectados:** M06, M09
+**Indicadores en juego:** I5, I6
+
+Ni Consolidados-Reportes ni Búsqueda poseen entidad propia. M06 agrega sobre `INGRESO`, `SALIDA` y
+`MOVIMIENTO_STOCK`; M09 consulta `INGRESO` por padrón, fecha, placa o producto. Ninguno de los dos
+aparece como entidad en el modelo entidad-relación, y ese documento es la fuente única.
+
+En consecuencia, su estructura es:
+
+```
+apps/reportes/          M06            apps/busqueda/        M09
+  repositories/   lectura sobre M03/M04/M05    repositories/  lectura sobre M03
+  exportadores/   una clase por formato (OCP)  services/
+  services/                                    serializers/
+  serializers/                                 views/
+  views/                                       permissions.py  filters.py  urls.py  tests/
+  permissions.py  filters.py  urls.py  tests/
+```
+
+Sin `models/` y sin `migrations/`. Crear paquetes vacíos «por simetría» es peor que no crearlos: un
+`models/` vacío invita a que alguien agregue ahí una entidad que debía discutirse primero en el
+modelo ER, y un `migrations/` vacío hace creer que el módulo tiene esquema propio cuando no lo tiene.
+
+**La regla que esto fija, y que vale para los nueve módulos:** una app solo tiene `models/` si aporta
+una entidad al modelo entidad-relación. Si un módulo necesita persistir algo nuevo, la entidad se
+añade primero al ERD y después al código, nunca al revés. Aplica a M07: si la cola de sincronización
+llegara a necesitar un registro de lote, ese registro se discute en el ERD antes de existir en
+`apps/sincronizacion/models/`.
+
+`exportadores/` en M06 es la aplicación literal del principio abierto/cerrado: `ExportadorExcel` y
+`ExportadorPDF` hoy, y el formato de declaración semestral —pendiente hasta la semana 7— como clase
+nueva, sin tocar lo existente. Es el único caso del backend donde la abstracción está justificada de
+antemano, porque la segunda implementación ya existe.
+
+## D-11. El frontend vive en un repositorio separado, con capas dentro de cada feature
+
+**Módulos afectados:** todos los del cliente
+**Indicador en juego:** ninguno de forma directa; protege la ventana de observación
+
+Dos decisiones en una, porque se tomaron juntas.
+
+**Repositorio aparte.** El frontend se despliega como archivos estáticos y el backend como servicio
+con base de datos: dos ciclos de vida distintos. Con un solo repositorio, un cambio de estilos obliga
+a reconstruir y volver a desplegar la API, y todo despliegue en producción durante la ventana de
+observación es una amenaza a la validez interna (`ARQ-02` §7). El costo es que el contrato de la API
+deja de estar garantizado por el compilador; se compensa con el esquema OpenAPI en `/api/v1/docs/`
+como contrato, la misma convención de commits en ambos historiales y una etiqueta `M{nn}-cerrado`
+puesta el mismo día en los dos repositorios.
+
+**Capas dentro del feature.** Cada `features/<modulo>/` se divide en `data-access/` (única puerta a
+`HttpClient`), `pages/` (componentes ruteados, con estado) y `ui/` (presentacionales, sin estado). Es
+la misma separación por motivo de cambio que ya se aplica en el servidor. La consecuencia verificable
+es que un componente de `ui/` se prueba con entradas y salidas, sin `HttpTestingController`: eso es
+lo que sostiene la característica *capacidad de ser probado* de ISO/IEC 25010 que afirma la tesis.
+
+Se descartó un monorepo Nx: aporta límites de dependencia y build incremental, que rinden con varios
+equipos y varias aplicaciones. Aquí hay una aplicación, un desarrollador y ocho semanas.
+
+M07 no tiene carpeta en `features/`: la captura sin conexión es transversal y vive en `core/` como
+interceptor más cola. Si fuera una pantalla, M03 tendría que saber si hay red — la dependencia que
+D-04 prohíbe.
+
 ## Pendientes que bloquean decisiones
 
 | Pendiente | Bloquea | Fecha límite |

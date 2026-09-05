@@ -48,4 +48,4 @@ flowchart TD
     I2 --> Fin
 ```
 
-Este diagrama documenta por qué el tipo MERMA existe como categoría separada: sin él, toda desviación sería indistinguible de un error de registro. La rama I1 solo puede recorrerse si el criterio de merma por humedad está definido, pendiente registrado en `../requisitos/reglas_negocio.md`.
+Este diagrama documenta por qué el tipo MERMA existe como categoría separada: sin él, toda desviación sería indistinguible de un error de registro. La rama I1 solo puede recorrerse si el criterio de merma por humedad está definido, pendiente registrado en `../requerimientos/reglas_negocio.md`.

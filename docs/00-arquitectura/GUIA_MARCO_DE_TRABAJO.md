@@ -158,7 +158,7 @@ backend/
     base.txt  dev.txt  prod.txt
   config/
     settings/
-      __init__.py  base.py  dev.py  pre.py  prod.py
+      __init__.py  base.py  development.py  preproduction.py  production.py
     urls.py  wsgi.py  asgi.py
   utils/
     excepciones.py          excepciones de dominio (no importan DRF)
@@ -213,6 +213,16 @@ __all__ = ["Producto", "Vehiculo", "Transportista", "Cliente"]
 
 Sin esto Django detecta los modelos igual, pero mover un archivo rompe las migraciones y las
 referencias por cadena (`"catalogo.Vehiculo"`).
+
+**Excepción: M06 y M09 no llevan `models/` ni `migrations/`** (D-10). No aportan entidad al modelo ER;
+agregan y consultan sobre M03, M04 y M05. M06 añade `exportadores/`, una clase por formato:
+
+```
+apps/reportes/     repositories/ exportadores/ services/ serializers/ views/ ...
+apps/busqueda/     repositories/ services/ serializers/ views/ ...
+```
+
+Regla general: una app tiene `models/` solo si aporta una entidad al modelo entidad-relación.
 
 ### 2.4 Configuración por entornos
 
@@ -273,7 +283,7 @@ REST_FRAMEWORK = {
 `.env.example` (versionado, sin secretos reales):
 
 ```
-DJANGO_SETTINGS_MODULE=config.settings.dev
+DJANGO_SETTINGS_MODULE=config.settings.development
 DJANGO_SECRET_KEY=cambiar
 DEBUG=True
 DATABASE_URL=postgres://logistica:cambiar_en_produccion@localhost:5432/logistica_minera_dev
@@ -499,7 +509,7 @@ urlpatterns = [
 
 ```ini
 [pytest]
-DJANGO_SETTINGS_MODULE = config.settings.dev
+DJANGO_SETTINGS_MODULE = config.settings.development
 python_files = test_*.py
 addopts = -ra --strict-markers
 ```
@@ -536,6 +546,10 @@ python manage.py runserver
 ---
 
 ## 3. Frontend — Angular
+
+> **El frontend se movió a su propio repositorio** (`logistica-minera-frontend`, D-11). Esta sección
+> queda como referencia rápida; la guía de instalación y la estructura viven en
+> `GUIA_FRONTEND_ANGULAR.md`.
 
 ### 3.1 Creación
 
@@ -710,8 +724,7 @@ ng test
 Para cada módulo Mxx, en este orden. No se salta ningún paso: cada uno produce evidencia citable en la sustentación.
 
 1. `git checkout -b feature/Mxx-nombre` (desde `develop`).
-2. Leer `docs/modulos/Mxx-*/requisitos/` — RU, RS, RF, RNF, RN. (M01 y M02 usan `requerimientos/`;
-   el resto usa `requisitos/`. Es una inconsistencia conocida de la documentación.)
+2. Leer `docs/modulos/Mxx-*/requerimientos/` — RU, RS, RF, RNF, RN.
 3. Backend: `models/` (RN) → `repositories/` (lectura) → `services/` (RS) → `serializers/` + `views/`
    (RF) → `permissions.py` (por acción).
 4. Migración: `makemigrations` + `migrate`. Revisar el SQL generado con `sqlmigrate` antes de aplicarlo en preproducción.
