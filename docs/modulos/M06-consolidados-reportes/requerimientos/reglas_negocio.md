@@ -6,7 +6,7 @@
 |---|---|---|
 | RN-M06-01 | El consolidado incluye únicamente documentos en estado REGISTRADO; los anulados se excluyen del cálculo | Se contarían toneladas de ingresos invalidados |
 | RN-M06-02 | El consolidado reporta la cantidad de documentos anulados del periodo por separado | Se ocultaría la magnitud de las correcciones realizadas |
-| RN-M06-03 | La producción se desagrega siempre por titularidad del vehículo | Se perdería el hallazgo central del estudio en el reporte que la gerencia consulta |
+| RN-M06-03 | La producción se desagrega siempre por titularidad del vehículo | Se perdería el hallazgo central del diagnóstico en el reporte que la gerencia consulta |
 | RN-M06-04 | Un periodo sin movimientos genera consolidado con valores en cero, no un error | El indicador I6 se degradaría por una causa ajena a la operación |
 | RN-M06-05 | El consolidado es un cálculo derivado: no se almacena como dato editable | Un reporte editado dejaría de reflejar los registros y sería inauditable |
 | RN-M06-06 | Toda exportación identifica el periodo, la fecha de generación y el usuario responsable | Un archivo circulando sin contexto podría atribuirse a un periodo equivocado |
@@ -21,4 +21,4 @@ Es la decisión correcta —el reporte debe reflejar el estado real de los regis
 
 ## Nota sobre RN-M06-07
 
-El alcance termina en la generación del archivo. La revisión, validación y presentación de la declaración semestral son responsabilidad del personal de la empresa. Esta frontera está declarada en `../../00-arquitectura/ARQ-01_Modulos_del_Sistema.md` §5 y conviene tenerla presente para sustentación.
+El alcance termina en la generación del archivo. La revisión, validación y presentación de la declaración semestral son responsabilidad del personal de la empresa. Esta frontera está declarada en `../../00-arquitectura/ARQ-01_Modulos_del_Sistema.md` §5 y conviene tenerla presente para la revisión técnica.

@@ -17,7 +17,7 @@
 
 ## Nota sobre RN-M04-06
 
-Esta regla merece justificación explícita porque contradice la intuición habitual en sistemas de inventario. El stock del sistema es una **estimación** construida a partir de los ingresos y salidas registrados; el stock físico real difiere por humedad, precisión de la balanza e ingresos aún no capturados. Impedir una salida real porque la estimación no la respalda invitaría a registrar ingresos ficticios, contaminando la propia variable que la tesis mide.
+Esta regla merece justificación explícita porque contradice la intuición habitual en sistemas de inventario. El stock del sistema es una **estimación** construida a partir de los ingresos y salidas registrados; el stock físico real difiere por humedad, precisión de la balanza e ingresos aún no capturados. Impedir una salida real porque la estimación no la respalda invitaría a registrar ingresos ficticios, contaminando la propia variable que el sistema busca reducir.
 
 ## Pendiente que bloquea este módulo
 

@@ -1,6 +1,6 @@
 # Decisiones de diseño fijadas
 
-**Estado:** cerradas. Reabrir cualquiera exige justificación escrita, porque todas condicionan un indicador de la tesis o la integridad del dominio.
+**Estado:** cerradas. Reabrir cualquiera exige justificación escrita, porque todas condicionan un indicador operativo o la integridad del dominio.
 
 ---
 
@@ -11,13 +11,13 @@
 
 La hora de pesaje la ingresa el usuario copiándola del ticket de balanza. La hora de registro la asigna el servidor automáticamente al persistir. La diferencia entre ambas **es** el indicador I1.
 
-Si se colapsan en un solo campo, el indicador desaparece y la dimensión D1 de la variable dependiente queda sin medición. En el código, `hora_registro` es `editable=False` y la asigna **el servicio**, no el ORM. `auto_now_add` sería incorrecto: fija la hora de inserción en la base, y para un ingreso capturado sin conexión el valor correcto es la hora de captura local que envía el cliente (ver D-03). Ningún rol puede modificarla.
+Si se colapsan en un solo campo, el indicador desaparece y la dimensión D1 de resultado queda sin medición. En el código, `hora_registro` es `editable=False` y la asigna **el servicio**, no el ORM. `auto_now_add` sería incorrecto: fija la hora de inserción en la base, y para un ingreso capturado sin conexión el valor correcto es la hora de captura local que envía el cliente (ver D-03). Ningún rol puede modificarla.
 
 ## D-02. El correlativo lo asigna el servidor, nunca el dispositivo
 
 **Módulos afectados:** M03, M07
 
-Un ingreso capturado sin conexión recibe un identificador local temporal (UUID generado en el cliente) y obtiene su correlativo definitivo al sincronizar. Si el dispositivo asignara el correlativo, dos supervisores trabajando sin conexión de forma simultánea generarían el mismo número, y la unidad de análisis de la tesis dejaría de ser identificable de forma única.
+Un ingreso capturado sin conexión recibe un identificador local temporal (UUID generado en el cliente) y obtiene su correlativo definitivo al sincronizar. Si el dispositivo asignara el correlativo, dos supervisores trabajando sin conexión de forma simultánea generarían el mismo número, y la unidad de registro del sistema dejaría de ser identificable de forma única.
 
 Implementación: transacción con bloqueo sobre la tabla de correlativos, o secuencia de PostgreSQL. Nunca `MAX(correlativo) + 1` fuera de transacción.
 
@@ -42,7 +42,7 @@ Por eso M07 figura en la semana 4 del cronograma y no en la 8, y por eso el esqu
 
 **Módulo afectado:** M09
 
-I5 mide el tiempo de recuperación del dato de un ingreso concreto (por padrón, fecha, placa o producto). Ninguno de los diez requerimientos originales cubría búsqueda por criterios. Sin ella, I5 no mejora en el postest y la dimensión D3 queda sin efecto medible. Se incorporó como RF-11.
+I5 mide el tiempo de recuperación del dato de un ingreso concreto (por padrón, fecha, placa o producto). Ninguno de los diez requerimientos originales cubría búsqueda por criterios. Sin ella, I5 no mejora en la medición posterior y la dimensión D3 queda sin efecto medible. Se incorporó como RF-11.
 
 ## D-06. El tipo de vehículo (propio / externo) es un atributo del catálogo, no texto libre
 
@@ -55,7 +55,7 @@ El hallazgo central del diagnóstico es que los volquetes propios se registran p
 
 **Módulos afectados:** M03, M08
 
-Un ingreso registrado no se elimina físicamente. Se marca como anulado, con motivo y responsable, y permanece en el histórico. La razón es metodológica: si durante la ventana de observación un registro pudiera desaparecer, no se podría demostrar ante el jurado que la cobertura del postest no fue depurada retroactivamente.
+Un ingreso registrado no se elimina físicamente. Se marca como anulado, con motivo y responsable, y permanece en el histórico. La razón es de trazabilidad: si durante el periodo de medición un registro pudiera desaparecer, no se podría demostrar ante la gerencia que la cobertura del histórico no fue depurada retroactivamente.
 
 ## D-08. Las reglas de negocio no se replican en el cliente como fuente de verdad
 
@@ -69,13 +69,13 @@ Angular puede validar en el formulario para mejorar la experiencia, pero la vali
 **Indicadores en juego:** I3, I5
 
 Cada app separa la lectura (`repositories/`) de la escritura (`services/`). La razón es de rendimiento
-con consecuencia metodológica: I3 mide el tiempo de determinación del stock e I5 el de recuperación de
+con consecuencia sobre la medición: I3 mide el tiempo de determinación del stock e I5 el de recuperación de
 un ingreso. Ambas son consultas que habrá que optimizar —`select_related`, índices, agregados— y esa
 optimización no debe obligar a tocar la lógica de escritura ni a rehacer sus pruebas.
 
 Lo que **no** es: el patrón Repository clásico, pensado para aislar un ORM que se quiere poder
 sustituir. Django ORM ya es la capa de acceso a datos, y envolverlo en una interfaz con una sola
-implementación es ceremonia que en sustentación se defiende peor que su ausencia. En consecuencia:
+implementación es ceremonia que en la revisión técnica se defiende peor que su ausencia. En consecuencia:
 
 - Una clase concreta por entidad (`RepositorioIngreso`), sin `Protocol` ni clase base abstracta.
 - No escribe: ni `save()`, ni `create()`, ni `update()`, ni `delete()`.
@@ -85,7 +85,7 @@ implementación es ceremonia que en sustentación se defiende peor que su ausenc
   sustituirla — el generador de correlativo (D-02), el reloj y los exportadores de M06 la exigen; un
   repositorio de productos, no.
 
-Pregunta previsible en sustentación: «¿por qué repositorios sobre un ORM que ya abstrae la base?».
+Pregunta previsible en la revisión técnica: «¿por qué repositorios sobre un ORM que ya abstrae la base?».
 La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
 
 ## D-10. M06 y M09 son apps de lectura: no tienen `models/` ni `migrations/`
@@ -127,14 +127,14 @@ antemano, porque la segunda implementación ya existe.
 ## D-11. El frontend vive en un repositorio separado, con capas dentro de cada feature
 
 **Módulos afectados:** todos los del cliente
-**Indicador en juego:** ninguno de forma directa; protege la ventana de observación
+**Indicador en juego:** ninguno de forma directa; protege el periodo de medición
 
 Dos decisiones en una, porque se tomaron juntas.
 
 **Repositorio aparte.** El frontend se despliega como archivos estáticos y el backend como servicio
 con base de datos: dos ciclos de vida distintos. Con un solo repositorio, un cambio de estilos obliga
 a reconstruir y volver a desplegar la API, y todo despliegue en producción durante la ventana de
-observación es una amenaza a la validez interna (`ARQ-02` §7). El costo es que el contrato de la API
+observación es un cambio no controlado en las condiciones de medición (`ARQ-02` §7). El costo es que el contrato de la API
 deja de estar garantizado por el compilador; se compensa con el esquema OpenAPI en `/api/v1/docs/`
 como contrato, la misma convención de commits en ambos historiales y una etiqueta `M{nn}-cerrado`
 puesta el mismo día en los dos repositorios.
@@ -143,7 +143,7 @@ puesta el mismo día en los dos repositorios.
 `HttpClient`), `pages/` (componentes ruteados, con estado) y `ui/` (presentacionales, sin estado). Es
 la misma separación por motivo de cambio que ya se aplica en el servidor. La consecuencia verificable
 es que un componente de `ui/` se prueba con entradas y salidas, sin `HttpTestingController`: eso es
-lo que sostiene la característica *capacidad de ser probado* de ISO/IEC 25010 que afirma la tesis.
+lo que sostiene la característica *capacidad de ser probado* de ISO/IEC 25010 que declara este sistema.
 
 Se descartó un monorepo Nx: aporta límites de dependencia y build incremental, que rinden con varios
 equipos y varias aplicaciones. Aquí hay una aplicación, un desarrollador y ocho semanas.
@@ -158,4 +158,4 @@ D-04 prohíbe.
 |---|---|---|
 | Criterio de estimación de merma por humedad | M04, indicador I4 | Antes de la semana 5 |
 | Formato oficial de declaración semestral | M06 | Antes de la semana 7 |
-| Confirmación de tamaño de muestra para D3 con la asesora | Análisis inferencial | Antes de cerrar el capítulo III |
+| Definición del volumen mínimo de registros para evaluar D3 | Seguimiento de indicadores | Antes de cerrar el periodo de medición |

@@ -41,7 +41,7 @@ Combinar el evento `online` con una verificación efectiva contra un endpoint li
 
 La hora de captura proviene del dispositivo y puede estar desajustada. RN-M07-02 rechaza horas futuras en el servidor, pero un reloj **atrasado** produciría latencias infladas sin ser detectado.
 
-Mitigación: al iniciar sesión, el cliente compara su hora con la del servidor y almacena el desfase; si supera unos minutos, muestra una advertencia al usuario. Documentar esta limitación en el capítulo de limitaciones de la tesis: es una amenaza a la validez de la medición de I1 que se mitiga pero no se elimina.
+Mitigación: al iniciar sesión, el cliente compara su hora con la del servidor y almacena el desfase; si supera unos minutos, muestra una advertencia al usuario. Documentar esta limitación en el registro de limitaciones conocidas del sistema: es un riesgo para la confiabilidad de la medición de I1 que se mitiga pero no se elimina.
 
 ## Backend (Django)
 

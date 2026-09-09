@@ -11,4 +11,4 @@
 | RNF-M01-05 | Usabilidad | El formulario de inicio de sesión es operable desde un teléfono en campo, con campos de al menos 44 px de alto | Inspección en dispositivo real |
 | RNF-M01-06 | Fiabilidad | La expiración de sesión no provoca pérdida de datos no guardados en el formulario de ingreso | Prueba manual: expirar sesión con formulario a medio llenar |
 
-**Nota sobre el indicador de la variable independiente:** RNF-M01-04 forma parte de la evidencia de *eficiencia de desempeño* bajo ISO/IEC 25010:2023, dimensión declarada en el capítulo II de la tesis. El protocolo de carga se documenta en `../../03-pruebas/`.
+**Nota sobre los objetivos de calidad:** RNF-M01-04 forma parte de la evidencia de *eficiencia de desempeño* bajo ISO/IEC 25010:2023, dimensión declarada en el análisis de calidad del sistema. El protocolo de carga se documenta en `../../03-pruebas/`.

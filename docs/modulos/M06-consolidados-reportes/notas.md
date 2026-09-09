@@ -33,7 +33,7 @@ class ExportadorExcel(ExportadorReporte): ...
 class ExportadorPDF(ExportadorReporte): ...
 ```
 
-Una fábrica resuelve el formato solicitado. `ServicioConsolidado` nunca importa `ExportadorExcel` directamente: recibe la abstracción. Este es el ejemplo concreto de abierto/cerrado y de inversión de dependencias en el proyecto, y conviene tenerlo identificado para sustentación.
+Una fábrica resuelve el formato solicitado. `ServicioConsolidado` nunca importa `ExportadorExcel` directamente: recibe la abstracción. Este es el ejemplo concreto de abierto/cerrado y de inversión de dependencias en el proyecto, y conviene tenerlo identificado para la revisión técnica.
 
 - Excel con `openpyxl`. Los números se escriben como números, no como cadenas (CA01): un valor numérico guardado como texto rompe las fórmulas del usuario y es un error frecuente.
 - PDF con `ReportLab`. El encabezado con periodo, fecha de generación y usuario es obligatorio (RN-M06-06).

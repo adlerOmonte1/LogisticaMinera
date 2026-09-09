@@ -13,4 +13,4 @@
 
 ## Nota sobre RS-M06-05
 
-La exportación se implementa con una interfaz común y una estrategia por formato (`ExportadorExcel`, `ExportadorPDF`). Añadir el formato de la declaración semestral no debe requerir modificar el código existente de los exportadores: es la aplicación concreta del principio de abierto/cerrado en este proyecto, y el ejemplo que conviene tener preparado para sustentación.
+La exportación se implementa con una interfaz común y una estrategia por formato (`ExportadorExcel`, `ExportadorPDF`). Añadir el formato de la declaración semestral no debe requerir modificar el código existente de los exportadores: es la aplicación concreta del principio de abierto/cerrado en este proyecto, y el ejemplo que conviene tener preparado para la revisión técnica.

@@ -23,7 +23,7 @@
 | Administrativo | Registro de ingresos y salidas, consultas, reportes y exportaciones |
 | Supervisor | Registro de ingresos y consulta de existencias |
 
-**Prioridades:** Crítica (bloquea a otras historias) · Alta (afecta a un indicador de la tesis) · Media (mejora la operación) · Baja (deseable)
+**Prioridades:** Crítica (bloquea a otras historias) · Alta (afecta a un indicador operativo) · Media (mejora la operación) · Baja (deseable)
 
 ---
 
@@ -258,7 +258,7 @@ Como administrador, quiero registrar los vehículos indicando si son propios o d
 
 **Descripción**
 
-El sistema debe mantener el padrón de vehículos que ingresan a planta, distinguiendo los de propiedad de la empresa de los contratados por viaje. Esta distinción es la base de uno de los indicadores del estudio y no puede quedar como texto libre: debe ser un campo controlado.
+El sistema debe mantener el padrón de vehículos que ingresan a planta, distinguiendo los de propiedad de la empresa de los contratados por viaje. Esta distinción es la base de uno de los indicadores operativos y no puede quedar como texto libre: debe ser un campo controlado.
 
 **Detalles**
 - Placa (obligatoria, única, formato validado).
@@ -364,7 +364,7 @@ Como supervisor de planta, quiero registrar el ingreso de un volquete con los da
 
 **Descripción**
 
-Es la historia central del sistema. El formulario debe reproducir los campos del ticket de balanza y permitir su captura en el punto de pesaje. El sistema registra dos marcas de tiempo distintas: la hora de pesaje, que ingresa el usuario desde el ticket, y la hora de registro, que genera automáticamente. La diferencia entre ambas es el indicador de latencia del estudio.
+Es la historia central del sistema. El formulario debe reproducir los campos del ticket de balanza y permitir su captura en el punto de pesaje. El sistema registra dos marcas de tiempo distintas: la hora de pesaje, que ingresa el usuario desde el ticket, y la hora de registro, que genera automáticamente. La diferencia entre ambas es el indicador de latencia de registro.
 
 **Detalles**
 - Fecha de pesaje (obligatoria, no puede ser posterior a la fecha actual).
@@ -404,11 +404,11 @@ Es la historia central del sistema. El formulario debe reproducir los campos del
 
 **Historia de Usuario**
 
-Como investigador, quiero que el sistema exija y valide la fecha y hora de pesaje, para que la latencia entre el pesaje y la disponibilidad del dato pueda medirse de forma confiable.
+Como responsable del sistema, quiero que el sistema exija y valide la fecha y hora de pesaje, para que la latencia entre el pesaje y la disponibilidad del dato pueda medirse de forma confiable.
 
 **Descripción**
 
-La hora de pesaje es el dato del que depende un indicador del estudio. El sistema debe impedir que quede vacía, que sea posterior al momento del registro o que corresponda a una fecha futura. Cuando la antigüedad supera las setenta y dos horas, el sistema solicita una confirmación explícita, para distinguir el registro tardío legítimo del error de digitación.
+La hora de pesaje es el dato del que depende uno de los indicadores operativos. El sistema debe impedir que quede vacía, que sea posterior al momento del registro o que corresponda a una fecha futura. Cuando la antigüedad supera las setenta y dos horas, el sistema solicita una confirmación explícita, para distinguir el registro tardío legítimo del error de digitación.
 
 **Detalles**
 - Campo obligatorio, sin valor por defecto.
@@ -440,11 +440,11 @@ La hora de pesaje es el dato del que depende un indicador del estudio. El sistem
 
 **Historia de Usuario**
 
-Como investigador, quiero que cada ingreso reciba un número correlativo único e inmutable, para disponer de un marco muestral auditable y poder identificar cualquier ingreso de forma inequívoca.
+Como responsable del sistema, quiero que cada ingreso reciba un número correlativo único e inmutable, para disponer de un padrón auditable y poder identificar cualquier ingreso de forma inequívoca.
 
 **Descripción**
 
-El número correlativo es el identificador que vincula el registro del sistema con el padrón de la investigación, con las solicitudes de recuperación de datos y con la verificación en el consolidado. Lo asigna el servidor, es secuencial sin saltos y no puede editarse ni reutilizarse.
+El número correlativo es el identificador que vincula el registro del sistema con el padrón de control de la empresa, con las solicitudes de recuperación de datos y con la verificación en el consolidado. Lo asigna el servidor, es secuencial sin saltos y no puede editarse ni reutilizarse.
 
 **Detalles**
 - Formato: `ING-{año}-{correlativo de cinco dígitos}`, por ejemplo ING-2027-00001.
@@ -663,7 +663,7 @@ Como supervisor de planta, quiero registrar la pérdida de peso del mineral por 
 
 **Descripción**
 
-La merma por humedad es una causa documentada de la diferencia entre el stock declarado y el calculado. El sistema debe registrarla como un movimiento propio, distinto de la salida por venta, indicando el criterio de estimación aplicado. Esta separación es la que permite interpretar el indicador de desviación del estudio.
+La merma por humedad es una causa documentada de la diferencia entre el stock declarado y el calculado. El sistema debe registrarla como un movimiento propio, distinto de la salida por venta, indicando el criterio de estimación aplicado. Esta separación es la que permite interpretar el indicador de desviación de inventario.
 
 **Detalles**
 - Fecha de la merma (obligatoria, no futura).
@@ -807,11 +807,11 @@ El kardex presenta todos los movimientos de un producto ordenados en el tiempo, 
 
 **Historia de Usuario**
 
-Como investigador, quiero consultar el stock que tenía cada producto en una fecha pasada, para poder contrastarlo con la cifra declarada por el supervisor en esa misma fecha.
+Como responsable del sistema, quiero consultar el stock que tenía cada producto en una fecha pasada, para poder contrastarlo con la cifra declarada por el supervisor en esa misma fecha.
 
 **Descripción**
 
-Esta historia habilita directamente el indicador de desviación del estudio. El sistema debe reconstruir el saldo de cualquier producto a una fecha determinada, considerando únicamente los movimientos ocurridos hasta esa fecha.
+Esta historia habilita directamente el indicador de desviación de inventario. El sistema debe reconstruir el saldo de cualquier producto a una fecha determinada, considerando únicamente los movimientos ocurridos hasta esa fecha.
 
 **Detalles**
 - Fecha de corte (obligatoria, no futura).
@@ -849,7 +849,7 @@ Como administrativo, quiero generar el consolidado de producción de un mes, par
 
 **Descripción**
 
-El consolidado es el documento que la empresa dejó de producir y cuya ausencia motiva el estudio. Debe generarse a demanda, en el momento, y presentar el total ingresado, su desagregación por producto y el stock de cierre. Incluye además el detalle de los ingresos del periodo con su número correlativo, condición necesaria para verificar la trazabilidad de cada ingreso.
+El consolidado es el documento que la empresa dejó de producir y cuya ausencia motiva este proyecto. Debe generarse a demanda, en el momento, y presentar el total ingresado, su desagregación por producto y el stock de cierre. Incluye además el detalle de los ingresos del periodo con su número correlativo, condición necesaria para verificar la trazabilidad de cada ingreso.
 
 **Detalles**
 - Selección del mes y año.
@@ -995,7 +995,7 @@ Como supervisor de planta, quiero registrar el ingreso de un volquete aunque no 
 
 **Descripción**
 
-Esta es la historia que ataca la causa raíz identificada en el estudio: los volquetes llegan fuera del horario administrativo y en un entorno con conectividad intermitente. El sistema debe almacenar el ingreso localmente y encolarlo para su envío posterior, aplicando las mismas validaciones que en el modo conectado.
+Esta es la historia que ataca la causa raíz identificada en el diagnóstico: los volquetes llegan fuera del horario administrativo y en un entorno con conectividad intermitente. El sistema debe almacenar el ingreso localmente y encolarlo para su envío posterior, aplicando las mismas validaciones que en el modo conectado.
 
 **Detalles**
 - El formulario opera sin conexión con los catálogos almacenados en caché.
@@ -1099,11 +1099,11 @@ La confianza en el modo sin conexión depende de que el usuario sepa qué está 
 
 **Historia de Usuario**
 
-Como investigador, quiero que un ingreso capturado sin conexión no pueda registrarse dos veces, para que el padrón no contenga duplicados que invaliden el conteo de la muestra.
+Como responsable del sistema, quiero que un ingreso capturado sin conexión no pueda registrarse dos veces, para que el padrón no contenga duplicados que invaliden el conteo de ingresos.
 
 **Descripción**
 
-Un envío repetido por reintento, por doble sincronización o por reinstalación de la aplicación no debe generar dos registros. El servidor debe reconocer el identificador local del dispositivo y descartar los envíos ya procesados. Esta historia protege la integridad del marco muestral del estudio.
+Un envío repetido por reintento, por doble sincronización o por reinstalación de la aplicación no debe generar dos registros. El servidor debe reconocer el identificador local del dispositivo y descartar los envíos ya procesados. Esta historia protege la integridad del padrón de ingresos.
 
 **Detalles**
 - Cada ingreso capturado localmente recibe un identificador único generado en el dispositivo.
@@ -1137,7 +1137,7 @@ Un envío repetido por reintento, por doble sincronización o por reinstalación
 
 **Historia de Usuario**
 
-Como investigador, quiero que el sistema registre automáticamente quién realizó cada operación y cuándo, para que los datos del estudio sean verificables por un tercero.
+Como responsable del sistema, quiero que el sistema registre automáticamente quién realizó cada operación y cuándo, para que los datos registrados sean verificables por un tercero.
 
 **Descripción**
 
@@ -1177,7 +1177,7 @@ Como administrador, quiero consultar el registro de eventos filtrando por usuari
 
 **Descripción**
 
-El sistema debe ofrecer una vista de consulta del registro de auditoría, de solo lectura, con filtros que permitan localizar un evento concreto. Esta vista es la que permite a un tercero contrastar los datos reportados en la investigación.
+El sistema debe ofrecer una vista de consulta del registro de auditoría, de solo lectura, con filtros que permitan localizar un evento concreto. Esta vista es la que permite a un tercero contrastar los datos reportados a la gerencia.
 
 **Detalles**
 - Filtros: rango de fechas, usuario, entidad, tipo de acción.
@@ -1213,7 +1213,7 @@ Como administrativo, quiero localizar un ingreso concreto indicando su número d
 
 **Descripción**
 
-Esta historia habilita directamente el indicador de tiempo de recuperación del dato del estudio. La operación actual consiste en buscar entre fotografías y hojas de cálculo; el sistema debe reducirla a una consulta directa que devuelva el detalle completo del ingreso.
+Esta historia habilita directamente el indicador de tiempo de recuperación del dato. La operación actual consiste en buscar entre fotografías y hojas de cálculo; el sistema debe reducirla a una consulta directa que devuelva el detalle completo del ingreso.
 
 **Detalles**
 - Campo de búsqueda accesible desde la pantalla principal.
@@ -1271,7 +1271,7 @@ No siempre se conoce el correlativo del ingreso que se busca. El sistema debe pe
 
 # Trazabilidad
 
-| Historia | RF | Indicador de la tesis | Semana |
+| Historia | RF | Indicador operativo | Semana |
 |---|---|---|---|
 | HU-M01-01 a HU-M01-05 | RF-08 | — | 1 |
 | HU-M02-01 a HU-M02-04 | RF-03 | I2 | 2 |

@@ -11,6 +11,6 @@
 
 ## Contexto del diagnóstico
 
-RU-M03-01 responde al problema central identificado en el Capítulo I: hoy el dato del ticket de balanza tarda horas —a veces días— en llegar a un registro consultable, porque depende de que alguien fotografíe el ticket y lo transcriba en la oficina. Esa demora es exactamente lo que mide el indicador I1.
+RU-M03-01 responde al problema central identificado en el diagnóstico inicial: hoy el dato del ticket de balanza tarda horas —a veces días— en llegar a un registro consultable, porque depende de que alguien fotografíe el ticket y lo transcriba en la oficina. Esa demora es exactamente lo que mide el indicador I1.
 
-RU-M03-06 responde a una exigencia metodológica además de operativa: durante la ventana de observación del postest, ningún registro puede desaparecer, o no sería posible demostrar que la cobertura no fue depurada retroactivamente.
+RU-M03-06 responde a una exigencia de trazabilidad además de operativa: durante el periodo de medición, ningún registro puede desaparecer, o no sería posible demostrar que la cobertura no fue depurada retroactivamente.

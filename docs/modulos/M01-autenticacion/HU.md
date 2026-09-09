@@ -1,6 +1,6 @@
 # Historias de usuario — M01 Autenticación y control de acceso
 
-**RF asociado:** RF-08 · **Indicador de tesis:** — (habilitante) · **Semana:** 1 · **Historias:** 5
+**RF asociado:** RF-08 · **Indicador:** — (habilitante) · **Semana:** 1 · **Historias:** 5
 
 ---
 

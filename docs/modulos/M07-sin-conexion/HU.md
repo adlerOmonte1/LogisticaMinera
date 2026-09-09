@@ -1,6 +1,6 @@
 # Historias de usuario — M07 Captura sin conexión (PWA)
 
-**RF asociado:** RF-10 · **Indicadores de tesis:** I1, I2 · **Semana:** 4 · **Historias:** 5
+**RF asociado:** RF-10 · **Indicadores:** I1, I2 · **Semana:** 4 · **Historias:** 5
 
 > Módulo diferenciador. Deriva de una restricción documentada: la conectividad en planta es intermitente. Si el registro exigiera conexión, la latencia (I1) no bajaría en las horas sin señal y la cobertura (I2) se degradaría justamente en los turnos con más ingresos.
 

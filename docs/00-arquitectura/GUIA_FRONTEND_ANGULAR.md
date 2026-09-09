@@ -10,8 +10,8 @@
 
 El frontend se despliega como estáticos y el backend como servicio con base de datos: son dos ciclos
 de vida distintos. Separarlos evita reconstruir y volver a desplegar la API por un cambio de estilos,
-que en la ventana de observación del postest es exactamente lo que hay que evitar (todo despliegue en
-producción es una amenaza a la validez interna, `ARQ-02` §7).
+que en el periodo de medición es exactamente lo que hay que evitar (todo despliegue en
+producción es un cambio no controlado en las condiciones de medición, `ARQ-02` §7).
 
 El precio es que el contrato de la API deja de estar garantizado por el compilador. Las tres reglas
 que lo compensan están en §7.
@@ -57,7 +57,7 @@ cada capa tiene un motivo de cambio distinto.
 
 La ganancia concreta: un componente de `ui/` que no inyecta servicios se prueba con entradas y
 salidas, sin `HttpTestingController`. Eso sostiene la característica *capacidad de ser probado* de
-ISO/IEC 25010 que afirma la tesis, y se enseña en sustentación abriendo una carpeta.
+ISO/IEC 25010 que declara este sistema, y se enseña en la revisión técnica abriendo una carpeta.
 
 ### Opción C — Monorepo Nx con librerías
 
@@ -266,7 +266,7 @@ terminado es el par completo, no la mitad.
 
 Lo que se pierde al separarlos hay que reponerlo con disciplina. Tres reglas:
 
-**1. La documentación no se duplica.** `docs/` vive solo en el repositorio de la tesis. El repositorio
+**1. La documentación no se duplica.** `docs/` vive solo en el repositorio de documentación. El repositorio
 del frontend lleva un `README.md` que enlaza a él y no repite ni requerimientos ni historias. Dos
 copias de una historia divergen y la trazabilidad muere ahí.
 
@@ -275,8 +275,8 @@ hora de registro (HU-M03-01)`. La cadena `indicador → RF → módulo → HU �
 tiene que poder reconstruirse aunque los commits estén repartidos en dos historiales.
 
 **3. Etiqueta las dos puntas cuando el par module esté cerrado.** `git tag M03-cerrado` en los dos
-repositorios, el mismo día. Es lo que permite responder en sustentación con qué versión exacta del
-sistema se recolectó el postest.
+repositorios, el mismo día. Es lo que permite responder en la revisión técnica con qué versión exacta del
+sistema se recolectó la medición posterior.
 
 Y una consecuencia operativa: `/api/v1/docs/` (el esquema OpenAPI que sirve el backend) pasa a ser el
 contrato entre ambos repositorios. Si cambia un serializer, se revisa ahí antes de tocar `models/`.

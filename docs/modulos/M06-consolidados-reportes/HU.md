@@ -1,6 +1,6 @@
 # Historias de usuario — M06 Consolidados y reportes
 
-**RF asociados:** RF-06, RF-07 · **Indicador de tesis:** I6 · **Semana:** 7 · **Historias:** 3
+**RF asociados:** RF-06, RF-07 · **Indicador:** I6 · **Semana:** 7 · **Historias:** 3
 
 > El indicador I6 mide el porcentaje de meses con reporte de producción consolidado disponible. La empresa tuvo ese reporte y lo perdió por falta de tiempo; este módulo lo restituye de forma automática.
 

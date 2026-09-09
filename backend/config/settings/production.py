@@ -1,7 +1,7 @@
-"""Producción: entorno donde se recolecta el postest de la tesis.
+"""Producción: entorno sobre el que se miden los indicadores operativos del sistema.
 
-Todo despliegue posterior al inicio de la ventana de observación debe registrarse: introduce una
-amenaza a la validez interna (ARQ-02 §7).
+Todo despliegue posterior al inicio del periodo de medición debe registrarse: introduce un cambio
+no controlado en las condiciones de medición (ARQ-02 §7).
 """
 
 from .base import *  # noqa: F401,F403

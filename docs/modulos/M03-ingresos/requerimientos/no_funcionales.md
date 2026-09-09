@@ -11,12 +11,12 @@
 | RNF-M03-07 | Adecuación funcional — corrección | El peso neto calculado por el servidor coincide con la diferencia bruto − tara en el 100 % de los registros | Consulta de verificación sobre la base |
 | RNF-M03-08 | Seguridad — no repudio | Todo ingreso queda asociado de forma inmutable al usuario que lo registró | Inspección: campo no editable, evento en auditoría |
 
-## Relación con la variable independiente
+## Relación con los objetivos de calidad
 
-RNF-M03-01, RNF-M03-02 y RNF-M03-03 constituyen la evidencia de la dimensión *eficiencia de desempeño* de la variable independiente bajo ISO/IEC 25010:2023. El protocolo de medición está en `../../03-pruebas/plan_de_pruebas.md`.
+RNF-M03-01, RNF-M03-02 y RNF-M03-03 constituyen la evidencia de la dimensión *eficiencia de desempeño* de la solución implantada bajo ISO/IEC 25010:2023. El protocolo de medición está en `../../03-pruebas/plan_de_pruebas.md`.
 
 RNF-M03-03 merece atención especial: el tiempo de llenado del formulario es un componente del indicador I1. Si el formulario es lento de completar, la latencia no baja lo suficiente aunque el registro sea inmediato. Un formulario de treinta campos anularía el beneficio del sistema.
 
 ## Relación con el indicador I1
 
-RNF-M03-06 es más que una comodidad. Si el formulario pierde los datos al caerse la conexión, el supervisor abandona el registro en campo y vuelve al método antiguo: anotar en papel y transcribir después. Eso devolvería la latencia a los valores del pretest.
+RNF-M03-06 es más que una comodidad. Si el formulario pierde los datos al caerse la conexión, el supervisor abandona el registro en campo y vuelve al método antiguo: anotar en papel y transcribir después. Eso devolvería la latencia a los valores de la línea base.

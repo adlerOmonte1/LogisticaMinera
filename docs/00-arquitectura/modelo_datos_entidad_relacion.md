@@ -89,7 +89,7 @@ erDiagram
 | ruc | varchar(11) | |
 | activo | boolean | |
 
-### INGRESO (M03) — unidad de análisis de la tesis
+### INGRESO (M03) — unidad de registro del sistema
 
 | Campo | Tipo | Notas |
 |---|---|---|
@@ -167,7 +167,7 @@ Tabla de asiento. Todo ingreso y toda salida generan exactamente un movimiento; 
 | `idx_ingreso_vehiculo` | INGRESO(id_vehiculo) | I2 — cobertura por titularidad |
 | `idx_movimiento_producto_fecha` | MOVIMIENTO_STOCK(id_producto, fecha_movimiento) | I3 — cálculo de stock |
 
-Sin estos índices, el indicador I5 no mejora de forma apreciable frente al proceso manual cuando el volumen de registros crece. Es una decisión de rendimiento con consecuencia metodológica directa.
+Sin estos índices, el indicador I5 no mejora de forma apreciable frente al proceso manual cuando el volumen de registros crece. Es una decisión de rendimiento con consecuencia directa sobre la medición.
 
 ## 4. Pendiente
 

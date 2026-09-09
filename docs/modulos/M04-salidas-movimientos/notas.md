@@ -31,4 +31,4 @@
 
 ## Bloqueo activo
 
-Este módulo **no puede cerrarse** hasta que se defina el criterio de estimación de merma por humedad. Se puede implementar la funcionalidad completa —el tipo MERMA es un enumerado más—, pero la interpretación del indicador I4 queda suspendida. Consultar con la asesora antes de la semana 5.
+Este módulo **no puede cerrarse** hasta que se defina el criterio de estimación de merma por humedad. Se puede implementar la funcionalidad completa —el tipo MERMA es un enumerado más—, pero la interpretación del indicador I4 queda suspendida. Consultar con la jefatura de operaciones antes de la semana 5.

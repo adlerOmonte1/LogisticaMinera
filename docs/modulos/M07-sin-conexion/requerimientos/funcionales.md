@@ -67,4 +67,4 @@ Cada elemento se procesa de forma independiente: el rechazo de uno no impide el 
 | Generar reportes | No |
 | Registrar salidas | No |
 
-El alcance offline se limita deliberadamente al registro de ingresos. Ampliarlo a salidas o existencias exigiría resolver conflictos de saldo entre dispositivos, complejidad que no aporta a ningún indicador de la tesis.
+El alcance offline se limita deliberadamente al registro de ingresos. Ampliarlo a salidas o existencias exigiría resolver conflictos de saldo entre dispositivos, complejidad que no aporta a ningún indicador operativo.

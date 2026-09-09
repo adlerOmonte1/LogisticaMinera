@@ -8,4 +8,4 @@
 | RNF-M04-04 | Usabilidad — protección contra errores | La advertencia de stock insuficiente exige confirmación explícita, no se descarta con un clic accidental | Inspección funcional |
 | RNF-M04-05 | Adecuación funcional — pertinencia | El sistema no solicita ni almacena precios, montos ni datos de facturación | Inspección del modelo de datos |
 
-**RNF-M04-05 es una restricción de alcance con valor defensivo.** Está declarada explícitamente para poder responder en sustentación por qué el sistema no factura: no es una omisión, es una decisión documentada (ver ARQ-01 §5).
+**RNF-M04-05 es una restricción de alcance con valor defensivo.** Está declarada explícitamente para poder responder en la revisión técnica por qué el sistema no factura: no es una omisión, es una decisión documentada (ver ARQ-01 §5).

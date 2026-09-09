@@ -1,7 +1,7 @@
 # Convenciones de códigos y nomenclatura
 
 **Documento:** transversal
-**Aplica a:** documentación, código fuente, historias de usuario y capítulos de la tesis
+**Aplica a:** documentación, código fuente, historias de usuario y documentación de arquitectura
 
 ---
 
@@ -17,10 +17,10 @@ Requerimiento de sistema   RS-Mxx-nn              (por módulo)
 Historia de usuario        HU-Mxx-nn              (por módulo)
 Criterio de aceptación     CAnn                   (dentro de una historia)
 Caso de prueba             CP-RF-xx-nn
-Indicador de la tesis      I1 … I6                (variable dependiente)
+Indicador operativo        I1 … I6                (resultados operativos)
 ```
 
-Los RF son globales porque muchos cruzan más de un módulo y porque son los que aparecen en la tesis. Los RNF, RN, RU y RS se numeran por módulo porque su alcance es local.
+Los RF son globales porque muchos cruzan más de un módulo y porque son los que aparecen en la documentación de requisitos. Los RNF, RN, RU y RS se numeran por módulo porque su alcance es local.
 
 ## 2. Por qué los cinco tipos de requisito están separados
 
@@ -61,14 +61,14 @@ develop                   Integración
 feature/M03-ingresos      Una rama por módulo
 ```
 
-Formato de commit: `M03: registra hora de pesaje separada de hora de registro (HU-M03-01)`. Referenciar siempre la historia de usuario permite reconstruir la trazabilidad desde el historial de git, evidencia útil en sustentación.
+Formato de commit: `M03: registra hora de pesaje separada de hora de registro (HU-M03-01)`. Referenciar siempre la historia de usuario permite reconstruir la trazabilidad desde el historial de git, evidencia útil en la revisión técnica.
 
 ## 5. Trazabilidad bidireccional
 
 Toda historia se nombra con el módulo al que pertenece. En consecuencia, desde cualquier punto se puede navegar en ambos sentidos:
 
 ```
-Indicador de la tesis  ->  RF  ->  Módulo  ->  HU  ->  Caso de prueba  ->  Commit
+Indicador operativo  ->  RF  ->  Módulo  ->  HU  ->  Caso de prueba  ->  Commit
 ```
 
-Esta cadena es lo que permite responder en sustentación a la pregunta "¿cómo demuestra que el sistema mejoró el indicador?" sin improvisar.
+Esta cadena es lo que permite responder en la revisión técnica a la pregunta "¿cómo demuestra que el sistema mejoró el indicador?" sin improvisar.
