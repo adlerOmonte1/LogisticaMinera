@@ -23,9 +23,15 @@ class UsuarioDetailSerializer(serializers.ModelSerializer):
 def _validar_rol(valor):
     """`valor` llega como el código del choice (p. ej. "SUPERVISOR"); se
     resuelve a la instancia `Rol` aquí para que `services.usuarios` reciba
-    siempre el objeto, nunca la cadena (RN-M01-02)."""
-    rol, _ = Rol.objects.get_or_create(nombre=valor)
-    return rol
+    siempre el objeto, nunca la cadena (RN-M01-02).
+
+    Los tres roles se siembran en la migración `0002_roles_iniciales`; este
+    validador solo lee, nunca crea (solid-proyecto: un serializer no escribe).
+    """
+    try:
+        return Rol.objects.get(nombre=valor)
+    except Rol.DoesNotExist as exc:
+        raise serializers.ValidationError("Rol no reconocido") from exc
 
 
 class UsuarioCreateSerializer(serializers.Serializer):

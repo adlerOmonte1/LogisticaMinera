@@ -38,6 +38,7 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "corsheaders",
     "drf_spectacular",
+    "rest_framework_simplejwt.token_blacklist",  # HU-M01-02: invalidación de refresh en logout
 ]
 
 # Una app por módulo (ARQ-01). El orden espeja el código del módulo.
@@ -90,10 +91,8 @@ TEMPLATES = [
 
 DATABASES = {"default": env.db("DATABASE_URL")}
 
-# TODO (M01, semana 1): descomentar al crear el modelo `Usuario`.
-# Debe quedar fijado ANTES del primer `migrate`: cambiar AUTH_USER_MODEL con
-# migraciones ya aplicadas obliga a recrear la base.
-# AUTH_USER_MODEL = "accounts.Usuario"
+# Fijado antes del primer `migrate` (cambiarlo después obliga a recrear la base).
+AUTH_USER_MODEL = "accounts.Usuario"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -127,7 +126,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Provisional: se reemplaza por utils.paginacion.PaginacionEstandar al escribir utils/.
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    # "EXCEPTION_HANDLER": "utils.manejador_errores.manejador_uniforme",
+    "EXCEPTION_HANDLER": "utils.manejador_errores.manejador_uniforme",
 }
 
 SIMPLE_JWT = {

@@ -1,13 +1,3 @@
-"""Manejador uniforme de errores de la API (backend-django, "Contrato de la API").
-
-Toda respuesta de error de la API tiene la forma:
-
-    {"codigo": "...", "mensaje": "...", "detalles": {...}}
-
-`mensaje` coincide literalmente con el criterio de aceptación de la historia
-que protege. Las pruebas lo verifican por igualdad exacta.
-"""
-
 from rest_framework import exceptions as drf_exceptions
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as manejador_por_defecto
@@ -19,6 +9,7 @@ from common.excepciones import (
     ErrorDeValidacionDeDominio,
 )
 from common.eventos import registrador_por_defecto
+from common.red import ip_del_cliente
 
 _ESTADO_HTTP_POR_EXCEPCION = {
     ErrorDeValidacionDeDominio: 400,
@@ -34,15 +25,6 @@ def _estado_http(exc: ErrorDeDominio) -> int:
     return 400
 
 
-def _ip_del_cliente(request) -> str | None:
-    if request is None:
-        return None
-    adelante = request.META.get("HTTP_X_FORWARDED_FOR")
-    if adelante:
-        return adelante.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
-
-
 def manejador_uniforme(exc, context):
     """Reemplaza a `rest_framework.views.exception_handler` (ver settings)."""
     request = context.get("request")
@@ -54,7 +36,7 @@ def manejador_uniforme(exc, context):
             registrador_por_defecto.registrar(
                 evento="ACCESO_RECHAZADO",
                 usuario=usuario,
-                ip=_ip_del_cliente(request),
+                ip=ip_del_cliente(request),
                 detalles={"ruta": request.path if request else None, **exc.detalles},
             )
         return Response(

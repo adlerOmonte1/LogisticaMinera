@@ -5,7 +5,7 @@ Las funciones reciben instancias de `Usuario` ya resueltas por la vista
 id y el 404 son asunto de HTTP (views.py), no del dominio.
 """
 
-from apps.accounts.models import Rol, Usuario
+from apps.accounts.models import Usuario
 from apps.accounts.repositories import UsuarioRepository
 from common.excepciones import ErrorDeValidacionDeDominio
 

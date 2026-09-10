@@ -5,7 +5,8 @@ del transporte (backend-django, "Excepciones de dominio"). La vista traduce
 estas excepciones a HTTP a través de `utils.manejador_errores`.
 """
 
-from datetime import timedelta
+from collections.abc import Callable
+from datetime import datetime, timedelta
 
 from django.utils import timezone
 
@@ -49,6 +50,7 @@ def autenticar(
     *,
     ip: str | None = None,
     registrador: RegistradorDeEventos = registrador_por_defecto,
+    ahora: Callable[[], datetime] = timezone.now,
 ) -> Usuario:
     """HU-M01-01 CA01-CA05.
 
@@ -60,11 +62,15 @@ def autenticar(
     4. Contraseña correcta pero cuenta inactiva -> rechaza y NO cuenta como
        fallo (la credencial era válida).
     5. Éxito -> reinicia contador, actualiza `last_login`, registra evento.
+
+    `ahora` se inyecta para poder probar la expiración del bloqueo sin esperar
+    quince minutos reales (solid-proyecto, DIP: "inyecta el reloj").
     """
+    momento = ahora()
     usuario = UsuarioRepository.obtener_por_username(username)
 
     if usuario is not None and usuario.bloqueado_hasta is not None:
-        if usuario.bloqueado_hasta > timezone.now():
+        if usuario.bloqueado_hasta > momento:
             raise CuentaBloqueada()
         usuario.bloqueado_hasta = None
         usuario.intentos_fallidos = 0
@@ -73,7 +79,7 @@ def autenticar(
         if usuario is not None:
             usuario.intentos_fallidos += 1
             if usuario.intentos_fallidos >= MAX_INTENTOS_FALLIDOS:
-                usuario.bloqueado_hasta = timezone.now() + timedelta(minutes=MINUTOS_BLOQUEO)
+                usuario.bloqueado_hasta = momento + timedelta(minutes=MINUTOS_BLOQUEO)
             usuario.save(update_fields=["intentos_fallidos", "bloqueado_hasta"])
             if usuario.bloqueado_hasta is not None:
                 raise CuentaBloqueada()
@@ -86,7 +92,7 @@ def autenticar(
         usuario.save(update_fields=["intentos_fallidos", "bloqueado_hasta"])
         raise CuentaInactiva()
 
-    usuario.last_login = timezone.now()
+    usuario.last_login = momento
     usuario.save(update_fields=["intentos_fallidos", "bloqueado_hasta", "last_login"])
 
     registrador.registrar(evento="INICIO_DE_SESION", usuario=usuario, ip=ip, detalles={})
