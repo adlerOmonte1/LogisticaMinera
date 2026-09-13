@@ -6,6 +6,9 @@ __pycache__/
 .venv/
 venv/
 *.sqlite3
+.coverage
+htmlcov/
+.pytest_cache/
 .env
 
 # Node / Angular
