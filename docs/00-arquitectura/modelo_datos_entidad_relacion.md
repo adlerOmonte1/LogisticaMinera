@@ -126,8 +126,10 @@ erDiagram
 | id_cliente | FK -> CLIENTE | nulo si es movimiento interno |
 | tipo_movimiento | enum | VENTA / TRASLADO_INTERNO / MERMA |
 | cantidad_tn | decimal(8,2) | |
+| motivo | text | obligatorio cuando `tipo_movimiento` = MERMA (RN-M04-04) |
 | id_usuario_registro | FK -> USUARIO | |
 | estado | enum | REGISTRADO / ANULADO |
+| motivo_anulacion | text | obligatorio si estado = ANULADO (RN-M04-07) |
 
 ### MOVIMIENTO_STOCK (M05)
 
@@ -150,13 +152,15 @@ Tabla de asiento. Todo ingreso y toda salida generan exactamente un movimiento; 
 |---|---|---|
 | id_evento | PK | |
 | id_usuario | FK -> USUARIO | |
-| accion | enum | CREAR / MODIFICAR / ANULAR / EXPORTAR / INICIAR_SESION |
+| accion | enum | CREAR / MODIFICAR / ANULAR / EXPORTAR / INICIAR_SESION / CERRAR_SESION / ACCESO_RECHAZADO |
 | entidad | varchar(50) | nombre de la tabla afectada |
 | id_entidad | int | identificador del registro afectado |
 | valores_anteriores | jsonb | nulo en creación |
 | valores_nuevos | jsonb | nulo en anulación |
 | fecha_hora | datetime | |
 | direccion_ip | varchar(45) | |
+
+`CERRAR_SESION` lo exige RS-M01-08 («inicio de sesión, cierre de sesión y cambio de rol») y `ACCESO_RECHAZADO`, la regla de que toda solicitud rechazada por autorización quede registrada. El dominio vive en `common/eventos.py` (`Accion.OPCIONES`), listo para usarse como `choices` del modelo de M08.
 
 ## 3. Índices que sostienen indicadores
 

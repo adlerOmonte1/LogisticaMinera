@@ -8,7 +8,7 @@ from common.excepciones import (
     ErrorDeDominio,
     ErrorDeValidacionDeDominio,
 )
-from common.eventos import registrador_por_defecto
+from common.eventos import Accion, registrador_por_defecto
 from common.red import ip_del_cliente
 
 _ESTADO_HTTP_POR_EXCEPCION = {
@@ -34,10 +34,15 @@ def manejador_uniforme(exc, context):
             usuario = getattr(request, "user", None)
             usuario = usuario if usuario and usuario.is_authenticated else None
             registrador_por_defecto.registrar(
-                evento="ACCESO_RECHAZADO",
+                accion=Accion.ACCESO_RECHAZADO,
+                entidad="Autorizacion",
                 usuario=usuario,
                 ip=ip_del_cliente(request),
-                detalles={"ruta": request.path if request else None, **exc.detalles},
+                valores_nuevos={
+                    "ruta": request.path if request else None,
+                    "metodo": request.method if request else None,
+                    **exc.detalles,
+                },
             )
         return Response(
             {"codigo": exc.codigo, "mensaje": exc.mensaje, "detalles": exc.detalles},

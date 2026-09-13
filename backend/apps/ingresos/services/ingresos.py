@@ -13,11 +13,12 @@ from django.utils import timezone
 
 from apps.ingresos.models import Ingreso
 from apps.ingresos.repositories import IngresoRepository
-from common.eventos import RegistradorDeEventos, registrador_por_defecto
+from common.correlativo import GeneradorCorrelativo
+from common.eventos import Accion, RegistradorDeEventos, registrador_por_defecto
 from common.excepciones import ConflictoDeConcurrencia, ErrorDeValidacionDeDominio
 from common.stock import ServicioStock, servicio_stock_por_defecto
 
-from .correlativo import GeneradorCorrelativo, generador_por_defecto
+from .correlativo import generador_por_defecto
 
 # Mensajes literales — coinciden con los criterios de aceptación de HU-M03-01,
 # HU-M03-06 y HU-M03-07. Las pruebas los verifican por igualdad exacta.
@@ -27,6 +28,7 @@ MENSAJE_MOTIVO_OBLIGATORIO = "Debe indicar el motivo de la anulación"
 MENSAJE_INGRESO_ANULADO_EDICION = "No se puede editar un ingreso anulado"
 MENSAJE_INGRESO_YA_ANULADO = "El ingreso ya se encuentra anulado"
 MENSAJE_CAMPO_NO_EDITABLE = "El campo indicado no es editable"
+MENSAJE_CAPTURA_FUTURA = "La hora de captura no puede ser posterior a la hora del servidor"
 
 # RS-M03-10: ninguno de estos campos se acepta en una edición, con
 # independencia del rol. `estado` solo cambia vía anulación (D-07).
@@ -102,18 +104,46 @@ def registrar_ingreso(
     `ahora`, `generador` y `servicio_stock` se inyectan (DIP): las pruebas
     sustituyen el reloj para fijar la hora de pesaje límite, y el generador
     y el servicio de stock por dobles deterministas, sin tocar esta función.
+
+    **Este es también el punto de entrada de la cola de M07** (D-08: un
+    registro que llega por sincronización se somete a las mismas reglas que
+    uno del formulario). Para ello `datos` admite tres claves opcionales:
+
+    - `uuid_local`: identificador de captura del dispositivo (D-02). Si ya
+      existe un ingreso con ese uuid, la operación es **idempotente** y
+      devuelve el ingreso ya registrado en lugar de duplicarlo: reenviar un
+      lote no debe crear dos veces el mismo ingreso.
+    - `hora_captura_local`: pasa a ser `hora_registro` (D-03). Si no viene, se
+      usa la hora del servidor. La latencia I1 debe medir el tiempo hasta la
+      captura, no hasta que hubo señal.
+    - `hora_sincronizacion`: momento en que el lote llegó al servidor; solo
+      auditoría.
     """
     momento = ahora()
-    _validar_fecha_pesaje(datos["fecha_pesaje"], datos["hora_pesaje"], momento)
+
+    uuid_local = datos.get("uuid_local")
+    if uuid_local is not None:
+        ya_registrado = IngresoRepository.obtener_por_uuid_local(uuid_local)
+        if ya_registrado is not None:
+            return ya_registrado  # HU-M07-04: reenviar la cola no duplica.
+
+    # D-03: para un ingreso capturado sin conexión manda la hora de captura.
+    hora_registro = datos.get("hora_captura_local") or momento
+    if hora_registro > momento:
+        raise ErrorDeValidacionDeDominio(MENSAJE_CAPTURA_FUTURA, codigo="CAPTURA_FUTURA")
+
+    _validar_fecha_pesaje(datos["fecha_pesaje"], datos["hora_pesaje"], hora_registro)
     _validar_pesos(datos["peso_bruto_tn"], datos["tara_tn"])
     _validar_ticket_no_duplicado(datos["numero_ticket"])
 
     with transaction.atomic():
         ingreso = Ingreso(
-            correlativo=generador.siguiente(momento),
+            correlativo=generador.siguiente(hora_registro),
+            uuid_local=uuid_local,
             fecha_pesaje=datos["fecha_pesaje"],
             hora_pesaje=datos["hora_pesaje"],
-            hora_registro=momento,  # D-01, D-03: nunca auto_now_add.
+            hora_registro=hora_registro,  # D-01, D-03: nunca auto_now_add.
+            hora_sincronizacion=datos.get("hora_sincronizacion"),
             vehiculo=datos["vehiculo"],
             producto=datos["producto"],
             peso_bruto_tn=datos["peso_bruto_tn"],
@@ -121,15 +151,20 @@ def registrar_ingreso(
             peso_neto_tn=datos["peso_bruto_tn"] - datos["tara_tn"],  # RN-M03-04: siempre calculado.
             numero_ticket=datos["numero_ticket"],
             usuario_registro=usuario,  # RN-M03-12, RNF-M03-08: atribución permanente.
+            capturado_offline=uuid_local is not None,
         )
         ingreso.full_clean(validate_constraints=False)
         try:
             ingreso.save()
         except IntegrityError:
-            # Defensa ante la carrera que el chequeo anterior no cubre por sí
-            # solo: dos altas del mismo ticket casi simultáneas. El
-            # constraint de base de datos es quien realmente lo impide; aquí
-            # solo se traduce al mensaje de dominio.
+            # Defensa ante las carreras que el chequeo previo no cubre por sí
+            # solo: dos altas del mismo ticket —o dos envíos del mismo lote—
+            # casi simultáneas. Los constraints de base de datos son quienes
+            # realmente lo impiden; aquí solo se traducen.
+            if uuid_local is not None:
+                ya_registrado = IngresoRepository.obtener_por_uuid_local(uuid_local)
+                if ya_registrado is not None:
+                    return ya_registrado
             existente = IngresoRepository.obtener_activo_por_ticket(datos["numero_ticket"])
             if existente is not None:
                 raise ConflictoDeConcurrencia(
@@ -140,9 +175,11 @@ def registrar_ingreso(
 
         servicio_stock.generar_movimiento_entrada(ingreso)  # RN-M03-08.
         registrador.registrar(
-            evento="INGRESO_CREADO",
+            accion=Accion.CREAR,
+            entidad="Ingreso",
+            id_entidad=ingreso.pk,
             usuario=usuario,
-            detalles={"id": ingreso.pk, "correlativo": ingreso.correlativo},
+            valores_nuevos={"correlativo": ingreso.correlativo, **_snapshot(ingreso)},
         )
     return ingreso
 
@@ -162,7 +199,7 @@ def editar_ingreso(
         raise ConflictoDeConcurrencia(MENSAJE_INGRESO_ANULADO_EDICION, codigo="INGRESO_ANULADO")
 
     valores_anteriores = _snapshot(ingreso)
-    recalcula_stock = False
+    ajusta_stock = False
 
     if "numero_ticket" in datos and datos["numero_ticket"] != ingreso.numero_ticket:
         _validar_ticket_no_duplicado(datos["numero_ticket"], excluir_id=ingreso.pk)
@@ -180,7 +217,7 @@ def editar_ingreso(
 
     if "producto" in datos:
         ingreso.producto = datos["producto"]
-        recalcula_stock = True
+        ajusta_stock = True
 
     if "peso_bruto_tn" in datos or "tara_tn" in datos:
         nuevo_bruto = datos.get("peso_bruto_tn", ingreso.peso_bruto_tn)
@@ -189,21 +226,22 @@ def editar_ingreso(
         ingreso.peso_bruto_tn = nuevo_bruto
         ingreso.tara_tn = nueva_tara
         ingreso.peso_neto_tn = nuevo_bruto - nueva_tara
-        recalcula_stock = True
+        ajusta_stock = True
 
     with transaction.atomic():
         ingreso.full_clean(validate_constraints=False)
         ingreso.save()
-        if recalcula_stock:
-            servicio_stock.recalcular_movimiento_entrada(ingreso)  # HU-M03-06 CA03.
+        if ajusta_stock:
+            # HU-M03-06 CA03: la corrección se expresa como movimiento
+            # compensatorio, no mutando el asiento original (RN-M05-09).
+            servicio_stock.ajustar_por_edicion(ingreso, valores_anteriores)
         registrador.registrar(
-            evento="INGRESO_MODIFICADO",
+            accion=Accion.MODIFICAR,
+            entidad="Ingreso",
+            id_entidad=ingreso.pk,
             usuario=usuario,
-            detalles={
-                "id": ingreso.pk,
-                "anterior": valores_anteriores,
-                "nuevo": _snapshot(ingreso),
-            },
+            valores_anteriores=valores_anteriores,
+            valores_nuevos=_snapshot(ingreso),
         )
     return ingreso
 
@@ -230,9 +268,14 @@ def anular_ingreso(
         ingreso.motivo_anulacion = motivo
         ingreso.save(update_fields=["estado", "motivo_anulacion"])
         servicio_stock.revertir_movimiento_entrada(ingreso)  # RN-M03-11.
+        # HU-M03-07 CA04: el motivo forma parte del rastro, por eso viaja en
+        # `valores_nuevos` junto al cambio de estado.
         registrador.registrar(
-            evento="INGRESO_ANULADO",
+            accion=Accion.ANULAR,
+            entidad="Ingreso",
+            id_entidad=ingreso.pk,
             usuario=usuario,
-            detalles={"id": ingreso.pk, "correlativo": ingreso.correlativo, "motivo": motivo},
+            valores_anteriores={"estado": Ingreso.REGISTRADO},
+            valores_nuevos={"estado": Ingreso.ANULADO, "motivo_anulacion": motivo},
         )
     return ingreso

@@ -4,7 +4,7 @@ from apps.catalogo.models import Producto
 from apps.catalogo.repositories import ProductoRepository
 from common.excepciones import ErrorDeValidacionDeDominio
 
-from ._eventos import registrar_evento
+from ._eventos import registrar_creacion, registrar_desactivacion, registrar_modificacion
 
 MENSAJE_CODIGO_DUPLICADO = "El código de producto ya está registrado"
 MENSAJE_DESACTIVADO_CON_MOVIMIENTOS = (
@@ -23,7 +23,7 @@ def crear_producto(datos: dict, usuario) -> Producto:
     )
     producto.full_clean()
     producto.save()
-    registrar_evento("CREADO", "Producto", producto, usuario)
+    registrar_creacion("Producto", producto, usuario)
     return producto
 
 
@@ -34,7 +34,7 @@ def actualizar_producto(producto: Producto, datos: dict, usuario) -> Producto:
         producto.nombre = datos["nombre"]
     producto.full_clean()
     producto.save()
-    registrar_evento("MODIFICADO", "Producto", producto, usuario)
+    registrar_modificacion("Producto", producto, usuario)
     return producto
 
 
@@ -44,5 +44,5 @@ def desactivar_producto(producto: Producto, usuario) -> Producto:
     está creada, así que la baja es incondicional."""
     producto.activo = False
     producto.save(update_fields=["activo"])
-    registrar_evento("DESACTIVADO", "Producto", producto, usuario)
+    registrar_desactivacion("Producto", producto, usuario)
     return producto

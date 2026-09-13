@@ -5,13 +5,14 @@ from datetime import datetime
 import pytest
 
 from apps.ingresos.models import ContadorCorrelativo
-from apps.ingresos.services.correlativo import GeneradorCorrelativoPorAnio
+from apps.ingresos.services.correlativo import PREFIJO_INGRESO, generador_por_defecto
+from common.correlativo import GeneradorCorrelativoPorAnio
 
 pytestmark = pytest.mark.django_db
 
 
 def test_hu_m03_03_ca01_correlativos_sucesivos_son_distintos_y_crecientes():
-    generador = GeneradorCorrelativoPorAnio()
+    generador = generador_por_defecto
     momento = datetime(2026, 5, 1, 10, 0)
 
     primero = generador.siguiente(momento)
@@ -22,7 +23,7 @@ def test_hu_m03_03_ca01_correlativos_sucesivos_son_distintos_y_crecientes():
 
 
 def test_el_correlativo_se_reinicia_por_anio():
-    generador = GeneradorCorrelativoPorAnio()
+    generador = generador_por_defecto
     generador.siguiente(datetime(2026, 12, 31, 23, 0))
 
     primero_del_anio_siguiente = generador.siguiente(datetime(2027, 1, 1, 0, 5))
@@ -31,9 +32,18 @@ def test_el_correlativo_se_reinicia_por_anio():
 
 
 def test_el_contador_persiste_el_ultimo_valor_por_anio():
-    generador = GeneradorCorrelativoPorAnio()
+    generador = generador_por_defecto
     generador.siguiente(datetime(2026, 5, 1, 10, 0))
     generador.siguiente(datetime(2026, 5, 1, 10, 1))
 
     contador = ContadorCorrelativo.objects.get(anio=2026)
     assert contador.ultimo_valor == 2
+
+
+def test_rn_m04_10_el_prefijo_de_la_serie_es_parametrizable():
+    """M04 usará su propia tabla de contadores y su propio prefijo, de modo
+    que las series de ingresos y salidas son independientes por construcción."""
+    otra_serie = GeneradorCorrelativoPorAnio(ContadorCorrelativo, "SAL")
+
+    assert PREFIJO_INGRESO == "ING"
+    assert otra_serie.siguiente(datetime(2026, 5, 1, 10, 0)).startswith("SAL-2026-")

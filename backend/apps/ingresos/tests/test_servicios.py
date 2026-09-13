@@ -1,7 +1,8 @@
 """Casos de uso de M03: alta, edición y anulación (RS-M03-01 a RS-M03-10)."""
 
 import logging
-from datetime import date, datetime, time
+import uuid
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
 import pytest
@@ -23,7 +24,7 @@ class ServicioStockEspia:
     def __init__(self):
         self.generados = []
         self.revertidos = []
-        self.recalculados = []
+        self.ajustados = []
 
     def generar_movimiento_entrada(self, ingreso):
         self.generados.append(ingreso.pk)
@@ -31,8 +32,8 @@ class ServicioStockEspia:
     def revertir_movimiento_entrada(self, ingreso):
         self.revertidos.append(ingreso.pk)
 
-    def recalcular_movimiento_entrada(self, ingreso):
-        self.recalculados.append(ingreso.pk)
+    def ajustar_por_edicion(self, ingreso, valores_anteriores):
+        self.ajustados.append(ingreso.pk)
 
 
 def _reloj_fijo(momento):
@@ -152,7 +153,10 @@ def test_ca07_genera_movimiento_de_stock_y_evento_de_auditoria(administrador, ca
         )
 
     assert espia.generados == [ingreso.pk]
-    assert any("INGRESO_CREADO" in m and ingreso.correlativo in m for m in caplog.messages)
+    assert any(
+        "accion=CREAR" in m and "entidad=Ingreso" in m and ingreso.correlativo in m
+        for m in caplog.messages
+    )
 
 
 # --- HU-M03-06 -----------------------------------------------------------
@@ -177,10 +181,13 @@ def test_ca01_edicion_persiste_cambios_y_registra_valores_anteriores(administrad
         editado = svc.editar_ingreso(ingreso, {"numero_ticket": "TCK-ED1-CORREGIDO"}, administrador)
 
     assert editado.numero_ticket == "TCK-ED1-CORREGIDO"
-    assert any("INGRESO_MODIFICADO" in m and "TCK-ED1-CORREGIDO" in m for m in caplog.messages)
+    assert any(
+        "accion=MODIFICAR" in m and "TCK-ED1" in m and "TCK-ED1-CORREGIDO" in m
+        for m in caplog.messages
+    )
 
 
-def test_ca03_editar_peso_recalcula_el_movimiento_de_stock(administrador):
+def test_ca03_editar_peso_ajusta_el_movimiento_de_stock(administrador):
     ingreso = IngresoFactory()
     espia = ServicioStockEspia()
 
@@ -189,10 +196,10 @@ def test_ca03_editar_peso_recalcula_el_movimiento_de_stock(administrador):
         administrador, servicio_stock=espia,
     )
 
-    assert espia.recalculados == [ingreso.pk]
+    assert espia.ajustados == [ingreso.pk]
 
 
-def test_ca03_editar_producto_tambien_recalcula_el_stock(administrador):
+def test_ca03_editar_producto_tambien_ajusta_el_stock(administrador):
     from apps.catalogo.tests.factories import ProductoFactory
 
     ingreso = IngresoFactory()
@@ -200,7 +207,7 @@ def test_ca03_editar_producto_tambien_recalcula_el_stock(administrador):
 
     svc.editar_ingreso(ingreso, {"producto": ProductoFactory()}, administrador, servicio_stock=espia)
 
-    assert espia.recalculados == [ingreso.pk]
+    assert espia.ajustados == [ingreso.pk]
 
 
 def test_editar_fecha_y_hora_de_pesaje(administrador):
@@ -243,7 +250,7 @@ def test_editar_no_afecta_stock_si_solo_cambia_el_numero_de_ticket(administrador
 
     svc.editar_ingreso(ingreso, {"numero_ticket": "TCK-SIN-IMPACTO"}, administrador, servicio_stock=espia)
 
-    assert espia.recalculados == []
+    assert espia.ajustados == []
 
 
 def test_ca04_no_se_puede_editar_un_ingreso_anulado(administrador):
@@ -296,6 +303,63 @@ def test_ca04_anular_registra_usuario_motivo_y_fecha_en_auditoria(administrador,
         svc.anular_ingreso(ingreso, "Duplicado por error de digitación", administrador)
 
     assert any(
-        "INGRESO_ANULADO" in m and administrador.username in m and "Duplicado" in m
+        "accion=ANULAR" in m and administrador.username in m and "Duplicado" in m
         for m in caplog.messages
     )
+
+
+# --- Punto de entrada de la cola de M07 (D-02, D-03, D-08) ---------------
+
+
+def _datos_offline(**cambios):
+    from apps.catalogo.tests.factories import ProductoFactory, VehiculoFactory
+
+    base = _datos_validos(vehiculo=VehiculoFactory(), producto=ProductoFactory())
+    base["uuid_local"] = uuid.uuid4()
+    base.update(cambios)
+    return base
+
+
+def test_d03_la_hora_de_captura_local_manda_sobre_la_del_servidor(administrador):
+    captura = timezone.make_aware(datetime(2026, 3, 15, 9, 0))
+    sincronizacion = timezone.make_aware(datetime(2026, 3, 16, 7, 30))
+    datos = _datos_offline(hora_captura_local=captura, hora_sincronizacion=sincronizacion)
+
+    ingreso = svc.registrar_ingreso(datos, administrador, ahora=_reloj_fijo(sincronizacion))
+
+    # I1 mide hasta la captura, no hasta que hubo señal.
+    assert ingreso.hora_registro == captura
+    assert ingreso.hora_sincronizacion == sincronizacion
+    assert ingreso.capturado_offline is True
+
+
+def test_reenviar_el_mismo_uuid_local_no_duplica_el_ingreso(administrador):
+    momento = timezone.make_aware(datetime(2026, 3, 15, 9, 0))
+    datos = _datos_offline(hora_captura_local=momento)
+
+    primero = svc.registrar_ingreso(datos, administrador, ahora=_reloj_fijo(momento))
+    segundo = svc.registrar_ingreso(datos, administrador, ahora=_reloj_fijo(momento))
+
+    assert primero.pk == segundo.pk
+    assert Ingreso.objects.filter(uuid_local=datos["uuid_local"]).count() == 1
+
+
+def test_una_hora_de_captura_futura_es_rechazada(administrador):
+    momento = timezone.make_aware(datetime(2026, 3, 15, 9, 0))
+    datos = _datos_offline(hora_captura_local=momento + timedelta(hours=1))
+
+    with pytest.raises(ErrorDeValidacionDeDominio) as exc:
+        svc.registrar_ingreso(datos, administrador, ahora=_reloj_fijo(momento))
+    assert str(exc.value) == "La hora de captura no puede ser posterior a la hora del servidor"
+
+
+def test_el_ingreso_en_linea_no_queda_marcado_como_offline(administrador):
+    from apps.catalogo.tests.factories import ProductoFactory, VehiculoFactory
+
+    datos = _datos_validos(vehiculo=VehiculoFactory(), producto=ProductoFactory())
+    ingreso = svc.registrar_ingreso(
+        datos, administrador, ahora=_reloj_fijo(timezone.make_aware(datetime(2026, 3, 15, 9, 0)))
+    )
+
+    assert ingreso.capturado_offline is False
+    assert ingreso.uuid_local is None

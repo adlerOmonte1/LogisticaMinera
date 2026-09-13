@@ -158,7 +158,7 @@ Como administrativo, quiero corregir un ingreso cuando detecto un error de trans
 
 > **CA02.** Dado que el usuario intenta modificar el correlativo o la hora de registro, cuando envía la solicitud, entonces el sistema la rechaza: ambos campos no son editables por ningún rol.
 
-> **CA03.** Dado que la edición modifica el peso bruto, la tara o el producto, cuando se guarda, entonces el sistema recalcula el movimiento de stock asociado.
+> **CA03.** Dado que la edición modifica el peso bruto, la tara o el producto, cuando se guarda, entonces el sistema genera el movimiento de stock que compensa la diferencia, conservando el asiento original en el kardex.
 
 > **CA04.** Dado que un ingreso está anulado, cuando el usuario intenta editarlo, entonces el sistema rechaza la operación mostrando "No se puede editar un ingreso anulado".
 

@@ -92,4 +92,4 @@ def test_desactivar_transportista_sin_vehiculos_no_devuelve_mensaje(administrado
 def test_crear_producto_registra_evento_en_auditoria(administrador, caplog):
     with caplog.at_level(logging.INFO, logger="auditoria"):
         productos.crear_producto({"codigo": "AUD", "nombre": "Auditado"}, administrador)
-    assert any("CATALOGO_CREADO" in m and "Producto" in m for m in caplog.messages)
+    assert any("accion=CREAR" in m and "entidad=Producto" in m for m in caplog.messages)

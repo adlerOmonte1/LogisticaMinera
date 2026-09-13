@@ -152,6 +152,39 @@ M07 no tiene carpeta en `features/`: la captura sin conexión es transversal y v
 interceptor más cola. Si fuera una pantalla, M03 tendría que saber si hay red — la dependencia que
 D-04 prohíbe.
 
+## D-12. El kardex es de solo-anexado: una corrección genera un movimiento, no muta el anterior
+
+**Módulos afectados:** M03, M04, M05
+**Indicadores en juego:** I3, I4
+
+HU-M03-06 CA03 decía que editar un ingreso «recalcula el movimiento de stock asociado», mientras que
+RN-M05-01, RN-M05-02 y RN-M05-09 fijan que el saldo es siempre la suma algebraica de los movimientos,
+que **no se escribe directamente por ninguna vía** y que una corrección genera un movimiento nuevo
+conservando el original en el kardex. Eran dos modelos incompatibles: uno mutable y otro de asiento.
+
+Manda el kardex. Un asiento no se reescribe: si un ingreso se corrige, se anexa el movimiento que
+compensa la diferencia. La razón es auditable, no estética — si los movimientos pudieran mutar, el
+kardex dejaría de poder explicar cómo se llegó al saldo actual, que es justamente la evidencia sobre
+la que se interpretan I3 e I4.
+
+En consecuencia: HU-M03-06 CA03, el diagrama S-M03-04 y A-M03-02 quedaron redactados en esos
+términos, y el puerto `common/stock.py` expone `ajustar_por_edicion(ingreso, valores_anteriores)`, no
+un `recalcular_movimiento`.
+
+## D-13. Cada serie de correlativos tiene su propia tabla de contadores
+
+**Módulos afectados:** M03, M04
+
+RN-M04-10 exige que la serie de salidas sea independiente de la de ingresos. La independencia se
+consigue por construcción y no por convención: cada módulo mantiene su propia tabla de contadores
+(`contador_correlativo_ingreso`, y la que corresponda en M04) y le pasa su prefijo al generador
+compartido de `common/correlativo.py`. No existe una tabla común donde dos series pudieran solaparse
+en la misma fila del año.
+
+La mecánica —bloqueo con `select_for_update()`, incremento, formato `{PREFIJO}-{año}-{cinco
+dígitos}`— vive una sola vez; la tabla es infraestructura de cada módulo y por eso no aparece en el
+modelo entidad-relación (D-10).
+
 ## Pendientes que bloquean decisiones
 
 | Pendiente | Bloquea | Fecha límite |

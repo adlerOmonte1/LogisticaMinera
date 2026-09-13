@@ -55,5 +55,5 @@ class LogoutView(APIView):
     def post(self, request):
         entrada = LogoutSerializer(data=request.data)
         entrada.is_valid(raise_exception=True)
-        cerrar_sesion(entrada.validated_data["refresh"])
+        cerrar_sesion(entrada.validated_data["refresh"], ip=ip_del_cliente(request))
         return Response(status=204)
