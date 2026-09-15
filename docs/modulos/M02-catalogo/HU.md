@@ -1,6 +1,6 @@
 # Historias de usuario — M02 Catálogo maestro
 
-**RF asociado:** RF-03 · **Indicador de tesis:** I2 · **Semana:** 2 · **Historias:** 4
+**RF asociado:** RF-03 · **Indicador:** I2 · **Semana:** 2 · **Historias:** 4
 
 > Este módulo sostiene el indicador I2 (cobertura de registro por tipo de vehículo). Sin un catálogo de vehículos con titularidad clasificada, el hallazgo central del diagnóstico —que los volquetes propios se registran peor que los externos— no puede demostrarse con datos.
 

@@ -1,6 +1,6 @@
 # Historias de usuario — M05 Existencias
 
-**RF asociado:** RF-04 · **Indicadores de tesis:** I3, I4 · **Semana:** 5 · **Historias:** 3
+**RF asociado:** RF-04 · **Indicadores:** I3, I4 · **Semana:** 5 · **Historias:** 3
 
 > El indicador I3 mide el tiempo de determinación del stock por producto. Hoy ese cálculo es manual sobre papel y toma minutos; el módulo lo convierte en una consulta.
 

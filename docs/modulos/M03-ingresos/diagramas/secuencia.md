@@ -101,7 +101,7 @@ sequenceDiagram
     NG-->>A: Mensaje correspondiente
 ```
 
-## S-M03-04 · Edición con recálculo de stock (HU-M03-06, CA03)
+## S-M03-04 · Edición con ajuste de stock (HU-M03-06, CA03)
 
 ```mermaid
 sequenceDiagram
@@ -124,8 +124,8 @@ sequenceDiagram
         SRV->>DB: BEGIN TRANSACTION
         SRV->>DB: Aplicar cambios
         alt Cambio en peso o producto
-            SRV->>STK: recalcular_movimiento(ingreso)
-            STK->>DB: Actualizar movimiento y saldos posteriores
+            SRV->>STK: ajustar_por_edicion(ingreso, valores_anteriores)
+            STK->>DB: Insertar movimiento compensatorio y nuevo saldo
         end
         SRV->>AUD: Registrar MODIFICAR con valores anterior y nuevo
         SRV->>DB: COMMIT

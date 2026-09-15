@@ -26,7 +26,7 @@ No usar `Ingreso.objects.aggregate(Max('correlativo'))`. Bajo concurrencia produ
 1. Secuencia de PostgreSQL (`CREATE SEQUENCE ingreso_correlativo_seq`) consultada con `nextval`.
 2. Tabla de contadores con `select_for_update()` dentro de la transacción.
 
-La segunda es preferible si el correlativo debe reiniciarse por año o llevar prefijo. Documentar cuál se adoptó, porque es una pregunta previsible en sustentación.
+La segunda es preferible si el correlativo debe reiniciarse por año o llevar prefijo. Documentar cuál se adoptó, porque es una pregunta previsible en la revisión técnica.
 
 ### Servicio
 
@@ -36,7 +36,7 @@ Toda la operación —correlativo, persistencia, movimiento de stock, evento de 
 
 ### Índices
 
-Los declarados en `../../00-arquitectura/modelo_datos_entidad_relacion.md` §3 deben crearse desde la primera migración, no añadirse al final. El indicador I5 se mide sobre el sistema en producción y una migración de índices a mitad de la ventana de observación introduciría un cambio no controlado en las condiciones de medición.
+Los declarados en `../../00-arquitectura/modelo_datos_entidad_relacion.md` §3 deben crearse desde la primera migración, no añadirse al final. El indicador I5 se mide sobre el sistema en producción y una migración de índices a mitad del periodo de medición introduciría un cambio no controlado en las condiciones de medición.
 
 ## Frontend (Angular)
 

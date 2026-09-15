@@ -22,4 +22,4 @@ La solución es la restricción de unicidad sobre `uuid_local` en el servidor: s
 
 ## Nota sobre RN-M07-01 y la decisión D-03
 
-Esta regla es la traducción operativa de la decisión D-03. Está registrada dos veces —en las decisiones de arquitectura y aquí— porque su violación no produce un error visible: produce datos que parecen correctos y que invalidan silenciosamente el indicador principal de la tesis. Es el tipo de fallo que solo se detecta al analizar los resultados, cuando ya no hay tiempo de corregirlo.
+Esta regla es la traducción operativa de la decisión D-03. Está registrada dos veces —en las decisiones de arquitectura y aquí— porque su violación no produce un error visible: produce datos que parecen correctos y que invalidan silenciosamente el indicador operativo principal. Es el tipo de fallo que solo se detecta al analizar los resultados, cuando ya no hay tiempo de corregirlo.

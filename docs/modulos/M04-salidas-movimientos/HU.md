@@ -1,6 +1,6 @@
 # Historias de usuario — M04 Salidas y movimientos
 
-**RF asociado:** RF-05 · **Indicador de tesis:** I4 · **Semana:** 5 · **Historias:** 3
+**RF asociado:** RF-05 · **Indicador:** I4 · **Semana:** 5 · **Historias:** 3
 
 > Este módulo sostiene el indicador I4 (desviación entre stock declarado y stock estimado). Sin registro de salidas, el stock calculado sería puramente acumulativo y la desviación carecería de sentido.
 

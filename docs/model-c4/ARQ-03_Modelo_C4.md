@@ -10,23 +10,23 @@
 
 ## 1. Por qué C4
 
-Un único diagrama de arquitectura obliga a elegir entre ser legible para el jurado o ser útil para
+Un único diagrama de arquitectura obliga a elegir entre ser legible para la gerencia o ser útil para
 programar. C4 resuelve esa tensión con cuatro niveles de acercamiento, cada uno con su audiencia:
 
 | Nivel | Responde a | Audiencia |
 |---|---|---|
-| 1 · Contexto | Qué hace el sistema y con quién interactúa | Jurado, asesora, empresa |
-| 2 · Contenedores | En qué piezas ejecutables se divide | Jurado técnico, sustentación |
+| 1 · Contexto | Qué hace el sistema y con quién interactúa | Gerencia, jefatura de operaciones, equipo técnico |
+| 2 · Contenedores | En qué piezas ejecutables se divide | Equipo técnico y desarrollo |
 | 3 · Componentes | Cómo se organiza cada pieza por dentro | Desarrollo |
 | 4 · Código | Cómo se estructuran las clases del caso crítico | Desarrollo y defensa de SOLID |
 
 El modelo cumple además una función de medición: el nivel 2 es la **evidencia visual** del indicador
-de la variable independiente «porcentaje de módulos implementados sobre módulos planificados». Un
+de avance «porcentaje de módulos implementados sobre módulos planificados». Un
 diagrama que dibuje contenedores que el despliegue no tiene infla ese denominador y se vuelve en
-contra en cuanto el jurado lo contrasta con el sistema real.
+contra en cuanto la gerencia lo contrasta con el sistema real.
 
 Notación: Mermaid, coherente con el resto de la documentación. Las etiquetas van sin tildes por la
-convención del repositorio, que evita fallos de renderizado en la exportación del documento de tesis.
+convención del repositorio, que evita fallos de renderizado en la exportación del documento de arquitectura.
 
 ---
 
@@ -69,11 +69,11 @@ impreso que el supervisor transcribe. Esto no es una carencia que haya que discu
 
 Porque el pesaje y el registro son actos separados, hay dos marcas de tiempo distintas —`hora_pesaje`,
 copiada del ticket, y `hora_registro`, asignada por el servidor— y la diferencia entre ambas es la
-latencia que la tesis mide (D-01). Si la balanza estuviera integrada, ambas marcas coincidirían
+latencia que el sistema busca reducir (D-01). Si la balanza estuviera integrada, ambas marcas coincidirían
 siempre, la latencia sería cero por construcción y **no habría nada que medir ni que mejorar**.
 
-Declararlo en el nivel 1 evita además la pregunta previsible en sustentación sobre por qué no se
-integró el equipo: la respuesta es que la unidad de análisis dejaría de existir, y que integrar una
+Declararlo en el nivel 1 evita además la pregunta previsible en la revisión técnica sobre por qué no se
+integró el equipo: la respuesta es que la unidad de registro dejaría de existir, y que integrar una
 balanza de plataforma exige hardware y protocolo fuera del alcance de ocho semanas.
 
 ---
@@ -112,7 +112,7 @@ flowchart TB
 |---|---|---|---|
 | **Aplicación web progresiva** | Angular 17+ | Interfaz de los nueve módulos | Instalable desde el navegador, sin tienda de aplicaciones ni proceso de publicación. La aplicación móvil nativa está declarada fuera de alcance en ARQ-01 §5 |
 | **Service Worker** | Angular Service Worker | Cachea el formulario de ingreso y los catálogos de producto y vehículo | Es lo que permite que el formulario abra **sin señal**. Sin él, M07 no existe y la latencia I1 no baja en las horas sin cobertura |
-| **IndexedDB** | API del navegador | Cola de ingresos pendientes y borrador del formulario en curso | Sostiene RNF-M03-06: si el formulario pierde los datos al caerse la conexión, el supervisor vuelve al papel y I1 regresa a los valores del pretest |
+| **IndexedDB** | API del navegador | Cola de ingresos pendientes y borrador del formulario en curso | Sostiene RNF-M03-06: si el formulario pierde los datos al caerse la conexión, el supervisor vuelve al papel y I1 regresa a los valores de la línea base |
 | **Nginx** | Nginx | Sirve el build de Angular y enruta `/api/` al backend | Un solo origen para el navegador, sin abrir CORS en producción. Además es donde se termina HTTPS, sin el cual el service worker no se registra y la PWA no funciona |
 | **API REST** | Django 5 + DRF | Reglas de negocio, casos de uso y autorización | Autoridad única de validación. Un registro que llega por la cola de sincronización no pasa por el formulario y debe someterse a las mismas reglas (D-08) |
 | **PostgreSQL 16** | PostgreSQL | Persistencia | Transacciones ACID, necesarias para asignar el correlativo bajo concurrencia (D-02) y para que el movimiento de stock se genere en el mismo acto que el ingreso (RN-M03-08) |
@@ -196,7 +196,7 @@ las que sostienen el indicador I3, y deben poder optimizarse sin tocar la lógic
 
 ### 4.2 Componentes de M03 — Registro de ingresos
 
-Es el módulo núcleo: la unidad de análisis de la tesis es el ingreso de volquete.
+Es el módulo núcleo: la unidad de registro del sistema es el ingreso de volquete.
 
 ```mermaid
 flowchart TB
@@ -228,7 +228,7 @@ flowchart TB
 | Componente | Justificación |
 |---|---|
 | `ServicioIngreso` | Concentra el caso de uso completo. La transacción única —correlativo, persistencia, movimiento de stock y evento de auditoría— vive aquí. Si el movimiento de stock falla, el ingreso no queda registrado: un ingreso sin movimiento rompe RN-M03-08 en silencio |
-| `GeneradorCorrelativo` como **abstracción** | D-02 deja abiertas dos implementaciones válidas y cuál se adopte es pregunta previsible en sustentación. Se inyecta en el servicio, no se instancia dentro: así se sustituye por uno determinista en pruebas sin tocar la lógica del caso de uso |
+| `GeneradorCorrelativo` como **abstracción** | D-02 deja abiertas dos implementaciones válidas y cuál se adopte es pregunta previsible en la revisión técnica. Se inyecta en el servicio, no se instancia dentro: así se sustituye por uno determinista en pruebas sin tocar la lógica del caso de uso |
 | `Reloj` como abstracción | HU-M03-02 fija umbrales de 72 horas y 30 días de antigüedad. Un servicio que llama a `timezone.now()` internamente **no se puede probar** contra esos límites |
 | `SelectorIngresos` | Listado con filtros combinables y totales del conjunto filtrado. El filtro por titularidad es la lectura directa de I2 |
 | Dependencia de `ServicioStock` y `ServicioAuditoria` | Son de M05 y M08. Se dibujan porque la transacción los abarca: la trazabilidad entre módulos no es opcional |
@@ -259,7 +259,7 @@ flowchart TB
 | `Validador local` | Mejora la experiencia; **no es fuente de verdad** (D-08). La validación autoritativa está en el servidor |
 | `Cola local` | Guarda ingresos con `uuid_local`, que actúa como **clave de idempotencia**: un lote reenviado tras un timeout no duplica ingresos. Sin esto, un reintento infla la producción declarada |
 | `Sincronizador` | Envía en orden cronológico de captura. Un elemento que falla permanece en la cola con el motivo y **no bloquea a los demás** |
-| `Endpoint de lote` → `ServicioIngreso` | La flecha crítica del diagrama: el lote entra por el **mismo** caso de uso que el alta en línea. Escribir un camino paralelo de validación más laxa sería abrir la puerta por la que entrarían los datos del postest |
+| `Endpoint de lote` → `ServicioIngreso` | La flecha crítica del diagrama: el lote entra por el **mismo** caso de uso que el alta en línea. Escribir un camino paralelo de validación más laxa sería abrir la puerta por la que entrarían datos inconsistentes al histórico |
 
 **El riesgo que este nivel hace visible:** dos supervisores sincronizando lotes al mismo tiempo
 convergen sobre el mismo `GeneradorCorrelativo`. Es el punto más probable de fallo de todo el sistema
@@ -273,7 +273,7 @@ C4 admite este nivel y recomienda usarlo con parsimonia: el código cambia más 
 documento, y un nivel 4 exhaustivo produce documentación desactualizada, que es peor que no tenerla.
 
 Se dibuja **solo el caso de uso crítico**, `registrar_ingreso`, porque es donde se concentra la
-inversión de dependencias y es la pregunta que se defiende en sustentación.
+inversión de dependencias y es la pregunta que se defiende en la revisión técnica.
 
 ```mermaid
 classDiagram

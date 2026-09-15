@@ -17,7 +17,7 @@
 
 ## Relación con el indicador I2
 
-El endpoint `GET /api/v1/catalogo/vehiculos/?titularidad=PROPIO` permite construir el denominador del indicador de cobertura para volquetes propios. Sin este filtro, la cobertura solo puede calcularse de forma agregada y el hallazgo diferencial de la tesis no es demostrable.
+El endpoint `GET /api/v1/catalogo/vehiculos/?titularidad=PROPIO` permite construir el denominador del indicador de cobertura para volquetes propios. Sin este filtro, la cobertura solo puede calcularse de forma agregada y el hallazgo diferencial del diagnóstico no es demostrable.
 
 ## Permisos
 

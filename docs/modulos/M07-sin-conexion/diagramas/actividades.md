@@ -50,7 +50,7 @@ flowchart TD
     N1 --> Fin
 ```
 
-Este es el diagrama más importante del módulo para la validez de la tesis. Si la asignación de A1 tomara la hora del servidor en lugar de la hora de captura, el indicador I1 mediría disponibilidad de red y no oportunidad del registro. El error no produciría ningún síntoma visible en el funcionamiento del sistema.
+Este es el diagrama más importante del módulo para la confiabilidad de la medición. Si la asignación de A1 tomara la hora del servidor en lugar de la hora de captura, el indicador I1 mediría disponibilidad de red y no oportunidad del registro. El error no produciría ningún síntoma visible en el funcionamiento del sistema.
 
 ## A-M07-03 · Decisión de reintento y límite de intentos (RN-M07-09)
 

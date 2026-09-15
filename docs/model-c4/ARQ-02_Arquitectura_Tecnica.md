@@ -204,6 +204,6 @@ Todas las respuestas de error devuelven un cuerpo uniforme: `{"codigo": "...", "
 |---|---|
 | Desarrollo | Local, base de datos con datos de prueba |
 | Preproducción | Servidor de pruebas donde se ejecutan las pruebas de carga con JMeter (semana 8) |
-| Producción | Servidor en planta/administración; el postest se recolecta sobre este entorno |
+| Producción | Servidor en planta/administración; la medición posterior se recolecta sobre este entorno |
 
-El postest de la tesis solo puede recolectarse en producción con usuarios reales. Cualquier despliegue posterior al inicio de la ventana de observación debe registrarse, porque introduce una amenaza a la validez interna.
+La medición posterior a la puesta en marcha solo puede recolectarse en producción con usuarios reales. Cualquier despliegue posterior al inicio del periodo de medición debe registrarse, porque introduce un cambio no controlado en las condiciones de medición.

@@ -49,7 +49,7 @@ flowchart TD
     E2 --> Fin
     D3 -->|Si| ED[Aplicar cambios]
     ED --> D4{Cambio afecta peso o producto?}
-    D4 -->|Si| RC[Recalcular movimiento de stock]
+    D4 -->|Si| RC[Generar movimiento compensatorio de stock]
     D4 -->|No| AU[Registrar valores anterior y nuevo en auditoria]
     RC --> AU
     AU --> Fin

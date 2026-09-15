@@ -11,8 +11,8 @@
 
 ## Relación directa con el indicador I3
 
-RNF-M05-01 y RNF-M05-02 son la traducción técnica del indicador I3. El instrumento de la tesis mide el tiempo que un usuario tarda en determinar el stock de un producto; ese tiempo se compone del tiempo de respuesta del sistema más el tiempo de navegación del usuario. RNF-M05-06 reduce el segundo componente al eliminar pasos de navegación.
+RNF-M05-01 y RNF-M05-02 son la traducción técnica del indicador I3. La medición de este indicador considera el tiempo que un usuario tarda en determinar el stock de un producto; ese tiempo se compone del tiempo de respuesta del sistema más el tiempo de navegación del usuario. RNF-M05-06 reduce el segundo componente al eliminar pasos de navegación.
 
 ## Sobre RNF-M05-04
 
-El uso de punto flotante para cantidades en toneladas produciría desviaciones acumuladas de centésimas que, sumadas sobre cientos de movimientos, podrían confundirse con una desviación real de inventario y contaminar el indicador I4. Es un detalle técnico con consecuencia directa sobre la validez de los datos.
+El uso de punto flotante para cantidades en toneladas produciría desviaciones acumuladas de centésimas que, sumadas sobre cientos de movimientos, podrían confundirse con una desviación real de inventario y contaminar el indicador I4. Es un detalle técnico con consecuencia directa sobre la confiabilidad de los datos.

@@ -36,7 +36,7 @@ flowchart LR
 
 La balanza **no está integrada** al sistema. Es una fuente externa que produce un ticket en papel; el usuario transcribe sus datos. La integración automática está fuera de alcance (ver `../../00-arquitectura/ARQ-01_Modulos_del_Sistema.md` §5).
 
-Esta decisión tiene consecuencia metodológica: la latencia I1 incluye el tiempo de transcripción manual. Si la balanza estuviera integrada, la latencia tendería a cero y el indicador perdería variabilidad. La transcripción manual es parte del proceso real que se mide.
+Esta decisión tiene consecuencia sobre la medición: la latencia I1 incluye el tiempo de transcripción manual. Si la balanza estuviera integrada, la latencia tendería a cero y el indicador perdería variabilidad. La transcripción manual es parte del proceso real que se mide.
 
 ## Casos de uso
 

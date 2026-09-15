@@ -35,14 +35,14 @@ psql -U postgres -c "ALTER ROLE logistica SET timezone TO 'America/Lima';"
 psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE logistica_minera TO logistica;"
 ```
 
-`timezone = America/Lima` no es cosmético: el indicador I1 es una diferencia de tiempos entre la hora del ticket de balanza (local) y la hora asignada por el servidor. Un desfase de zona horaria contamina la medición de la tesis.
+`timezone = America/Lima` no es cosmético: el indicador I1 es una diferencia de tiempos entre la hora del ticket de balanza (local) y la hora asignada por el servidor. Un desfase de zona horaria contamina la medición del indicador.
 
 ### 1.2 Tres bases, tres entornos
 
 ```
 logistica_minera_dev     desarrollo local, datos de prueba
 logistica_minera_pre     preproducción, pruebas de carga JMeter (semana 8)
-logistica_minera         producción, donde se recolecta el postest
+logistica_minera         producción, donde se recolecta la medición posterior
 ```
 
 Nunca se ejecutan pruebas de carga contra producción: alterarían los tiempos de respuesta que sostienen el RNF de eficiencia de desempeño.
@@ -721,7 +721,7 @@ ng test
 
 ## 4. Flujo de trabajo de un módulo, de principio a fin
 
-Para cada módulo Mxx, en este orden. No se salta ningún paso: cada uno produce evidencia citable en la sustentación.
+Para cada módulo Mxx, en este orden. No se salta ningún paso: cada uno produce evidencia citable en la revisión técnica.
 
 1. `git checkout -b feature/Mxx-nombre` (desde `develop`).
 2. Leer `docs/modulos/Mxx-*/requerimientos/` — RU, RS, RF, RNF, RN.
@@ -752,18 +752,18 @@ Un módulo está terminado cuando, y solo cuando:
 
 ---
 
-## 6. Errores que invalidan la tesis, no solo el código
+## 6. Errores que invalidan la medición, no solo el código
 
-| Error | Consecuencia metodológica |
+| Error | Consecuencia sobre la medición |
 |---|---|
 | Poner `auto_now_add` en `hora_registro` | El indicador I1 desaparece; D1 queda sin medición (D-01) |
 | Asignar el correlativo en el cliente | Colisiones offline; el ingreso deja de ser identificable (D-02) |
 | Usar la hora de sincronización como hora de registro | I1 mide señal de red, no latencia de captura (D-03) |
 | Dejar M07 para el final | Obliga a reescribir M03 (D-04) |
 | Guardar el tipo de vehículo como texto libre | I2 se vuelve inclasificable (D-06) |
-| `DELETE` físico de un ingreso | No se puede demostrar que el postest no fue depurado (D-07) |
+| `DELETE` físico de un ingreso | No se puede demostrar que el histórico no fue depurado (D-07) |
 | Validar solo en Angular | Los registros de la cola offline entran sin validar (D-08) |
-| Desplegar durante la ventana de observación sin registrarlo | Amenaza a la validez interna (`ARQ-02` §7) |
+| Desplegar durante el periodo de medición sin registrarlo | Cambio no controlado en las condiciones de medición (`ARQ-02` §7) |
 
 ---
 
@@ -780,4 +780,4 @@ Un módulo está terminado cuando, y solo cuando:
 | 7 | M06 consolidados y reportes |
 | 8 | Preproducción, JMeter, corrección de RNF |
 
-Coincide con `ARQ-01` §3. Si una semana se desplaza, se documenta: el porcentaje de módulos implementados sobre planificados es el indicador de la variable independiente.
+Coincide con `ARQ-01` §3. Si una semana se desplaza, se documenta: el porcentaje de módulos implementados sobre planificados es el indicador de avance de la implementación.

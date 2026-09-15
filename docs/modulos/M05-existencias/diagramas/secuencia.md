@@ -20,7 +20,7 @@ sequenceDiagram
     NG-->>A: Tabla de productos con saldo y ultimo movimiento
 ```
 
-La consulta lee el saldo denormalizado del último movimiento de cada producto (RS-M05-03). No recorre el histórico: si lo hiciera, el tiempo de respuesta crecería con el volumen y el indicador I3 se degradaría durante la ventana de observación.
+La consulta lee el saldo denormalizado del último movimiento de cada producto (RS-M05-03). No recorre el histórico: si lo hiciera, el tiempo de respuesta crecería con el volumen y el indicador I3 se degradaría durante el periodo de medición.
 
 ## S-M05-02 · Generación de movimiento desde un ingreso (RN-M05-03)
 

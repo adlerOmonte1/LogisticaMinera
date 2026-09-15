@@ -12,4 +12,4 @@
 
 ## Nota sobre RS-M05-03
 
-La denormalización del saldo resultante es una decisión de rendimiento con consecuencia metodológica: sostiene el indicador I3. Calcular el saldo recorriendo todos los movimientos cada vez haría que el tiempo de consulta creciera con el histórico, y el indicador se degradaría a lo largo de la ventana de observación por una razón ajena al diseño del sistema.
+La denormalización del saldo resultante es una decisión de rendimiento con consecuencia sobre la medición: sostiene el indicador I3. Calcular el saldo recorriendo todos los movimientos cada vez haría que el tiempo de consulta creciera con el histórico, y el indicador se degradaría a lo largo del periodo de medición por una razón ajena al diseño del sistema.

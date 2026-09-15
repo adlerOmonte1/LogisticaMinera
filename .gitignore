@@ -1,5 +1,4 @@
-# Notas de trabajo fuera del repositorio
-skills/
+
 
 # Python / Django
 __pycache__/
@@ -7,6 +6,9 @@ __pycache__/
 .venv/
 venv/
 *.sqlite3
+.coverage
+htmlcov/
+.pytest_cache/
 .env
 
 # Node / Angular

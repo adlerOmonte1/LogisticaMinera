@@ -48,7 +48,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Cierre de la ventana de observacion]) --> L1[Listar los meses del periodo de estudio]
+    Start([Cierre del periodo de medicion]) --> L1[Listar los meses del periodo evaluado]
     L1 --> P1[Para cada mes]
     P1 --> V1{Existe consolidado disponible?}
     V1 -->|Si| C1[Contar como mes con reporte]
@@ -60,4 +60,4 @@ flowchart TD
     R1 --> Fin([Registrar indicador I6])
 ```
 
-En el pretest, este cálculo se realiza sobre el archivo documental de la empresa. En el postest, se lee directamente del endpoint de disponibilidad. La diferencia entre ambos valores es el efecto que la tesis mide para la dimensión D3.
+En la línea base, este cálculo se realiza sobre el archivo documental de la empresa. En la medición posterior, se lee directamente del endpoint de disponibilidad. La diferencia entre ambos valores es la mejora que aporta el sistema en la dimensión D3.

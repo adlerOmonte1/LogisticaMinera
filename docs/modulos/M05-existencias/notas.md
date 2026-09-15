@@ -23,9 +23,9 @@
 
 La decisión de denormalizar el saldo tiene un costo: si un movimiento antiguo se anula, todos los saldos resultantes posteriores de ese producto deben recalcularse. Es una operación de escritura que puede tocar muchas filas.
 
-Se acepta ese costo porque las anulaciones son excepcionales mientras que las consultas de saldo son constantes, y porque el indicador I3 depende del tiempo de consulta, no del tiempo de anulación. La alternativa —calcular el saldo en cada consulta— degradaría el indicador de forma creciente a lo largo de la ventana de observación.
+Se acepta ese costo porque las anulaciones son excepcionales mientras que las consultas de saldo son constantes, y porque el indicador I3 depende del tiempo de consulta, no del tiempo de anulación. La alternativa —calcular el saldo en cada consulta— degradaría el indicador de forma creciente a lo largo del periodo de medición.
 
-Documentar esta decisión con su justificación es importante: es exactamente el tipo de compromiso técnico sobre el que un jurado puede preguntar.
+Documentar esta decisión con su justificación es importante: es exactamente el tipo de compromiso técnico sobre el que un revisor externo puede preguntar.
 
 ## Dependencias
 

@@ -41,13 +41,13 @@
     {
       "uuid_local": "550e8400-e29b-41d4-a716-446655440000",
       "estado": "ACEPTADO",
-      "correlativo": "ING-2027-000342"
+      "correlativo": "ING-2027-00342"
     },
     {
       "uuid_local": "660e8400-e29b-41d4-a716-446655440001",
       "estado": "RECHAZADO",
       "codigo": "TICKET_DUPLICADO",
-      "mensaje": "El ticket número 004520 ya fue registrado en el ingreso ING-2027-000339"
+      "mensaje": "El ticket número 004520 ya fue registrado en el ingreso ING-2027-00339"
     }
   ]
 }
@@ -67,4 +67,4 @@ Cada elemento se procesa de forma independiente: el rechazo de uno no impide el 
 | Generar reportes | No |
 | Registrar salidas | No |
 
-El alcance offline se limita deliberadamente al registro de ingresos. Ampliarlo a salidas o existencias exigiría resolver conflictos de saldo entre dispositivos, complejidad que no aporta a ningún indicador de la tesis.
+El alcance offline se limita deliberadamente al registro de ingresos. Ampliarlo a salidas o existencias exigiría resolver conflictos de saldo entre dispositivos, complejidad que no aporta a ningún indicador operativo.

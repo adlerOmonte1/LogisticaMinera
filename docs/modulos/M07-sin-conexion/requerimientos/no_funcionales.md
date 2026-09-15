@@ -11,9 +11,9 @@
 | RNF-M07-07 | Seguridad — integridad | Los datos en IndexedDB no contienen credenciales ni información de otros usuarios | Inspección del almacenamiento local |
 | RNF-M07-08 | Compatibilidad | La aplicación funciona en Chrome para Android versión 90 o superior, que es el navegador disponible en los dispositivos del personal | Prueba en dispositivo real del personal |
 
-## RNF-M07-05 y la validez del indicador I1
+## RNF-M07-05 y la confiabilidad del indicador I1
 
-Este requisito es el más importante del módulo desde el punto de vista de la tesis. Si la hora de registro fuera la de sincronización, el indicador I1 mediría el tiempo hasta que hubo señal, no el tiempo hasta que se capturó el dato. La medición quedaría invalidada precisamente en el módulo diseñado para mejorarla.
+Este requisito es el más importante del módulo desde el punto de vista de la medición. Si la hora de registro fuera la de sincronización, el indicador I1 mediría el tiempo hasta que hubo señal, no el tiempo hasta que se capturó el dato. La medición quedaría invalidada precisamente en el módulo diseñado para mejorarla.
 
 La verificación debe ser explícita y documentada: capturar un ingreso sin conexión, esperar varias horas, sincronizar, y comprobar que `hora_registro` corresponde al momento de captura y `hora_sincronizacion` al momento del envío.
 

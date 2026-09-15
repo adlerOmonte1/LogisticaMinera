@@ -10,4 +10,4 @@
 | RU-M01-04 | Si alguien deja la empresa, quiero desactivarlo sin perder lo que ya registró |
 | RU-M01-05 | Quiero poder cambiar mi contraseña cuando quiera, sin pedírselo a nadie |
 
-**Origen:** entrevistas con el personal administrativo y el supervisor de planta durante el diagnóstico (Capítulo I).
+**Origen:** entrevistas con el personal administrativo y el supervisor de planta durante el diagnóstico (diagnóstico inicial).

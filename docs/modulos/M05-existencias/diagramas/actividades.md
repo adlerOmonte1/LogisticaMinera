@@ -50,4 +50,4 @@ flowchart TD
     D1 -->|No| Fin([Fin de la verificacion])
 ```
 
-Esta rutina no es una funcionalidad para el usuario: es un control interno que debe ejecutarse al menos al inicio y al cierre de la ventana de observación del postest. Su resultado es evidencia de la validez de los datos recolectados y conviene documentarlo como anexo de la tesis.
+Esta rutina no es una funcionalidad para el usuario: es un control interno que debe ejecutarse al menos al inicio y al cierre del periodo de medición. Su resultado es evidencia de la confiabilidad de los datos recolectados y conviene documentarlo como anexo del expediente técnico.
