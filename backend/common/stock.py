@@ -38,6 +38,12 @@ class ServicioStock(Protocol):
     def ajustar_por_edicion(self, ingreso, valores_anteriores: dict) -> None: ...
 
     # --- M04: salidas ---
+    def saldo_actual(self, producto) -> Decimal | None:
+        """Saldo vigente del producto, o `None` si todavía no se puede
+        calcular. RS-M04-04 lo consulta para **advertir**, nunca para
+        bloquear (RN-M04-06)."""
+        ...
+
     def generar_movimiento_salida(self, salida) -> None: ...
 
     def revertir_movimiento_salida(self, salida) -> None: ...
@@ -59,6 +65,11 @@ class ServicioStockPendiente:
 
     def ajustar_por_edicion(self, ingreso, valores_anteriores: dict) -> None:
         pass
+
+    def saldo_actual(self, producto) -> Decimal | None:
+        # Sin M05 no hay kardex que consultar. `None` significa «no se sabe»,
+        # distinto de `0`: no debe interpretarse como stock agotado.
+        return None
 
     def generar_movimiento_salida(self, salida) -> None:
         pass
