@@ -1,100 +1,164 @@
 # ARQ-01 — Definición de módulos del sistema
 
 **Documento:** ARQ-01
-**Versión:** 1.1
-**Estado:** Aprobado — base del indicador I1
+**Versión:** 2.0
+**Estado:** Aprobado
+**Alcance:** la lista cerrada de módulos del sistema web inteligente, con la justificación de cada uno
+**Deriva de:** `../00-tesis/marco_tesis.md` y `../00-tesis/decisiones_reformulacion.md`
 
 ---
 
 ## 1. Propósito
 
-Fijar la lista cerrada de módulos que constituyen el sistema web. Esta lista es el **denominador** del indicador de avance de la implementación "porcentaje de módulos implementados sobre módulos planificados". Toda ampliación posterior baja ese porcentaje; toda reducción debe documentarse antes de firmar la ficha técnica.
+Fijar la lista cerrada de módulos que constituyen el sistema web inteligente para el control de
+inventarios de ingreso de mineral, y dejar por escrito por qué existe cada uno.
+
+Un módulo es una **responsabilidad acotada del dominio**: un conjunto de decisiones que cambian
+juntas y por el mismo motivo. No es una pantalla, ni una tabla, ni un indicador.
+
+El avance de la implementación se mide sobre los **10 requerimientos funcionales** de la lista de
+control del marco, no sobre el número de módulos. Un módulo puede cubrir varios RF y un RF puede
+apoyarse en más de un módulo; el denominador fijo son los RF. Esta es la única mención al
+seguimiento de la tesis en este documento: el detalle está en
+`../02-trazabilidad/matriz_HU_RF_indicador.md`.
 
 ## 2. Criterio de derivación
 
-Ningún módulo se incorpora por analogía con otros sistemas de inventario. Cada uno se deriva de una de dos fuentes:
+Ningún módulo se incorpora por analogía con otros sistemas de inventario. Cada uno existe porque
+cumple las tres condiciones siguientes:
 
-- **Un indicador de resultado** que no puede mejorar sin ese módulo.
-- **Una restricción documentada** en el diagnóstico inicial (conectividad intermitente en planta, ausencia de registro de volquetes propios, pérdida del reporte mensual).
+1. **Responsabilidad propia.** Cubre una parte del dominio que ningún otro módulo cubre. Si dos
+   módulos cambian siempre a la vez y por la misma razón, son uno solo.
+2. **Contrato explícito.** Lo que ofrece a los demás se expresa como una interfaz o un conjunto de
+   endpoints, no como acceso directo a sus tablas.
+3. **Requerimiento que lo exige.** Corresponde a al menos un RF de la lista de control, o es
+   transversal y da soporte a todos (auditoría).
+
+Un módulo que no cumple las tres es una capa, una utilidad compartida o una pantalla, y pertenece
+dentro de otro.
 
 ## 3. Lista de módulos
 
-| Código | Módulo | RF que agrupa | Indicador que habilita | Semana |
-|---|---|---|---|---|
-| M01 | Autenticación y control de acceso | RF-08 | — (habilitante) | 1 |
-| M02 | Catálogo maestro | RF-03 | I2 | 2 |
-| M03 | Registro de ingresos | RF-01, RF-02, RF-09 | I1, I2, I5 | 2–3 |
-| M04 | Salidas y movimientos | RF-05 | I4 | 5 |
-| M05 | Existencias | RF-04 | I3, I4 | 5 |
-| M06 | Consolidados y reportes | RF-06, RF-07 | I6 | 7 |
-| M07 | Captura sin conexión (PWA) | RF-10 | I1, I2 | 4 |
-| M08 | Auditoría | RF-12 | — (trazabilidad) | 3 y 6 |
-| M09 | Búsqueda | RF-11 | I5 | 6 |
+| Código | Módulo | Responsabilidad | RF que cubre |
+|---|---|---|---|
+| M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 |
+| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad y capacidad, y transportistas | RF06 (soporte) |
+| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación y código único | RF01, RF04, RF05, RF06 |
+| M04 | Reconocimiento automático del ticket | Leer los seis campos del ticket con su nivel de confianza | RF02 |
+| M05 | Validación automática de consistencia | Aplicar las reglas V1 a V5 y registrar su resultado | RF03 |
+| M06 | Trazabilidad del proceso | Asignar ingresos a lotes y registrar su paso por cada etapa | RF07 |
+| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |
+| M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 |
+| M09 | Auditoría | Registrar quién hizo qué y cuándo sobre cada entidad | — (transversal) |
 
-**Total planificado: 9 módulos.**
+**Total: 9 módulos y 10 RF.** Cada RF tiene un módulo principal responsable; ningún RF queda sin
+dueño y ninguno está repartido entre dos módulos sin que uno decida.
 
 ## 4. Justificación módulo por módulo
 
-**M01 — Autenticación.** No deriva de un indicador; es habilitante. Sin control de acceso por rol, el registro de eventos de M08 no puede atribuirse a un responsable y la cobertura de registro (I2) no es auditable.
+**M01 — Autenticación y roles.** Es habilitante. Sin control de acceso por rol, ninguna operación
+puede atribuirse a un responsable y el registro de eventos de M09 no tiene a quién imputar los
+cambios. Cubre RF10.
 
-**M02 — Catálogo maestro.** El indicador I2 mide cobertura de registro *por tipo de vehículo* (propio vs. externo). Esa distinción exige un catálogo de vehículos con su titularidad declarada. Sin catálogo, el tipo de vehículo se captura como texto libre y el indicador se vuelve inclasificable.
+**M02 — Catálogo maestro.** El ingreso referencia datos que no se digitan: el vehículo, su
+titularidad y su capacidad, y el tipo de mineral. Que esos datos sean un catálogo y no texto libre
+es lo que permite derivar el tipo de vehículo de la placa (D-06) y contrastar el peso neto con la
+capacidad declarada (regla V4). Un catálogo escrito a mano en cada ingreso haría ambas cosas
+imposibles.
 
-**M03 — Registro de ingresos.** Es el núcleo. La unidad de registro de todo el sistema es el ingreso de volquete a planta. I1 (latencia entre pesaje y disponibilidad del dato) e I2 (cobertura) se miden directamente sobre los registros que produce este módulo.
+**M03 — Registro de ingresos.** Es el núcleo. La unidad de registro del sistema es el ingreso de
+mineral a planta, y aquí se materializa: recibe la imagen, orquesta el reconocimiento y la
+validación, recoge la confirmación del usuario y persiste el ingreso con su código único y sus tres
+marcas de tiempo. M03 no lee la imagen ni aplica las reglas: las delega y decide con su resultado.
 
-**M04 — Salidas y movimientos.** El indicador I4 (desviación entre stock declarado y estimado) requiere que las salidas se registren con el mismo rigor que los ingresos. Sin salidas, el stock calculado es acumulativo y la desviación carece de sentido.
+**M04 — Reconocimiento automático del ticket.** Existe como módulo propio, y no como una función
+dentro de M03, por dos razones. La primera es de sustitución: el motor concreto está pendiente de
+elegir (D-12) y debe poder cambiarse sin tocar el registro, por lo que queda detrás de la interfaz
+`ReconocedorTicket`. La segunda es de responsabilidad: extraer texto de una imagen y decidir si un
+ingreso es válido son problemas distintos, con datos, errores y pruebas distintos. Cubre RF02.
 
-**M05 — Existencias.** I3 mide el tiempo de determinación del stock por producto. Hoy ese cálculo es manual sobre papel. El módulo lo convierte en una consulta.
+**M05 — Validación automática de consistencia.** Las reglas V1 a V5 son conocimiento del dominio que
+se consulta desde dos momentos distintos —sobre los datos propuestos por el reconocimiento y sobre
+los confirmados por el usuario— y que debe poder ampliarse sin tocar el registro. Se ejecuta siempre
+en el servidor (D-08). Cubre RF03.
 
-**M06 — Consolidados y reportes.** I6 mide el porcentaje de meses con reporte de producción consolidado disponible. El reporte mensual existió en la empresa y se perdió; este módulo lo restituye de forma automática. Incluye el formato de declaración semestral requerido por la normativa vigente.
+**M06 — Trazabilidad del proceso.** El mineral de varios volquetes se mezcla en cancha, de modo que
+el vínculo directo entre un ingreso y una etapa no es realista: el ingreso se asigna a un lote de
+proceso y es el lote el que registra su paso por secado, zarandeo, molienda y ensacado (DR-04). Esa
+indirección es la responsabilidad del módulo. Cubre RF07.
 
-**M07 — Captura sin conexión.** Deriva de una restricción documentada: la conectividad en planta es intermitente. Si el registro exige conexión, la latencia (I1) no baja en las horas sin señal y la cobertura (I2) se degrada justamente en los turnos con más ingresos. Es el diferenciador del sistema frente a una aplicación web convencional.
+**M07 — Consulta de ingresos y respaldo.** Recuperar un ingreso concreto por placa y fecha, con la
+imagen de su ticket, es una lectura con sus propios índices y su propio contrato. No tiene entidad
+propia: lee sobre M03 (D-10). Cubre RF08.
 
-**M08 — Auditoría.** No mejora ningún indicador de resultado, pero sostiene la confiabilidad de los datos recolectados: permite demostrar ante la gerencia que los registros del histórico no fueron alterados retroactivamente.
+**M08 — Consolidación de la producción.** Agrega los ingresos no anulados del mes por tipo de
+mineral y entrega el total, con su exportación (DR-06). Tampoco tiene entidad propia. Cubre RF09.
 
-**M09 — Búsqueda.** Deriva del indicador I5 (tiempo de recuperación del dato de un ingreso concreto). Ninguno de los diez requerimientos originales contemplaba búsqueda por criterios. Sin ella, I5 no mejora y la dimensión D3 queda sin efecto medible. Se incorporó como RF-11.
+**M09 — Auditoría.** Transversal y sin RF propio. Registra creación, corrección y anulación, y
+también el reconocimiento y las correcciones sobre los datos propuestos. No mejora ninguna función
+del negocio: sostiene que el histórico pueda demostrarse íntegro, que es condición de todo lo demás.
 
 ## 5. Fuera de alcance
 
-Se declara explícitamente para proteger el cronograma de desarrollo y para poder responder en la revisión técnica:
+Se declara explícitamente para proteger el cronograma y para poder responderlo en la revisión
+técnica:
 
-- Facturación, cobranza y precios de venta
-- Cálculo y pago de fletes a transportistas
+- Salidas de producto y ventas
+- Inventario de producto terminado, sus movimientos internos y las pérdidas por humedad
+- Reportes normativos periódicos
+- Facturación, cobranza, precios y fletes a transportistas
 - Contabilidad y planillas
-- Cualquier registro de la actividad en la concesión minera
-- Geolocalización o seguimiento de vehículos
-- Predicción de demanda, aprendizaje automático o analítica avanzada
-- Aplicación móvil nativa (el alcance es una aplicación web progresiva)
+- Cualquier registro de la actividad en la mina
+- Mineral sulfuro
+- Integración directa con la balanza
+- Predicción de demanda o pronósticos
+- Aplicación móvil nativa
+- Operación sin señal de red, salvo la conservación del borrador (DR-01)
 - Operación multiempresa
 - Balance metalúrgico y determinación de leyes
 
-## 6. Distribución en ocho semanas
+## 6. Orden de construcción
 
-| Semana | Foco | Entregable verificable |
+Las semanas concretas están en `../01-plan/PLAN_DE_TRABAJO.md`. Aquí solo consta el orden que
+imponen las dependencias:
+
+| Orden | Módulos | Por qué en esa posición |
 |---|---|---|
-| 1 | Arquitectura, modelo de datos, esqueleto PWA, M01 | Login funcional con roles; decisión de arquitectura documentada |
-| 2 | M02 y arranque de M03 | Catálogo operativo; formulario de ingreso con validaciones |
-| 3 | M03 completo y M08 | Alta, edición, listado e histórico de ingresos, con registro de eventos |
-| 4 | M07 sobre M03 | Registro de un ingreso sin conexión y sincronización verificada |
-| 5 | M04 y M05 | Stock por producto coincidente con el cálculo manual |
-| 6 | M09 y kardex | Búsqueda de un ingreso por padrón en menos de un minuto |
-| 7 | M06 | Consolidado mensual y formato de declaración semestral exportables |
-| 8 | Pruebas funcionales, pruebas de carga, corrección y despliegue | Acta de pruebas funcionales y protocolo de carga completados |
+| 1 | M01, M02 | Todo lo demás necesita usuario atribuido y catálogos |
+| 2 | M03 | Núcleo; debe existir antes que lo que lo consume |
+| 3 | M04, M05 | Se inyectan en M03; requieren su servicio de registro |
+| 4 | M09 | Transversal; se incorpora junto con las operaciones que audita |
+| 5 | M06, M07, M08 | Leen o amplían lo que M03 ya produce |
 
-M07 se aborda en la semana 4 y no al final, por la razón indicada en `decisiones_diseno.md` §4. La semana 8 es de estabilización y **no** de desarrollo: es donde se consolidan las mediciones de los indicadores operativos.
+M04 y M05 no pueden quedar para el final: M03 se construye asumiendo que existen, con sus interfaces
+inyectadas desde el principio. Si se añadieran después, habría que reescribir el servicio de
+registro.
 
 ## 7. Riesgos del alcance
 
 | Riesgo | Impacto | Mitigación |
 |---|---|---|
-| M07 resulta más costoso de lo previsto | Baja el porcentaje de módulos implementados y se pierde el diferenciador | Decisión firme en semana 1. Si se descarta, retirarlo de la lista planificada **antes** de firmar la ficha técnica |
-| El criterio de merma no está definido | M04 no puede construirse correctamente y el indicador I4 queda sin interpretación | Definirlo antes de la semana 5 |
-| El formato de declaración semestral no está a la mano | M06 se construye a ciegas | Conseguir el formato oficial antes de la semana 7 |
-| Nueve módulos en ocho semanas | Sobrecarga | M08 puede reducirse a registro de eventos sin interfaz de consulta si el tiempo aprieta |
-| Volumen de datos insuficiente en el periodo de medición | Los indicadores pierden representatividad | Acordar con la jefatura de operaciones la extensión del periodo antes de cerrarlo |
+| Precisión insuficiente del motor de reconocimiento | El usuario corrige tantos campos que el registro tarda más que la transcripción manual | Piloto con 20 a 30 tickets reales antes de fijar D-12; la interfaz `ReconocedorTicket` permite cambiar de motor sin tocar M03 |
+| Calidad de las fotografías en planta | Tickets ilegibles por luz, sombra, papel térmico desvaído o encuadre | Camino manual siempre disponible (HU-M04-01 CA03 y CA04); guía de captura al usuario; validación de tamaño y formato |
+| Mezcla de mineral en cancha | El vínculo ingreso–etapa no refleja la operación real y la trazabilidad queda inservible | Lote de proceso como indirección (DR-04); confirmar con la empresa cómo se agrupa realmente el mineral antes de implementar M06 |
+| Placa reconocida que no está en el catálogo | El registro se bloquea en planta, donde no hay quien dé de alta el vehículo | DR-05: el Administrativo puede darlo de alta en el momento; medir cuántas veces ocurre durante el piloto |
+| El catálogo de tipo de mineral no está definido | M02 y M08 se construyen sobre un supuesto | Definir sus valores con la empresa antes de implementar M02 (DR-03) |
+| Motor o reglas modificados durante la medición | Los ingresos del periodo dejan de ser comparables entre sí | D-16: motor, versión y reglas congelados; la versión se registra en cada reconocimiento |
+| Nueve módulos en el cronograma previsto | Sobrecarga | M09 puede reducirse a registro de eventos sin interfaz de consulta si el tiempo aprieta |
 
 ## 8. Referencias cruzadas
 
-- Convención de códigos: `convenciones_codigo.md`
-- Decisiones que condicionan la implementación: `decisiones_diseno.md`
+- Marco de la tesis y lista de RF: `../00-tesis/marco_tesis.md`
+- Decisiones de reformulación: `../00-tesis/decisiones_reformulacion.md`
+- Decisiones que condicionan la implementación: `../00-arquitectura/decisiones_diseno.md`
+- Convención de códigos: `../00-arquitectura/convenciones_codigo.md`
 - Organización del código Django/Angular: `ARQ-02_Arquitectura_Tecnica.md`
+- Contenedores y componentes: `ARQ-03_Modelo_C4.md`
 - Trazabilidad completa: `../02-trazabilidad/matriz_HU_RF_indicador.md`
+
+## 9. Nota sobre la numeración anterior
+
+Los módulos se renumeraron el 21/09/2026 (DR-07). Las carpetas de `docs/modulos/` con la numeración
+antigua M04 a M07 y las apps del backend que no figuran en la sección 3 pertenecen al alcance
+anterior y se retiran en las fases 7 y 10 del plan de migración. Los commits `M04:` anteriores a esa
+fecha se refieren al módulo de salidas, hoy fuera de alcance.
