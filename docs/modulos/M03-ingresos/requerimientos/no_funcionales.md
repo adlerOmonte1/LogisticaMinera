@@ -2,21 +2,30 @@
 
 | Código | Característica ISO/IEC 25010:2023 | Requerimiento | Verificación |
 |---|---|---|---|
-| RNF-M03-01 | Eficiencia de desempeño — comportamiento temporal | El alta de un ingreso responde en menos de 2 segundos con 20 usuarios concurrentes | Prueba de carga JMeter (semana 8) |
-| RNF-M03-02 | Eficiencia de desempeño — comportamiento temporal | El listado filtrado de un mes devuelve resultados en menos de 3 segundos con 1000 ingresos en base | Prueba de carga con datos sintéticos |
-| RNF-M03-03 | Usabilidad — operabilidad | El formulario de registro se completa en menos de 90 segundos por un usuario capacitado, medido desde que abre la pantalla | Observación cronometrada en campo |
-| RNF-M03-04 | Usabilidad — protección contra errores del usuario | Los campos numéricos abren teclado numérico en dispositivos móviles | Inspección en dispositivo real |
-| RNF-M03-05 | Usabilidad — operabilidad | El formulario es completamente operable en pantalla de 5 pulgadas sin desplazamiento horizontal | Inspección en dispositivo real |
-| RNF-M03-06 | Fiabilidad — tolerancia a fallos | La pérdida de conexión durante el llenado del formulario no borra los datos ingresados | Prueba manual: activar modo avión a media captura |
-| RNF-M03-07 | Adecuación funcional — corrección | El peso neto calculado por el servidor coincide con la diferencia bruto − tara en el 100 % de los registros | Consulta de verificación sobre la base |
-| RNF-M03-08 | Seguridad — no repudio | Todo ingreso queda asociado de forma inmutable al usuario que lo registró | Inspección: campo no editable, evento en auditoría |
+| RNF-M03-01 | Adecuación funcional — corrección | La imagen del ticket se acepta en JPG o PNG de hasta 10 MB; cualquier otro formato o tamaño se rechaza con mensaje explícito | Prueba automatizada con archivos de muestra de cada formato y tamaño límite |
+| RNF-M03-02 | Eficiencia de desempeño — comportamiento temporal | Desde que se envía la imagen hasta que se presentan los campos propuestos transcurren menos de 8 segundos con una imagen de 5 MB sobre red móvil | Cronometraje en planta con diez capturas consecutivas |
+| RNF-M03-03 | Eficiencia de desempeño — comportamiento temporal | La confirmación del ingreso responde en menos de 2 segundos con 5000 ingresos en base | Prueba automatizada con datos sintéticos |
+| RNF-M03-04 | Eficiencia de desempeño — utilización de recursos | La imagen se reduce en el cliente antes de enviarse, conservando legible el texto del ticket | Inspección en dispositivo real sobre veinte tickets, comparando la lectura antes y después de reducir |
+| RNF-M03-05 | Fiabilidad — tolerancia a fallos | El borrador del registro —imagen y campos editados— se conserva en el dispositivo si se pierde la conexión, y se reanuda al recuperarla sin volver a fotografiar | Inspección en dispositivo real desactivando la red a mitad del registro |
+| RNF-M03-06 | Fiabilidad — capacidad de recuperación | Si la operación falla después de confirmar, no queda un ingreso parcialmente persistido | Prueba automatizada que fuerza el fallo en cada paso de la transacción |
+| RNF-M03-07 | Usabilidad — operabilidad | El registro completo se realiza desde un teléfono, en vertical y con una sola mano, sin desplazamiento horizontal | Inspección en dispositivo real |
+| RNF-M03-08 | Usabilidad — protección contra errores del usuario | Los campos con confianza inferior al umbral se resaltan visualmente antes de confirmar, y las inconsistencias se muestran junto al campo afectado | Inspección en dispositivo real |
+| RNF-M03-09 | Usabilidad — protección contra errores del usuario | Los campos numéricos abren el teclado numérico en dispositivos móviles | Inspección en dispositivo real |
+| RNF-M03-10 | Seguridad — no repudio | La imagen del ticket se conserva sin alteración mientras el ingreso exista, incluso si este se anula | Consulta de verificación sobre el almacén de imágenes tras una anulación |
+| RNF-M03-11 | Seguridad — confidencialidad | La imagen solo es accesible para usuarios autenticados con permiso sobre el ingreso; no se sirve desde una ruta pública adivinable | Inspección de configuración e intento de acceso sin sesión |
+| RNF-M03-12 | Mantenibilidad — modularidad | Cambiar el motor de reconocimiento o añadir una regla de validación no obliga a modificar el servicio de registro | Inspección de código: el servicio depende de las interfaces, no de implementaciones |
 
-## Relación con los objetivos de calidad
+## Nota sobre RNF-M03-02 y RNF-M03-04
 
-RNF-M03-01, RNF-M03-02 y RNF-M03-03 constituyen la evidencia de la dimensión *eficiencia de desempeño* de la solución implantada bajo ISO/IEC 25010:2023. El protocolo de medición está en `../../03-pruebas/plan_de_pruebas.md`.
+Son el par que decide si el sistema se usa o se abandona. El registro ocurre de pie junto al
+volquete, con la conectividad de la planta, y una espera larga empuja al usuario a volver al papel.
+RNF-M03-04 es la palanca principal: una fotografía de teléfono actual supera con facilidad los 5 MB
+y casi todo ese peso es irrelevante para leer un ticket. Reducir de más, en cambio, vuelve ilegible
+el texto impreso en papel térmico, por eso la verificación compara la lectura antes y después.
 
-RNF-M03-03 merece atención especial: el tiempo de llenado del formulario es un componente del indicador I1. Si el formulario es lento de completar, la latencia no baja lo suficiente aunque el registro sea inmediato. Un formulario de treinta campos anularía el beneficio del sistema.
+## Nota sobre RNF-M03-05
 
-## Relación con el indicador I1
-
-RNF-M03-06 es más que una comodidad. Si el formulario pierde los datos al caerse la conexión, el supervisor abandona el registro en campo y vuelve al método antiguo: anotar en papel y transcribir después. Eso devolvería la latencia a los valores de la línea base.
+Sustituye a la operación sin conexión que contemplaba el alcance anterior. No se trata de registrar
+sin red, sino de no perder el trabajo ya hecho: la fotografía tomada y los campos corregidos siguen
+disponibles cuando la señal vuelve. El ingreso se confirma siempre contra el servidor, porque el
+código único y la validación viven allí (D-02, D-08).
