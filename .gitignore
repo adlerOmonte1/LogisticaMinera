@@ -6,6 +6,9 @@ __pycache__/
 .venv/
 venv/
 *.sqlite3
+.coverage
+htmlcov/
+.pytest_cache/
 .env
 
 # Node / Angular
@@ -18,3 +21,6 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+
+# Artefacto intermedio del generador del PDF de historias de usuario
+docs/03-pruebas/_build_hu.html

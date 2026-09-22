@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from apps.accounts.models import Usuario
 from apps.accounts.repositories import UsuarioRepository
-from common.eventos import RegistradorDeEventos, registrador_por_defecto
+from common.eventos import Accion, RegistradorDeEventos, registrador_por_defecto
 from common.excepciones import ErrorDeValidacionDeDominio
 
 MAX_INTENTOS_FALLIDOS = 5  # RN-M01-07
@@ -95,22 +95,48 @@ def autenticar(
     usuario.last_login = momento
     usuario.save(update_fields=["intentos_fallidos", "bloqueado_hasta", "last_login"])
 
-    registrador.registrar(evento="INICIO_DE_SESION", usuario=usuario, ip=ip, detalles={})
+    registrador.registrar(
+        accion=Accion.INICIAR_SESION,
+        entidad="Usuario",
+        id_entidad=usuario.pk,
+        usuario=usuario,
+        ip=ip,
+    )
     return usuario
 
 
-def cerrar_sesion(refresh_token: str) -> None:
+def cerrar_sesion(
+    refresh_token: str,
+    *,
+    ip: str | None = None,
+    registrador: RegistradorDeEventos = registrador_por_defecto,
+) -> None:
     """HU-M01-02 CA01: invalida el token vigente.
 
     Requiere `rest_framework_simplejwt.token_blacklist` instalada (ver
     settings): sin la tabla de lista negra, `blacklist()` no tiene dónde
     persistir la invalidación y el token seguiría siendo válido hasta expirar
     por tiempo — contradiría CA01 y CA02.
+
+    El usuario se toma del propio token: el endpoint de cierre de sesión no
+    exige cabecera de autorización (basta con presentar el refresh), así que
+    `request.user` sería anónimo.
     """
     from rest_framework_simplejwt.exceptions import TokenError
     from rest_framework_simplejwt.tokens import RefreshToken
 
     try:
-        RefreshToken(refresh_token).blacklist()
+        token = RefreshToken(refresh_token)
+        id_usuario = token.payload.get("user_id")
+        token.blacklist()
     except TokenError as exc:
         raise ErrorDeValidacionDeDominio(MENSAJE_TOKEN_INVALIDO, codigo="TOKEN_INVALIDO") from exc
+
+    # RS-M01-08: el cierre de sesión también deja rastro.
+    registrador.registrar(
+        accion=Accion.CERRAR_SESION,
+        entidad="Usuario",
+        id_entidad=id_usuario,
+        usuario=UsuarioRepository.obtener_por_id(id_usuario) if id_usuario else None,
+        ip=ip,
+    )

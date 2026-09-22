@@ -1,12 +1,16 @@
 # Historias de usuario — M03 Registro de ingresos
 
-**RF asociados:** RF-01, RF-02, RF-09 · **Indicadores:** I1, I2, I5 · **Semanas:** 2–3 · **Historias:** 7
+**RF asociados:** RF01, RF04, RF05, RF06 · **Historias:** 3
 
-> Módulo núcleo. La unidad de registro de todo el sistema —el ingreso de volquete a planta— se materializa aquí. Los indicadores I1 (latencia entre pesaje y disponibilidad del dato) e I2 (cobertura de registro por tipo de vehículo) se calculan directamente sobre los registros que produce este módulo.
+> Módulo núcleo del sistema. Aquí se materializa la unidad de registro —el ingreso de mineral a
+> planta— a partir de la imagen del ticket de balanza. M03 no lee la imagen ni decide si los datos
+> son coherentes: delega lo primero en `ReconocedorTicket` (M04) y lo segundo en
+> `ValidadorConsistencia` (M05), recoge la confirmación del usuario y persiste el ingreso con su
+> código único, su respaldo y sus tres marcas de tiempo.
 
 ---
 
-## HU-M03-01 — Registro de un ingreso de volquete
+## HU-M03-01 — Registro de un ingreso a partir del ticket de balanza
 
 | Campo | Descripción |
 |:--|:--|
@@ -16,175 +20,191 @@
 
 **Historia**
 
-Como supervisor de planta, quiero registrar el ingreso de un volquete apenas sale de la balanza, para que el dato quede disponible sin esperar a que alguien lo transcriba en la oficina.
+Como supervisor de planta, quiero registrar el ingreso fotografiando el ticket de balanza apenas el
+volquete sale de la balanza, para que el dato y su respaldo queden disponibles sin transcripción
+posterior en la oficina.
 
 **Descripción**
 
-El registro toma los datos del ticket de balanza: fecha y hora de pesaje, número de ticket, placa del vehículo, producto, peso bruto y tara. El peso neto lo calcula el sistema. La hora de registro la asigna el servidor de forma automática y no es editable por ningún rol.
+El registro empieza cuando el usuario captura o carga la imagen del ticket. En ese momento el
+sistema conserva la imagen y asigna la hora de inicio del registro. El reconocedor propone los seis
+datos del ticket con su nivel de confianza y el validador señala las inconsistencias. El usuario
+revisa, corrige lo que haga falta y elige el tipo de mineral. El tipo de vehículo no se digita: se
+deriva del catálogo a partir de la placa.
+
+Nada de lo propuesto se guarda como dato del ingreso hasta que el usuario confirma. Al confirmar, el
+servidor vuelve a validar, asigna el código único y la hora de fin del registro, y persiste el
+ingreso junto con los valores reconocidos y los confirmados, en una sola transacción.
+
+El ingreso guarda tres marcas de tiempo independientes: la fecha y hora del ticket, el inicio del
+registro y el fin del registro. La primera se lee del ticket y es editable antes de confirmar; las
+otras dos las asigna el servidor y ningún rol las modifica.
 
 **Detalles**
-- Fecha y hora de pesaje: obligatorias, tomadas del ticket.
-- Número de ticket: obligatorio, texto.
-- Vehículo: obligatorio, seleccionado del catálogo (M02).
-- Producto: obligatorio, seleccionado del catálogo (M02).
-- Peso bruto y tara: obligatorios, decimales positivos.
-- Peso neto: calculado, no editable.
-- Correlativo: asignado por el servidor.
+- Imagen del ticket: obligatoria, JPG o PNG, hasta 10 MB.
+- Placa: obligatoria, reconocida y editable; debe corresponder a un vehículo vigente del catálogo.
+- Fecha y hora del ticket: obligatorias, reconocidas y editables antes de confirmar.
+- Peso bruto, tara y peso neto: obligatorios, reconocidos y editables, en toneladas, decimales
+  positivos. El peso neto se toma del ticket; no se calcula.
+- Tipo de mineral: obligatorio, seleccionado del catálogo.
+- Tipo de vehículo: derivado del catálogo, no editable.
+- Número de ticket: opcional; si se consigna, único entre los ingresos no anulados.
+- Justificación del peso: obligatoria solo si el peso neto quedó fuera del rango de carga.
+- Inicio y fin del registro: asignados por el servidor, no editables.
+- Código: asignado por el servidor, no editable.
 
 **Criterios de aceptación**
 
-> **CA01.** Dado que el usuario completa todos los campos obligatorios con datos válidos, cuando confirma el registro, entonces el sistema persiste el ingreso, le asigna un correlativo y muestra "Ingreso registrado con el número {correlativo}".
+> **CA01.** Dado que el usuario capturó la imagen y confirma datos válidos y sin inconsistencias
+> pendientes, cuando confirma el registro, entonces el sistema persiste el ingreso, le asigna un
+> código y muestra "Ingreso registrado con el código {codigo}".
 
-> **CA02.** Dado que el usuario omite un campo obligatorio, cuando intenta guardar, entonces el sistema rechaza la operación indicando cuáles campos faltan.
+> **CA02.** Dado que el usuario no adjuntó la imagen del ticket, cuando intenta confirmar, entonces
+> el sistema rechaza la operación mostrando "Debe adjuntar la imagen del ticket de balanza".
 
-> **CA03.** Dado que la tara es mayor o igual al peso bruto, cuando el usuario intenta guardar, entonces el sistema rechaza la operación mostrando "La tara no puede ser mayor o igual al peso bruto".
+> **CA03.** Dado que falta alguno de los campos obligatorios, cuando el usuario intenta confirmar,
+> entonces el sistema rechaza la operación mostrando "Debe completar los campos obligatorios" e
+> indica cuáles faltan.
 
-> **CA04.** Dado que el número de ticket ya fue registrado, cuando el usuario intenta guardar, entonces el sistema rechaza la operación mostrando "El ticket número {n} ya fue registrado en el ingreso {correlativo}".
+> **CA04.** Dado que la placa no corresponde a un vehículo vigente del catálogo, cuando el usuario
+> intenta confirmar, entonces el sistema rechaza la operación mostrando "La placa {placa} no está
+> registrada en el catálogo de vehículos".
 
-> **CA05.** Dado que el usuario registra un ingreso, cuando el sistema lo persiste, entonces almacena la hora de pesaje ingresada por el usuario y la hora de registro asignada por el servidor como **dos campos independientes**, y no permite editar la segunda.
+> **CA05.** Dado que existe una inconsistencia bloqueante o una advertencia sin justificar, cuando
+> el usuario intenta confirmar, entonces el sistema rechaza la operación mostrando "Debe corregir o
+> justificar las inconsistencias señaladas".
 
-> **CA06.** Dado que la fecha y hora de pesaje son posteriores a la hora del servidor, cuando el usuario intenta guardar, entonces el sistema rechaza la operación mostrando "La fecha y hora de pesaje no pueden ser posteriores a la hora actual".
+> **CA06.** Dado que el usuario adjunta un archivo que no es JPG ni PNG, o que supera los 10 MB,
+> cuando intenta cargarlo, entonces el sistema lo rechaza mostrando "La imagen debe estar en formato
+> JPG o PNG y no superar los 10 MB".
 
-> **CA07.** Dado que el ingreso se persiste correctamente, cuando concluye la operación, entonces el sistema genera el movimiento de stock de entrada correspondiente y registra el evento en auditoría.
+> **CA07.** Dado que un ingreso fue registrado, cuando se consulta su detalle, entonces el sistema
+> muestra la fecha y hora del ticket, el inicio del registro y el fin del registro como tres valores
+> distintos, y no permite editar los dos últimos.
+
+> **CA08.** Dado que el número de ticket ya figura en un ingreso no anulado, cuando el usuario
+> intenta confirmar, entonces el sistema rechaza la operación mostrando "El ticket número {n} ya fue
+> registrado en el ingreso {codigo}".
+
+> **CA09.** Dado que el ingreso se persiste, cuando concluye la operación, entonces el sistema
+> conserva la imagen asociada al ingreso, guarda para cada campo el valor reconocido y el confirmado,
+> y registra el evento en auditoría.
+
+> **CA10.** Dado que la operación falla en cualquier punto después de confirmar, cuando el sistema
+> la interrumpe, entonces no queda un ingreso a medio registrar: o se persiste todo o no se persiste
+> nada.
 
 ---
 
-## HU-M03-02 — Cálculo automático del peso neto
+## HU-M03-02 — Corrección de un ingreso registrado
 
 | Campo | Descripción |
 |:--|:--|
 | **Identificador** | HU-M03-02 |
-| **Prioridad** | Crítica |
+| **Épica** | Registro de ingresos |
+| **Prioridad** | Alta |
 
 **Historia**
 
-Como supervisor, quiero que el sistema calcule el peso neto, para no equivocarme restando a mano y para que todos los registros usen el mismo criterio.
+Como administrativo, quiero corregir un dato equivocado de un ingreso ya registrado, para que el
+histórico refleje lo que dice el ticket sin tener que anular el registro y volver a crearlo.
+
+**Descripción**
+
+La corrección alcanza a los datos que provienen del ticket y a los que el usuario eligió: fecha y
+hora del ticket, pesos, vehículo, tipo de mineral y número de ticket. No alcanza al código, a las
+dos marcas de tiempo del servidor ni a la imagen, que es el respaldo de lo que se registró.
+
+Toda corrección exige un motivo y vuelve a someter los datos a las reglas de validación: un ingreso
+corregido cumple exactamente las mismas condiciones que uno nuevo. El sistema conserva los valores
+anteriores, de modo que siempre puede reconstruirse qué decía el registro antes del cambio.
+
+**Detalles**
+- Campos corregibles: fecha y hora del ticket, peso bruto, tara, peso neto, vehículo, tipo de
+  mineral, número de ticket y justificación del peso.
+- Campos no corregibles: código, hora de inicio y fin del registro, imagen del ticket, usuario que
+  registró.
+- Motivo de la corrección: obligatorio, texto libre.
+- Roles autorizados: Administrativo y Administrador.
 
 **Criterios de aceptación**
 
-> **CA01.** Dado que el usuario ingresa peso bruto y tara válidos, cuando ambos campos pierden el foco, entonces el sistema muestra el peso neto calculado como la diferencia, sin permitir su edición.
+> **CA01.** Dado que el usuario modifica uno o más campos corregibles e indica el motivo, cuando
+> guarda la corrección, entonces el sistema actualiza el ingreso y muestra "Ingreso {codigo}
+> actualizado".
 
-> **CA02.** Dado que el usuario modifica el peso bruto o la tara, cuando el campo cambia, entonces el sistema recalcula el peso neto de inmediato.
+> **CA02.** Dado que el usuario no indica el motivo, cuando intenta guardar la corrección, entonces
+> el sistema rechaza la operación mostrando "Debe indicar el motivo de la corrección".
 
-> **CA03.** Dado que un registro llega por la cola de sincronización, cuando el servidor lo procesa, entonces recalcula el peso neto en el servidor y descarta el valor enviado por el cliente.
+> **CA03.** Dado que los valores corregidos incumplen una regla de validación, cuando el usuario
+> intenta guardar, entonces el sistema rechaza la operación con el mensaje literal de la regla
+> incumplida.
+
+> **CA04.** Dado que el usuario intenta modificar el código o alguna de las marcas de tiempo
+> asignadas por el servidor, cuando envía la corrección, entonces el sistema ignora esos valores y
+> conserva los originales.
+
+> **CA05.** Dado que el ingreso está anulado, cuando el usuario intenta corregirlo, entonces el
+> sistema rechaza la operación mostrando "No se puede corregir un ingreso anulado".
+
+> **CA06.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta corregir un
+> ingreso, entonces el sistema rechaza la operación mostrando "Acción no autorizada".
+
+> **CA07.** Dado que la corrección se persiste, cuando concluye la operación, entonces el sistema
+> registra en auditoría el valor anterior y el nuevo de cada campo modificado, junto con el motivo y
+> el usuario responsable.
 
 ---
 
-## HU-M03-03 — Asignación de correlativo por el servidor
+## HU-M03-03 — Anulación de un ingreso
 
 | Campo | Descripción |
 |:--|:--|
 | **Identificador** | HU-M03-03 |
-| **Prioridad** | Crítica |
-
-**Historia**
-
-Como administrador, quiero que el número correlativo de cada ingreso lo asigne el servidor, para que no existan dos ingresos con el mismo número aunque se registren desde dispositivos distintos.
-
-**Descripción**
-
-Un ingreso capturado sin conexión lleva un identificador local temporal (UUID) y recibe su correlativo definitivo al sincronizar. La asignación ocurre dentro de una transacción con bloqueo, no mediante una consulta del máximo actual.
-
-**Criterios de aceptación**
-
-> **CA01.** Dado que el sistema persiste un ingreso, cuando asigna el correlativo, entonces este es único en todo el sistema y estrictamente creciente.
-
-> **CA02.** Dado que dos registros se sincronizan de forma simultánea, cuando el servidor los procesa, entonces cada uno recibe un correlativo distinto.
-
-> **CA03.** Dado que un ingreso fue capturado sin conexión, cuando se sincroniza, entonces conserva su identificador local en el campo correspondiente y recibe además el correlativo del servidor.
-
-> **CA04.** Dado que un ingreso ya tiene correlativo asignado, cuando se edita cualquier otro campo, entonces el correlativo permanece inalterado.
-
----
-
-## HU-M03-04 — Listado y filtrado de ingresos
-
-| Campo | Descripción |
-|:--|:--|
-| **Identificador** | HU-M03-04 |
+| **Épica** | Registro de ingresos |
 | **Prioridad** | Alta |
 
 **Historia**
 
-Como administrativo, quiero ver la lista de ingresos registrados con filtros por fecha, producto y vehículo, para revisar la operación del periodo.
-
-**Criterios de aceptación**
-
-> **CA01.** Dado que el usuario accede al listado, cuando la pantalla carga, entonces el sistema muestra los ingresos del mes en curso ordenados por fecha de pesaje descendente.
-
-> **CA02.** Dado que el usuario aplica un filtro por rango de fechas, cuando confirma, entonces el sistema muestra únicamente los ingresos comprendidos en ese rango.
-
-> **CA03.** Dado que el listado supera cincuenta registros, cuando se muestra, entonces el sistema pagina los resultados.
-
-> **CA04.** Dado que un ingreso está anulado, cuando aparece en el listado, entonces el sistema lo muestra visualmente diferenciado y con su motivo de anulación accesible.
-
----
-
-## HU-M03-05 — Consulta del detalle de un ingreso
-
-| Campo | Descripción |
-|:--|:--|
-| **Identificador** | HU-M03-05 |
-| **Prioridad** | Alta |
-
-**Historia**
-
-Como administrativo, quiero abrir un ingreso y ver todos sus datos, para verificarlo contra el ticket físico cuando haya alguna duda.
-
-**Criterios de aceptación**
-
-> **CA01.** Dado que el usuario selecciona un ingreso, cuando se abre el detalle, entonces el sistema muestra todos sus campos, incluidos la hora de pesaje, la hora de registro y, si corresponde, la hora de sincronización.
-
-> **CA02.** Dado que el ingreso fue capturado sin conexión, cuando se muestra el detalle, entonces el sistema lo indica de forma visible.
-
-> **CA03.** Dado que el usuario tiene rol Supervisor, cuando abre el detalle de un ingreso, entonces puede consultarlo pero no editarlo.
-
----
-
-## HU-M03-06 — Edición de un ingreso registrado
-
-| Campo | Descripción |
-|:--|:--|
-| **Identificador** | HU-M03-06 |
-| **Prioridad** | Media |
-
-**Historia**
-
-Como administrativo, quiero corregir un ingreso cuando detecto un error de transcripción, para que el histórico refleje el ticket real.
-
-**Criterios de aceptación**
-
-> **CA01.** Dado que el usuario con rol Administrativo o Administrador modifica campos editables, cuando guarda, entonces el sistema actualiza el registro y conserva los valores anteriores en auditoría.
-
-> **CA02.** Dado que el usuario intenta modificar el correlativo o la hora de registro, cuando envía la solicitud, entonces el sistema la rechaza: ambos campos no son editables por ningún rol.
-
-> **CA03.** Dado que la edición modifica el peso bruto, la tara o el producto, cuando se guarda, entonces el sistema recalcula el movimiento de stock asociado.
-
-> **CA04.** Dado que un ingreso está anulado, cuando el usuario intenta editarlo, entonces el sistema rechaza la operación mostrando "No se puede editar un ingreso anulado".
-
----
-
-## HU-M03-07 — Anulación de un ingreso
-
-| Campo | Descripción |
-|:--|:--|
-| **Identificador** | HU-M03-07 |
-| **Prioridad** | Media |
-
-**Historia**
-
-Como administrativo, quiero anular un ingreso registrado por error indicando el motivo, para que quede constancia de la corrección sin borrar información.
+Como administrador, quiero anular un ingreso que no debió registrarse, para que deje de contar en
+los totales sin desaparecer del histórico.
 
 **Descripción**
 
-El sistema no elimina ingresos. La anulación es un cambio de estado con motivo obligatorio y responsable identificado. El ingreso anulado permanece en el histórico y su movimiento de stock se revierte.
+Un ingreso no se elimina nunca. Se marca como anulado con un motivo y un responsable, y permanece
+consultable. A partir de ese momento queda fuera de todo total y de toda consolidación, pero sigue
+apareciendo en el detalle y en el historial, con su imagen y sus datos intactos.
+
+La anulación es la vía para los errores que no se resuelven corrigiendo: un ingreso duplicado, uno
+registrado sobre el volquete equivocado o uno cuyo ticket no corresponde a la operación.
+
+**Detalles**
+- Motivo de la anulación: obligatorio, texto libre.
+- Rol autorizado: Administrador.
+- Efecto: el ingreso se excluye de totales y consolidaciones; permanece en el detalle y en las
+  consultas, señalado como anulado.
+- El número de ticket de un ingreso anulado vuelve a quedar disponible para otro ingreso.
 
 **Criterios de aceptación**
 
-> **CA01.** Dado que el usuario solicita anular un ingreso e indica el motivo, cuando confirma, entonces el sistema cambia el estado a ANULADO, conserva el registro y revierte el movimiento de stock asociado.
+> **CA01.** Dado que el administrador indica el motivo, cuando confirma la anulación, entonces el
+> sistema marca el ingreso como anulado y muestra "Ingreso {codigo} anulado".
 
-> **CA02.** Dado que el usuario intenta anular sin indicar motivo, cuando confirma, entonces el sistema rechaza la operación mostrando "Debe indicar el motivo de la anulación".
+> **CA02.** Dado que el administrador no indica el motivo, cuando intenta anular, entonces el
+> sistema rechaza la operación mostrando "Debe indicar el motivo de la anulación".
 
-> **CA03.** Dado que el usuario intenta eliminar físicamente un ingreso, cuando envía la solicitud, entonces el sistema la rechaza: la eliminación física no está disponible en ninguna interfaz ni endpoint.
+> **CA03.** Dado que el ingreso ya está anulado, cuando se intenta anularlo de nuevo, entonces el
+> sistema rechaza la operación mostrando "El ingreso {codigo} ya fue anulado".
 
-> **CA04.** Dado que un ingreso se anula, cuando concluye la operación, entonces el sistema registra en auditoría el usuario, la fecha, la hora y el motivo.
+> **CA04.** Dado que el usuario tiene rol de Administrativo o de Supervisor de planta, cuando
+> intenta anular un ingreso, entonces el sistema rechaza la operación mostrando "Acción no
+> autorizada".
+
+> **CA05.** Dado que un ingreso fue anulado, cuando se consulta su detalle, entonces el sistema lo
+> muestra con todos sus datos, su imagen, su estado de anulado, el motivo y el responsable.
+
+> **CA06.** Dado que un ingreso fue anulado, cuando se calcula cualquier total por periodo o por
+> tipo de mineral, entonces ese ingreso no se incluye.
+
+> **CA07.** Dado que la anulación se persiste, cuando concluye la operación, entonces el sistema
+> registra el evento en auditoría con el motivo y el usuario responsable.

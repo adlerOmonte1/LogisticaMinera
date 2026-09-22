@@ -82,7 +82,10 @@ def test_ca05_inicio_de_sesion_exitoso_registra_evento_en_auditoria(api, supervi
     with caplog.at_level(logging.INFO, logger="auditoria"):
         api.post(LOGIN, {"username": supervisor.username, "password": password})
 
-    assert any("INICIO_DE_SESION" in m and supervisor.username in m for m in caplog.messages)
+    assert any(
+        "accion=INICIAR_SESION" in m and "entidad=Usuario" in m and supervisor.username in m
+        for m in caplog.messages
+    )
 
 
 def test_rn_m01_07_contador_se_reinicia_tras_acceso_exitoso(api, supervisor, password):
@@ -123,3 +126,14 @@ def test_hu02_ca02_endpoint_protegido_sin_token_responde_401(api):
     respuesta = api.get("/api/v1/usuarios/")
 
     assert respuesta.status_code == 401
+
+
+def test_rs_m01_08_el_cierre_de_sesion_queda_en_auditoria(api, supervisor, password, caplog):
+    login = api.post(LOGIN, {"username": supervisor.username, "password": password})
+
+    with caplog.at_level(logging.INFO, logger="auditoria"):
+        api.post("/api/v1/auth/logout/", {"refresh": login.data["refresh"]})
+
+    assert any(
+        "accion=CERRAR_SESION" in m and supervisor.username in m for m in caplog.messages
+    )

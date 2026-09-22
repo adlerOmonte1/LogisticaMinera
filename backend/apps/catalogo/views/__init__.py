@@ -6,7 +6,7 @@ defecto), crear, editar y desactivar. Sin `DELETE`: la baja es siempre lógica
 HTTP.
 """
 
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -38,7 +38,18 @@ from apps.catalogo.services import clientes, productos, transportistas, vehiculo
 _VERDADERO = {"1", "true", "True", "si", "sí"}
 
 
-class CatalogoViewSet(viewsets.ModelViewSet):
+class CatalogoViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Compuesto por mixins explícitos, sin `DestroyModelMixin` (ISP,
+    solid-proyecto): la clase no ofrece la capacidad de borrar, en vez de
+    ofrecerla y bloquearla después. `http_method_names` queda solo para
+    excluir `PUT` — `update()` siempre trata la edición como parcial."""
+
     http_method_names = ["get", "post", "patch", "head", "options"]
     permission_classes = [IsAuthenticated, PuedeGestionarCatalogo]
 

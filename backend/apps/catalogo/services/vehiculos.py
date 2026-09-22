@@ -8,7 +8,7 @@ from apps.catalogo.models import Transportista, Vehiculo
 from apps.catalogo.repositories import VehiculoRepository
 from common.excepciones import ErrorDeValidacionDeDominio
 
-from ._eventos import registrar_evento
+from ._eventos import registrar_creacion, registrar_desactivacion, registrar_modificacion
 from .validadores import validar_placa
 
 MENSAJE_PLACA_DUPLICADA = "La placa ya está registrada"
@@ -56,7 +56,7 @@ def crear_vehiculo(datos: dict, usuario) -> Vehiculo:
     )
     vehiculo.full_clean()
     vehiculo.save()
-    registrar_evento("CREADO", "Vehiculo", vehiculo, usuario)
+    registrar_creacion("Vehiculo", vehiculo, usuario)
     return vehiculo
 
 
@@ -79,12 +79,12 @@ def actualizar_vehiculo(vehiculo: Vehiculo, datos: dict, usuario) -> Vehiculo:
 
     vehiculo.full_clean()
     vehiculo.save()
-    registrar_evento("MODIFICADO", "Vehiculo", vehiculo, usuario)
+    registrar_modificacion("Vehiculo", vehiculo, usuario)
     return vehiculo
 
 
 def desactivar_vehiculo(vehiculo: Vehiculo, usuario) -> Vehiculo:
     vehiculo.activo = False
     vehiculo.save(update_fields=["activo"])
-    registrar_evento("DESACTIVADO", "Vehiculo", vehiculo, usuario)
+    registrar_desactivacion("Vehiculo", vehiculo, usuario)
     return vehiculo

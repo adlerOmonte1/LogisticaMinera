@@ -1,6 +1,6 @@
 ---
 name: revision-coherencia
-description: Verifica la coherencia y la trazabilidad cruzada de la documentación de la tesis minera — que cada HU tenga requisitos y diagramas, que los códigos RN, RNF, RU, RS y RF referenciados existan, que las rutas relativas resuelvan y que los módulos no se contradigan entre sí. Úsala antes de un commit de documentación, al terminar un módulo, o cuando se pida revisar, auditar o validar la documentación o buscar inconsistencias entre módulos.
+description: Verifica la coherencia y la trazabilidad cruzada de la documentación del sistema web inteligente de ingreso de mineral — que cada HU tenga requerimientos, diagramas y fila en la matriz de trazabilidad, que los códigos RN, RNF, RU, RS y RF referenciados existan, que las rutas relativas resuelvan, que no sobrevivan conceptos del sistema anterior y que los módulos no se contradigan entre sí. Úsala antes de un commit de documentación, al terminar un módulo, o cuando se pida revisar, auditar o validar la documentación o buscar inconsistencias entre módulos.
 ---
 
 # Revisión de coherencia
@@ -26,11 +26,22 @@ comm -23 /tmp/citados.txt /tmp/definidos.txt
 Lo que salga está **citado pero no definido**. Es el error más frecuente al ampliar un módulo: se
 añade una regla en un diagrama y no se registra en `reglas_negocio.md`.
 
+Para los requerimientos funcionales globales, el formato vigente es `RF01` **sin guion**. Toda
+aparición del formato con guion es un residuo del sistema anterior y se reporta como bloqueante:
+
+```bash
+grep -rnE "RF-[0-9]{2}" docs skills --include=*.md
+grep -rhoE "\bRF[0-9]{2}\b" docs --include=*.md | sort -u
+```
+
+La segunda orden no debe devolver ningún código fuera del rango RF01 a RF10.
+
 ### 2. Historias sin cobertura
 
-Cada `HU-M{nn}-{nn}` debe aparecer, además de en su `HU.md`, en `requisitos/funcionales.md` y en al
-menos un diagrama. Recorre las historias del módulo y comprueba en qué carpetas aparece cada una;
-la que no figure en requisitos o en diagramas está incompleta.
+Cada `HU-M{nn}-{nn}` debe aparecer, además de en su `HU.md`, en `requerimientos/funcionales.md`, en
+al menos un diagrama y en `docs/02-trazabilidad/matriz_HU_RF_indicador.md`. Recorre las historias
+del módulo y comprueba en qué archivos aparece cada una; la que no figure en los cuatro está
+incompleta.
 
 ### 3. Numeración con saltos o duplicados
 
@@ -45,52 +56,82 @@ serie solo es aceptable si una historia se retiró, y debe estar dicho en el mó
 
 Regla estricta del repositorio: ningún carácter acentuado, `ñ`, `¿` o `¡` dentro de un bloque de
 código mermaid. Localiza los bloques y revisa su contenido; cada carácter acentuado que sobreviva
-rompe el renderizado en la exportación del documento de tesis.
+rompe el renderizado en la exportación del documento de tesis. Comprueba también que ningún
+diagrama nombre el motor de reconocimiento concreto en lugar de `ReconocedorTicket` (D-12).
 
 ### 5. Rutas relativas rotas
 
 Los documentos se enlazan entre sí con rutas relativas, y varias apuntan a carpetas que aún no
-existen (`00-arquitectura/`, `03-pruebas/`).
+existen (`02-trazabilidad/`, `03-pruebas/`).
 
 ```bash
 grep -rnoE '\.\./[^` )]+\.md' docs --include=*.md | sort -u
 ```
 
 Comprueba cada destino. Los que faltan **no son errores de escritura**: son trabajo pendiente.
-Repórtalos en su propia lista y no los borres de los documentos.
+Repórtalos en su propia lista y no los borres de los documentos. Atención especial a los enlaces
+que apunten a carpetas de módulo retiradas en la renumeración: esos sí son errores.
 
 ### 6. Contradicciones entre módulos
 
 La comprobación que ninguna herramienta hace por ti. Para cada módulo, contrasta lo que declara con
 lo que otros módulos afirman de él, leyendo las tablas «Depende de» y «Es requerido por» de los
-`notas.md`.
+`notas.md` y la sección «Responsabilidad y límites» de cada `funcionales.md`.
 
-Si M03 declara que M08 registra los eventos de creación, modificación y anulación, la documentación
-de M08 **debe** ofrecer exactamente eso. Una dependencia declarada por un módulo y no honrada por el
-otro es un defecto de la tesis, no del código.
+Si M03 declara que invoca `ValidadorConsistencia` para aplicar V1 a V5 y que M09 registra los
+eventos de creación, corrección y anulación, la documentación de M05 y de M09 **debe** ofrecer
+exactamente eso. Una dependencia declarada por un módulo y no honrada por el otro es un defecto de
+la documentación, no del código.
 
-### 7. Backlog global contra módulos
+### 7. Índice global contra módulos
 
-`docs/HistoriasUsuario.md` es el backlog maestro y ya diverge de los `HU.md`. Divergencia
-comprobada: `HU-M02-04` es «Desactivación de elementos del catálogo» en el backlog global y
-«Gestión de clientes» en el módulo.
+`docs/HistoriasUsuario.md` es un **índice** generado desde los `HU.md`: identificador, título, rol,
+prioridad y enlace, sin criterios de aceptación. La divergencia que se reporta es de **lista**: una
+historia que está en un `HU.md` y falta en el índice, o al revés, o un título que no coincide. No
+compares criterios de aceptación: el índice no los contiene por diseño.
 
-Compara los títulos de historia de ambos orígenes. Los `HU.md` por módulo son la versión más
-reciente. **Reporta las divergencias; no las resuelvas.** Reescribir el backlog global sin decidirlo
-el autor puede alterar el recuento de historias que ya figura en el documento de tesis.
+Los `HU.md` por módulo son la versión más reciente. **Reporta las divergencias; no las resuelvas.**
+Reescribir el índice sin decidirlo el autor puede alterar el recuento de historias que ya figura en
+el documento de tesis.
 
-### 8. Coherencia con el diseño de la investigación
+### 8. Coherencia con el diseño del sistema
 
 Revisión de fondo, la que decide si la documentación sirve. Para cada módulo:
 
-- [ ] La cabecera de `HU.md` declara RF, indicador, semana y número de historias, y ese número
+- [ ] La cabecera de `HU.md` declara los RF asociados y el número de historias, y ese número
       coincide con las historias efectivamente escritas.
 - [ ] Ningún documento admite eliminación física de un registro.
-- [ ] Ningún documento colapsa `hora_pesaje` y `hora_registro`.
+- [ ] El ingreso conserva tres marcas de tiempo independientes, y las dos asignadas por el servidor
+      (inicio y fin del registro) no son editables por ningún rol.
+- [ ] Ningún criterio de aceptación persiste un dato reconocido sin confirmación del usuario, ni
+      omite guardar por separado el valor reconocido y el confirmado.
+- [ ] Ningún archivo de `docs/modulos/` cita indicadores de la tesis ni contiene secciones que
+      relacionen el módulo con la medición; el patrón exacto lo detecta el script de la
+      comprobación 9.
+- [ ] Cada HU tiene fila en `docs/02-trazabilidad/matriz_HU_RF_indicador.md`.
+- [ ] Cada `funcionales.md` declara la responsabilidad y los límites del módulo, y ninguna función
+      excede esa responsabilidad.
 - [ ] Todo RNF tiene característica ISO/IEC 25010:2023 y método de verificación.
 - [ ] Toda operación restringida por rol tiene un criterio de aceptación que verifica el rechazo.
-- [ ] Cada módulo explica en algún punto qué medición se pierde si se implementa mal.
-- [ ] La semana asignada no precede a la de un módulo del que este depende.
+
+### 9. Conceptos del sistema anterior
+
+El repositorio documentó antes otro alcance, retirado en la reformulación del 21/09/2026. Ningún
+término de aquel sistema debe sobrevivir en la documentación vigente. El patrón de búsqueda está
+centralizado en un solo lugar —`scripts/verificar_migracion.sh`, Anexo F del plan de migración—
+para no duplicarlo ni reintroducir los términos retirados en esta skill:
+
+```bash
+bash scripts/verificar_migracion.sh
+```
+
+El script excluye los documentos que describen la propia migración, porque esos sí deben conservar
+la terminología antigua. Cualquier otra coincidencia es un residuo: repórtala como bloqueante
+indicando archivo y línea. Si el script aún no existe, toma su patrón del Anexo F del plan y
+ejecútalo tal cual, sin transcribirlo a este archivo.
+
+Revisa además que no se citen las carpetas de módulo retiradas en la renumeración ni sus historias,
+y que los módulos M01 a M09 correspondan al mapa de `contexto-tesis`.
 
 ## Formato del informe
 
@@ -98,8 +139,8 @@ Revisión de fondo, la que decide si la documentación sirve. Para cada módulo:
 ## Revisión de coherencia — {alcance}
 
 ### Bloqueantes
-Contradicen el diseño de la investigación o rompen la trazabilidad.
-- {archivo}:{línea} — {qué} — {qué indicador o regla compromete}
+Contradicen el diseño del sistema o rompen la trazabilidad.
+- {archivo}:{línea} — {qué} — {qué regla, dependencia o contrato compromete}
 
 ### Inconsistencias
 Divergencias entre documentos que exigen decisión del autor.

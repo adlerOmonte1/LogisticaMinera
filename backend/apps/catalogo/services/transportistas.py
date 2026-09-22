@@ -3,7 +3,7 @@
 from apps.catalogo.models import Transportista
 from apps.catalogo.repositories import TransportistaRepository
 
-from ._eventos import registrar_evento
+from ._eventos import registrar_creacion, registrar_desactivacion, registrar_modificacion
 from .validadores import validar_ruc
 
 MENSAJE_DESACTIVADO_CON_VEHICULOS = (
@@ -18,7 +18,7 @@ def crear_transportista(datos: dict, usuario) -> Transportista:
     )
     transportista.full_clean()
     transportista.save()
-    registrar_evento("CREADO", "Transportista", transportista, usuario)
+    registrar_creacion("Transportista", transportista, usuario)
     return transportista
 
 
@@ -29,7 +29,7 @@ def actualizar_transportista(transportista: Transportista, datos: dict, usuario)
         transportista.ruc = validar_ruc(datos["ruc"])
     transportista.full_clean()
     transportista.save()
-    registrar_evento("MODIFICADO", "Transportista", transportista, usuario)
+    registrar_modificacion("Transportista", transportista, usuario)
     return transportista
 
 
@@ -40,7 +40,7 @@ def desactivar_transportista(transportista: Transportista, usuario) -> Transport
     tenia_vehiculos = TransportistaRepository.tiene_vehiculos(transportista)
     transportista.activo = False
     transportista.save(update_fields=["activo"])
-    registrar_evento("DESACTIVADO", "Transportista", transportista, usuario)
+    registrar_desactivacion("Transportista", transportista, usuario)
     transportista.mensaje = (
         MENSAJE_DESACTIVADO_CON_VEHICULOS if tenia_vehiculos else None
     )
