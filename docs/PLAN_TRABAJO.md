@@ -7,6 +7,8 @@
 | Ejecutor | Agente de IA sobre el repositorio (Claude Code u otro), con revisión humana por fase |
 | Rama | `docs/reformulacion/sistema-inteligente` |
 | Regla de oro | Ninguna fase empieza sin que la anterior haya pasado su verificación y tu revisión |
+| Principio rector | La documentación describe **un sistema**, no una tesis. Prevalece sobre los ejemplos de los Anexos D y E |
+| Estado | Fase 0 y Fase 1 ejecutadas el 22/09/2026 |
 
 ---
 
@@ -18,6 +20,13 @@
 4. Al terminar cada fase, ejecuta la **Verificación** y revisa tú los archivos. Solo entonces haces el commit.
 5. La Fase 5 (módulo piloto M03) es el punto de control más importante. Lo que apruebes ahí se convierte en la plantilla de los demás módulos.
 
+**Principio rector.** Los módulos se definen por su **responsabilidad** en el dominio, no por el
+indicador que sostienen. Ningún archivo de `docs/modulos/` cita indicadores (I1 a I6, ERA, TDI, SUS,
+TCA, RFC, CPS) ni cierra con una sección sobre la medición: lo que protege un indicador se expresa
+como regla de negocio o RNF, con su consecuencia en términos del dominio. La relación tesis ↔ sistema
+vive en un solo lugar, `docs/02-trazabilidad/matriz_HU_RF_indicador.md`. Las reglas V1 a V5 sí se
+citan en los módulos, porque son reglas del sistema. El cronograma vive solo en `docs/01-plan/`.
+
 **Por qué las skills se actualizan primero.** Las skills del repositorio (`historias-usuario`, `diagramas-uml`, `requisitos-modulo`, etc.) le dan instrucciones al agente. Hoy contienen reglas del sistema anterior. Por ejemplo, `historias-usuario` prohíbe que el peso neto sea un campo de entrada, y en el nuevo diseño el neto se lee del ticket. Si no se corrigen antes, el agente reproducirá el sistema antiguo aunque el prompt diga lo contrario.
 
 ---
@@ -26,8 +35,8 @@
 
 | Fase | Qué produce | Quién | Punto de control |
 |---|---|---|---|
-| 0 | Rama, marco de tesis, decisiones cerradas, `CLAUDE.md` | Tú | Decisiones del Anexo B firmadas |
-| 1 | Skills de documentación reescritas | Agente | Revisión de `contexto-tesis` |
+| 0 | Rama, marco de tesis, decisiones cerradas, `CLAUDE.md` | Tú | Decisiones del Anexo B firmadas — **hecha** |
+| 1 | Skills de documentación reescritas | Agente | Revisión de `contexto-tesis` — **hecha** |
 | 2 | ARQ-01 (módulos) y decisiones de diseño D-01 a D-16 | Agente | Lista cerrada de módulos |
 | 3 | Modelo entidad-relación | Agente | Entidades e índices |
 | 4 | Matriz de trazabilidad y backlog índice | Agente | Cada RF y tarea tiene HU |
@@ -43,7 +52,13 @@
 
 ## 3. Fases
 
-### Fase 0 — Preparación y decisiones (manual)
+### Fase 0 — Preparación y decisiones — **ejecutada el 22/09/2026**
+
+> Se creó `CLAUDE.md`, `docs/00-tesis/marco_tesis.md`, `docs/00-tesis/decisiones_reformulacion.md`
+> (DR-01 a DR-08 aceptadas), `docs/00-tesis/ejemplos_plantilla.md` y `scripts/verificar_migracion.sh`.
+> El análisis de impacto **no se copió** a `docs/00-tesis/`: permanece en `docs/REFORMULACION.md` y
+> se referencia desde ahí, para no mantener dos copias del mismo documento. El trabajo sobre el Word
+> de la tesis (DR-06) sigue pendiente y es responsabilidad del autor.
 
 **Objetivo.** Dejar en el repositorio la fuente de verdad de la tesis y las decisiones cerradas, para que el agente no invente nada.
 
@@ -67,7 +82,11 @@
 
 ---
 
-### Fase 1 — Fuente de verdad y skills de documentación
+### Fase 1 — Fuente de verdad y skills de documentación — **ejecutada el 22/09/2026**
+
+> Reescritas `contexto-tesis`, `historias-usuario`, `requisitos-modulo`, `diagramas-uml`,
+> `revision-coherencia` y `modulo-nuevo`, más un ejemplo de `commit-tesis`. El prompt que sigue se
+> conserva como registro de lo que se pidió.
 
 **Objetivo.** Que el agente, en las fases siguientes, cargue reglas del sistema nuevo y no del antiguo.
 
@@ -122,8 +141,11 @@ Carga la skill contexto-tesis. Lee docs/00-tesis/decisiones_reformulacion.md.
 
 1. Reescribe docs/model-c4/ARQ-01_Modulos_del_Sistema.md con la lista cerrada M01 a M09 del
    marco. Conserva las secciones: propósito, criterio de derivación, lista, justificación módulo
-   por módulo, fuera de alcance, distribución por semanas, riesgos y referencias. El denominador
-   del avance ya no son los módulos sino los 10 RF de la lista de control (indicador RFC).
+   por módulo, fuera de alcance, distribución por semanas, riesgos y referencias. El criterio de
+   derivación es la RESPONSABILIDAD del módulo en el dominio, no el indicador que habilita: la
+   tabla no lleva columna de indicador y la justificación de cada módulo se redacta en términos
+   del sistema. El denominador del avance ya no son los módulos sino los 10 RF de la lista de
+   control; esa relación se enuncia una sola vez, en la sección de propósito.
    Añade en riesgos: precisión insuficiente del motor de reconocimiento, calidad de las fotos
    en planta y mezcla de mineral en cancha (trazabilidad).
 2. Actualiza docs/00-arquitectura/decisiones_diseno.md: aplica la tabla de la sección 7.1 del
@@ -157,8 +179,10 @@ Requisitos:
   versión), RESULTADO_VALIDACION (regla V1 a V5, resultado, resolución), ETAPA_PROCESO y la
   entidad de vínculo que defina DR-04.
 - Eliminar SALIDA, MOVIMIENTO_STOCK y CLIENTE.
-- Debajo de cada entidad, indica qué indicador (I1 a I6, ERA, TDI) calcula o sostiene.
-- Sección de índices: justifica cada uno por el indicador que sostiene.
+- Debajo de cada entidad, indica qué necesidad del dominio cubre y qué módulo la escribe o la lee.
+- Sección de índices: justifica cada uno por la consulta que sostiene y su frecuencia esperada.
+  El modelo de datos es documentación del sistema: la relación con los indicadores vive en la
+  matriz de trazabilidad.
 - Diagrama erDiagram en Mermaid, sin tildes dentro del bloque.
 ```
 
@@ -216,20 +240,26 @@ Reescribe completo docs/modulos/M03-ingresos/:
 - notas.md: implementación Django y Angular, inyección de ReconocedorTicket y
   ValidadorConsistencia en el servicio de registro, y transacción única.
 
-Cada archivo cierra con la sección obligatoria que explica qué se rompe en la tesis si se
-implementa mal. Al terminar, verifica que cada HU aparezca en funcionales.md y en al menos
-un diagrama.
+Cada archivo cierra con la sección que el sistema necesita: funcionales.md con
+"Responsabilidad y límites" y la tabla de permisos, reglas_negocio.md con la consecuencia de cada
+regla, notas.md con dependencias y riesgo de implementación. Ningún archivo cita indicadores.
+Al terminar, verifica que cada HU aparezca en funcionales.md, en al menos un diagrama y en la
+matriz de trazabilidad.
 ```
 
 Antes de pegar este prompt, guarda los Anexos D y E en `docs/00-tesis/ejemplos_plantilla.md`.
 
 **Verificación (tuya, detallada).**
 
-- [ ] La HU de registro protege I1, I2 e I3 con criterios explícitos.
+- [ ] La HU de registro exige las tres marcas de tiempo como valores distintos y no editables las
+      dos del servidor, y los siete campos obligatorios.
 - [ ] Ningún criterio persiste datos reconocidos sin confirmación.
+- [ ] Ningún archivo del módulo cita indicadores de la tesis ni cierra con una sección sobre la
+      medición; `bash scripts/verificar_migracion.sh` pasa sin hallazgos en M03.
 - [ ] Los mensajes de error están entre comillas y son literales.
 - [ ] Los diagramas renderizan en GitHub y no tienen tildes dentro de los bloques Mermaid.
-- [ ] `reglas_negocio.md` ya no menciona el stock ni el cálculo del neto como única fuente.
+- [ ] `reglas_negocio.md` ya no menciona inventario de producto ni el cálculo del neto como única
+      fuente, y cada consecuencia está redactada en términos del dominio.
 
 Si apruebas, actualiza la línea de referencia de estilo en `skills/historias-usuario` para que apunte a este M03.
 
@@ -251,7 +281,8 @@ Toma las HU de la matriz de trazabilidad. {Para M04 y M05 usa como base las HU d
 docs/00-tesis/ejemplos_plantilla.md.}
 {M04: el motor queda detrás de la interfaz ReconocedorTicket; el motor concreto es el de D-12.}
 {M05: una regla por fila V1 a V5, con mensaje literal y si es bloqueante o exige justificación.}
-{M06: aplica DR-04 para el vínculo del ingreso con las etapas y deja explícita la fórmula de I6.}
+{M06: aplica DR-04 para el vinculo del ingreso con las etapas mediante lote de proceso, y deja
+explicito como se determina que un ingreso ha pasado por cada una de las cuatro etapas.}
 No modifiques otros módulos. Si necesitas algo de M03, anótalo como dependencia en notas.md.
 ```
 
@@ -269,9 +300,10 @@ No modifiques otros módulos. Si necesitas algo de M03, anótalo como dependenci
 Carga contexto-tesis, historias-usuario, requisitos-modulo y diagramas-uml. Referencia de
 estilo: docs/modulos/M03-ingresos/.
 
-1. Crea docs/modulos/M07-consulta/ (RF08, indicador I4: placa y fecha, con la imagen del
-   respaldo), docs/modulos/M08-consolidacion/ (RF09, indicador I5, según DR-06) y
-   docs/modulos/M09-auditoria/ (transversal, sin RF propio).
+1. Crea docs/modulos/M07-consulta/ (RF08: localizar un ingreso por placa y fecha y presentar su
+   ticket de respaldo), docs/modulos/M08-consolidacion/ (RF09: generar y exportar el total
+   acumulado mensual por producto, segun DR-06) y docs/modulos/M09-auditoria/ (transversal, sin
+   RF propio).
 2. M01-autenticacion: cambia solo las secciones de relación con indicadores y las
    referencias a RF (RF10).
 3. M02-catalogo: retira todo lo relacionado con clientes, aplica DR-03 al catálogo de
@@ -326,7 +358,8 @@ Carga contexto-tesis y pruebas-y-desempeno.
    aplica los instrumentos de la VI (lista de control, ficha de capacidad inteligente y
    tareas, SUS), no JMeter. Añade la condición: el sistema no se usa en planta hasta que
    termine el pretest.
-2. Crea docs/03-pruebas/plan_de_pruebas.md con: un caso de prueba por RF (CP01 a CP10),
+2. Crea docs/03-pruebas/plan_de_pruebas.md con: un caso de prueba por RF (CP01 a CP10; los casos
+   por criterio de aceptacion mantienen el formato CP-HU-M03-01-01),
    protocolo del conjunto de prueba de ERA (DR-08: cantidad de tickets, campos, cálculo),
    protocolo de TDI (inconsistencias sembradas por tipo V1 a V5), protocolo de las tareas
    T01 a T06, y congelamiento del motor y las reglas (D-16).
@@ -346,7 +379,11 @@ Carga contexto-tesis y pruebas-y-desempeno.
 
 ```text
 Carga backend-django y contexto-tesis. En backend/:
-1. Elimina las apps salidas, existencias y sincronizacion (solo tienen esqueletos vacíos).
+0. Estado real de la rama: apps/salidas esta IMPLEMENTADA (modelos, migracion, servicios, vistas
+   y pruebas) y apps/ingresos tambien, con el diseno anterior (hora_pesaje, neto calculado,
+   capturado_offline, uuid_local). apps/existencias y apps/sincronizacion si son esqueletos.
+1. Elimina las apps salidas, existencias y sincronizacion, con su migracion de retiro cuando
+   corresponda. Refactoriza apps/ingresos al nuevo modelo de INGRESO en lugar de recrearla.
 2. En catalogo, elimina Cliente (modelo, serializer, servicio, vista, rutas, factory y pruebas)
    con una migración nueva; no edites 0001_initial.
 3. Crea los esqueletos de las apps reconocimiento, validacion y trazabilidad con la misma
@@ -390,6 +427,9 @@ Luego: revisas el informe, abres el PR hacia `main` y haces el merge.
 ---
 
 ## Anexo A — `docs/00-tesis/marco_tesis.md`
+
+> **Ya creado.** El archivo vigente es `docs/00-tesis/marco_tesis.md`, con los `[CONFIRMAR]` de
+> DR-06 ya resueltos. Lo de abajo se conserva como registro del contenido original.
 
 ```markdown
 # Marco de tesis — fuente de verdad
@@ -493,18 +533,21 @@ conexión (solo se conserva el borrador) · multiempresa · balance metalúrgico
 
 ## Anexo B — Decisiones de reformulación (`docs/00-tesis/decisiones_reformulacion.md`)
 
-Cada fila trae una recomendación. Márcala como **Aceptada** o escribe tu alternativa. Los ejemplos de los Anexos D y E asumen las recomendaciones.
+> **Cerrado el 22/09/2026.** Las ocho decisiones se aceptaron con su recomendación. El archivo
+> vigente es `docs/00-tesis/decisiones_reformulacion.md`.
+
+Cada fila trae una recomendación. Los ejemplos de los Anexos D y E asumen las recomendaciones.
 
 | Código | Decisión | Recomendación | Bloquea | Estado |
 |---|---|---|---|---|
-| DR-01 | Captura sin conexión | Retirar M07. Conservar solo el RNF de borrador ante pérdida de conexión | Fases 2 y 5 | |
-| DR-02 | Motor de reconocimiento | Piloto con 20 a 30 tickets reales de dos o tres motores antes de fijar D-12. La documentación usa la interfaz `ReconocedorTicket` y no depende del motor | Fases 6 y 10 | |
-| DR-03 | Tipo de mineral frente a producto | Un solo catálogo (tipo de mineral) usado al ingreso (C6) y al consolidar (RF09). Definir sus valores con la empresa | Fase 3 | |
-| DR-04 | Vínculo del ingreso con las etapas | Mediante un lote de proceso: el ingreso se asigna a un lote y el lote registra su paso por cada etapa. Si la planta procesa volquete por volquete, el vínculo directo es más simple | Fases 3 y 6 | |
-| DR-05 | Placa reconocida que no está en el catálogo | No se confirma el ingreso. El usuario elige el vehículo del catálogo o el Administrativo lo da de alta. Se preservan D-06 y C7 | Fase 5 | |
-| DR-06 | RF03, RF09 y tarea T06 | Ampliar RF03 a los cinco tipos de V1 a V5. RF09 = generar y exportar el total acumulado mensual. T06 = exportar ese total | Fase 0 (Word) | |
-| DR-07 | Numeración de módulos | Renumerar M01 a M09 según el marco. Solo M01 y M02 tienen código y conservan su número | Fase 2 | |
-| DR-08 | Conjunto de prueba | ERA: 50 tickets reales × 6 campos. TDI: 10 inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante la medición | Fase 9 | |
+| DR-01 | Captura sin conexión | Retirar M07. Conservar solo el RNF de borrador ante pérdida de conexión | Fases 2 y 5 | Aceptada |
+| DR-02 | Motor de reconocimiento | Piloto con 20 a 30 tickets reales de dos o tres motores antes de fijar D-12. La documentación usa la interfaz `ReconocedorTicket` y no depende del motor | Fases 6 y 10 | Aceptada |
+| DR-03 | Tipo de mineral frente a producto | Un solo catálogo (tipo de mineral) usado al ingreso (C6) y al consolidar (RF09). Definir sus valores con la empresa | Fase 3 | Aceptada |
+| DR-04 | Vínculo del ingreso con las etapas | Mediante un lote de proceso: el ingreso se asigna a un lote y el lote registra su paso por cada etapa. Si la planta procesa volquete por volquete, el vínculo directo es más simple | Fases 3 y 6 | Aceptada |
+| DR-05 | Placa reconocida que no está en el catálogo | No se confirma el ingreso. El usuario elige el vehículo del catálogo o el Administrativo lo da de alta. Se preservan D-06 y C7 | Fase 5 | Aceptada |
+| DR-06 | RF03, RF09 y tarea T06 | Ampliar RF03 a los cinco tipos de V1 a V5. RF09 = generar y exportar el total acumulado mensual. T06 = exportar ese total | Fase 0 (Word) | Aceptada — pendiente aplicarlo al Word |
+| DR-07 | Numeración de módulos | Renumerar M01 a M09 según el marco. Solo M01 y M02 tienen código y conservan su número | Fase 2 | Aceptada |
+| DR-08 | Conjunto de prueba | ERA: 50 tickets reales × 6 campos. TDI: 10 inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante la medición | Fase 9 | Aceptada |
 
 ---
 
@@ -520,7 +563,17 @@ Fuentes de verdad, en este orden:
 1. docs/00-tesis/marco_tesis.md
 2. docs/00-tesis/decisiones_reformulacion.md
 3. docs/00-tesis/ejemplos_plantilla.md (patrón de HU y diagramas)
-4. docs/00-tesis/IMPACTO_Reformulacion_Sistema_Inteligente.md (qué cambia y por qué)
+4. docs/REFORMULACION.md (qué cambia y por qué)
+
+Principio rector: la documentación describe UN SISTEMA, no una tesis.
+- Los módulos se definen por su responsabilidad en el dominio, no por el indicador que habilitan.
+- Ningún archivo de docs/modulos/ cita indicadores (I1 a I6, ERA, TDI, SUS, TCA, RFC, CPS) ni
+  cierra con una sección sobre la medición.
+- La relación tesis ↔ sistema vive solo en docs/02-trazabilidad/matriz_HU_RF_indicador.md.
+- Lo que protege un indicador se expresa como regla de negocio o RNF, con su consecuencia en
+  términos del dominio y su método de verificación.
+- Las reglas V1 a V5 sí se citan en los módulos: son reglas del sistema.
+- El cronograma vive solo en docs/01-plan/.
 
 Reglas:
 - No inventes RF, indicadores, tareas ni reglas que no estén en el marco. Si falta algo,
@@ -531,8 +584,8 @@ Reglas:
   se anulan.
 - Mermaid: sin tildes, eñes ni signos de apertura dentro del bloque; sin paréntesis ni
   comas dentro de [ ] o { }; sin HTML.
-- Español académico formal. Cada archivo de módulo cierra con la sección que explica qué se
-  rompe en la tesis si se implementa mal.
+- Español académico formal. Cada archivo cierra con la sección que el sistema necesita:
+  dependencias, permisos, consecuencia de violar una regla, riesgo de implementación.
 - Un módulo por sesión y por commit. Al terminar, lista los archivos cambiados y las dudas.
 - No toques backend/ salvo en la fase que lo indique.
 ```
@@ -541,7 +594,9 @@ Reglas:
 
 ## Anexo D — Ejemplos de historias de usuario
 
-> Guarda los Anexos D y E en `docs/00-tesis/ejemplos_plantilla.md`. En los `HU.md` reales, cada historia usa encabezado `##`.
+> **Estos anexos ya están en `docs/00-tesis/ejemplos_plantilla.md`, en su versión corregida.** Usa
+> ese archivo, no este: las versiones de abajo se conservan como registro y llevan aplicadas las
+> mismas correcciones del principio rector. En los `HU.md` reales, cada historia usa encabezado `##`.
 
 ### HU-M03-01 — Registro de un ingreso a partir del ticket de balanza *(reformulada)*
 
@@ -559,7 +614,7 @@ Como supervisor de planta, quiero registrar el ingreso fotografiando el ticket d
 
 El registro empieza cuando el usuario captura o carga la imagen del ticket. En ese momento el sistema asigna la hora de inicio del registro. El motor de reconocimiento (M04) propone los seis datos del ticket y el validador (M05) señala las inconsistencias. El usuario revisa, corrige si hace falta y completa el tipo de mineral. El tipo de vehículo no se digita, porque se toma del catálogo a partir de la placa. Al confirmar, el servidor asigna el código único y la hora de fin del registro, y conserva la imagen como respaldo del ingreso.
 
-El ingreso guarda tres marcas de tiempo independientes: la fecha y hora del ticket, el inicio del registro y el fin del registro. De ellas dependen los indicadores I1 e I2.
+El ingreso guarda tres marcas de tiempo independientes: la fecha y hora del ticket, el inicio del registro y el fin del registro. La primera se lee del ticket y es editable antes de confirmar; las otras dos las asigna el servidor y ningún rol las modifica.
 
 **Detalles**
 - Imagen del ticket: obligatoria, JPG o PNG, hasta 10 MB.
@@ -588,10 +643,6 @@ El ingreso guarda tres marcas de tiempo independientes: la fecha y hora del tick
 
 > **CA07.** Dado que el ingreso se persiste, cuando concluye la operación, entonces el sistema conserva la imagen asociada al ingreso y registra el evento en auditoría.
 
-**Relación con los indicadores**
-
-I1 se mide desde la fecha y hora del ticket hasta el inicio del registro, e I2 desde el inicio hasta el fin. Si el sistema colapsa esas marcas o permite editarlas, ambos indicadores se vuelven falsificables (CA06). CA03 hace que la completitud (I3) llegue al 100 % en el postest por diseño, no por disciplina del usuario. CA07 garantiza que exista el respaldo que I4 debe recuperar.
-
 ---
 
 ### HU-M04-01 — Reconocimiento automático de los datos del ticket *(nueva)*
@@ -608,7 +659,7 @@ Como supervisor de planta, quiero que el sistema lea automáticamente los datos 
 
 **Descripción**
 
-El motor de reconocimiento procesa la imagen y devuelve seis campos (placa, fecha, hora, peso bruto, tara y peso neto), cada uno con su nivel de confianza. El resultado es una propuesta: nunca se persiste como dato del ingreso sin la confirmación del usuario (D-13). El sistema conserva por separado el valor reconocido y el valor confirmado de cada campo, porque esa diferencia es la que permite calcular la exactitud del reconocimiento (ERA).
+El motor de reconocimiento procesa la imagen y devuelve seis campos (placa, fecha, hora, peso bruto, tara y peso neto), cada uno con su nivel de confianza. El resultado es una propuesta: nunca se persiste como dato del ingreso sin la confirmación del usuario (D-13). El sistema conserva por separado el valor reconocido y el valor confirmado de cada campo, porque esa diferencia es la que permite auditar después qué leyó el motor y qué corrigió la persona.
 
 **Detalles**
 - Campos reconocidos: placa, fecha, hora, peso bruto, tara y peso neto.
@@ -627,10 +678,6 @@ El motor de reconocimiento procesa la imagen y devuelve seis campos (placa, fech
 > **CA04.** Dado que la imagen es ilegible o tiene un formato no admitido, cuando el sistema intenta procesarla, entonces muestra "No fue posible leer el ticket. Tome una nueva fotografía o ingrese los datos manualmente".
 
 > **CA05.** Dado que el usuario confirma el ingreso, cuando el sistema lo persiste, entonces guarda para cada campo el valor reconocido, el valor confirmado, la confianza, el motor y la versión.
-
-**Relación con el indicador ERA**
-
-ERA compara lo que el motor leyó con el valor real del ticket. Sin CA05, esa comparación solo existiría en la hoja A del instrumento y no podría verificarse contra el sistema. Si se cambia el motor o su versión durante la medición, ERA mide dos sistemas distintos (D-16).
 
 ---
 
@@ -672,10 +719,6 @@ El validador aplica las reglas V1 a V5 sobre los datos reconocidos y, de nuevo, 
 
 > **CA05.** Dado que el ingreso se confirma, cuando el sistema lo persiste, entonces guarda el resultado de cada regla aplicada y la justificación, si la hubo.
 
-**Relación con el indicador TDI**
-
-TDI siembra inconsistencias de los cinco tipos y cuenta cuántas detecta el sistema. Una regla que falte en el validador aparece como detección fallida en todas sus inconsistencias sembradas. Si las reglas cambian durante la medición, TDI deja de ser comparable (D-16).
-
 ---
 
 ## Anexo E — Ejemplos de requerimientos y diagramas
@@ -684,26 +727,33 @@ TDI siembra inconsistencias de los cinco tipos y cuenta cuántas detecta el sist
 
 **RF global asociado:** **RF03** — Validar automáticamente la consistencia de los datos del ticket.
 
-| Función | Descripción | HU | RF | Endpoint |
-|---|---|---|---|---|
-| Validar datos propuestos | Aplica V1 a V5 sobre el resultado del reconocimiento | HU-M05-01 | RF03 | `POST /api/v1/validaciones/` |
-| Validar al confirmar | Repite V1 a V5 sobre los datos confirmados | HU-M05-01 | RF03 | (interno, desde M03) |
-| Registrar resultado | Persiste el resultado por regla y la justificación | HU-M05-01 | RF03 | (interno) |
+| Función | Descripción | HU | Endpoint |
+|---|---|---|---|
+| Validar datos propuestos | Aplica V1 a V5 sobre el resultado del reconocimiento | HU-M05-01 | `POST /api/v1/validaciones/` |
+| Validar al confirmar | Repite V1 a V5 sobre los datos confirmados | HU-M05-01 | (interno, desde M03) |
+| Registrar resultado | Persiste el resultado por regla y la justificación | HU-M05-01 | (interno) |
+
+#### Responsabilidad y límites
+
+M05 decide si un conjunto de datos es coherente; no los lee del ticket ni los persiste como ingreso.
+Recibe valores ya extraídos y devuelve la lista de inconsistencias. Quien decide qué hacer con esa
+lista es M03, a través de la interfaz `ValidadorConsistencia`.
 
 ### E.2 `requerimientos/reglas_negocio.md` — M05 (fragmento)
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
-| RN-M05-01 | Las reglas V1 a V5 se ejecutan en el servidor; el cliente solo muestra el resultado | Un ingreso enviado sin pasar por la interfaz evitaría la validación y TDI sería inflado |
-| RN-M05-02 | Un ingreso no se confirma con una regla bloqueante incumplida | Se registrarían datos incoherentes y la integridad del registro dejaría de ser medible |
-| RN-M05-03 | V4 exige justificación escrita para confirmar | Se perdería la explicación de las sobrecargas reales |
-| RN-M05-04 | Las reglas y sus parámetros no cambian durante la ventana de medición | TDI mediría dos validadores distintos |
+| RN-M05-01 | Las reglas V1 a V5 se ejecutan en el servidor; el cliente solo muestra el resultado | Un ingreso enviado sin pasar por la interfaz entraría sin validar, y el histórico contendría datos que el sistema declara imposibles |
+| RN-M05-02 | Un ingreso no se confirma con una regla bloqueante incumplida | Se registrarían toneladas que el ticket no respalda |
+| RN-M05-03 | V4 exige justificación escrita para confirmar | Una sobrecarga quedaría registrada sin explicación y sería indistinguible de un error de lectura |
+| RN-M05-04 | El resultado de cada regla aplicada se persiste junto al ingreso | No se podría reconstruir por qué un ingreso se aceptó ni quién justificó una advertencia |
+| RN-M05-05 | Las reglas y sus parámetros no cambian durante la ventana de medición (D-16) | Dos ingresos del mismo periodo habrían sido evaluados con criterios distintos |
 
 ### E.3 `diagramas/caso_uso.md` — M04
 
 ```mermaid
 flowchart LR
-    SUP(("Supervisor"))
+    SUP(("Supervisor de planta"))
     ADV(("Administrativo"))
     ADM(("Administrador"))
     MOT[["Motor de reconocimiento"]]
@@ -723,8 +773,8 @@ flowchart LR
 
 | Caso | HU | Actores | Nota |
 |---|---|---|---|
-| Reconocer datos del ticket | HU-M04-01 | Supervisor, Administrativo | El resultado es una propuesta; no se persiste sin confirmación |
-| Revisar campos de baja confianza | HU-M04-01 | Supervisor, Administrativo | Umbral por defecto de 0,80 |
+| Reconocer datos del ticket | HU-M04-01 | Supervisor de planta, Administrativo | El resultado es una propuesta; no se persiste sin confirmación |
+| Revisar campos de baja confianza | HU-M04-01 | Supervisor de planta, Administrativo | Umbral por defecto de 0,80 |
 | Consultar resultado del reconocimiento | HU-M04-02 | Administrativo, Administrador | Muestra el valor reconocido frente al confirmado |
 
 Los actores se definen en `../../M01-autenticacion/diagramas/caso_uso.md` y no se redefinen aquí.
@@ -735,13 +785,15 @@ Los actores se definen en `../../M01-autenticacion/diagramas/caso_uso.md` y no s
 
 ```mermaid
 sequenceDiagram
-    actor S as Supervisor
+    actor S as Supervisor de planta
     participant NG as Angular
     participant API as Django REST
     participant SRV as ServicioIngreso
-    participant REC as ReconocedorTicket
-    participant VAL as ValidadorConsistencia
+    participant REC as ReconocedorTicket M04
+    participant VAL as ValidadorConsistencia M05
+    participant IMG as Almacen de imagenes
     participant DB as PostgreSQL
+    participant AUD as Auditoria M09
 
     S->>NG: Captura la foto del ticket
     NG->>API: POST reconocimientos con imagen
@@ -799,9 +851,11 @@ flowchart TD
 
 ### E.6 Matriz de trazabilidad (fragmento)
 
+Este es el **único** documento donde el sistema se relaciona con los indicadores de la tesis.
+
 | HU | Título | Rol | Prioridad | RF | Indicador | Tarea | Caso de prueba |
 |---|---|---|---|---|---|---|---|
-| HU-M03-01 | Registro de un ingreso a partir del ticket | Supervisor | Crítica | RF01, RF06 | I1, I2, I3 | T01 | CP01 |
+| HU-M03-01 | Registro de un ingreso a partir del ticket | Supervisor de planta | Crítica | RF01, RF06 | I1, I2, I3 | T01 | CP01 |
 | HU-M03-06 | Corrección de un ingreso registrado | Administrativo | Alta | RF04 | I3 | T02 | CP04 |
 | HU-M04-01 | Reconocimiento automático de los datos del ticket | Supervisor | Crítica | RF02 | ERA | T01 | CP02 |
 | HU-M05-01 | Detección automática de inconsistencias | Supervisor | Crítica | RF03 | TDI | T02 | CP03 |
@@ -810,6 +864,10 @@ flowchart TD
 ---
 
 ## Anexo F — `scripts/verificar_migracion.sh`
+
+> **Ya creado y ejecutable.** El script vigente amplía el patrón de abajo con `hora_pesaje`,
+> `hora_registro` y las secciones de indicadores, y centraliza el patrón para que las skills no
+> tengan que transcribirlo.
 
 ```bash
 #!/usr/bin/env bash

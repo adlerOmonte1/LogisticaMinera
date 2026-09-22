@@ -27,7 +27,7 @@ Lo que salga está **citado pero no definido**. Es el error más frecuente al am
 añade una regla en un diagrama y no se registra en `reglas_negocio.md`.
 
 Para los requerimientos funcionales globales, el formato vigente es `RF01` **sin guion**. Toda
-aparición de `RF-01` es un residuo del sistema anterior y se reporta como bloqueante:
+aparición del formato con guion es un residuo del sistema anterior y se reporta como bloqueante:
 
 ```bash
 grep -rnE "RF-[0-9]{2}" docs skills --include=*.md
@@ -105,8 +105,9 @@ Revisión de fondo, la que decide si la documentación sirve. Para cada módulo:
       (inicio y fin del registro) no son editables por ningún rol.
 - [ ] Ningún criterio de aceptación persiste un dato reconocido sin confirmación del usuario, ni
       omite guardar por separado el valor reconocido y el confirmado.
-- [ ] Ningún archivo de `docs/modulos/` cita indicadores de la tesis ni contiene secciones
-      «Relación con el indicador», «Indicador de tesis» o «qué se rompe en la tesis».
+- [ ] Ningún archivo de `docs/modulos/` cita indicadores de la tesis ni contiene secciones que
+      relacionen el módulo con la medición; el patrón exacto lo detecta el script de la
+      comprobación 9.
 - [ ] Cada HU tiene fila en `docs/02-trazabilidad/matriz_HU_RF_indicador.md`.
 - [ ] Cada `funcionales.md` declara la responsabilidad y los límites del módulo, y ninguna función
       excede esa responsabilidad.
