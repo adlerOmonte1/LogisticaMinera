@@ -1,6 +1,6 @@
 # Diagramas de secuencia — M02 Catálogo maestro
 
-## S-M02-01 · Registro de vehículo externo (HU-M02-02, CA03)
+## S-M02-01 · Registro de un vehículo externo (HU-M02-01, CA04)
 
 ```mermaid
 sequenceDiagram
@@ -10,17 +10,18 @@ sequenceDiagram
     participant SRV as ServicioCatalogo
     participant DOM as Modelo Vehiculo
     participant DB as PostgreSQL
-    participant AUD as Auditoria M08
+    participant AUD as Auditoria M09
 
-    A->>NG: Completa placa, titularidad EXTERNO, capacidad
-    NG->>NG: Validacion de formulario (conveniencia)
+    A->>NG: Completa placa, titularidad EXTERNO y capacidad
+    NG->>NG: Validacion de formulario de conveniencia
     NG->>API: POST /api/v1/catalogo/vehiculos/
     API->>SRV: crear_vehiculo(datos)
-    SRV->>DOM: Validar invariantes RN-M02-02 a 05
+    SRV->>DOM: Validar invariantes RN-M02-01 a 05
+
     alt Titularidad EXTERNO sin transportista
         DOM-->>SRV: Error de dominio
         SRV-->>API: Error de validacion
-        API-->>NG: 400 Debe indicar el transportista
+        API-->>NG: 400 Debe indicar el transportista para un vehiculo externo
         NG-->>A: Mensaje de error en el campo
     else Datos validos
         DOM->>DB: Persistir vehiculo activo
@@ -32,7 +33,7 @@ sequenceDiagram
     end
 ```
 
-## S-M02-02 · Desactivación con registros dependientes (HU-M02-01, CA03)
+## S-M02-02 · Desactivación con registros dependientes (HU-M02-02, CA03)
 
 ```mermaid
 sequenceDiagram
@@ -41,40 +42,48 @@ sequenceDiagram
     participant API as Django REST
     participant SRV as ServicioCatalogo
     participant DB as PostgreSQL
+    participant AUD as Auditoria M09
 
-    A->>NG: Solicita eliminar producto
-    NG->>API: PATCH /api/v1/catalogo/productos/{id}/desactivar/
-    API->>SRV: desactivar_producto(id)
-    SRV->>DB: Contar movimientos asociados
-    DB-->>SRV: Cantidad de movimientos
-    alt Tiene movimientos
+    A->>NG: Solicita desactivar un tipo de mineral
+    NG->>API: PATCH /api/v1/catalogo/tipos-mineral/{id}/desactivar/
+    API->>SRV: desactivar_tipo_mineral(id)
+    SRV->>DB: Contar ingresos asociados
+    DB-->>SRV: Cantidad de ingresos
+
+    alt Tiene ingresos asociados
         SRV->>DB: activo = falso
+        SRV->>AUD: Registrar evento MODIFICAR
         SRV-->>API: Desactivado con advertencia
-        API-->>NG: 200 El producto se desactivo porque tiene movimientos
-    else Sin movimientos
+        API-->>NG: 200 El tipo de mineral se desactivo porque tiene ingresos registrados
+    else Sin ingresos asociados
         SRV->>DB: activo = falso
+        SRV->>AUD: Registrar evento MODIFICAR
         SRV-->>API: Desactivado
-        API-->>NG: 200 Producto desactivado
+        API-->>NG: 200 Tipo de mineral desactivado
     end
+
     NG-->>A: Mensaje correspondiente
 ```
 
-## S-M02-03 · Precarga de catálogos para operación offline (RNF-M02-03)
+## S-M02-03 · Consulta del catálogo desde el registro de ingresos (HU-M02-01, HU-M02-02)
 
 ```mermaid
 sequenceDiagram
+    actor S as Supervisor de planta
     participant NG as Angular
-    participant SW as Service Worker
     participant API as Django REST
-    participant IDB as IndexedDB
+    participant REP as RepositorioCatalogo
 
-    NG->>API: GET /api/v1/catalogo/productos/
-    API-->>NG: Lista de productos vigentes
-    NG->>IDB: Guardar catalogo local
-    NG->>API: GET /api/v1/catalogo/vehiculos/
-    API-->>NG: Lista de vehiculos vigentes
-    NG->>IDB: Guardar catalogo local
-    Note over SW,IDB: Al perder conexion, el formulario<br/>de ingreso lee de IndexedDB
-    NG->>IDB: Leer catalogo (sin conexion)
-    IDB-->>NG: Productos y vehiculos
+    S->>NG: Abre el formulario de registro de un ingreso
+    NG->>API: GET /api/v1/catalogo/vehiculos/?vigente=true
+    API->>REP: listar_vigentes()
+    REP-->>API: Vehiculos activos
+    API-->>NG: 200 con la lista
+
+    NG->>API: GET /api/v1/catalogo/tipos-mineral/?vigente=true
+    API->>REP: listar_vigentes()
+    REP-->>API: Tipos de mineral activos
+    API-->>NG: 200 con la lista
+
+    NG-->>S: Selectores de placa y tipo de mineral poblados
 ```
