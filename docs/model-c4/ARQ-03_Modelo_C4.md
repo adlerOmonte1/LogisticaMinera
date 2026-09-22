@@ -1,7 +1,7 @@
 # ARQ-03 — Modelo C4 del sistema
 
 **Documento:** ARQ-03
-**Versión:** 1.0
+**Versión:** 2.0
 **Estado:** Aprobado
 **Alcance:** los cuatro niveles de abstracción del sistema, con la justificación de cada elemento
 **Deriva de:** `ARQ-01_Modulos_del_Sistema.md` y `ARQ-02_Arquitectura_Tecnica.md`
@@ -20,13 +20,12 @@ programar. C4 resuelve esa tensión con cuatro niveles de acercamiento, cada uno
 | 3 · Componentes | Cómo se organiza cada pieza por dentro | Desarrollo |
 | 4 · Código | Cómo se estructuran las clases del caso crítico | Desarrollo y defensa de SOLID |
 
-El modelo cumple además una función de medición: el nivel 2 es la **evidencia visual** del indicador
-de avance «porcentaje de módulos implementados sobre módulos planificados». Un
-diagrama que dibuje contenedores que el despliegue no tiene infla ese denominador y se vuelve en
-contra en cuanto la gerencia lo contrasta con el sistema real.
+Un diagrama que dibuje contenedores que el despliegue no tiene, u omita los que sí tiene, se
+contradice con la lista de control de funcionalidad en cuanto alguien lo contrasta con el sistema
+real.
 
 Notación: Mermaid, coherente con el resto de la documentación. Las etiquetas van sin tildes por la
-convención del repositorio, que evita fallos de renderizado en la exportación del documento de arquitectura.
+convención del repositorio, que evita fallos de renderizado en la exportación del documento.
 
 ---
 
@@ -38,43 +37,50 @@ flowchart TB
     ADV(["Administrativo"])
     SUP(["Supervisor de planta"])
 
-    SIS["Sistema de Control de Produccion y Existencias"]
+    SIS["Sistema web inteligente de control de inventarios de ingreso de mineral"]
 
     BAL["Balanza de plataforma - equipo externo no integrado"]
-    AUT["Autoridad de formalizacion - receptora de la declaracion semestral"]
+    MOT["Motor de reconocimiento - local o servicio externo segun D-12"]
 
-    SUP -->|Registra ingresos y consulta existencias| SIS
-    ADV -->|Registra salidas y genera reportes| SIS
+    SUP -->|Fotografia el ticket registra y consulta| SIS
+    ADV -->|Corrige consulta consolida y exporta| SIS
     ADM -->|Gestiona usuarios catalogos y anulaciones| SIS
 
     BAL -.->|Ticket de balanza impreso en papel| SUP
-    SIS -.->|Archivo descargable de declaracion semestral| AUT
+    SIS -.->|Envia la imagen del ticket a reconocer| MOT
+    MOT -.->|Devuelve seis campos con su confianza| SIS
 ```
 
 ### 2.1 Justificación de los elementos
 
 | Elemento | Por qué está | Qué pasaría sin él |
 |---|---|---|
-| **Supervisor de planta** | Es quien está en el punto de pesaje cuando llega el volquete, a cualquier hora | El registro volvería a depender del horario administrativo, que es la causa raíz de la latencia I1 |
-| **Administrativo** | Opera salidas, consultas y reportes | Sin registro de salidas, el stock sería acumulativo y el indicador I4 carecería de sentido |
-| **Administrador** | Gestiona usuarios, catálogos, anulaciones y ajustes | Sin gestión de catálogo con titularidad, I2 quedaría inclasificable (D-06) |
+| **Supervisor de planta** | Es quien está en el punto de pesaje cuando llega el volquete, y quien fotografía el ticket | El registro volvería a depender de que alguien transcriba el papel más tarde, la causa raíz de la espera que I1 mide |
+| **Administrativo** | Corrige datos reconocidos, consulta, consolida y exporta | Sin esta operación, un dato mal leído por el motor quedaría sin forma de corregirse fuera del momento del registro |
+| **Administrador** | Gestiona usuarios, catálogos y anulaciones | Sin gestión de catálogo con titularidad y capacidad, el tipo de vehículo y la regla V4 quedarían sin base (D-06) |
 | **Balanza de plataforma** | Frontera declarada: **no hay integración** | — |
-| **Autoridad de formalización** | Destinataria de la declaración semestral exigida por la Ley 32213 | El módulo M06 perdería su justificación normativa |
+| **Motor de reconocimiento** | Sistema externo o local que lee la imagen; el sistema depende de su contrato, no de su implementación (D-12) | Sin él, el registro sería manual y RF02 no tendría cómo cumplirse |
 
-### 2.2 La frontera con la balanza es la decisión más importante de este nivel
+### 2.2 La frontera con la balanza sigue siendo la decisión más importante de este nivel
 
-La balanza **no está integrada** y no se propone integrarla. El dato llega al sistema en un ticket
-impreso que el supervisor transcribe. Esto no es una carencia que haya que disculpar: es lo que
-**hace existir el indicador I1**.
+La balanza **no está integrada** y no se propone integrarla. El dato llega al sistema como una
+fotografía del ticket impreso, que el motor de reconocimiento lee y el usuario confirma. Esto no es
+una carencia que haya que disculpar: es lo que **hace existir la medición de oportunidad del
+registro**.
 
-Porque el pesaje y el registro son actos separados, hay dos marcas de tiempo distintas —`hora_pesaje`,
-copiada del ticket, y `hora_registro`, asignada por el servidor— y la diferencia entre ambas es la
-latencia que el sistema busca reducir (D-01). Si la balanza estuviera integrada, ambas marcas coincidirían
-siempre, la latencia sería cero por construcción y **no habría nada que medir ni que mejorar**.
+Porque el pesaje y el registro son actos separados, hay tres marcas de tiempo distintas —la del
+ticket, leída de la fotografía; el inicio del registro, cuando llega la imagen; y el fin del
+registro, cuando se confirma— y las diferencias entre ellas son lo que el sistema busca reducir
+(D-01). Si la balanza estuviera integrada, esas marcas coincidirían por construcción y no habría
+nada que observar.
 
-Declararlo en el nivel 1 evita además la pregunta previsible en la revisión técnica sobre por qué no se
-integró el equipo: la respuesta es que la unidad de registro dejaría de existir, y que integrar una
-balanza de plataforma exige hardware y protocolo fuera del alcance de ocho semanas.
+### 2.3 El motor de reconocimiento como frontera abierta
+
+A diferencia de la balanza, el motor de reconocimiento **sí participa activamente**: recibe una
+imagen y devuelve datos. Se dibuja como sistema externo, con línea discontinua, porque D-12 aún no
+decide si vive dentro del servidor (procesamiento local) o fuera de él (un servicio en la nube). El
+sistema no se compromete con ninguna de las dos: la interfaz `ReconocedorTicket` (nivel 3) es la
+misma en ambos casos.
 
 ---
 
@@ -85,67 +91,62 @@ flowchart TB
     SUP(["Supervisor de planta"])
     ADV(["Administrativo y Administrador"])
 
-    subgraph Dispositivo["Dispositivo del usuario - telefono o computadora"]
-        PWA["Aplicacion web progresiva - Angular 17 standalone y signals"]
-        SW["Service Worker - cachea recursos y catalogos"]
-        IDB[("IndexedDB - cola de pendientes y borrador del formulario")]
+    subgraph Cliente["Dispositivo del usuario - telefono o computadora"]
+        NG["Aplicacion web - Angular 17 standalone y signals"]
     end
 
     subgraph Servidor["Servidor"]
         NGX["Nginx - sirve estaticos y enruta la API"]
         API["API REST - Django 5 y Django REST Framework"]
         DB[("PostgreSQL 16")]
+        IMG[("Almacen de imagenes")]
     end
 
-    SUP --> PWA
-    ADV --> PWA
-    PWA --> SW
-    SW --> IDB
-    PWA -->|HTTPS JSON con JWT| NGX
+    MOT["Motor de reconocimiento - local o externo segun D-12"]
+
+    SUP --> NG
+    ADV --> NG
+    NG -->|HTTPS JSON con JWT| NGX
     NGX --> API
     API --> DB
+    API --> IMG
+    API -->|Interfaz ReconocedorTicket| MOT
 ```
 
 ### 3.1 Justificación de cada contenedor
 
 | Contenedor | Tecnología | Responsabilidad | Justificación |
 |---|---|---|---|
-| **Aplicación web progresiva** | Angular 17+ | Interfaz de los nueve módulos | Instalable desde el navegador, sin tienda de aplicaciones ni proceso de publicación. La aplicación móvil nativa está declarada fuera de alcance en ARQ-01 §5 |
-| **Service Worker** | Angular Service Worker | Cachea el formulario de ingreso y los catálogos de producto y vehículo | Es lo que permite que el formulario abra **sin señal**. Sin él, M07 no existe y la latencia I1 no baja en las horas sin cobertura |
-| **IndexedDB** | API del navegador | Cola de ingresos pendientes y borrador del formulario en curso | Sostiene RNF-M03-06: si el formulario pierde los datos al caerse la conexión, el supervisor vuelve al papel y I1 regresa a los valores de la línea base |
-| **Nginx** | Nginx | Sirve el build de Angular y enruta `/api/` al backend | Un solo origen para el navegador, sin abrir CORS en producción. Además es donde se termina HTTPS, sin el cual el service worker no se registra y la PWA no funciona |
-| **API REST** | Django 5 + DRF | Reglas de negocio, casos de uso y autorización | Autoridad única de validación. Un registro que llega por la cola de sincronización no pasa por el formulario y debe someterse a las mismas reglas (D-08) |
-| **PostgreSQL 16** | PostgreSQL | Persistencia | Transacciones ACID, necesarias para asignar el correlativo bajo concurrencia (D-02) y para que el movimiento de stock se genere en el mismo acto que el ingreso (RN-M03-08) |
+| **Aplicación web** | Angular 17+ | Interfaz de los nueve módulos | Instalable desde el navegador, sin tienda de aplicaciones ni proceso de publicación. La aplicación móvil nativa está fuera de alcance (ARQ-01 §5) |
+| **Nginx** | Nginx | Sirve el build de Angular y enruta `/api/` al backend | Un solo origen para el navegador, sin abrir CORS en producción; termina HTTPS |
+| **API REST** | Django 5 + DRF | Reglas de negocio, casos de uso y autorización | Autoridad única de validación (D-08): toda petición, venga de donde venga, se somete a las mismas reglas |
+| **PostgreSQL 16** | PostgreSQL | Persistencia | Transacciones ACID, necesarias para asignar el código bajo concurrencia (D-02) y para que el reconocimiento, la validación y la auditoría se persistan en el mismo acto que el ingreso |
+| **Almacén de imágenes** | A definir con D-14 | Conserva la fotografía del ticket como respaldo del ingreso | Sostiene RN-M03-01 (ningún ingreso sin imagen) y la consulta de M07; separado de PostgreSQL porque el volumen y el patrón de acceso de archivos binarios difieren del de filas relacionales |
+| **Motor de reconocimiento** | A definir con D-12 | Lee los seis campos del ticket a partir de la imagen | Se accede exclusivamente a través de `ReconocedorTicket`; el contenedor puede vivir dentro del servidor o fuera de él sin que el resto del sistema lo note |
 
-### 3.2 Por qué el dispositivo tiene almacenamiento propio
+No hay Service Worker ni almacén local con cola de reintento en segundo plano: ese componente
+pertenecía a un módulo que ya no forma parte del alcance (DR-01). El navegador conserva un borrador
+del formulario mientras no hay señal (RNF-M03-05), pero eso no exige infraestructura de
+sincronización: el ingreso siempre se confirma contra el servidor.
 
-Separar `IndexedDB` como contenedor y no como detalle interno de la aplicación es deliberado: **es un
-almacén de datos que sobrevive al cierre de la aplicación y que, durante un tiempo, contiene registros
-que el servidor todavía no conoce**. Eso tiene consecuencias que el nivel 2 debe hacer visibles:
-
-- Esos ingresos aún no tienen correlativo. Lo reciben al sincronizar, nunca antes (D-02).
-- Su `hora_registro` es la de captura local, no la de sincronización (D-03).
-- Mientras están en la cola, el sistema tiene dos verdades parciales. La reconciliación es el punto
-  de mayor riesgo del proyecto.
-
-Dibujarlo dentro de la aplicación web, como si fuera una caché más, oculta exactamente el problema
-que M07 existe para gestionar.
-
-### 3.3 Contenedores que deliberadamente no existen
+### 3.2 Contenedores que deliberadamente no existen
 
 | No existe | Por qué |
 |---|---|
-| **Broker de tareas** (Celery, Redis) | HU-M06-01 exige el consolidado «a demanda, en el momento». Un broker añade una pieza que desplegar y vigilar sin requisito que la pida |
-| **Almacén de imágenes** | La fotografía del ticket no figura en el modelo entidad-relación, ni en HU-M03-01, ni en ninguna regla de negocio. Fotografiar el ticket es la práctica manual actual de los transportistas externos (D-06), no un requisito del sistema |
-| **Servicio de reportes separado** | Los reportes se generan en la misma API y se descargan; no se almacenan |
-| **Segunda base de datos o caché distribuida** | El volumen previsto no la justifica. Los cuatro índices del modelo ER sostienen los tiempos exigidos |
+| **Broker de tareas** (Celery, Redis) | D-15 fija el procesamiento síncrono por defecto. Se revisa solo si el piloto de motores muestra tiempos que lo justifiquen |
+| **Cola de sincronización o almacén de reintento en el cliente** | Pertenecía a la captura sin señal de red, retirada del alcance (DR-01) |
+| **Servicio de exportación separado** | El consolidado se genera en la misma API y se descarga; no se almacena |
+| **Segunda base de datos o caché distribuida** | El volumen previsto no la justifica; los índices del modelo entidad-relación sostienen los tiempos exigidos |
 
-Esta tabla es tan importante como el diagrama. Un contenedor dibujado y no construido baja el
-porcentaje de módulos cumplidos; uno construido y no dibujado aparece como sorpresa en la revisión.
+Esta tabla es tan importante como el diagrama. Un contenedor dibujado y no construido contradice la
+lista de control de funcionalidad; uno construido y no dibujado aparece como sorpresa en la revisión.
 
 ---
 
 ## 4. Nivel 3 — Componentes
+
+Se dibuja solo para M03, M04 y M05: son los módulos que se explican en sustentación y donde vive la
+inversión de dependencias que defiende el diseño.
 
 ### 4.1 Componentes del contenedor API — estructura transversal
 
@@ -155,12 +156,12 @@ correspondencia requisito-capa de ARQ-02 §5.
 ```mermaid
 flowchart TB
     subgraph APIC["Contenedor API REST"]
-        V["views/ - entrada y salida HTTP - RF"]
+        V["views - entrada y salida HTTP - RF"]
         PE["permissions.py - autorizacion por accion"]
-        SE["serializers.py - traduccion dominio y JSON"]
-        SV["services/ - casos de uso - RS"]
-        SL["repositories/ - consultas de lectura"]
-        MO["models/ - invariantes del dominio - RN"]
+        SE["serializers - traduccion dominio y JSON"]
+        SV["services - casos de uso - RS"]
+        SL["repositories - consultas de lectura"]
+        MO["models - invariantes del dominio - RN"]
         EX["utils - excepciones de dominio"]
     end
     DB[("PostgreSQL")]
@@ -178,48 +179,45 @@ flowchart TB
 
 | Componente | Responsabilidad única | Principio |
 |---|---|---|
-| `views/` | Traducir HTTP y nada más | SRP |
+| `views` | Traducir HTTP y nada más | SRP |
 | `permissions.py` | Autorizar por acción, no por objeto monolítico de usuario | ISP |
-| `serializers/` | Traducir dominio ↔ JSON; no valida reglas de negocio | SRP |
-| `services/` | Orquestar un caso de uso; invoca reglas, no las contiene | SRP, DIP |
-| `repositories/` | Consultar para leer, separado de la escritura | SRP |
-| `models/` | Proteger las invariantes de la entidad | SRP |
-| `utils/` | Excepciones de dominio, traducidas a HTTP en el borde | DIP |
+| `serializers` | Traducir dominio ↔ JSON; no valida reglas de negocio | SRP |
+| `services` | Orquestar un caso de uso; invoca reglas, no las contiene | SRP, DIP |
+| `repositories` | Consultar para leer, separado de la escritura | SRP |
+| `models` | Proteger las invariantes de la entidad | SRP |
+| `utils` | Excepciones de dominio, traducidas a HTTP en el borde | DIP |
 
-**La flecha que no existe es la que más importa:** `models/` y `services/` no dependen de
-`rest_framework`. Si lo hicieran, la regla de negocio quedaría atada al transporte HTTP y la cola de
-sincronización de M07 —que no llega por una petición de formulario— no podría reutilizarla. Ese es el
-motivo concreto, no una preferencia de diseño.
-
-La separación entre `repositories/` y `services/` tampoco es ceremonial: las consultas de lectura son
-las que sostienen el indicador I3, y deben poder optimizarse sin tocar la lógica de escritura.
+**La flecha que no existe es la que más importa:** `models` y `services` no dependen de
+`rest_framework`. Si lo hicieran, la regla de negocio quedaría atada al transporte HTTP, y un
+componente distinto de vista —una tarea programada, un comando de administración— no podría
+reutilizarla.
 
 ### 4.2 Componentes de M03 — Registro de ingresos
 
-Es el módulo núcleo: la unidad de registro del sistema es el ingreso de volquete.
+Es el módulo núcleo: la unidad de registro del sistema es el ingreso de mineral a partir del ticket.
 
 ```mermaid
 flowchart TB
-    VIS["IngresoViewSet - RF-01 y RF-02"]
-    SRV["ServicioIngreso - registrar editar anular"]
-    GEN["GeneradorCorrelativo - abstraccion"]
-    G1["CorrelativoPorSecuencia - nextval de PostgreSQL"]
-    G2["CorrelativoPorContador - select for update"]
+    VIS["IngresoViewSet - RF01 RF04 RF05 RF06"]
+    SRV["ServicioIngreso - iniciar registrar corregir anular"]
+    REC["ReconocedorTicket - abstraccion contenedor M04"]
+    VAL["ValidadorConsistencia - abstraccion contenedor M05"]
+    GEN["GeneradorCodigo - abstraccion"]
     REL["Reloj - abstraccion"]
-    MOD["Modelo Ingreso - RN-M03-01 a RN-M03-12"]
+    IMG["AlmacenImagenes - abstraccion"]
+    MOD["Modelo Ingreso - RN-M03-01 a RN-M03-15"]
     SEL["SelectorIngresos - listado filtros y totales"]
-    STK["ServicioStock - contenedor M05"]
-    AUD["ServicioAuditoria - contenedor M08"]
+    AUD["ServicioAuditoria - contenedor M09"]
     DB[("PostgreSQL")]
 
     VIS --> SRV
     VIS --> SEL
+    SRV --> REC
+    SRV --> VAL
     SRV --> GEN
-    GEN --> G1
-    GEN --> G2
     SRV --> REL
+    SRV --> IMG
     SRV --> MOD
-    SRV --> STK
     SRV --> AUD
     MOD --> DB
     SEL --> DB
@@ -227,43 +225,69 @@ flowchart TB
 
 | Componente | Justificación |
 |---|---|
-| `ServicioIngreso` | Concentra el caso de uso completo. La transacción única —correlativo, persistencia, movimiento de stock y evento de auditoría— vive aquí. Si el movimiento de stock falla, el ingreso no queda registrado: un ingreso sin movimiento rompe RN-M03-08 en silencio |
-| `GeneradorCorrelativo` como **abstracción** | D-02 deja abiertas dos implementaciones válidas y cuál se adopte es pregunta previsible en la revisión técnica. Se inyecta en el servicio, no se instancia dentro: así se sustituye por uno determinista en pruebas sin tocar la lógica del caso de uso |
-| `Reloj` como abstracción | HU-M03-02 fija umbrales de 72 horas y 30 días de antigüedad. Un servicio que llama a `timezone.now()` internamente **no se puede probar** contra esos límites |
-| `SelectorIngresos` | Listado con filtros combinables y totales del conjunto filtrado. El filtro por titularidad es la lectura directa de I2 |
-| Dependencia de `ServicioStock` y `ServicioAuditoria` | Son de M05 y M08. Se dibujan porque la transacción los abarca: la trazabilidad entre módulos no es opcional |
+| `ServicioIngreso` | Concentra el caso de uso completo. La transacción única —código, persistencia de valores reconocidos y confirmados, y evento de auditoría— vive aquí. Si el evento de auditoría falla, el ingreso no queda registrado: ninguna operación se completa sin su rastro (RN-M09-01) |
+| `ReconocedorTicket` como **abstracción** | D-12 deja abierta la elección del motor. Se inyecta en el servicio, no se instancia dentro: así se sustituye por un doble determinista en pruebas sin depender de un servicio externo |
+| `ValidadorConsistencia` como abstracción | Las reglas V1 a V5 viven en M05 y se aplican dos veces (sobre lo propuesto y sobre lo confirmado). El servicio de M03 no conoce las reglas concretas, solo el contrato |
+| `Reloj` como abstracción | Las tres marcas de tiempo son el núcleo del registro. Un servicio que llama a `timezone.now()` internamente no se puede probar controlando el instante exacto de cada una |
+| `AlmacenImagenes` como abstracción | D-14 no ha fijado el medio de almacenamiento; el servicio guarda a través de la interfaz sin saber si el destino es un volumen local o un servicio de objetos |
+| `SelectorIngresos` | Listado con filtros combinables y totales del conjunto filtrado, sin recorrer resultados en Python |
+| Dependencia de `ServicioAuditoria` | Es de M09. Se dibuja porque la transacción lo abarca: la trazabilidad entre módulos no es opcional |
 
-### 4.3 Componentes de M07 — Captura sin conexión
+### 4.3 Componentes de M04 — Reconocimiento automático del ticket
 
 ```mermaid
 flowchart TB
-    FRM["Formulario de ingreso - el mismo componente de M03"]
-    VAL["Validador local - reglas visibles con textos identicos"]
-    COL[("Cola local - IndexedDB")]
-    CON["Servicio de conectividad - detecta cambio de estado"]
-    SIN["Sincronizador - orden cronologico y hasta tres reintentos"]
-    LOT["Endpoint de lote - POST api v1 sincronizacion lote"]
-    SRV["ServicioIngreso - reutilizado de M03"]
+    IFC["ReconocedorTicket - interfaz"]
+    AD1["AdaptadorMotorA - ejemplo OCR local"]
+    AD2["AdaptadorMotorB - ejemplo servicio en la nube"]
+    SRV["ServicioReconocimiento - persiste el resultado"]
+    MOD["Modelo ReconocimientoTicket y CampoReconocido"]
+    DB[("PostgreSQL")]
 
-    FRM --> VAL
-    VAL --> COL
-    CON --> SIN
-    COL --> SIN
-    SIN -->|Lote con uuid_local y hora_captura_local| LOT
-    LOT --> SRV
+    IFC <|.. AD1
+    IFC <|.. AD2
+    SRV --> IFC
+    SRV --> MOD
+    MOD --> DB
 ```
 
 | Componente | Justificación |
 |---|---|
-| Formulario **reutilizado** de M03 | Si hubiera dos formularios, divergirían. El usuario no debe percibir dos sistemas distintos, y las validaciones locales muestran los mismos textos que en línea (HU-M07-02 CA02) |
-| `Validador local` | Mejora la experiencia; **no es fuente de verdad** (D-08). La validación autoritativa está en el servidor |
-| `Cola local` | Guarda ingresos con `uuid_local`, que actúa como **clave de idempotencia**: un lote reenviado tras un timeout no duplica ingresos. Sin esto, un reintento infla la producción declarada |
-| `Sincronizador` | Envía en orden cronológico de captura. Un elemento que falla permanece en la cola con el motivo y **no bloquea a los demás** |
-| `Endpoint de lote` → `ServicioIngreso` | La flecha crítica del diagrama: el lote entra por el **mismo** caso de uso que el alta en línea. Escribir un camino paralelo de validación más laxa sería abrir la puerta por la que entrarían datos inconsistentes al histórico |
+| `ReconocedorTicket` como interfaz, no como clase | Es el único punto de acoplamiento entre M03 y el motor concreto. Ningún otro componente del sistema importa el SDK o la librería de un motor: solo el adaptador correspondiente |
+| Dos adaptadores dibujados a la vez | D-12 exige comparar motores en un piloto antes de elegir. El diagrama muestra que la arquitectura ya admite esa comparación sin cambios estructurales |
+| `ServicioReconocimiento` separado de los adaptadores | Los adaptadores solo traducen: reciben una imagen y devuelven el contrato de `ReconocedorTicket`. Guardar el resultado, calcular si un campo fue corregido y registrar el evento de auditoría es responsabilidad de otro componente, para que cambiar de motor no toque la lógica de persistencia |
 
-**El riesgo que este nivel hace visible:** dos supervisores sincronizando lotes al mismo tiempo
-convergen sobre el mismo `GeneradorCorrelativo`. Es el punto más probable de fallo de todo el sistema
-y debe probarse con dos clientes concurrentes, no solo con el alta en línea.
+### 4.4 Componentes de M05 — Validación automática de consistencia
+
+```mermaid
+flowchart TB
+    IFC["ValidadorConsistencia - interfaz"]
+    COL["Coleccion de reglas registradas"]
+    V1["ReglaV1PesoNeto"]
+    V2["ReglaV2Tara"]
+    V3["ReglaV3Placa"]
+    V4["ReglaV4Capacidad"]
+    V5["ReglaV5Fecha"]
+    SRV["ServicioValidacion - compone y persiste"]
+    MOD["Modelo ResultadoValidacion"]
+    DB[("PostgreSQL")]
+
+    IFC --> COL
+    COL --> V1
+    COL --> V2
+    COL --> V3
+    COL --> V4
+    COL --> V5
+    SRV --> IFC
+    SRV --> MOD
+    MOD --> DB
+```
+
+| Componente | Justificación |
+|---|---|
+| Una clase por regla | Añadir una regla nueva —una placa fuera del catálogo, un tipo de mineral incompatible— es una clase más en la colección, sin tocar V1 a V5 (OCP) |
+| `ValidadorConsistencia` recorre la colección sin nombrar ninguna regla | Es la garantía de que RN-M05-04 (evaluar las cinco siempre) no dependa de que el desarrollador recuerde encadenar condicionales |
+| `ServicioValidacion` separado de las reglas | Las reglas son puras: reciben datos, devuelven si cumplen. Persistir el resultado con su momento y su resolución es responsabilidad de otro componente |
 
 ---
 
@@ -277,14 +301,16 @@ inversión de dependencias y es la pregunta que se defiende en la revisión téc
 
 ```mermaid
 classDiagram
-    class GeneradorCorrelativo {
+    class ReconocedorTicket {
         <<interface>>
-        +siguiente(anio) str
+        +reconocer(imagen) ResultadoReconocimiento
     }
-    class CorrelativoPorSecuencia {
-        +siguiente(anio) str
+    class ValidadorConsistencia {
+        <<interface>>
+        +validar(datos) list~Inconsistencia~
     }
-    class CorrelativoPorContador {
+    class GeneradorCodigo {
+        <<interface>>
         +siguiente(anio) str
     }
     class Reloj {
@@ -292,55 +318,59 @@ classDiagram
         +ahora() datetime
     }
     class ServicioIngreso {
-        -generador GeneradorCorrelativo
+        -reconocedor ReconocedorTicket
+        -validador ValidadorConsistencia
+        -generador GeneradorCodigo
         -reloj Reloj
+        +iniciar_registro(imagen, usuario) Propuesta
         +registrar_ingreso(datos, usuario) Ingreso
-        +anular_ingreso(ingreso, motivo, usuario) Ingreso
+        +corregir_ingreso(id, cambios, motivo, usuario) Ingreso
+        +anular_ingreso(id, motivo, usuario) Ingreso
     }
     class Ingreso {
-        +correlativo str
-        +uuid_local uuid
-        +hora_pesaje time
-        +hora_registro datetime
+        +codigo str
+        +fecha_hora_ticket datetime
+        +hora_inicio_registro datetime
+        +hora_fin_registro datetime
         +peso_neto_tn Decimal
         +validar_invariantes()
-        +calcular_peso_neto() Decimal
     }
 
-    GeneradorCorrelativo <|.. CorrelativoPorSecuencia
-    GeneradorCorrelativo <|.. CorrelativoPorContador
-    ServicioIngreso --> GeneradorCorrelativo
+    ServicioIngreso --> ReconocedorTicket
+    ServicioIngreso --> ValidadorConsistencia
+    ServicioIngreso --> GeneradorCodigo
     ServicioIngreso --> Reloj
     ServicioIngreso --> Ingreso
 ```
 
 ### 5.1 Qué demuestra este diagrama
 
-- **DIP.** `ServicioIngreso` depende de `GeneradorCorrelativo` y de `Reloj`, no de sus
-  implementaciones. Cambiar de secuencia de PostgreSQL a tabla de contadores no toca el caso de uso
-  ni obliga a rehacer sus pruebas.
-- **SRP.** `Ingreso` protege sus invariantes y calcula el peso neto; no sabe de correlativos, de
-  transacciones ni de HTTP.
-- **Capacidad de ser probado.** Las dos abstracciones existen porque **hay pruebas que las exigen**:
-  correlativos deterministas y control del tiempo para los umbrales de 72 horas y 30 días. No se
-  abstrae por si acaso —con nueve módulos en ocho semanas, una interfaz sin segunda implementación ni
-  prueba que la sustituya es ceremonia y se defiende peor que su ausencia.
+- **DIP.** `ServicioIngreso` depende de cuatro interfaces, no de sus implementaciones. Cambiar de
+  motor de reconocimiento o de generador de código no toca el caso de uso ni obliga a rehacer sus
+  pruebas.
+- **SRP.** `Ingreso` protege sus invariantes; no sabe de motores de reconocimiento, de reglas de
+  validación ni de HTTP. El peso neto es un dato que recibe y valida, no un valor que calcula.
+- **Capacidad de ser probado.** Las cuatro abstracciones existen porque hay pruebas que las exigen:
+  un motor de reconocimiento real no puede invocarse en cada corrida de pruebas, las reglas de
+  validación deben poder simularse en ambos sentidos, y el reloj debe poder fijarse para verificar
+  las tres marcas de tiempo con precisión. No se abstrae por si acaso: una interfaz sin segunda
+  implementación ni prueba que la sustituya es ceremonia y se defiende peor que su ausencia (D-09).
 
 ---
 
 ## 6. Trazabilidad del modelo
 
-| Nivel | Elemento | Módulo | Indicador | Decisión |
+| Nivel | Elemento | Módulo | RF | Decisión |
 |---|---|---|---|---|
-| 1 | Frontera con la balanza | M03 | I1 | D-01 |
-| 1 | Autoridad de formalización | M06 | I6 | — |
-| 2 | Service Worker e IndexedDB | M07 | I1, I2 | D-04 |
-| 2 | API REST como autoridad de validación | Todos | — | D-08 |
-| 2 | PostgreSQL con transacciones | M03, M05 | I3, I4 | D-02 |
-| 3 | `GeneradorCorrelativo` inyectado | M03, M07 | — | D-02 |
-| 3 | Formulario reutilizado en M07 | M07 | I1 | D-03 |
-| 3 | `repositories/` separado | M05, M09 | I3, I5 | — |
-| 4 | `Reloj` inyectado | M03 | I1 | D-01 |
+| 1 | Frontera con la balanza | M03 | RF01 | D-01 |
+| 1 | Motor de reconocimiento como sistema externo | M04 | RF02 | D-12 |
+| 2 | Almacén de imágenes | M03 | RF01 | D-14 |
+| 2 | API REST como autoridad de validación | Todos | RF03 | D-08 |
+| 2 | PostgreSQL con transacciones | M03, M09 | RF05 | D-02 |
+| 3 | `ReconocedorTicket` inyectado | M03, M04 | RF02 | D-12 |
+| 3 | `ValidadorConsistencia` inyectado | M03, M05 | RF03 | D-08 |
+| 3 | `repositories` separado | M07, M08 | RF08, RF09 | D-09 |
+| 4 | `Reloj` inyectado | M03 | RF01 | D-01 |
 
 ---
 
@@ -348,6 +378,6 @@ classDiagram
 
 - Lista cerrada de módulos y alcance declarado: `ARQ-01_Modulos_del_Sistema.md`
 - Capas, contrato de API y aplicación de SOLID: `ARQ-02_Arquitectura_Tecnica.md`
-- Decisiones que condicionan el modelo: `decisiones_diseno.md`
-- Entidades y sus campos: `modelo_datos_entidad_relacion.md`
-- Convención de códigos y nomenclatura: `convenciones_codigo.md`
+- Decisiones que condicionan el modelo: `../00-arquitectura/decisiones_diseno.md`
+- Entidades y sus campos: `../00-arquitectura/modelo_datos_entidad_relacion.md`
+- Convención de códigos y nomenclatura: `../00-arquitectura/convenciones_codigo.md`
