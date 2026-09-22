@@ -64,6 +64,28 @@ razonamiento, no en los criterios.
 `Detalles` es opcional en historias simples (ver HU-M02-03). La tabla, la historia y los criterios
 no lo son.
 
+## Granularidad: una historia por capacidad, no por operación
+
+**Un CRUD completo es una sola historia.** Dar de alta, editar, listar y desactivar una entidad de
+catálogo son cuatro operaciones del mismo trabajo y se cubren con criterios de aceptación distintos
+dentro de una historia, no con cuatro historias. Escribir «Registrar producto», «Editar producto»,
+«Listar productos» y «Desactivar producto» infla el backlog sin añadir información.
+
+Merece historia propia lo que tiene **lógica dedicada**: un flujo con decisiones, una regla de
+dominio que solo aplica ahí, un contrato con otro módulo o un rol distinto. El reconocimiento
+automático, la detección de inconsistencias, la anulación con motivo o la exportación son historias
+propias; «editar» un catálogo, no.
+
+| Caso | Cómo se documenta |
+|---|---|
+| CRUD de una entidad de catálogo | Una historia, con un criterio por operación |
+| Alta con reglas propias y consulta simple del mismo recurso | Una historia, salvo que los roles difieran |
+| Capacidad con flujo propio (reconocer, validar, anular, exportar) | Historia propia |
+| Misma operación para dos roles con alcance distinto | Una historia, con un criterio de rechazo por rol |
+
+Entre 1 y 4 historias por módulo es lo normal en este sistema. Si un módulo supera cinco, comprueba
+que no estés fragmentando un CRUD.
+
 ## Reglas de redacción
 
 **El rol es uno de los tres definidos.** Administrador, Administrativo o Supervisor de planta. No
