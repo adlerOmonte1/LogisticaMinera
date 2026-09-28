@@ -69,7 +69,7 @@ token de inmediato; la sesión también expira por inactividad tras el tiempo co
 |:--|:--|
 | **Identificador** | HU-M01-02 |
 | **Épica** | Autenticación y roles |
-| **Prioridad** | Crítica |
+| **Prioridad** | Alta |
 
 **Historia**
 

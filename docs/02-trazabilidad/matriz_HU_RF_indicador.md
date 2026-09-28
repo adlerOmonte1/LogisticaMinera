@@ -54,7 +54,7 @@ funcionalidad.
 | HU-M08-01 | Total acumulado mensual por tipo de mineral | Administrativo | Crítica | RF09 | I5 | T05 | CP09 |
 | HU-M08-02 | Exportación del total acumulado mensual | Administrativo | Alta | RF09 | I5 | T06 | CP09 |
 | **M09 — Auditoría** |
-| HU-M09-01 | Registro de eventos del sistema | — (automático) | Alta | — | — | — | — |
+| HU-M09-01 | Registro de eventos del sistema | Administrador | Alta | — | — | — | — |
 | HU-M09-02 | Consulta del historial de un registro | Administrador | Media | — | — | — | — |
 
 **Total: 21 historias.**

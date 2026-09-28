@@ -86,7 +86,7 @@ El contrato de la API. Es el puente entre la historia y el código.
 | Reconocer ticket | Recibe la imagen y devuelve los seis campos con su confianza | HU-M04-01 | `POST /api/v1/reconocimientos/` |
 | Validar datos propuestos | Aplica V1 a V5 y devuelve las inconsistencias | HU-M05-01 | `POST /api/v1/validaciones/` |
 | Registrar ingreso | Persiste los datos confirmados con código y hora de fin | HU-M03-01 | `POST /api/v1/ingresos/` |
-| Anular ingreso | Baja lógica con motivo | HU-M03-07 | `PATCH /api/v1/ingresos/{id}/anular/` |
+| Anular ingreso | Baja lógica con motivo | HU-M03-03 | `PATCH /api/v1/ingresos/{id}/anular/` |
 
 ## Responsabilidad y límites
 

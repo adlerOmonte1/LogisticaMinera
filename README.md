@@ -20,7 +20,7 @@ sistema web inteligente descrito arriba. La reformulación se documenta en
 | Rama | Contenido |
 |---|---|
 | `main` | Última versión estable: backend con M01 y M02 implementados, bajo el diseño anterior |
-| `docs/reformulacion/sistema-inteligente` | Documentación reescrita para el sistema nuevo (fases 0 a 8 completas); el backend todavía no se tocó |
+| `docs/reformulacion/sistema-inteligente` | Documentación reescrita para el sistema nuevo (fases 0 a 9 completas); el backend todavía no se tocó |
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|

@@ -365,7 +365,7 @@ class Ingreso(ModeloBase):
         ]
 
     def clean(self):
-        # RN-M03-08: la fecha del ticket no es posterior al inicio del registro
+        # RN-M03-07: la fecha del ticket no es posterior al inicio del registro
         if self.hora_inicio_registro and self.fecha_hora_ticket > self.hora_inicio_registro:
             raise ValidationError(
                 {"fecha_hora_ticket": "La fecha del ticket no puede ser posterior a la fecha de registro."}

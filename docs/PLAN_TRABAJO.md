@@ -8,7 +8,7 @@
 | Rama | `docs/reformulacion/sistema-inteligente` |
 | Regla de oro | Ninguna fase empieza sin que la anterior haya pasado su verificación y tu revisión |
 | Principio rector | La documentación describe **un sistema**, no una tesis. Prevalece sobre los ejemplos de los Anexos D y E |
-| Estado | Fase 0 y Fase 1 ejecutadas el 22/09/2026 |
+| Estado | Fases 0 a 9 ejecutadas entre el 22/09/2026 y el 27/09/2026; pendientes la 10 y la 11 |
 
 ---
 
@@ -37,14 +37,14 @@ citan en los módulos, porque son reglas del sistema. El cronograma vive solo en
 |---|---|---|---|
 | 0 | Rama, marco de tesis, decisiones cerradas, `CLAUDE.md` | Tú | Decisiones del Anexo B firmadas — **hecha** |
 | 1 | Skills de documentación reescritas | Agente | Revisión de `contexto-tesis` — **hecha** |
-| 2 | ARQ-01 (módulos) y decisiones de diseño D-01 a D-16 | Agente | Lista cerrada de módulos |
-| 3 | Modelo entidad-relación | Agente | Entidades e índices |
-| 4 | Matriz de trazabilidad y backlog índice | Agente | Cada RF y tarea tiene HU |
-| 5 | **Módulo piloto M03 completo** | Agente | **Aprobación de estilo** |
-| 6 | Módulos nuevos M04, M05, M06 | Agente | Una revisión por módulo |
-| 7 | M07, M08, M09, ajustes a M01 y M02, retiro de módulos antiguos | Agente | Carpetas antiguas eliminadas |
-| 8 | ARQ-02, ARQ-03 (C4) y guías | Agente | Diagramas C4 coherentes |
-| 9 | Plan de trabajo, plan de pruebas y skills técnicas | Agente | Protocolo ERA/TDI |
+| 2 | ARQ-01 (módulos) y decisiones de diseño D-01 a D-16 | Agente | Lista cerrada de módulos — **hecha** |
+| 3 | Modelo entidad-relación | Agente | Entidades e índices — **hecha** |
+| 4 | Matriz de trazabilidad y backlog índice | Agente | Cada RF y tarea tiene HU — **hecha** |
+| 5 | **Módulo piloto M03 completo** | Agente | **Aprobación de estilo** — **hecha** |
+| 6 | Módulos nuevos M04, M05, M06 | Agente | Una revisión por módulo — **hecha** |
+| 7 | M07, M08, M09, ajustes a M01 y M02, retiro de módulos antiguos | Agente | Carpetas antiguas eliminadas — **hecha** |
+| 8 | ARQ-02, ARQ-03 (C4) y guías | Agente | Diagramas C4 coherentes — **hecha** |
+| 9 | Plan de trabajo, plan de pruebas y skills técnicas | Agente | Protocolo ERA/TDI — **hecha** |
 | 10 | Limpieza del backend | Agente | Pruebas en verde |
 | 11 | Auditoría final y merge | Agente + tú | Script sin hallazgos |
 

@@ -337,7 +337,7 @@ Este es el **único** documento donde el sistema se relaciona con los indicadore
 | HU | Título | Rol | Prioridad | RF | Indicador | Tarea | Caso de prueba |
 |---|---|---|---|---|---|---|---|
 | HU-M03-01 | Registro de un ingreso a partir del ticket | Supervisor de planta | Crítica | RF01, RF06 | I1, I2, I3 | T01 | CP01 |
-| HU-M03-06 | Corrección de un ingreso registrado | Administrativo | Alta | RF04 | I3 | T02 | CP04 |
+| HU-M03-02 | Corrección de un ingreso registrado | Administrativo | Alta | RF04 | I3 | T02 | CP04 |
 | HU-M04-01 | Reconocimiento automático de los datos del ticket | Supervisor de planta | Crítica | RF02 | ERA | T01 | CP02 |
 | HU-M05-01 | Detección automática de inconsistencias | Supervisor de planta | Crítica | RF03 | TDI | T02 | CP03 |
 | HU-M07-01 | Consulta de un ingreso por placa y fecha | Administrativo | Crítica | RF08 | I4 | T03 | CP08 |

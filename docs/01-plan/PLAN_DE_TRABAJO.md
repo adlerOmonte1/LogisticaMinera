@@ -230,7 +230,7 @@ Se construyen con `factory-boy`, nunca con registros creados a mano dentro de la
 juego de datos de preproducción que reproduce un mes de operación de planta: catálogo completo,
 ingresos con reconocimiento exitoso y con reconocimiento fallido, ingresos con cada una de las
 inconsistencias V1 a V5, lotes en distintos puntos de su recorrido por las etapas, y un mes sin
-ingresos, porque la consolidación de un mes vacío es un caso de prueba obligatorio (RNF-M08-06).
+ingresos, porque la consolidación de un mes vacío es un caso de prueba obligatorio (HU-M08-01 CA03).
 
 El conjunto de tickets reales para medir ERA y TDI se guarda aparte, con las inconsistencias
 sembradas documentadas en `../03-pruebas/plan_de_pruebas.md` §4 (DR-08): no se genera

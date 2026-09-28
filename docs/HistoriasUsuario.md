@@ -96,7 +96,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
-| HU-M09-01 | Registro de eventos del sistema | — (automático) | Alta |
+| HU-M09-01 | Registro de eventos del sistema | Administrador | Alta |
 | HU-M09-02 | Consulta del historial de un registro | Administrador | Media |
 
 ---
