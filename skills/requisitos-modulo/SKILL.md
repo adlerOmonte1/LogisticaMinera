@@ -61,7 +61,7 @@ implementación.
 | Código | Requerimiento | Deriva de |
 |---|---|---|
 | RS-M{nn}-01 | El sistema conserva la `imagen_ticket` asociada al ingreso y asigna `hora_inicio_registro` al recibirla | RU-M{nn}-01 |
-| RS-M{nn}-02 | El sistema presenta los seis campos reconocidos con su `confianza` y permite editarlos antes de confirmar | RU-M{nn}-02 |
+| RS-M{nn}-02 | El sistema presenta los tres campos reconocidos —placa, fecha y peso bruto— con su `confianza` y permite editarlos antes de confirmar | RU-M{nn}-02 |
 | RS-M{nn}-05 | El sistema asigna `codigo` y `hora_fin_registro` dentro de la misma transacción | — (integridad con M05) |
 ```
 
@@ -83,10 +83,10 @@ El contrato de la API. Es el puente entre la historia y el código.
 
 | Función | Descripción | HU | Endpoint |
 |---|---|---|---|
-| Reconocer ticket | Recibe la imagen y devuelve los seis campos con su confianza | HU-M04-01 | `POST /api/v1/reconocimientos/` |
-| Validar datos propuestos | Aplica V1 a V5 y devuelve las inconsistencias | HU-M05-01 | `POST /api/v1/validaciones/` |
+| Reconocer ticket | Recibe la imagen y devuelve la placa, la fecha y el peso bruto con su confianza | HU-M04-01 | `POST /api/v1/reconocimientos/` |
+| Validar datos propuestos | Aplica V1 a V5 y devuelve las inconsistencias | HU-M05-01 | (interno, desde M03) |
 | Registrar ingreso | Persiste los datos confirmados con código y hora de fin | HU-M03-01 | `POST /api/v1/ingresos/` |
-| Anular ingreso | Baja lógica con motivo | HU-M03-07 | `PATCH /api/v1/ingresos/{id}/anular/` |
+| Anular ingreso | Baja lógica con motivo | HU-M03-03 | `PATCH /api/v1/ingresos/{id}/anular/` |
 
 ## Responsabilidad y límites
 
@@ -157,8 +157,8 @@ Invariantes del dominio. Lo que sigue siendo cierto sin importar qué interfaz l
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
-| RN-M{nn}-01 | El peso neto confirmado no difiere de bruto menos tara en más de 0,01 t (V1) | Se registrarían toneladas que el ticket no respalda |
-| RN-M{nn}-02 | La tara es estrictamente menor que el peso bruto (V2) | El peso neto sería cero o negativo |
+| RN-M{nn}-01 | El peso neto lo calcula el servidor como bruto menos la tara del vehículo, y el ingreso conserva la tara aplicada | Un cambio posterior de tara reescribiría en silencio las toneladas ya registradas |
+| RN-M{nn}-02 | La tara del vehículo es estrictamente menor que el peso bruto (V2) | El peso neto sería cero o negativo |
 | RN-M{nn}-03 | La fecha del ticket no es posterior a la fecha de registro (V5) | El ingreso quedaría fechado en el futuro y el orden de los registros dejaría de ser reconstruible |
 | RN-M{nn}-04 | `hora_inicio_registro` y `hora_fin_registro` las asigna el servidor y ningún rol las modifica | Las marcas de tiempo serían falsificables y el registro dejaría de ser atribuible |
 | RN-M{nn}-05 | Ningún valor reconocido se persiste como dato del ingreso sin confirmación del usuario | Un error del motor se convertiría en dato oficial sin que nadie lo revisara |

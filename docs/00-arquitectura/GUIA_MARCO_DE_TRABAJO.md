@@ -339,50 +339,58 @@ class Ingreso(ModeloBase):
 
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/")
-    fecha_hora_ticket = models.DateTimeField()                     # leida del ticket (D-01)
+    fecha_hora_pesaje = models.DateTimeField()                     # fecha reconocida + hora digitada (D-01)
     hora_inicio_registro = models.DateTimeField(editable=False)    # del servidor (D-01)
     hora_fin_registro = models.DateTimeField(editable=False)       # del servidor (D-01)
     vehiculo = models.ForeignKey("catalogo.Vehiculo", on_delete=models.PROTECT)
     tipo_mineral = models.ForeignKey("catalogo.TipoMineral", on_delete=models.PROTECT)
     peso_bruto_tn = models.DecimalField(max_digits=8, decimal_places=2)
-    tara_tn = models.DecimalField(max_digits=8, decimal_places=2)
-    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2)   # leido, no calculado
+    tara_tn = models.DecimalField(max_digits=8, decimal_places=2,
+                                  null=True, editable=False)       # tara aplicada (D-17)
+    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2,
+                                       null=True, editable=False)  # calculado (D-17)
     numero_ticket = models.CharField(max_length=20, blank=True)
-    justificacion_peso = models.TextField(blank=True)
     lote = models.ForeignKey("trazabilidad.LoteProceso", null=True, blank=True,
                               on_delete=models.PROTECT)
     usuario_registro = models.ForeignKey("accounts.Usuario", on_delete=models.PROTECT,
                                           editable=False)
-    estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.REGISTRADO)
+    estado = models.CharField(max_length=12, choices=Estado.choices)  # EN_PROCESO, REGISTRADO, ANULADO
     motivo_anulacion = models.TextField(blank=True)
 
     class Meta:
         db_table = "ingreso"
         indexes = [
-            models.Index(fields=["vehiculo", "fecha_hora_ticket"], name="idx_ingreso_vehiculo_fecha"),
-            models.Index(fields=["fecha_hora_ticket", "tipo_mineral"], name="idx_ingreso_fecha_mineral"),
+            models.Index(fields=["vehiculo", "fecha_hora_pesaje"], name="idx_ingreso_vehiculo_fecha"),
+            models.Index(fields=["fecha_hora_pesaje", "tipo_mineral"], name="idx_ingreso_fecha_mineral"),
             models.Index(fields=["estado"], name="idx_ingreso_estado"),
         ]
 
     def clean(self):
-        # RN-M03-08: la fecha del ticket no es posterior al inicio del registro
-        if self.hora_inicio_registro and self.fecha_hora_ticket > self.hora_inicio_registro:
+        # RN-M03-07: la fecha del ticket no es posterior al inicio del registro
+        if self.hora_inicio_registro and self.fecha_hora_pesaje > self.hora_inicio_registro:
             raise ValidationError(
-                {"fecha_hora_ticket": "La fecha del ticket no puede ser posterior a la fecha de registro."}
+                {"fecha_hora_pesaje": "La fecha del ticket no puede ser posterior a la fecha de registro."}
             )
         # D-07: la anulacion exige motivo
         if self.estado == self.Estado.ANULADO and not self.motivo_anulacion:
             raise ValidationError({"motivo_anulacion": "Se requiere motivo para anular un ingreso."})
+
+    def aplicar_tara(self, tara):
+        # D-17, RN-M03-04: el neto se calcula aqui y en ningun otro lugar
+        self.tara_tn = tara
+        self.peso_neto_tn = self.peso_bruto_tn - tara
+        self.estado = self.Estado.REGISTRADO
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 ```
 
-`peso_neto_tn` **no** es `editable=False` ni una propiedad calculada: es un dato del ticket
-(RN-M03-04). Calcularlo como `peso_bruto_tn - tara_tn` haría que la regla V1 de M05 —que compara
-justamente esos dos valores— nunca pudiera detectar un ticket incoherente, porque la comparación
-siempre daría cero.
+El ticket de balanza imprime un solo peso, el bruto (DR-09). `peso_neto_tn` es `editable=False` y
+lo calcula `aplicar_tara()` con la tara del vehículo; el ingreso **almacena** la tara aplicada y el
+neto, en lugar de derivarlos al vuelo del catálogo, para que un cambio posterior de la tara no
+reescriba el histórico (D-17). Si el vehículo aún no tiene tara, el ingreso se guarda En proceso y
+`aplicar_tara()` se invoca después, desde el destare (HU-M03-04).
 
 Los mensajes de error están en español y **coinciden literalmente** con los criterios de aceptación
 de las historias (`ARQ-02` §6). Esto convierte a las pruebas en evidencia directa de los CA.
@@ -419,11 +427,14 @@ class ServicioIngreso:
 
         ingreso = Ingreso(
             **datos,
+            estado=Ingreso.Estado.EN_PROCESO,
             usuario_registro=usuario,
             hora_inicio_registro=hora_inicio,
-            hora_fin_registro=self._reloj.ahora(),
+            hora_fin_registro=self._reloj.ahora(),           # tambien si queda En proceso
             codigo=self._generador_codigo.siguiente(),      # D-02, inyectado (DIP)
         )
+        if ingreso.vehiculo.tara_tn is not None:            # DR-10: sin tara, espera el destare
+            ingreso.aplicar_tara(ingreso.vehiculo.tara_tn)
         ingreso.save()
         self._auditoria.registrar(usuario=usuario, accion="CREAR", entidad="INGRESO",
                                    id_entidad=ingreso.id, valores_nuevos=datos)
@@ -446,7 +457,7 @@ class RepositorioIngreso:
             Ingreso.objects
             .select_related("vehiculo", "tipo_mineral", "usuario_registro")
             .filter(**(filtros or {}))
-            .order_by("-fecha_hora_ticket")
+            .order_by("-fecha_hora_pesaje")
         )
 
     def por_codigo(self, codigo: str) -> Ingreso | None:
@@ -454,7 +465,9 @@ class RepositorioIngreso:
 ```
 
 Clase concreta, sin interfaz ni `Protocol`: la abstracción se crea cuando una prueba exige
-sustituirla, y aquí no la exige (D-09). Devuelve entidades o `QuerySet`, nunca diccionarios listos
+sustituirla, y aquí no la exige (D-09). La excepción está en M05: la regla V1 necesita buscar
+ingresos duplicados y se prueba sin base de datos, de modo que declara su propio `Protocol` mínimo
+(`buscar_por_placa_fecha_peso`), que este repositorio satisface. Devuelve entidades o `QuerySet`, nunca diccionarios listos
 para la respuesta — eso es trabajo del serializer.
 
 **`views/` — solo HTTP (RF)**
@@ -572,7 +585,7 @@ import pytest
 @pytest.mark.django_db
 def test_RN_M03_08_ticket_posterior_al_registro_es_rechazado(ingreso_factory):
     with pytest.raises(ValidationError) as e:
-        ingreso_factory(fecha_hora_ticket="2099-12-31T23:59:00Z")
+        ingreso_factory(fecha_hora_pesaje="2099-12-31T23:59:00Z")
     assert "posterior a la fecha de registro" in str(e.value)
 ```
 
@@ -674,7 +687,7 @@ export interface Ingreso {
   id: number;
   codigo: string;
   imagenTicket: string;       // URL del respaldo
-  fechaHoraTicket: string;    // ISO
+  fechaHoraPesaje: string;    // ISO
   horaInicioRegistro: string;
   horaFinRegistro: string;
   vehiculoId: number;
@@ -822,7 +835,7 @@ la revisión técnica.
    aplicarlo en preproducción.
 5. Pruebas: una por criterio de aceptación, nombrada `test_<CODIGO>_<enunciado>`.
 6. Frontend: `models/` → servicio del feature → componentes → ruta diferida.
-7. Commit por historia: `M04: reconoce los seis campos del ticket con su confianza (HU-M04-01)`.
+7. Commit por historia: `M04: reconoce placa fecha y peso bruto del ticket (HU-M04-01)`.
 8. Pull request hacia `develop` con la lista de HU cerradas y la salida de `pytest`.
 
 ---
@@ -853,7 +866,7 @@ Un módulo está terminado cuando, y solo cuando:
 |---|---|
 | Poner `auto_now_add` en `hora_inicio_registro` o `hora_fin_registro` | Las marcas fijarían el instante de inserción en la base, no el hecho real que describen (D-01) |
 | Asignar el código en el cliente | Dos confirmaciones simultáneas producirían el mismo código; el ingreso dejaría de ser identificable (D-02) |
-| Calcular `peso_neto_tn` en vez de leerlo del ticket | La regla V1 nunca podría detectar un ticket incoherente, porque la comparación siempre daría cero (RN-M03-04) |
+| Derivar `peso_neto_tn` al vuelo de la tara del catálogo en lugar de almacenarlo con la tara aplicada | Un cambio de tara decidido por la Gerencia reescribiría en silencio las toneladas de todo el histórico del vehículo (RN-M03-04, D-17) |
 | Persistir un valor reconocido sin confirmación del usuario | Un error del motor se convertiría en dato oficial sin revisión (D-13) |
 | Sobrescribir el valor reconocido con el confirmado en la misma columna | Se perdería la única evidencia de si el reconocimiento funciona (RN-M04-02) |
 | Invocar el motor de reconocimiento directamente, sin pasar por `ReconocedorTicket` | Cambiar de motor cuando se cierre D-12 obligaría a reescribir el servicio de registro |

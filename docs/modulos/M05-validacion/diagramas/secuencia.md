@@ -5,20 +5,25 @@
 ```mermaid
 sequenceDiagram
     participant SRV as ServicioIngreso M03
+    participant CAT as RepositorioVehiculo M02
     participant VAL as ValidadorConsistencia M05
     participant REG as Coleccion de reglas
-    participant CAT as RepositorioVehiculo M02
+    participant DUP as RepositorioIngreso M03
 
-    SRV->>VAL: validar(datos del ticket, vehiculo)
-    VAL->>CAT: obtener capacidad del vehiculo
-    CAT-->>VAL: capacidad_tn
+    SRV->>CAT: Obtener tara y capacidad del vehiculo
+    CAT-->>SRV: tara_tn y capacidad_tn o tara vacia
+    SRV->>VAL: validar(datos del ingreso con tara y capacidad)
     VAL->>REG: Recorrer las cinco reglas
 
     loop Por cada regla V1 a V5
         REG->>REG: Comprobar si estan los datos necesarios
-        alt Falta algun dato
+        alt Falta algun dato como la tara en el primer viaje
             REG-->>VAL: Regla omitida RN-M05-07
-        else Datos completos
+        else Regla V1
+            REG->>DUP: buscar_por_placa_fecha_peso
+            DUP-->>REG: Ingreso coincidente o ninguno
+            REG-->>VAL: Advertencia de posible duplicado o cumple
+        else Otras reglas con datos completos
             REG->>REG: Evaluar la condicion
             REG-->>VAL: Cumple o incumple con su mensaje
         end
@@ -30,7 +35,7 @@ sequenceDiagram
 La colección se recorre entera aunque una regla falle: el usuario debe ver de una vez todo lo que
 tiene que arreglar.
 
-## S-M05-02 · Resolución de una advertencia de peso fuera de rango (HU-M05-01)
+## S-M05-02 · Resolución de una advertencia que exige justificación (HU-M05-01)
 
 ```mermaid
 sequenceDiagram
@@ -45,7 +50,7 @@ sequenceDiagram
     NG->>API: POST /api/v1/ingresos/
     API->>SRV: registrar_ingreso(datos confirmados)
     SRV->>VAL: validar(datos confirmados)
-    VAL-->>SRV: V4 incumplida y es advertencia
+    VAL-->>SRV: V4 incumplida y exige justificacion
 
     alt Sin justificacion escrita
         SRV-->>API: Rechazo RN-M05-03
@@ -59,11 +64,15 @@ sequenceDiagram
     end
 
     SRV->>DB: BEGIN TRANSACTION
-    SRV->>DB: Persistir ingreso con la justificacion
-    SRV->>DB: Persistir resultado de las cinco reglas
+    SRV->>DB: Persistir el ingreso
+    SRV->>DB: Persistir resultado de las cinco reglas con la justificacion
     SRV->>DB: COMMIT
     API-->>NG: 201 ingreso registrado
 ```
+
+El flujo es el mismo para la advertencia V1 de posible duplicado; solo cambia el mensaje, que en ese
+caso es «Debe indicar la justificación del posible duplicado». La justificación se guarda en el
+resultado de la regla que la exigió, no en el ingreso.
 
 ## S-M05-03 · Registro del resultado de la validación (HU-M05-01)
 

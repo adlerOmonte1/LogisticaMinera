@@ -9,7 +9,7 @@
 ```
 apps/validacion/
 ├── models/          RESULTADO_VALIDACION
-├── reglas/          una clase por regla: v1_pesos.py, v2_tara.py, v3_placa.py, v4_capacidad.py, v5_fecha.py
+├── reglas/          una clase por regla: v1_duplicado.py, v2_tara.py, v3_placa.py, v4_capacidad.py, v5_fecha.py
 ├── services/        composicion de las reglas y persistencia del resultado
 ├── repositories/    lectura de los resultados de un ingreso
 ├── serializers/  views/  permissions.py  urls.py  tests/
@@ -29,7 +29,8 @@ class Regla(Protocol):
 ```
 
 Cada regla vive en su archivo, no conoce a las demás y no accede a la base: recibe los datos ya
-reunidos, incluida la capacidad del vehículo. Esto hace que cada una se pruebe sin base de datos ni
+reunidos, incluidas la tara y la capacidad del vehículo. V1 es la única que consulta otros ingresos,
+y lo hace a través de un repositorio inyectado (véase «Parámetros»). Esto hace que cada una se pruebe sin base de datos ni
 petición HTTP (RNF-M05-07), y que añadir una sea crear una clase y registrarla (RNF-M05-06).
 
 El servicio recorre la colección registrada y **no nombra ninguna regla concreta**. Un `if` por
@@ -55,20 +56,25 @@ evaluación (RN-M05-04). Quien decide si la operación continúa es M03.
 
 ### Parámetros
 
-La tolerancia de V1 y el patrón de placa de V3 se leen de la configuración (RNF-M05-08), no se
-escriben en las clases. La capacidad de V4 llega en los datos, leída del catálogo por el servicio
-de registro: la regla no consulta la base.
+El patrón de placa de V3 se lee de la configuración (RNF-M05-08), no se escribe en la clase. La
+tara y la capacidad que necesitan V2 y V4 llegan en los datos, leídas del catálogo por el servicio de
+registro: esas reglas no consultan la base.
+
+V1 es la excepción: para saber si un ticket está duplicado necesita buscar otros ingresos. No lo
+hace por su cuenta, sino a través de un repositorio de lectura que recibe inyectado
+(`buscar_por_placa_fecha_peso`), de modo que la regla sigue probándose sin base de datos con un doble
+de ese repositorio.
 
 ### Persistencia del resultado
 
 `RESULTADO_VALIDACION` guarda una fila por regla evaluada, con su momento —sobre los datos
-propuestos o sobre los confirmados—, si cumplió, el detalle con los valores concretos y la
-resolución. Se escribe dentro de la transacción del ingreso: un resultado sin ingreso no describe
+propuestos, sobre los confirmados o al registrar el destare—, si cumplió, el detalle con los valores
+concretos, la resolución y, si la advertencia se justificó, el texto de la justificación. Se escribe dentro de la transacción del ingreso: un resultado sin ingreso no describe
 nada.
 
 El detalle conserva los valores que motivaron el incumplimiento, no solo el hecho de que ocurrió.
-Saber que V1 falló sirve de poco; saber que el ticket decía 28,50 cuando bruto menos tara daba 28,30
-permite entender qué pasó.
+Saber que V2 falló sirve de poco; saber que se leyó un peso bruto de 1,589 t contra una tara de
+4,000 t —un punto decimal mal leído— permite entender qué pasó.
 
 ## Frontend (Angular)
 
@@ -76,8 +82,8 @@ permite entender qué pasó.
 
 - Las inconsistencias se muestran junto al campo afectado, con el **mensaje literal** que devuelve el
   servidor (RN-M05-08). La interfaz no los reformula ni los acorta.
-- Las bloqueantes y la advertencia de V4 se distinguen visualmente: las primeras impiden confirmar,
-  la segunda habilita el campo de justificación.
+- Las bloqueantes y las advertencias de V1 y V4 se distinguen visualmente: las primeras impiden
+  confirmar, las segundas habilitan el campo de justificación.
 - Puede replicarse la comprobación de pesos en el formulario para dar respuesta inmediata, pero es
   una ayuda visual: la decisión siempre la toma el servidor (D-08). Si ambas discrepan, manda el
   servidor.
@@ -105,18 +111,18 @@ corrige un dato e introduce una incoherencia nueva, que es justamente el caso qu
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución de la consulta |
-| M02 | La capacidad declarada del vehículo, que necesita V4 |
-| M03 | Los datos a evaluar y la transacción en que se persiste el resultado |
+| M02 | La tara y la capacidad declarada del vehículo, que necesitan V2 y V4 |
+| M03 | Los datos a evaluar, la búsqueda de posibles duplicados de V1 y la transacción en que se persiste el resultado |
 | M09 | Registro del evento de validación |
 
 | Es requerido por | Para |
 |---|---|
-| M03 | Evaluar los datos propuestos y los confirmados antes de persistir |
+| M03 | Evaluar los datos propuestos, los confirmados y los del destare antes de persistir |
 
 ## Pendientes que afectan a este módulo
 
 | Pendiente | Efecto |
 |---|---|
-| Tolerancia de V1, a confirmar con la empresa | Es configuración, de modo que no bloquea la implementación, pero sí el cierre del conjunto de prueba |
+| Tara de los vehículos existentes | Los vehículos que ya operan antes de la puesta en marcha necesitan su tara cargada, o todos sus primeros ingresos quedarán En proceso |
 | Patrón de placa peruana vigente | Define la expresión regular de V3; conviene contrastarla con las placas reales del catálogo |
 | Conjunto de inconsistencias sembradas | Necesario para verificar RNF-M05-02 y RNF-M05-03 |

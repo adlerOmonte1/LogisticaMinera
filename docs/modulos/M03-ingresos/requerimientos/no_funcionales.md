@@ -14,6 +14,9 @@
 | RNF-M03-10 | Seguridad — no repudio | La imagen del ticket se conserva sin alteración mientras el ingreso exista, incluso si este se anula | Consulta de verificación sobre el almacén de imágenes tras una anulación |
 | RNF-M03-11 | Seguridad — confidencialidad | La imagen solo es accesible para usuarios autenticados con permiso sobre el ingreso; no se sirve desde una ruta pública adivinable | Inspección de configuración e intento de acceso sin sesión |
 | RNF-M03-12 | Mantenibilidad — modularidad | Cambiar el motor de reconocimiento o añadir una regla de validación no obliga a modificar el servicio de registro | Inspección de código: el servicio depende de las interfaces, no de implementaciones |
+| RNF-M03-13 | Usabilidad — operabilidad | El alta de un vehículo nuevo se completa en la misma pantalla del registro, sin navegar a otra y sin perder la imagen ni los campos ya capturados | Inspección en dispositivo real registrando el primer viaje de un vehículo |
+| RNF-M03-14 | Usabilidad — protección contra errores del usuario | La hora del pesaje se ingresa con un control de hora, sin valor precargado, para que el usuario la escriba en lugar de aceptar la hora actual por descuido | Inspección en dispositivo real |
+| RNF-M03-15 | Usabilidad — reconocibilidad | Los ingresos En proceso se distinguen de los Registrados en toda lista, y el sistema muestra cuántos están pendientes de destare | Inspección en dispositivo real |
 
 ## Nota sobre RNF-M03-02 y RNF-M03-04
 
@@ -29,3 +32,10 @@ Sustituye a la operación sin conexión que contemplaba el alcance anterior. No 
 sin red, sino de no perder el trabajo ya hecho: la fotografía tomada y los campos corregidos siguen
 disponibles cuando la señal vuelve. El ingreso se confirma siempre contra el servidor, porque el
 código único y la validación viven allí (D-02, D-08).
+
+## Nota sobre RNF-M03-14
+
+La hora del pesaje es el único dato del registro que no sale del ticket ni del sistema: la digita
+el usuario (DR-09). Precargarla con la hora actual parece una comodidad, pero la volvería igual al
+inicio del registro cada vez que el usuario no la corrija, y la primera marca de tiempo dejaría de
+describir el pesaje.

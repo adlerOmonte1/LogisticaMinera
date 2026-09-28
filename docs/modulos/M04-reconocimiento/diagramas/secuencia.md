@@ -49,7 +49,7 @@ sequenceDiagram
     SRV->>DB: Persistir ingreso
     SRV->>RCS: guardar(reconocimiento, valores confirmados)
     RCS->>DB: Persistir cabecera con motor y version
-    RCS->>DB: Persistir seis campos con valor reconocido y confirmado
+    RCS->>DB: Persistir tres campos con valor reconocido y confirmado
     RCS->>AUD: Registrar evento RECONOCER
     RCS->>AUD: Registrar evento CORREGIR_DATO por cada campo corregido
     SRV->>DB: COMMIT
@@ -81,7 +81,7 @@ sequenceDiagram
         API-->>NG: 200 indicando registro manual y su motivo
     else Reconocimiento existente
         API->>REP: obtener_por_ingreso(id)
-        REP->>DB: Leer cabecera y seis campos
+        REP->>DB: Leer cabecera y tres campos
         DB-->>REP: Valores reconocido y confirmado
         REP-->>API: Comparacion por campo
         API-->>NG: 200 con motor version y confianza

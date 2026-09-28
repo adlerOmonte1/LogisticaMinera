@@ -6,12 +6,13 @@
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
-| RN-M08-01 | El total de un periodo excluye los ingresos anulados | El total declarado incluiría toneladas que se retiraron del histórico |
+| RN-M08-01 | El total de un periodo considera solo los ingresos Registrados: excluye los anulados y los En proceso | El total declarado incluiría toneladas retiradas del histórico, o ingresos que todavía no tienen peso neto |
 | RN-M08-02 | El total se calcula a demanda, sin acumulado almacenado | Un acumulado guardado se desincronizaría en cuanto un ingreso se corrigiera o anulara después de calculado, y el error no sería visible hasta compararlo |
 | RN-M08-03 | Un tipo de mineral sin ingresos en el periodo no aparece en el resultado | Un total en cero sugeriría que hubo actividad sin producción, cuando en realidad no hubo actividad |
 | RN-M08-04 | No se consolida un periodo posterior al mes en curso | El total describiría producción que todavía no puede haber ocurrido |
 | RN-M08-05 | El total exportado es el mismo que se muestra en pantalla para el mismo periodo | Dos cifras distintas para el mismo mes serían indefendibles ante cualquiera que las contraste |
 | RN-M08-06 | Añadir un formato de exportación no modifica el cálculo del total ni los formatos existentes | Cada formato nuevo arriesgaría introducir una discrepancia en el número que reporta |
+| RN-M08-07 | El resultado informa cuántos ingresos del periodo siguen En proceso, en pantalla y en el archivo exportado | Un total con ingresos pendientes de destare se reportaría como definitivo |
 
 ## Nota sobre RN-M08-02
 

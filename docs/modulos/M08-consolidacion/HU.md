@@ -24,8 +24,11 @@ mineral, para reportar la producción sin sumar los tickets a mano.
 **Descripción**
 
 La consolidación toma un mes y un año, y devuelve, por cada tipo de mineral que tuvo ingresos en ese
-periodo, el número de ingresos y la suma de sus pesos netos. Los ingresos anulados quedan fuera del
-cálculo: el total describe lo que efectivamente ingresó, no lo que se intentó registrar.
+periodo, el número de ingresos y la suma de sus pesos netos. Solo cuentan los ingresos Registrados:
+los anulados quedan fuera porque el total describe lo que efectivamente ingresó, no lo que se intentó
+registrar, y los que siguen En proceso quedan fuera porque aún no tienen peso neto. Como un total con
+ingresos pendientes de destare todavía no es definitivo, el sistema informa cuántos hay en el
+periodo.
 
 El cálculo se hace a demanda sobre los ingresos existentes, no sobre un acumulado que se actualiza
 en cada registro. Un acumulado guardado se desincroniza en cuanto un ingreso se corrige o se anula
@@ -35,7 +38,8 @@ después de calculado, y el error pasaría inadvertido hasta que alguien compara
 - Periodo: mes y año, obligatorios.
 - Agrupación: por tipo de mineral.
 - Por cada tipo: número de ingresos y suma de toneladas.
-- Excluye ingresos anulados.
+- Solo suman los ingresos Registrados; excluye los anulados y los En proceso.
+- Informa, aparte del total, cuántos ingresos del periodo siguen En proceso.
 - Un mes sin ingresos para un tipo de mineral no aparece en el resultado, no aparece con total cero.
 - Roles autorizados: Administrativo y Administrador.
 
@@ -54,12 +58,17 @@ después de calculado, y el error pasaría inadvertido hasta que alguien compara
 > **CA04.** Dado que el usuario indica un periodo futuro, cuando solicita la consolidación, entonces
 > el sistema rechaza la operación mostrando "No se puede consolidar un periodo futuro".
 
-> **CA05.** Dado que se corrige el peso neto de un ingreso ya consolidado en un cálculo anterior,
+> **CA05.** Dado que se corrige el peso bruto de un ingreso ya consolidado en un cálculo anterior, y
+> con él su peso neto,
 > cuando se vuelve a solicitar la consolidación de ese mismo periodo, entonces el sistema devuelve el
 > total actualizado con la corrección.
 
 > **CA06.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta solicitar la
 > consolidación, entonces el sistema rechaza la operación mostrando "Acción no autorizada".
+
+> **CA07.** Dado que un ingreso del periodo está En proceso, cuando se calcula el total, entonces el
+> sistema no lo incluye en la suma ni en el conteo y muestra "Hay {n} ingresos en proceso en el
+> periodo, pendientes del destare".
 
 ---
 

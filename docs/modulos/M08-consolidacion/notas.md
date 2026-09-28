@@ -23,8 +23,8 @@ class RepositorioConsolidacion:
     def calcular(self, mes: int, anio: int) -> list[TotalPorTipoMineral]:
         return (
             Ingreso.objects
-            .filter(fecha_hora_ticket__year=anio, fecha_hora_ticket__month=mes)
-            .exclude(estado="ANULADO")
+            .filter(fecha_hora_pesaje__year=anio, fecha_hora_pesaje__month=mes)
+            .filter(estado=Ingreso.Estado.REGISTRADO)
             .values("tipo_mineral__nombre")
             .annotate(toneladas=Sum("peso_neto_tn"), cantidad=Count("id"))
             .order_by("tipo_mineral__nombre")
@@ -35,10 +35,13 @@ Decisiones no obvias:
 
 - **Una sola consulta agregada, sin recorrer ingresos en Python.** Con `values().annotate()` la base
   hace el agrupamiento; es la forma que sostiene RNF-M08-01 conforme crece el histórico.
-- **`.exclude(estado="ANULADO")` antes de `.annotate()`**, no después. Filtrar tras agregar sumaría
-  primero y descontaría después, lo que con `Sum` puede dar un resultado distinto si hay valores
-  negativos en juego, y aquí no debería haberlos pero la regla se aplica siempre en el mismo orden
-  para no depender de esa suposición.
+- **`.filter(estado=REGISTRADO)` y no `.exclude(estado="ANULADO")`.** El segundo criterio dejaría
+  entrar los ingresos En proceso: contarían en `cantidad` y su peso neto nulo desaparecería de
+  `Sum` sin aviso. El filtro va antes de `.annotate()`, para que la agregación opere solo sobre los
+  ingresos computables. Es el mismo criterio que usa el total de M07 y debe venir del mismo método
+  del gestor de `Ingreso`.
+- **El número de ingresos En proceso del periodo se obtiene con una segunda consulta de conteo**
+  (RN-M08-07) y viaja con el resultado, también al exportador.
 - **No hay tabla de acumulado ni tarea programada que la actualice.** Es la traducción directa de
   RN-M08-02: cualquier mecanismo de caché o precálculo reintroduce el riesgo de desincronización que
   la regla existe para evitar. Si el rendimiento lo exigiera más adelante, la vía es un índice, no
@@ -89,8 +92,8 @@ correcciones y las anulaciones (HU-M03-02, HU-M03-03), que también deberían di
 actualización y es fácil olvidar en alguna de las dos rutas. El resultado es un acumulado que queda
 desactualizado en silencio: ninguna prueba que solo registre ingresos nuevos lo detecta.
 
-La prueba que sí lo detecta registra un ingreso, calcula el consolidado, **corrige** el peso neto de
-ese ingreso, y vuelve a calcular el consolidado del mismo mes esperando el valor corregido
+La prueba que sí lo detecta registra un ingreso, calcula el consolidado, **corrige** el peso bruto de
+ese ingreso —y con él su peso neto—, y vuelve a calcular el consolidado del mismo mes esperando el valor corregido
 (HU-M08-01 CA05). Es la prueba que un acumulado desincronizado no puede pasar.
 
 **Riesgo secundario:** que el exportador redondee de forma distinta a como se presenta en pantalla,

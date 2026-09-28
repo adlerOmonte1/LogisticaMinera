@@ -90,10 +90,15 @@ Catálogo único, usado al registrar el ingreso y al consolidar (DR-03).
 | placa | varchar(10) | única, formato validado (regla V3) |
 | tipo_titularidad | enum | PROPIO / EXTERNO — de aquí se deriva el tipo de vehículo del ingreso (D-06) |
 | capacidad_tn | decimal(6,2) | límite de carga que contrasta la regla V4 |
+| tara_tn | decimal(8,2) | peso del vehículo vacío, obtenido en el destare de su primer viaje; nulo hasta entonces (DR-10) |
+| fecha_destare | datetime | momento en que se registró la tara; nulo hasta el destare |
+| id_usuario_destare | FK → USUARIO | quien digitó la tara; nulo hasta el destare |
 | id_transportista | FK → TRANSPORTISTA | nulo si es propio |
 | activo | boolean | |
 
-**Para qué existe.** Que el tipo de vehículo y su capacidad no se digiten en cada ingreso.
+**Para qué existe.** Que el tipo de vehículo, su capacidad y su tara no se digiten en cada ingreso.
+La tara se fija una sola vez, en el destare, y se mantiene por decisión de la Gerencia; solo el
+Administrador puede modificarla, con motivo, y el cambio queda en auditoría (D-17).
 **Quién la usa.** La escribe M02; la leen M03, M05 y M07.
 
 ### TRANSPORTISTA (M02)
@@ -112,31 +117,36 @@ Catálogo único, usado al registrar el ingreso y al consolidar (DR-03).
 | id_ingreso | PK | |
 | codigo | varchar(20) | único, asignado por el servidor (D-02), `editable=False` |
 | imagen_ticket | varchar(255) | ruta del respaldo; **obligatoria** (D-14 fija el medio) |
-| fecha_hora_ticket | datetime | leída del ticket, corregible antes de confirmar |
+| fecha_hora_pesaje | datetime | fecha reconocida del ticket y hora digitada por el usuario; corregible antes de confirmar |
 | hora_inicio_registro | datetime | asignada por el servidor al recibir la imagen, `editable=False` |
-| hora_fin_registro | datetime | asignada por el servidor al persistir, `editable=False` |
-| id_vehiculo | FK → VEHICULO | la placa debe existir en el catálogo (DR-05) |
+| hora_fin_registro | datetime | asignada por el servidor al confirmar, también si queda En proceso; `editable=False` |
+| id_vehiculo | FK → VEHICULO | si la placa no existe, el vehículo se da de alta en la misma pantalla (DR-05, DR-10) |
 | id_tipo_mineral | FK → TIPO_MINERAL | |
-| peso_bruto_tn | decimal(8,2) | leído del ticket |
-| tara_tn | decimal(8,2) | leído del ticket |
-| peso_neto_tn | decimal(8,2) | **leído del ticket**, no calculado; la regla V1 lo contrasta |
+| peso_bruto_tn | decimal(8,2) | reconocido del ticket, corregible antes de confirmar |
+| tara_tn | decimal(8,2) | tara del vehículo **aplicada** a este ingreso, copiada del catálogo; nula mientras esté En proceso |
+| peso_neto_tn | decimal(8,2) | **calculado por el servidor**: `peso_bruto_tn − tara_tn`; `editable=False`; nulo mientras esté En proceso (D-17) |
 | numero_ticket | varchar(20) | opcional; único entre los no anulados |
-| justificacion_peso | text | obligatorio si la regla V4 se resolvió con justificación |
 | id_lote | FK → LOTE_PROCESO | nulo mientras el ingreso no se asigne a un lote |
 | id_usuario_registro | FK → USUARIO | `editable=False` |
-| estado | enum | REGISTRADO / ANULADO (D-07) |
+| estado | enum | EN_PROCESO / REGISTRADO / ANULADO (D-07, D-17) |
 | motivo_anulacion | text | obligatorio si estado = ANULADO |
 
 **Para qué existe.** Es la unidad de registro: un volquete que entrega mineral en planta, con su
 respaldo fotográfico y las tres marcas de tiempo que describen cómo se registró (D-01).
 
-**Los siete datos obligatorios del registro** son la placa —a través de `id_vehiculo`—,
-`fecha_hora_ticket`, `peso_bruto_tn`, `tara_tn`, `peso_neto_tn`, `id_tipo_mineral` y el tipo de
-vehículo, derivado de `VEHICULO.tipo_titularidad`. Ninguno admite nulo en un ingreso confirmado.
+**Los siete datos del registro** son la placa —a través de `id_vehiculo`—, `fecha_hora_pesaje`,
+`peso_bruto_tn`, `tara_tn`, `peso_neto_tn`, `id_tipo_mineral` y el tipo de vehículo, derivado de
+`VEHICULO.tipo_titularidad`. En un ingreso Registrado ninguno admite nulo; en uno En proceso faltan
+solo la tara y el peso neto, que llegan con el destare.
 
-**Por qué el peso neto no se calcula.** El ticket de balanza ya lo trae impreso. Calcularlo
-sustituiría el dato real por uno derivado y haría imposible detectar un ticket incoherente, que es
-justamente lo que la regla V1 debe señalar.
+**Por qué el peso neto se calcula.** El ticket de balanza imprime un único peso, el bruto (DR-09).
+La tara es un atributo del vehículo y el neto es su diferencia. El ingreso guarda la tara que se le
+aplicó, en lugar de consultarla en el catálogo cada vez, para que un cambio posterior de la tara de
+un vehículo no reescriba el neto de los ingresos ya registrados (D-17).
+
+**Estados.** `EN_PROCESO`: confirmado, con código y marcas de tiempo, pero pendiente del destare del
+vehículo; no cuenta en ningún total ni se asigna a un lote. `REGISTRADO`: completo, con neto.
+`ANULADO`: retirado de los totales, conservado en el histórico.
 
 **Quién la usa.** La escribe M03; la leen M07 y M08; la referencian M04, M05 y M06; la audita M09.
 
@@ -156,13 +166,13 @@ Un reconocimiento por ingreso. Conserva qué leyó el motor, frente a lo que con
 
 ### CAMPO_RECONOCIDO (M04)
 
-Seis filas por reconocimiento: placa, fecha, hora, peso bruto, tara y peso neto.
+Tres filas por reconocimiento: placa, fecha y peso bruto, que son los datos que imprime el ticket (DR-09).
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | id_campo | PK | |
 | id_reconocimiento | FK → RECONOCIMIENTO_TICKET | |
-| nombre_campo | enum | PLACA / FECHA / HORA / PESO_BRUTO / TARA / PESO_NETO |
+| nombre_campo | enum | PLACA / FECHA / PESO_BRUTO |
 | valor_reconocido | varchar(50) | nulo si el motor no pudo leerlo |
 | valor_confirmado | varchar(50) | lo que el usuario aceptó o corrigió |
 | confianza | decimal(4,3) | entre 0 y 1; nulo si no hubo lectura |
@@ -183,10 +193,11 @@ Una fila por regla aplicada a un ingreso.
 | id_resultado | PK | |
 | id_ingreso | FK → INGRESO | |
 | regla | enum | V1 / V2 / V3 / V4 / V5 |
-| momento | enum | PROPUESTA / CONFIRMACION — las reglas se aplican dos veces |
+| momento | enum | PROPUESTA / CONFIRMACION / DESTARE — las reglas se aplican sobre lo propuesto, sobre lo confirmado y, en el primer viaje, al registrar la tara |
 | cumple | boolean | |
 | detalle | text | valores concretos que motivaron el incumplimiento |
 | resolucion | enum | NO_APLICA / CORREGIDA / JUSTIFICADA |
+| justificacion | text | obligatoria si la resolución es JUSTIFICADA; solo las reglas V1 y V4 la admiten |
 | fecha_hora | datetime | |
 
 **Para qué existe.** Dejar constancia de qué se revisó y cómo se resolvió. Sin ella no se puede
@@ -244,6 +255,7 @@ lote tiene el `PASO_ETAPA` correspondiente. Un ingreso sin lote no ha recorrido 
 | id_entidad | int | identificador del registro afectado |
 | valores_anteriores | jsonb | nulo en creación |
 | valores_nuevos | jsonb | nulo en anulación |
+| motivo | text | explicación escrita por el usuario; obligatoria en la corrección de un ingreso y en el cambio de tara de un vehículo |
 | fecha_hora | datetime | |
 | direccion_ip | varchar(45) | |
 
@@ -253,6 +265,10 @@ registra que el motor procesó una imagen, la segunda que una persona cambió un
 por autorización quede registrada. El dominio vive en `common/eventos.py`, listo para usarse como
 `choices`.
 
+El destare no añade una acción: se registra como `MODIFICAR` sobre el vehículo y sobre cada ingreso
+que pasa de En proceso a Registrado. El motivo tiene columna propia porque no es un valor del
+registro afectado, sino la explicación del cambio.
+
 ## 3. Índices
 
 Cada índice se justifica por la consulta que sostiene y por su frecuencia esperada. Se crean desde
@@ -261,10 +277,10 @@ la primera migración: añadirlos después cambia las condiciones de trabajo a m
 | Índice | Tabla | Consulta que sostiene | Frecuencia |
 |---|---|---|---|
 | `idx_ingreso_codigo` | INGRESO(codigo) | Localizar un ingreso por su código. Cubierto por `unique=True` | Alta |
-| `idx_ingreso_vehiculo_fecha` | INGRESO(id_vehiculo, fecha_hora_ticket) | Consulta por placa y fecha de M07, que es su caso de uso principal | Alta |
-| `idx_ingreso_fecha_mineral` | INGRESO(fecha_hora_ticket, id_tipo_mineral) | Total acumulado mensual por producto de M08 | Media |
-| `idx_ingreso_estado` | INGRESO(estado) | Excluir los anulados de todo total | Alta, siempre combinada |
-| `idx_campo_reconocimiento` | CAMPO_RECONOCIDO(id_reconocimiento) | Recuperar los seis campos de un reconocimiento | Media |
+| `idx_ingreso_vehiculo_fecha` | INGRESO(id_vehiculo, fecha_hora_pesaje) | Consulta por placa y fecha de M07, y búsqueda de un ticket duplicado por la regla V1 | Alta |
+| `idx_ingreso_fecha_mineral` | INGRESO(fecha_hora_pesaje, id_tipo_mineral) | Total acumulado mensual por producto de M08 | Media |
+| `idx_ingreso_estado` | INGRESO(estado) | Excluir de todo total los ingresos anulados y los que siguen En proceso | Alta, siempre combinada |
+| `idx_campo_reconocimiento` | CAMPO_RECONOCIDO(id_reconocimiento) | Recuperar los tres campos de un reconocimiento | Media |
 | `idx_resultado_ingreso` | RESULTADO_VALIDACION(id_ingreso) | Inconsistencias de un ingreso | Media |
 | `idx_paso_lote` | PASO_ETAPA(id_lote) | Etapas recorridas por un lote | Media |
 | `idx_evento_entidad` | EVENTO_AUDITORIA(entidad, id_entidad) | Historial de un registro concreto | Baja |
@@ -278,7 +294,7 @@ conservarse por el filtro del catálogo.
 | Decisión | Razón |
 |---|---|
 | Las dos marcas de tiempo del servidor son `editable=False` | Si se pudieran editar, el registro dejaría de describir cómo se trabajó realmente (D-01) |
-| El peso neto se almacena tal como aparece en el ticket | Calcularlo impediría detectar un ticket incoherente (regla V1) |
+| El peso neto lo calcula el servidor y el ingreso conserva la tara aplicada | Una tara consultada al vuelo del catálogo reescribiría el histórico al cambiar la tara de un vehículo (D-17) |
 | El valor reconocido y el confirmado son columnas distintas | Una sola columna borraría la diferencia entre lo que leyó el motor y lo que corrigió la persona (D-13) |
 | La imagen del ticket es obligatoria y no se sustituye | Es el respaldo del ingreso; sin ella el registro no es verificable |
 | Los ingresos anulados permanecen con su motivo | El histórico debe poder demostrarse íntegro (D-07) |
@@ -290,7 +306,7 @@ conservarse por el filtro del catálogo.
 |---|---|
 | Valores del catálogo `TIPO_MINERAL`, a definir con la empresa (DR-03) | Implementación de M02 y forma del total mensual de M08 |
 | Medio de almacenamiento y retención de `imagen_ticket` (D-14) | Implementación de M03 |
-| Confirmación de la tolerancia de 0,01 t de la regla V1 | Conjunto de prueba de M05 |
+| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente (DR-10) | Flujo de ingresos En proceso de M03 |
 | Forma real de agrupar el mineral en cancha | Alcance de `LOTE_PROCESO`; si la planta procesara volquete por volquete, el lote podría simplificarse a un vínculo directo |
 
 ## 6. Referencias

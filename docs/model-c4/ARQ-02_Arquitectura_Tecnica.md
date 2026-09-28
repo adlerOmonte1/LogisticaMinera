@@ -35,11 +35,11 @@ flowchart LR
     end
     subgraph Servidor
         API[Django REST Framework]
-        SRV[Capa de servicios<br/>casos de uso]
+        SRV[Capa de servicios - casos de uso]
         DOM[Modelos de dominio]
-        REC[ReconocedorTicket<br/>interfaz]
+        REC[ReconocedorTicket - interfaz]
     end
-    MOT[Motor de reconocimiento<br/>local o externo, D-12]
+    MOT[Motor de reconocimiento local o externo D-12]
     DB[(PostgreSQL)]
     IMG[(Almacen de imagenes)]
 
@@ -187,8 +187,8 @@ para que cada tipo aterrice en una capa distinta del código. Esta es la corresp
 | Requisitos no funcionales (RNF) | configuración, índices, timeouts | estrategias de captura y compresión de imagen | OCP |
 
 **S — Responsabilidad única.** Una vista REST solo traduce HTTP; un servicio solo orquesta un caso
-de uso; un modelo solo protege sus invariantes. La validación "el peso neto no coincide con el peso
-bruto menos la tara" (V1) vive en una regla de M05, no en el formulario Angular ni en el controlador
+de uso; un modelo solo protege sus invariantes. La validación "la tara del vehículo no puede ser
+mayor o igual que el peso bruto" (V2) vive en una regla de M05, no en el formulario Angular ni en el controlador
 de M03.
 
 **O — Abierto/cerrado.** Las reglas de validación (M05) se implementan como una clase por regla que

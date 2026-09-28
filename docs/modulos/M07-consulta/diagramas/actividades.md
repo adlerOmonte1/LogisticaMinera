@@ -44,12 +44,17 @@ flowchart TD
     M4 --> F3([Ticket contrastable con lo registrado])
 ```
 
-## A-M07-03 · Tratamiento de un ingreso anulado en las consultas (RN-M07-01, RN-M07-02)
+## A-M07-03 · Tratamiento de un ingreso anulado o en proceso en las consultas (RN-M07-01, RN-M07-02, RN-M07-10)
 
 ```mermaid
 flowchart TD
     I([Ingreso encontrado por la consulta]) --> D1{Esta anulado?}
-    D1 -->|No| A1[Incluir en la lista]
+    D1 -->|No| D2{Esta en proceso?}
+    D2 -->|Si| P1[Incluir en la lista senalado como en proceso]
+    P1 --> P2[Mostrar el peso neto como pendiente del destare]
+    P2 --> P3[Excluir el ingreso del total del conjunto]
+    P3 --> F
+    D2 -->|No| A1[Incluir en la lista]
     A1 --> A2[Sumar su peso neto al total del conjunto]
     D1 -->|Si| A3[Incluir en la lista senalado como anulado]
     A3 --> A4[Mostrar el motivo de la anulacion]

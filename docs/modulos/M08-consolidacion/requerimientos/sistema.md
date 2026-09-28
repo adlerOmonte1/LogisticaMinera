@@ -3,7 +3,7 @@
 | Código | Requerimiento | Deriva de |
 |---|---|---|
 | RS-M08-01 | El sistema calcula el total de `peso_neto_tn` y el número de ingresos agrupados por `tipo_mineral`, para un mes y año dados | RU-M08-01 |
-| RS-M08-02 | El sistema excluye los ingresos en estado `ANULADO` del cálculo | RU-M08-01 |
+| RS-M08-02 | El sistema considera en el cálculo solo los ingresos en estado `REGISTRADO` y excluye los `ANULADO` y los `EN_PROCESO` | RU-M08-01 |
 | RS-M08-03 | El sistema calcula el total a demanda sobre los ingresos existentes, sin almacenar un acumulado previo | RU-M08-04 |
 | RS-M08-04 | El sistema omite del resultado los tipos de mineral sin ingresos en el periodo, en lugar de mostrarlos con total cero | RU-M08-01 |
 | RS-M08-05 | El sistema rechaza un periodo posterior al mes en curso | — (integridad del cálculo) |
@@ -13,3 +13,4 @@
 | RS-M08-09 | El sistema incluye en el archivo exportado el periodo, la fecha de generación y el detalle por tipo de mineral | RU-M08-03 |
 | RS-M08-10 | El sistema registra en auditoría cada exportación, con el periodo y el usuario responsable | — (integridad con M09) |
 | RS-M08-11 | El sistema no persiste ninguna entidad propia: toda su información se deriva de `INGRESO` en el momento de la consulta | — (D-10) |
+| RS-M08-12 | El sistema informa el número de ingresos del periodo en estado `EN_PROCESO` junto al resultado | RU-M08-01 |

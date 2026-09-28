@@ -40,7 +40,8 @@ cerrarlo son operaciones del mismo trabajo.
 - Tipo de mineral: obligatorio, del catálogo; todos los ingresos del lote comparten el mismo.
 - Fecha de apertura: obligatoria. Fecha de cierre: se asigna al cerrar.
 - Estado: abierto o cerrado.
-- Solo se asignan ingresos no anulados.
+- Solo se asignan ingresos en estado Registrado: ni los anulados ni los que siguen En proceso,
+  pendientes del destare, porque aún no tienen peso neto.
 - Roles autorizados: Administrativo y Administrador.
 
 **Criterios de aceptación**
@@ -75,6 +76,10 @@ cerrarlo son operaciones del mismo trabajo.
 
 > **CA10.** Dado que el usuario consulta un lote, cuando el sistema lo muestra, entonces presenta su
 > composición: los ingresos asignados con su código, su fecha y su peso neto.
+
+> **CA11.** Dado que un ingreso está En proceso, cuando el usuario intenta asignarlo a un lote,
+> entonces el sistema rechaza la operación mostrando "El ingreso {codigo} está en proceso: falta el
+> destare del vehículo".
 
 ---
 

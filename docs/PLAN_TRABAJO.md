@@ -8,7 +8,15 @@
 | Rama | `docs/reformulacion/sistema-inteligente` |
 | Regla de oro | Ninguna fase empieza sin que la anterior haya pasado su verificación y tu revisión |
 | Principio rector | La documentación describe **un sistema**, no una tesis. Prevalece sobre los ejemplos de los Anexos D y E |
-| Estado | Fase 0 y Fase 1 ejecutadas el 22/09/2026 |
+| Estado | Fases 0 a 9 ejecutadas entre el 22/09/2026 y el 27/09/2026; ajuste por el formato real del ticket (DR-09, DR-10) el 28/09/2026; pendientes la 10 y la 11 |
+
+---
+
+> **Ajuste del 28/09/2026 (DR-09, DR-10).** El ticket real imprime solo la placa, la fecha y un
+> único peso, el bruto. Donde este documento habla de seis campos reconocidos, de un peso neto
+> leído del ticket o de V1 como diferencia de pesos, prevalecen `docs/00-tesis/marco_tesis.md` y
+> `docs/00-tesis/decisiones_reformulacion.md`: tres campos reconocidos, peso neto calculado con la
+> tara del vehículo, estado En proceso hasta el destare y V1 como ticket posiblemente duplicado.
 
 ---
 
@@ -37,14 +45,14 @@ citan en los módulos, porque son reglas del sistema. El cronograma vive solo en
 |---|---|---|---|
 | 0 | Rama, marco de tesis, decisiones cerradas, `CLAUDE.md` | Tú | Decisiones del Anexo B firmadas — **hecha** |
 | 1 | Skills de documentación reescritas | Agente | Revisión de `contexto-tesis` — **hecha** |
-| 2 | ARQ-01 (módulos) y decisiones de diseño D-01 a D-16 | Agente | Lista cerrada de módulos |
-| 3 | Modelo entidad-relación | Agente | Entidades e índices |
-| 4 | Matriz de trazabilidad y backlog índice | Agente | Cada RF y tarea tiene HU |
-| 5 | **Módulo piloto M03 completo** | Agente | **Aprobación de estilo** |
-| 6 | Módulos nuevos M04, M05, M06 | Agente | Una revisión por módulo |
-| 7 | M07, M08, M09, ajustes a M01 y M02, retiro de módulos antiguos | Agente | Carpetas antiguas eliminadas |
-| 8 | ARQ-02, ARQ-03 (C4) y guías | Agente | Diagramas C4 coherentes |
-| 9 | Plan de trabajo, plan de pruebas y skills técnicas | Agente | Protocolo ERA/TDI |
+| 2 | ARQ-01 (módulos) y decisiones de diseño D-01 a D-16 | Agente | Lista cerrada de módulos — **hecha** |
+| 3 | Modelo entidad-relación | Agente | Entidades e índices — **hecha** |
+| 4 | Matriz de trazabilidad y backlog índice | Agente | Cada RF y tarea tiene HU — **hecha** |
+| 5 | **Módulo piloto M03 completo** | Agente | **Aprobación de estilo** — **hecha** |
+| 6 | Módulos nuevos M04, M05, M06 | Agente | Una revisión por módulo — **hecha** |
+| 7 | M07, M08, M09, ajustes a M01 y M02, retiro de módulos antiguos | Agente | Carpetas antiguas eliminadas — **hecha** |
+| 8 | ARQ-02, ARQ-03 (C4) y guías | Agente | Diagramas C4 coherentes — **hecha** |
+| 9 | Plan de trabajo, plan de pruebas y skills técnicas | Agente | Protocolo ERA/TDI — **hecha** |
 | 10 | Limpieza del backend | Agente | Pruebas en verde |
 | 11 | Auditoría final y merge | Agente + tú | Script sin hallazgos |
 
@@ -429,7 +437,8 @@ Luego: revisas el informe, abres el PR hacia `main` y haces el merge.
 ## Anexo A — `docs/00-tesis/marco_tesis.md`
 
 > **Ya creado.** El archivo vigente es `docs/00-tesis/marco_tesis.md`, con los `[CONFIRMAR]` de
-> DR-06 ya resueltos. Lo de abajo se conserva como registro del contenido original.
+> DR-06 ya resueltos y ajustado por DR-09 y DR-10. Lo de abajo se conserva como registro del
+> contenido original y **no refleja** el formato real del ticket.
 
 ```markdown
 # Marco de tesis — fuente de verdad
@@ -533,8 +542,9 @@ conexión (solo se conserva el borrador) · multiempresa · balance metalúrgico
 
 ## Anexo B — Decisiones de reformulación (`docs/00-tesis/decisiones_reformulacion.md`)
 
-> **Cerrado el 22/09/2026.** Las ocho decisiones se aceptaron con su recomendación. El archivo
-> vigente es `docs/00-tesis/decisiones_reformulacion.md`.
+> **Cerrado el 22/09/2026.** Las ocho decisiones se aceptaron con su recomendación. El 28/09/2026 se
+> añadieron DR-09 y DR-10, que ajustan DR-05 y DR-08. El archivo vigente es
+> `docs/00-tesis/decisiones_reformulacion.md`.
 
 Cada fila trae una recomendación. Los ejemplos de los Anexos D y E asumen las recomendaciones.
 
@@ -595,8 +605,8 @@ Reglas:
 ## Anexo D — Ejemplos de historias de usuario
 
 > **Estos anexos ya están en `docs/00-tesis/ejemplos_plantilla.md`, en su versión corregida.** Usa
-> ese archivo, no este: las versiones de abajo se conservan como registro y llevan aplicadas las
-> mismas correcciones del principio rector. En los `HU.md` reales, cada historia usa encabezado `##`.
+> ese archivo, no este: las versiones de abajo se conservan como registro, llevan aplicadas las
+> mismas correcciones del principio rector y son anteriores a DR-09 y DR-10. En los `HU.md` reales, cada historia usa encabezado `##`.
 
 ### HU-M03-01 — Registro de un ingreso a partir del ticket de balanza *(reformulada)*
 

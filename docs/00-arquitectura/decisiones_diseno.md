@@ -16,13 +16,18 @@ El ingreso registra tres momentos distintos, y ninguno se deriva de otro:
 
 | Marca | Origen | Editable |
 |---|---|---|
-| Fecha y hora del ticket | Leída del ticket por el motor, corregible por el usuario | Sí, antes de confirmar |
+| Fecha y hora del pesaje | La fecha se reconoce del ticket; la hora la digita el usuario, porque el ticket no la imprime (DR-09) | Sí, antes de confirmar |
 | Inicio del registro | Asignada por el servidor al recibir la imagen | No |
-| Fin del registro | Asignada por el servidor al persistir el ingreso | No |
+| Fin del registro | Asignada por el servidor cuando el usuario confirma el ingreso | No |
 
 La primera dice cuándo se pesó el volquete; la segunda, cuándo alguien empezó a registrarlo; la
 tercera, cuándo el dato quedó disponible. Son tres hechos distintos del proceso y responden
 preguntas distintas.
+
+El fin del registro se asigna al confirmar, **también cuando el ingreso queda En proceso** por estar
+pendiente el destare del vehículo (D-17). El destare ocurre después, cuando el volquete ya descargó,
+y no mueve ninguna de las tres marcas: si lo hiciera, el tiempo de registro de un primer viaje
+incluiría el tiempo de descarga, que no es trabajo de registro.
 
 **Implementación.** Las dos marcas del servidor son `editable=False` y las asigna **el servicio**,
 no el ORM: `auto_now_add` fijaría la hora de inserción y no la del inicio real de la operación.
@@ -46,9 +51,9 @@ identificables de forma única.
 
 **Módulos afectados:** M02, M03, M05
 
-El vehículo se elige del catálogo, y de él se derivan dos datos que el usuario no digita: el tipo de
-vehículo del ingreso —propio o externo— y la capacidad de carga, que la regla V4 contrasta contra el
-peso neto.
+El vehículo se elige del catálogo, y de él se derivan tres datos que el usuario no digita en cada
+ingreso: el tipo de vehículo —propio o externo—, la capacidad de carga, que la regla V4 contrasta
+contra el peso neto, y la tara, con la que se calcula ese peso neto (D-17).
 
 **Si se revierte.** Con la titularidad escrita a mano, el tipo de vehículo dejaría de ser un valor
 clasificable y V4 no tendría contra qué comparar el peso neto.
@@ -159,7 +164,7 @@ equipos y varias aplicaciones. Aquí hay una aplicación y un equipo reducido.
 **Módulos afectados:** M03, M04
 
 El código de negocio no conoce el motor concreto. M03 recibe por inyección un `ReconocedorTicket`
-con una operación —dada una imagen, devolver seis campos con su confianza, más el identificador y la
+con una operación —dada una imagen, devolver tres campos (placa, fecha y peso bruto) con su confianza, más el identificador y la
 versión del motor— y no sabe si detrás hay OCR local, un servicio en la nube o un modelo multimodal
 por API.
 
@@ -182,6 +187,28 @@ reconocido y el valor confirmado de cada campo, junto con la confianza, el motor
 
 **Si se revierte.** Un error de lectura se convertiría en dato oficial sin que nadie lo revisara, y
 después sería imposible distinguir qué leyó el motor de qué escribió la persona.
+
+## D-17. El peso neto lo calcula el sistema con la tara del vehículo
+
+**Módulos afectados:** M02, M03, M05, M06, M08
+
+El ticket de balanza imprime un solo peso, el bruto (DR-09). La tara es un atributo del vehículo: se
+obtiene en el destare de su primer viaje, la digita el usuario y se mantiene por decisión de la
+Gerencia (DR-10). El peso neto lo calcula el servidor al confirmar el ingreso, como peso bruto menos
+la tara vigente del vehículo, y no es editable.
+
+El ingreso **conserva la tara que se aplicó** como dato propio, no como referencia al catálogo. Si la
+Gerencia decide después actualizar la tara de un vehículo, los ingresos ya registrados mantienen el
+neto con el que se registraron; solo los siguientes usan la tara nueva.
+
+Mientras el vehículo no tiene tara —primer viaje, antes del destare—, el ingreso se confirma en
+estado **En proceso**: tiene código, peso bruto y marcas de tiempo, pero no peso neto. No cuenta en
+la consolidación ni puede asignarse a un lote. Al registrarse la tara, el sistema calcula el neto y
+el ingreso pasa a Registrado.
+
+**Si se revierte.** Con un neto digitado en cada ingreso, dos registros del mismo vehículo podrían
+aplicar taras distintas sin que nada lo advirtiera. Con la tara como referencia viva al catálogo, un
+cambio de tara reescribiría en silencio el histórico de toneladas.
 
 ## D-14. Almacenamiento de las imágenes del ticket — *pendiente*
 
@@ -242,5 +269,5 @@ llegaron a `main`; las únicas referencias a ellas están en `apps/salidas`, que
 | Piloto de motores de reconocimiento | D-12, implementación de M04 | Antes de implementar M04 |
 | Medio de almacenamiento y política de retención de imágenes | D-14, implementación de M03 | Junto con el despliegue |
 | Valores del catálogo de tipo de mineral, a definir con la empresa | M02, M08 | Antes de implementar M02 |
-| Confirmación de la tolerancia de 0,01 t de la regla V1 | M05, conjunto de prueba | Antes de fijar el conjunto de prueba |
+| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10) | M03, D-17 | Antes de implementar M03 |
 | Forma real de agrupar el mineral en cancha | M06, alcance de DR-04 | Antes de implementar M06 |

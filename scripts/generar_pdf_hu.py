@@ -18,8 +18,12 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 
-# Modulos ya reescritos. Ampliar conforme avancen las fases 6 y 7 del plan de migracion.
-MODULOS_VIGENTES = ["M03-ingresos"]
+# Modulos reescritos para el sistema web inteligente (fases 5 a 7 del plan de migracion).
+MODULOS_VIGENTES = [
+    "M01-autenticacion", "M02-catalogo", "M03-ingresos", "M04-reconocimiento",
+    "M05-validacion", "M06-trazabilidad", "M07-consulta", "M08-consolidacion",
+    "M09-auditoria",
+]
 
 NOMBRES_MODULO = {
     "M01-autenticacion": "M01 · Autenticación y roles",
@@ -351,29 +355,31 @@ si cambió.</p>
 <thead><tr><th style="width:52mm">Dimensión</th><th>Qué debe hacer posible el sistema</th></tr></thead>
 <tbody>
 <tr><td><strong>Oportunidad del registro</strong></td><td>Que el ingreso se registre junto a la
-balanza, en el momento, y que queden tres marcas de tiempo independientes: la del ticket, el inicio
+balanza, en el momento, y que queden tres marcas de tiempo independientes: la del pesaje, el inicio
 del registro y su fin. De ahí la exigencia de que las dos últimas las asigne el servidor y nadie
 las edite.</td></tr>
 <tr><td><strong>Integridad del registro</strong></td><td>Que los siete datos del ingreso estén
 siempre completos y que exista el respaldo fotográfico recuperable. De ahí que la imagen sea
-obligatoria y que ningún campo admita quedar vacío al confirmar.</td></tr>
+obligatoria, que ningún campo admita quedar vacío al confirmar y que el ingreso de un vehículo
+todavía sin tara quede En proceso hasta completarse con el destare.</td></tr>
 <tr><td><strong>Consolidación de la producción</strong></td><td>Que el total del mes por tipo de
 mineral se obtenga a demanda y que cada ingreso pueda vincularse con las etapas del proceso.</td></tr>
 </tbody></table>
 
 <h3>Dónde está el componente inteligente</h3>
 <p>Dos capacidades distinguen este sistema de un formulario de captura: el
-<strong>reconocimiento automático</strong> de los seis datos del ticket a partir de su fotografía, y
+<strong>reconocimiento automático</strong> de los datos del ticket —placa, fecha y peso bruto— a
+partir de su fotografía, y
 la <strong>detección automática de inconsistencias</strong> mediante las cinco reglas de validación.
 Ambas se apoyan en una condición que atraviesa todas las historias: el sistema propone, el usuario
 confirma, y el valor propuesto y el confirmado se conservan por separado.</p>
 
-<div class="nota"><div class="t">Por qué el peso neto no se calcula</div>
-El ticket de balanza ya trae el peso neto impreso. Si el sistema lo calculara como bruto menos tara,
-la comparación entre ambos daría siempre cero y un ticket incoherente entraría sin que nadie lo
-advirtiera. Registrarlo como dato leído es lo que permite que la regla V1 lo contraste. Es la
-decisión de diseño que más probablemente alguien intentará «simplificar» durante la
-implementación.</div>
+<div class="nota"><div class="t">Por qué el peso neto lo calcula el sistema</div>
+El ticket de balanza imprime un solo peso, el bruto. La tara es el peso del vehículo vacío: se
+obtiene en el destare de su primer viaje y se mantiene por decisión de la Gerencia. El sistema
+calcula el peso neto como bruto menos tara y conserva en cada ingreso la tara que se le aplicó, de
+modo que un cambio posterior de tara no altere las toneladas ya registradas. Mientras un vehículo
+nuevo no ha sido destarado, su ingreso queda En proceso y no cuenta en los totales.</div>
 </div>
 """
 
@@ -398,17 +404,18 @@ sobre los que el usuario confirma. Se ejecutan siempre en el servidor.</p>
 <table>
 <thead><tr><th style="width:14mm">Regla</th><th>Qué detecta</th><th style="width:38mm">Efecto</th></tr></thead>
 <tbody>
-<tr><td><strong>V1</strong></td><td>El peso neto no coincide con el peso bruto menos la tara, más allá de la tolerancia</td><td>Bloquea</td></tr>
-<tr><td><strong>V2</strong></td><td>La tara es mayor o igual que el peso bruto</td><td>Bloquea</td></tr>
+<tr><td><strong>V1</strong></td><td>El ticket parece duplicado: ya existe un ingreso con la misma placa, fecha y peso bruto</td><td>Exige justificación</td></tr>
+<tr><td><strong>V2</strong></td><td>La tara del vehículo es mayor o igual que el peso bruto</td><td>Bloquea</td></tr>
 <tr><td><strong>V3</strong></td><td>La placa no tiene un formato válido</td><td>Bloquea</td></tr>
-<tr><td><strong>V4</strong></td><td>El peso neto queda fuera del rango de carga del vehículo</td><td>Exige justificación</td></tr>
+<tr><td><strong>V4</strong></td><td>El peso neto calculado queda fuera del rango de carga del vehículo</td><td>Exige justificación</td></tr>
 <tr><td><strong>V5</strong></td><td>La fecha del ticket es posterior a la del registro</td><td>Bloquea</td></tr>
 </tbody></table>
 
 <h3>Los siete datos obligatorios del ingreso</h3>
-<p>Placa del vehículo · fecha y hora del ticket · peso bruto · tara · peso neto · tipo de mineral ·
-tipo de vehículo. Los seis primeros provienen del ticket; el tipo de vehículo se deriva del catálogo
-a partir de la placa y no se digita.</p>
+<p>Placa del vehículo · fecha y hora del pesaje · peso bruto · tara · peso neto · tipo de mineral ·
+tipo de vehículo. La placa, la fecha y el peso bruto se reconocen del ticket; la hora del pesaje la
+digita el usuario; la tara y el tipo de vehículo vienen del catálogo a partir de la placa; el peso
+neto lo calcula el sistema.</p>
 
 <h3>Cómo leer una historia</h3>
 <table>
@@ -416,7 +423,7 @@ a partir de la placa y no se digita.</p>
 <tbody>
 <tr><td><strong>Historia</strong></td><td>Quién necesita la capacidad, qué necesita y para qué. Es el enunciado que se acuerda con el usuario</td></tr>
 <tr><td><strong>Descripción</strong></td><td>El razonamiento: qué hace el sistema, qué delega y qué restricciones aplica</td></tr>
-<tr><td><strong>Detalles</strong></td><td>Los campos, su obligatoriedad y su origen: leído del ticket, elegido, derivado o asignado por el servidor</td></tr>
+<tr><td><strong>Detalles</strong></td><td>Los campos, su obligatoriedad y su origen: reconocido del ticket, digitado, elegido, derivado, calculado o asignado por el servidor</td></tr>
 <tr><td><strong>Criterios de aceptación</strong></td><td>Lo verificable. Cada criterio se convierte en un caso de prueba, y los mensajes entre comillas se comprueban literalmente</td></tr>
 </tbody></table>
 </div>
@@ -433,6 +440,21 @@ def main():
 
     pendientes = [NOMBRES_MODULO[s] for s in NOMBRES_MODULO
                   if not any(s[:3] == v[:3] for v in vigentes)]
+
+    if pendientes:
+        nota_alcance = (
+            '<div class="nota"><div class="t">Alcance de este documento</div>\n'
+            f'Se detallan con sus criterios de aceptación las {total_detalle} historias de '
+            f'{", ".join(m["nombre"] for m in modulos)}. Las de '
+            f'{", ".join(p.split(" · ")[0] for p in pendientes)} figuran en el catálogo y se '
+            'detallarán conforme avance la documentación.</div>'
+        )
+    else:
+        nota_alcance = (
+            '<div class="nota"><div class="t">Alcance de este documento</div>\n'
+            f'Se detallan con sus criterios de aceptación las {total_detalle} historias de los '
+            'nueve módulos del sistema.</div>'
+        )
 
     doc = f"""<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
@@ -459,10 +481,7 @@ del trabajo de planta. Una historia cubre una capacidad completa: el mantenimien
 una sola historia con un criterio por operación, y se reserva historia propia para lo que tiene
 lógica dedicada, como el reconocimiento del ticket, la validación o la anulación.</p>
 {render_indice(grupos, vigentes)}
-<div class="nota"><div class="t">Alcance de este documento</div>
-Se detallan con sus criterios de aceptación las {total_detalle} historias de
-{", ".join(m["nombre"] for m in modulos)}. Las de {", ".join(p.split(" · ")[0] for p in pendientes)}
-figuran en el catálogo y se detallarán conforme avance la documentación.</div>
+{nota_alcance}
 </div>
 
 {TESIS}

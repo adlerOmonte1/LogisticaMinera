@@ -30,8 +30,8 @@ asigna semana: el cronograma vive en `docs/01-plan/`.
 grep -rn "M04" docs/modulos --include=*.md
 ```
 
-Si M03 ya declara que invoca `ReconocedorTicket` para obtener seis campos con su nivel de
-confianza, esa dependencia declarada **es un requisito vinculante**, no una sugerencia. Documentar
+Si M03 ya declara que invoca `ReconocedorTicket` para obtener la placa, la fecha y el peso
+bruto con su nivel de confianza, esa dependencia declarada **es un requisito vinculante**, no una sugerencia. Documentar
 un módulo contradiciendo lo que otro ya afirma de él invalida la trazabilidad del documento entero.
 
 Si la responsabilidad o el RF no se deducen del material existente, pregúntalo antes de escribir.
@@ -112,7 +112,7 @@ El punto más probable de fallo, cómo probarlo y por qué no basta con la prueb
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución del registro al usuario |
-| M04 | Propuesta de los seis campos del ticket |
+| M04 | Propuesta de la placa, la fecha y el peso bruto del ticket |
 
 | Es requerido por | Para |
 |---|---|

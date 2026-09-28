@@ -3,9 +3,10 @@
 **RF asociado:** RF06 (soporte) · **Historias:** 3
 
 > Módulo de soporte. Mantiene los datos que el registro de ingresos referencia y no digita:
-> vehículos con su titularidad y capacidad, tipos de mineral y transportistas. Sin este catálogo, el
-> tipo de vehículo se capturaría como texto libre y la capacidad no existiría para contrastarla
-> contra la regla V4.
+> vehículos con su titularidad, capacidad y tara, tipos de mineral y transportistas. Sin este
+> catálogo, el tipo de vehículo se capturaría como texto libre, la capacidad no existiría para
+> contrastarla contra la regla V4 y el peso neto no podría calcularse, porque el ticket de balanza
+> solo imprime el peso bruto.
 
 ---
 
@@ -20,8 +21,8 @@
 **Historia**
 
 Como administrativo, quiero registrar y mantener los volquetes indicando si son propios o de un
-transportista externo, y su capacidad de carga, para que el registro de ingresos derive el tipo de
-vehículo del catálogo y pueda contrastar el peso contra su capacidad.
+transportista externo, su capacidad de carga y su tara, para que el registro de ingresos derive el
+tipo de vehículo del catálogo, calcule el peso neto y pueda contrastarlo contra la capacidad.
 
 **Descripción**
 
@@ -30,12 +31,25 @@ Cada vehículo se identifica por placa, única en el catálogo. La titularidad e
 registrado; uno propio no lleva transportista. La capacidad de carga se declara en toneladas y es la
 que la regla V4 usa para señalar un peso neto fuera de rango.
 
+La tara es el peso del vehículo vacío. No se captura al dar de alta el vehículo: se obtiene en el
+destare de su primer viaje y la registra el usuario desde el ingreso que quedó En proceso
+(HU-M03-04). Hasta entonces el vehículo figura como pendiente de destare. Una vez registrada, la tara
+se mantiene por decisión de la Gerencia: solo el Administrador puede modificarla, indicando el
+motivo, y el cambio no altera los ingresos ya registrados, que conservan la tara que se les aplicó.
+
+Un vehículo puede darse de alta desde este catálogo o desde la pantalla de registro de un ingreso,
+cuando la placa del ticket no está registrada (HU-M03-01). En ambos casos se aplican las mismas
+reglas: el alta desde el registro no es un camino con menos controles.
+
 **Detalles**
 - Placa: obligatoria, única, formato de placa peruana.
 - Titularidad: obligatoria, PROPIO o EXTERNO.
 - Capacidad de carga: obligatoria, decimal positivo, en toneladas.
+- Tara: sin valor al dar de alta; decimal positivo en toneladas, registrada en el destare del primer
+  viaje, con su fecha y el usuario que la registró. Solo el Administrador la modifica, con motivo.
 - Transportista: obligatorio si la titularidad es EXTERNO; no se admite si es PROPIO.
 - Baja: lógica; un vehículo con ingresos asociados se desactiva, nunca se elimina.
+- Alta: desde el catálogo o desde el registro de un ingreso, con las mismas reglas.
 
 **Criterios de aceptación**
 
@@ -59,8 +73,27 @@ que la regla V4 usa para señalar un peso neto fuera de rango.
 > entonces el sistema lo desactiva en lugar de eliminarlo y muestra "El vehículo se desactivó porque
 > tiene ingresos registrados".
 
-> **CA07.** Dado que un vehículo está desactivado, cuando se abre el formulario de registro de un
-> ingreso, entonces no aparece entre las placas seleccionables.
+> **CA07.** Dado que un vehículo está desactivado, cuando se registra un ingreso nuevo, entonces el
+> sistema no permite asociarlo a ese ingreso.
+
+> **CA08.** Dado que el usuario da de alta un vehículo, cuando guarda, entonces el sistema lo registra
+> sin tara y lo muestra como pendiente de destare.
+
+> **CA09.** Dado que un vehículo ya tiene tara, cuando un usuario que no es Administrador intenta
+> modificarla, entonces el sistema rechaza la operación mostrando "Solo el Administrador puede
+> modificar la tara del vehículo".
+
+> **CA10.** Dado que el Administrador modifica la tara de un vehículo, cuando intenta guardar sin
+> indicar el motivo, entonces el sistema rechaza la operación mostrando "Debe indicar el motivo del
+> cambio de tara".
+
+> **CA11.** Dado que el Administrador modifica la tara con motivo, cuando guarda, entonces el sistema
+> actualiza la tara, registra en auditoría el valor anterior, el nuevo y el motivo, y los ingresos ya
+> registrados de ese vehículo conservan el peso neto con que se registraron.
+
+> **CA12.** Dado que la placa de un ticket no está en el catálogo, cuando el usuario da de alta el
+> vehículo desde la pantalla de registro, entonces el sistema aplica las mismas validaciones que el
+> alta desde el catálogo y devuelve al registro con el vehículo ya asociado.
 
 ---
 

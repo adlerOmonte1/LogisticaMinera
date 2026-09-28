@@ -5,7 +5,10 @@
 # Este script es la fuente unica del patron de terminos retirados. Las skills y los
 # documentos lo invocan en lugar de transcribirlo, para no reintroducir esos terminos.
 
-patrones='Producci[oó]n y Existencias|RF-[0-9]{2}|\bstock\b|kardex|\bmerma\b|declaraci[oó]n semestral|Ley 32213|sin conexi[oó]n|IndexedDB|cobertura de registro|meses con consolidado|JMeter|m[oó]dulos implementados|hora_pesaje|hora_registro|Relaci[oó]n con el indicador|Indicador de tesis|M0[4-7]-(salidas|existencias|consolidados|sin-conexion)'
+patrones='Producci[oó]n y Existencias|RF-[0-9]{2}|\bstock\b|kardex|\bmerma\b|declaraci[oó]n semestral|Ley 32213|sin conexi[oó]n|IndexedDB|cobertura de registro|meses con consolidado|JMeter|m[oó]dulos implementados|\bhora_pesaje\b|\bhora_registro\b|Relaci[oó]n con el indicador|Indicador de tesis|M0[4-7]-(salidas|existencias|consolidados|sin-conexion)'
+
+# hora_pesaje y hora_registro se buscan como palabra completa: eran los campos sueltos del
+# sistema anterior; fecha_hora_pesaje es el campo vigente del ingreso (D-01) y no debe marcarse.
 
 # Una linea puede eximirse marcandola con el comentario  <!-- migracion:ok -->  al final.
 # Se usa solo para instrucciones que nombran el termino para prohibirlo, y para el historial

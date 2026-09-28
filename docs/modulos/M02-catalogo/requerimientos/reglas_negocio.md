@@ -16,6 +16,10 @@
 | RN-M02-08 | Ninguna entidad de catálogo con registros dependientes se elimina físicamente | Se romperían las referencias del histórico de ingresos |
 | RN-M02-09 | Una entidad desactivada no se ofrece en el formulario de registro, pero sí aparece en consultas históricas | Los ingresos antiguos quedarían sin una etiqueta legible para su vehículo o su tipo de mineral |
 | RN-M02-10 | La unidad de medida de todo tipo de mineral es la tonelada | Los totales de la consolidación mezclarían unidades incompatibles |
+| RN-M02-11 | Un vehículo se da de alta sin tara; la primera tara se registra en el destare de su primer viaje, como decimal positivo en toneladas, con su fecha y el usuario que la registró | Se aceptaría una tara estimada o copiada de otro vehículo, y el peso neto de todos sus ingresos quedaría falseado |
+| RN-M02-12 | Una tara ya registrada solo la modifica el Administrador, con motivo obligatorio, y el cambio se registra en auditoría con el valor anterior y el nuevo | La tara, de la que depende el peso neto, cambiaría sin que nadie pudiera explicar por qué |
+| RN-M02-13 | El cambio de tara no altera los ingresos ya registrados: solo se aplica a los siguientes | Un cambio de tara reescribiría en silencio las toneladas ya consolidadas (D-17) |
+| RN-M02-14 | El alta de un vehículo desde el registro de un ingreso aplica las mismas reglas RN-M02-01 a RN-M02-05 que el alta desde el catálogo | El registro se convertiría en una puerta trasera para crear vehículos incompletos o duplicados |
 
 ## Nota sobre RN-M02-05
 
@@ -23,6 +27,15 @@ Es la regla que conecta este módulo con la validación de M05. La capacidad no 
 más que como un dato del vehículo; su propósito completo solo se entiende en la regla V4, que la
 lee para decidir si un peso neto es razonable. Un vehículo con capacidad cero o negativa haría que
 esa regla fallara o se volviera inservible para ese vehículo.
+
+## Nota sobre RN-M02-11 a RN-M02-13
+
+La tara es el dato del catálogo con más efecto sobre las toneladas: el ticket de balanza solo imprime
+el peso bruto, y el peso neto de cada ingreso es ese bruto menos la tara del vehículo. Por eso se
+registra una sola vez, a partir de un pesaje real del vehículo vacío, y su cambio posterior es una
+decisión de la Gerencia que ejecuta el Administrador y queda explicada por su motivo. Que el cambio
+no alcance a los ingresos anteriores es lo que permite que un total mensual ya consolidado siga
+siendo el mismo al consultarlo después.
 
 ## Nota sobre RN-M02-10
 

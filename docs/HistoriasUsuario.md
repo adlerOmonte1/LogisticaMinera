@@ -1,6 +1,6 @@
 # Historias de usuario — índice
 
-**Versión:** 2.0 · **Total: 21 historias en 9 módulos**
+**Versión:** 2.1 · **Total: 22 historias en 9 módulos**
 
 Este archivo es un **índice**. El detalle de cada historia —descripción, campos y criterios de
 aceptación— vive únicamente en el `HU.md` de su módulo; aquí solo constan el identificador, el
@@ -44,10 +44,11 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 | HU-M03-01 | Registro de un ingreso a partir del ticket de balanza | Supervisor de planta | Crítica |
 | HU-M03-02 | Corrección de un ingreso registrado | Administrativo | Alta |
 | HU-M03-03 | Anulación de un ingreso | Administrador | Alta |
+| HU-M03-04 | Registro del destare de un vehículo en su primer viaje | Supervisor de planta | Crítica |
 
 ## M04 — Reconocimiento automático del ticket
 
-*Detalle en `modulos/M04-reconocimiento/HU.md`* — pendiente, fase 6
+*Detalle en [`modulos/M04-reconocimiento/HU.md`](modulos/M04-reconocimiento/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
@@ -56,7 +57,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 ## M05 — Validación automática de consistencia
 
-*Detalle en `modulos/M05-validacion/HU.md`* — pendiente, fase 6
+*Detalle en [`modulos/M05-validacion/HU.md`](modulos/M05-validacion/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
@@ -64,7 +65,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 ## M06 — Trazabilidad del proceso
 
-*Detalle en `modulos/M06-trazabilidad/HU.md`* — pendiente, fase 6
+*Detalle en [`modulos/M06-trazabilidad/HU.md`](modulos/M06-trazabilidad/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
@@ -74,7 +75,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 ## M07 — Consulta de ingresos y respaldo
 
-*Detalle en `modulos/M07-consulta/HU.md`* — pendiente, fase 7
+*Detalle en [`modulos/M07-consulta/HU.md`](modulos/M07-consulta/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
@@ -83,7 +84,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 ## M08 — Consolidación de la producción
 
-*Detalle en `modulos/M08-consolidacion/HU.md`* — pendiente, fase 7
+*Detalle en [`modulos/M08-consolidacion/HU.md`](modulos/M08-consolidacion/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
@@ -92,11 +93,11 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 ## M09 — Auditoría
 
-*Detalle en `modulos/M09-auditoria/HU.md`* — pendiente, fase 7
+*Detalle en [`modulos/M09-auditoria/HU.md`](modulos/M09-auditoria/HU.md)*
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
-| HU-M09-01 | Registro de eventos del sistema | — (automático) | Alta |
+| HU-M09-01 | Registro de eventos del sistema | Administrador | Alta |
 | HU-M09-02 | Consulta del historial de un registro | Administrador | Media |
 
 ---

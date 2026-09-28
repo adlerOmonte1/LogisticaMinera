@@ -48,7 +48,7 @@ flowchart TB
 
     BAL -.->|Ticket de balanza impreso en papel| SUP
     SIS -.->|Envia la imagen del ticket a reconocer| MOT
-    MOT -.->|Devuelve seis campos con su confianza| SIS
+    MOT -.->|Devuelve placa fecha y peso bruto con su confianza| SIS
 ```
 
 ### 2.1 Justificación de los elementos
@@ -122,7 +122,7 @@ flowchart TB
 | **API REST** | Django 5 + DRF | Reglas de negocio, casos de uso y autorización | Autoridad única de validación (D-08): toda petición, venga de donde venga, se somete a las mismas reglas |
 | **PostgreSQL 16** | PostgreSQL | Persistencia | Transacciones ACID, necesarias para asignar el código bajo concurrencia (D-02) y para que el reconocimiento, la validación y la auditoría se persistan en el mismo acto que el ingreso |
 | **Almacén de imágenes** | A definir con D-14 | Conserva la fotografía del ticket como respaldo del ingreso | Sostiene RN-M03-01 (ningún ingreso sin imagen) y la consulta de M07; separado de PostgreSQL porque el volumen y el patrón de acceso de archivos binarios difieren del de filas relacionales |
-| **Motor de reconocimiento** | A definir con D-12 | Lee los seis campos del ticket a partir de la imagen | Se accede exclusivamente a través de `ReconocedorTicket`; el contenedor puede vivir dentro del servidor o fuera de él sin que el resto del sistema lo note |
+| **Motor de reconocimiento** | A definir con D-12 | Lee la placa, la fecha y el peso bruto del ticket a partir de la imagen | Se accede exclusivamente a través de `ReconocedorTicket`; el contenedor puede vivir dentro del servidor o fuera de él sin que el resto del sistema lo note |
 
 No hay Service Worker ni almacén local con cola de reintento en segundo plano: ese componente
 pertenecía a un módulo que ya no forma parte del alcance (DR-01). El navegador conserva un borrador
@@ -227,7 +227,7 @@ flowchart TB
 |---|---|
 | `ServicioIngreso` | Concentra el caso de uso completo. La transacción única —código, persistencia de valores reconocidos y confirmados, y evento de auditoría— vive aquí. Si el evento de auditoría falla, el ingreso no queda registrado: ninguna operación se completa sin su rastro (RN-M09-01) |
 | `ReconocedorTicket` como **abstracción** | D-12 deja abierta la elección del motor. Se inyecta en el servicio, no se instancia dentro: así se sustituye por un doble determinista en pruebas sin depender de un servicio externo |
-| `ValidadorConsistencia` como abstracción | Las reglas V1 a V5 viven en M05 y se aplican dos veces (sobre lo propuesto y sobre lo confirmado). El servicio de M03 no conoce las reglas concretas, solo el contrato |
+| `ValidadorConsistencia` como abstracción | Las reglas V1 a V5 viven en M05 y se aplican sobre lo propuesto, sobre lo confirmado y, en el primer viaje de un vehículo, al registrar el destare. El servicio de M03 no conoce las reglas concretas, solo el contrato |
 | `Reloj` como abstracción | Las tres marcas de tiempo son el núcleo del registro. Un servicio que llama a `timezone.now()` internamente no se puede probar controlando el instante exacto de cada una |
 | `AlmacenImagenes` como abstracción | D-14 no ha fijado el medio de almacenamiento; el servicio guarda a través de la interfaz sin saber si el destino es un volumen local o un servicio de objetos |
 | `SelectorIngresos` | Listado con filtros combinables y totales del conjunto filtrado, sin recorrer resultados en Python |
@@ -263,13 +263,14 @@ flowchart TB
 flowchart TB
     IFC["ValidadorConsistencia - interfaz"]
     COL["Coleccion de reglas registradas"]
-    V1["ReglaV1PesoNeto"]
+    V1["ReglaV1Duplicado"]
     V2["ReglaV2Tara"]
     V3["ReglaV3Placa"]
     V4["ReglaV4Capacidad"]
     V5["ReglaV5Fecha"]
     SRV["ServicioValidacion - compone y persiste"]
     MOD["Modelo ResultadoValidacion"]
+    REP["RepositorioIngreso M03 - lectura"]
     DB[("PostgreSQL")]
 
     IFC --> COL
@@ -278,6 +279,7 @@ flowchart TB
     COL --> V3
     COL --> V4
     COL --> V5
+    V1 --> REP
     SRV --> IFC
     SRV --> MOD
     MOD --> DB
@@ -287,6 +289,7 @@ flowchart TB
 |---|---|
 | Una clase por regla | Añadir una regla nueva —una placa fuera del catálogo, un tipo de mineral incompatible— es una clase más en la colección, sin tocar V1 a V5 (OCP) |
 | `ValidadorConsistencia` recorre la colección sin nombrar ninguna regla | Es la garantía de que RN-M05-04 (evaluar las cinco siempre) no dependa de que el desarrollador recuerde encadenar condicionales |
+| `ReglaV1Duplicado` con un repositorio inyectado | Es la única regla que necesita otros ingresos: busca uno no anulado con la misma placa, fecha y peso bruto. Lo hace a través de una interfaz de lectura, no importando el modelo de M03, y se prueba con un doble de ese repositorio |
 | `ServicioValidacion` separado de las reglas | Las reglas son puras: reciben datos, devuelven si cumplen. Persistir el resultado con su momento y su resolución es responsabilidad de otro componente |
 
 ---
@@ -326,13 +329,18 @@ classDiagram
         +registrar_ingreso(datos, usuario) Ingreso
         +corregir_ingreso(id, cambios, motivo, usuario) Ingreso
         +anular_ingreso(id, motivo, usuario) Ingreso
+        +registrar_destare(id, tara, usuario) Ingreso
     }
     class Ingreso {
         +codigo str
-        +fecha_hora_ticket datetime
+        +fecha_hora_pesaje datetime
         +hora_inicio_registro datetime
         +hora_fin_registro datetime
+        +peso_bruto_tn Decimal
+        +tara_tn Decimal
         +peso_neto_tn Decimal
+        +estado str
+        +aplicar_tara(tara)
         +validar_invariantes()
     }
 
@@ -349,7 +357,10 @@ classDiagram
   motor de reconocimiento o de generador de código no toca el caso de uso ni obliga a rehacer sus
   pruebas.
 - **SRP.** `Ingreso` protege sus invariantes; no sabe de motores de reconocimiento, de reglas de
-  validación ni de HTTP. El peso neto es un dato que recibe y valida, no un valor que calcula.
+  validación ni de HTTP. El peso neto no se recibe: `aplicar_tara()` lo calcula como peso bruto menos
+  la tara, conserva la tara aplicada y pasa el ingreso de En proceso a Registrado. Así la regla
+  «neto = bruto − tara» vive en un solo lugar, sea que la tara llegue del catálogo al confirmar o
+  del destare del primer viaje (D-17).
 - **Capacidad de ser probado.** Las cuatro abstracciones existen porque hay pruebas que las exigen:
   un motor de reconocimiento real no puede invocarse en cada corrida de pruebas, las reglas de
   validación deben poder simularse en ambos sentidos, y el reloj debe poder fijarse para verificar

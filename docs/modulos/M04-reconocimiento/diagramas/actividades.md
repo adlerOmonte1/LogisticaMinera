@@ -7,7 +7,7 @@ flowchart TD
     I([Imagen del ticket recibida]) --> R1[Invocar el motor a traves de la interfaz]
     R1 --> D1{Responde dentro del tiempo?}
     D1 -->|No| E1[Cancelar la espera y avisar que no esta disponible]
-    E1 --> L1[Presentar los seis campos vacios y editables]
+    E1 --> L1[Presentar los tres campos vacios y editables]
     D1 -->|Si| D2{Obtuvo alguna lectura?}
     D2 -->|No| E2[Informar que no fue posible leer el ticket]
     E2 --> L1
@@ -37,7 +37,7 @@ flowchart TD
     A1 --> F1([Sin reconocimiento asociado])
     D1 -->|Si| T1[Entrar en la transaccion del ingreso]
     T1 --> P1[Persistir cabecera con motor version y umbral]
-    P1 --> C1[Recorrer los seis campos]
+    P1 --> C1[Recorrer los tres campos]
     C1 --> P2[Guardar valor reconocido y valor confirmado]
     P2 --> D2{Los dos valores difieren?}
     D2 -->|Si| A2[Marcar el campo como corregido]

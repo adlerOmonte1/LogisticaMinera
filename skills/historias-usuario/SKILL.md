@@ -91,7 +91,7 @@ que no estés fragmentando un CRUD.
 **El rol es uno de los tres definidos.** Administrador, Administrativo o Supervisor de planta. No
 hay otros: una historia que solo existe «para medir algo» no es una historia. Lo que protege una
 medición se expresa como criterio de aceptación de una historia real. Ejemplo: en el registro de
-un ingreso, el criterio que exige que la fecha y hora del ticket, el inicio del registro y el fin
+un ingreso, el criterio que exige que la fecha y hora del pesaje, el inicio del registro y el fin
 del registro se muestren como tres valores distintos y que los dos últimos no sean editables.
 
 **El «para» es una consecuencia real, no una repetición del «quiero».**
@@ -108,7 +108,7 @@ por igualdad exacta y las notas de implementación exigen que la interfaz los re
 reformular. Redáctalos como los ya existentes: impersonales, sin culpar al usuario, sin exclamaciones.
 
 - «Debe adjuntar la imagen del ticket de balanza»
-- «El peso neto no coincide con el peso bruto menos la tara» (V1)
+- «El ticket parece duplicado: ya existe el ingreso {codigo} con la misma placa, fecha y peso» (V1)
 - «La tara no puede ser mayor o igual que el peso bruto» (V2)
 - «La placa no tiene un formato válido» (V3)
 - «El peso neto está fuera del rango de carga del vehículo {placa}» (V4)
@@ -132,8 +132,8 @@ el valor reconocido y el confirmado.
 | Prohibido | Por qué |
 |---|---|
 | Eliminación física de cualquier registro | Rompe la auditabilidad exigida por el diseño preexperimental (D-07) |
-| Persistir un dato reconocido sin confirmación del usuario | El reconocimiento es una propuesta; el peso neto se lee del ticket, es editable antes de confirmar y se valida con V1 (D-13) |
-| Menos de tres marcas de tiempo en el ingreso, o alguna de las del servidor editable | Fecha y hora del ticket, inicio y fin del registro son independientes; colapsarlas o editarlas hace falsificable el registro (D-01) |
+| Persistir un dato reconocido sin confirmación del usuario | El reconocimiento es una propuesta: la placa, la fecha y el peso bruto son editables antes de confirmar; el peso neto no se lee ni se digita, lo calcula el servidor con la tara del vehículo (D-13, D-17) |
+| Menos de tres marcas de tiempo en el ingreso, o alguna de las del servidor editable | Fecha y hora del pesaje, inicio y fin del registro son independientes; colapsarlas o editarlas hace falsificable el registro (D-01) |
 | Secciones o cabeceras que citen indicadores de la tesis | La relación con la tesis vive en la matriz de trazabilidad, no en el módulo |
 | Precios, montos o importes | Están fuera de alcance por decisión documentada |
 | Nombres de componentes, tablas o clases | Eso vive en `notas.md`, no en la historia |

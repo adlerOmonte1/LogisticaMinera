@@ -19,6 +19,14 @@ El ticket de balanza **se fotografía, se reconoce y se valida antes de persisti
 captura la imagen, el sistema propone los datos leídos, señala inconsistencias, el usuario corrige
 y confirma, y solo entonces el servidor asigna el código único y conserva la imagen como respaldo.
 
+**Formato real del ticket (DR-09).** El ticket imprime la placa, la fecha (día, mes y año) y un
+único peso, que es el **peso bruto**; además trae datos del cobro del pesaje y firmas, que el
+sistema no usa. No imprime hora, tara ni peso neto. Por eso el reconocimiento lee **tres campos**;
+la hora del pesaje la digita el usuario; la **tara** es un atributo del vehículo que se obtiene en
+el destare de su primer viaje y se mantiene por decisión de la Gerencia (DR-10); y el **peso neto lo
+calcula el servidor** como bruto menos tara, conservando la tara aplicada (D-17). Si el vehículo aún
+no tiene tara, el ingreso queda **En proceso** hasta el destare y no cuenta en ningún total.
+
 El diagnóstico encontró que:
 
 - El ticket de balanza se anota en papel y se transcribe después en la oficina, con horas o días
@@ -62,15 +70,17 @@ conservar marcas de tiempo confiables porque sirven para triangular el postest.
 
 | Dimensión | Indicador | Fórmula por ingreso | Unidad |
 |---|---|---|---|
-| D1 Oportunidad del registro | I1 Tiempo de espera del registro | Inicio del registro − fecha y hora del ticket | h |
+| D1 Oportunidad del registro | I1 Tiempo de espera del registro | Inicio del registro − fecha y hora del pesaje | h |
 | D1 Oportunidad del registro | I2 Tiempo de registro del ingreso | Fin del registro − inicio del registro | min |
 | D2 Integridad del registro | I3 Completitud del registro | Campos consignados / 7 × 100 | % |
 | D2 Integridad del registro | I4 Tiempo de recuperación del respaldo | Consulta → presentación del ticket y sus datos | min |
 | D3 Consolidación de la producción | I5 Tiempo de consolidación | Solicitud → entrega del total acumulado del mes por producto que incluye el ingreso | min |
 | D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / 4 × 100 | % |
 
-**Campos de completitud:** C1 placa · C2 fecha y hora · C3 peso bruto · C4 tara · C5 peso neto ·
-C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
+**Campos de completitud:** C1 placa · C2 fecha y hora del pesaje · C3 peso bruto · C4 tara ·
+C5 peso neto · C6 tipo de mineral · C7 tipo de vehículo (propio o externo). C1, C3 y la fecha de C2
+se reconocen del ticket; la hora de C2 se digita; C4 y C7 vienen del catálogo; C5 lo calcula el
+sistema.
 **Etapas del proceso:** secado, zarandeo, molienda, ensacado.
 
 **Tareas de usabilidad (hoja C):** T01 registrar un ingreso a partir de la imagen del ticket ·
@@ -82,13 +92,16 @@ producto · T06 exportar el total acumulado mensual por producto.
 
 | Regla | Inconsistencia | Tipo |
 |---|---|---|
-| V1 | Peso neto distinto de peso bruto menos tara (tolerancia 0,01 t) | Bloqueante |
-| V2 | Tara mayor o igual que el peso bruto | Bloqueante |
+| V1 | Ticket posiblemente duplicado: misma placa, misma fecha y mismo peso bruto que un ingreso no anulado | Exige justificación |
+| V2 | Tara del vehículo mayor o igual que el peso bruto | Bloqueante |
 | V3 | Placa con formato inválido | Bloqueante |
-| V4 | Peso neto fuera del rango de carga del vehículo (capacidad del catálogo) | Exige justificación |
+| V4 | Peso neto calculado fuera del rango de carga del vehículo (capacidad del catálogo) | Exige justificación |
 | V5 | Fecha del ticket posterior a la fecha de registro | Bloqueante |
 
-**Conjunto de prueba de la capacidad inteligente:** ERA sobre 50 tickets reales × 6 campos; TDI
+V2 y V4 se omiten mientras el vehículo no tiene tara y se evalúan al registrar el destare.
+
+**Conjunto de prueba de la capacidad inteligente:** ERA sobre 50 tickets reales × 3 campos (150
+lecturas); TDI
 sobre 10 inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante la medición.
 
 > **Regla:** los códigos I1 a I6, RFC, CPS, ERA, TDI, SUS, TCA, T01 a T06 y C1 a C7 solo se citan
@@ -102,12 +115,14 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 
 1. **Nada se elimina.** Baja lógica y anulación con motivo; jamás `DELETE` físico.
 2. **Todo queda atribuido.** Usuario y marca de tiempo en cada operación.
-3. **El ingreso guarda tres marcas de tiempo independientes.** `fecha_hora_ticket` se lee del
-   ticket y es editable antes de confirmar; `hora_inicio_registro` y `hora_fin_registro` las asigna
+3. **El ingreso guarda tres marcas de tiempo independientes.** `fecha_hora_pesaje` combina la
+   fecha reconocida del ticket y la hora que digita el usuario, y es editable antes de confirmar; `hora_inicio_registro` y `hora_fin_registro` las asigna
    el servidor y ningún rol las edita. Colapsarlas «para simplificar» destruye la medición.
 4. **Ningún dato reconocido se persiste sin confirmación del usuario** (D-13). El resultado del
    reconocimiento es una propuesta; el sistema conserva por separado el valor reconocido y el
    valor confirmado de cada campo.
+5. **El peso neto no se digita ni se lee: se calcula** con la tara del vehículo, y el ingreso
+   conserva la tara aplicada. Un cambio posterior de tara no reescribe el histórico (D-17).
 
 ## Roles
 
@@ -126,8 +141,8 @@ numeran **por módulo** porque su alcance es local.
 | RF | Descripción | Módulo principal |
 |---|---|---|
 | RF01 | Registrar el ingreso de mineral con la imagen del ticket de balanza | M03 |
-| RF02 | Reconocer automáticamente placa, fecha, hora, peso bruto, tara y peso neto del ticket | M04 |
-| RF03 | Validar automáticamente la consistencia de los datos del ticket: pesos, formato de placa, capacidad del vehículo y fecha (V1 a V5) | M05 |
+| RF02 | Reconocer automáticamente los datos del ticket: placa, fecha y peso bruto | M04 |
+| RF03 | Validar automáticamente la consistencia de los datos del ticket: duplicidad, pesos, formato de placa, capacidad del vehículo y fecha (V1 a V5) | M05 |
 | RF04 | Permitir el registro y la corrección manual de los datos reconocidos | M03 |
 | RF05 | Asignar un código único a cada ingreso de mineral | M03 |
 | RF06 | Registrar el tipo de mineral y el tipo de vehículo (propio o externo) | M03 (catálogo en M02) |
@@ -143,9 +158,9 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 | Módulo | Nombre | Responsabilidad | RF principal | Estado del código |
 |---|---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 | Implementado con pruebas (`apps/accounts`) |
-| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad y capacidad, y transportistas | RF06 (soporte) | Implementado con pruebas (`apps/catalogo`); pendiente retirar clientes y definir tipo de mineral |
-| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación y código único | RF01, RF04, RF05, RF06 | Implementado con el diseño anterior (`apps/ingresos`); pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Leer los seis campos del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Sin código |
+| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) | Implementado con pruebas (`apps/catalogo`); pendiente retirar clientes y definir tipo de mineral |
+| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 | Implementado con el diseño anterior (`apps/ingresos`); pendiente de refactor |
+| M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Sin código |
 | M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado, detrás de la interfaz `ValidadorConsistencia` | RF03 | Sin código |
 | M06 | Trazabilidad del proceso | Asignar ingresos a lotes de proceso y registrar su paso por cada etapa | RF07 | Sin código |
 | M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
@@ -181,7 +196,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 
 | ID | Decisión |
 |---|---|
-| D-01 | El ingreso guarda tres marcas de tiempo independientes: fecha y hora del ticket, inicio del registro y fin del registro |
+| D-01 | El ingreso guarda tres marcas de tiempo independientes: fecha y hora del pesaje, inicio del registro y fin del registro |
 | D-02 | El código único lo asigna el servidor, dentro de una transacción con bloqueo |
 | D-06 | La titularidad del vehículo es un atributo del catálogo, no texto libre; de ella se deriva el tipo de vehículo del ingreso |
 | D-07 | El sistema no borra ingresos: los anula |
@@ -191,6 +206,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-11 | El frontend vive en un repositorio separado |
 | D-13 | El dato reconocido no se guarda sin confirmación del usuario |
 | D-16 | Motor, versión y reglas no cambian entre el inicio y el fin de la medición |
+| D-17 | El peso neto lo calcula el servidor con la tara del vehículo; el ingreso conserva la tara aplicada |
 
 **Pendientes de cierre**
 
@@ -213,9 +229,11 @@ Del Anexo B del plan de migración, tomadas con su recomendación mientras el au
 contrario: DR-01 borrador ante pérdida de conexión como RNF, sin historias propias · DR-02 motor
 detrás de `ReconocedorTicket` · DR-03 un solo catálogo de tipo de mineral, usado al registrar y al
 consolidar · DR-04 vínculo ingreso–etapa mediante lote de proceso · DR-05 una placa que no está en
-el catálogo impide confirmar el ingreso hasta elegir o dar de alta el vehículo · DR-06 RF03 cubre
-V1 a V5 y RF09 incluye la exportación · DR-07 módulos renumerados M01 a M09 · DR-08 conjunto de
-prueba de 50 tickets y 10 inconsistencias.
+el catálogo es el primer viaje del vehículo, que se da de alta en la misma pantalla del registro
+(ajustada por DR-10) · DR-06 RF03 cubre V1 a V5 y RF09 incluye la exportación · DR-07 módulos
+renumerados M01 a M09 · DR-08 conjunto de prueba de 50 tickets × 3 campos y 10 inconsistencias ·
+DR-09 formato real del ticket: se reconocen placa, fecha y peso bruto · DR-10 la tara se registra
+en el destare del primer viaje; hasta entonces el ingreso queda En proceso.
 
 ## Fuera de alcance — declarado
 

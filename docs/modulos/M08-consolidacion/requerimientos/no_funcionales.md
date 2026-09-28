@@ -15,7 +15,7 @@ El cálculo se hace a demanda (RN-M08-02) y por lo tanto recorre los ingresos de
 consulta. Con el volumen previsto durante la ventana de operación esto es rápido, pero conviene
 vigilarlo conforme crezca el histórico: si el tiempo empeora con los meses, la solución no es
 almacenar un acumulado —eso reintroduce el problema que RN-M08-02 evita— sino un índice adecuado
-sobre `fecha_hora_ticket` y `tipo_mineral`, que ya existe según el modelo de datos.
+sobre `fecha_hora_pesaje` y `tipo_mineral`, que ya existe según el modelo de datos.
 
 ## Nota sobre RNF-M08-05
 

@@ -12,7 +12,10 @@ flowchart TD
     V1 -->|Si| V2{Ingreso anulado?}
     V2 -->|Si| E2[Rechazar: No se puede asignar un ingreso anulado]
     E2 --> L1
-    V2 -->|No| V3{Ya esta en un lote cerrado?}
+    V2 -->|No| V4{Ingreso en proceso?}
+    V4 -->|Si| E4[Rechazar: El ingreso esta en proceso falta el destare]
+    E4 --> L1
+    V4 -->|No| V3{Ya esta en un lote cerrado?}
     V3 -->|Si| E3[Rechazar: El lote ya fue cerrado]
     E3 --> L1
     V3 -->|No| P1[Asignar el ingreso y recalcular totales]
