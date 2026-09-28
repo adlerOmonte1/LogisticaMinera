@@ -1,9 +1,10 @@
 # PLAN-01 — Plan de trabajo, pruebas y entrega
 
 **Documento:** PLAN-01
-**Versión:** 1.0
+**Versión:** 2.0
 **Estado:** Vigente
-**Alcance:** Sistema web de control logístico de planta (M01 a M09, ver `../model-c4/ARQ-01_Modulos_del_Sistema.md`)
+**Alcance:** Sistema web inteligente de control de inventarios de ingreso de mineral (M01 a M09,
+ver `../model-c4/ARQ-01_Modulos_del_Sistema.md`)
 
 ---
 
@@ -27,11 +28,11 @@ software verificado.
 
 | Rol | Responsabilidad principal | Produce |
 |---|---|---|
-| Responsable técnico | Decisiones de arquitectura, revisión de PR, control de alcance | Decisiones en `decisiones_diseno.md`, aprobación de PR |
-| Desarrollo backend | Modelos, reglas de negocio, servicios, API | Código, migraciones, pruebas unitarias y de integración |
-| Desarrollo frontend | Aplicación Angular y capa PWA | Código, pruebas de componente, verificación offline |
-| Tester / QA | Diseño y ejecución de pruebas, gestión de defectos | Casos de prueba, reportes de defecto, acta de pruebas |
-| Jefatura de operaciones | Validación funcional con datos reales | Aceptación de usuario firmada por módulo |
+| Responsable técnico | Decisiones de arquitectura, revisión de PR, control de alcance, cierre de D-12 y D-14 | Decisiones en `decisiones_diseno.md`, aprobación de PR |
+| Desarrollo backend | Modelos, reglas de negocio, servicios, API, adaptadores del motor de reconocimiento | Código, migraciones, pruebas unitarias y de integración |
+| Desarrollo frontend | Aplicación Angular: captura de imagen, pantalla de confirmación, consultas | Código, pruebas de componente |
+| Tester / QA | Diseño y ejecución de pruebas, gestión de defectos, conjunto de prueba de ERA y TDI | Casos de prueba, reportes de defecto, acta de pruebas |
+| Jefatura de operaciones | Validación funcional con datos reales de planta | Aceptación de usuario firmada por módulo |
 | Administrador de base de datos (rol compartido) | Revisión de migraciones e índices | Visto bueno de migración antes de preproducción |
 
 En un equipo reducido una persona puede asumir varios roles, con una excepción que no se negocia:
@@ -47,20 +48,22 @@ personas, se cruzan: el backend prueba las historias del frontend y viceversa.
 | Entorno | Base de datos | Uso | Quién despliega |
 |---|---|---|---|
 | Desarrollo | Local por desarrollador | Trabajo diario | Cada desarrollador |
-| Preproducción | Copia anonimizada de producción | Pruebas de aceptación y de carga | Responsable técnico |
-| Producción | Servidor de planta | Operación real y medición de indicadores | Responsable técnico, con registro de despliegue |
+| Preproducción | Copia anonimizada de producción | Pruebas de aceptación y de rendimiento | Responsable técnico |
+| Producción | Servidor de planta | Operación real, solo después del pretest de la investigación | Responsable técnico, con registro de despliegue |
 
-Todo despliegue a producción realizado durante el periodo de medición se anota en el registro de
-despliegues con fecha, hora, versión y motivo. Un despliegue sin registrar introduce un cambio no
-controlado en las condiciones de medición (`../model-c4/ARQ-02_Arquitectura_Tecnica.md` §7).
+**El sistema no se usa en planta hasta que el pretest de la investigación haya terminado**
+(`../00-tesis/marco_tesis.md` §11). Todo despliegue a producción realizado durante la ventana de
+medición del postest se anota en el registro de despliegues con fecha, hora, versión y motivo. Un
+despliegue sin registrar introduce un cambio no controlado en las condiciones de observación
+(`../model-c4/ARQ-02_Arquitectura_Tecnica.md` §7).
 
 ### 3.2 Ramas
 
 ```
 main                      Código desplegado en producción, siempre etiquetado
 develop                   Integración; de aquí sale preproducción
-feature/M03-ingresos      Una rama por módulo
-fix/M03-hora-registro     Corrección de defecto reportado
+feature/M04-reconocimiento  Una rama por módulo
+fix/M03-marcas-tiempo       Corrección de defecto reportado
 ```
 
 Nada entra a `develop` sin pull request. Nada entra a `main` sin acta de pruebas del alcance que
@@ -98,7 +101,7 @@ frontend. Cada paso produce evidencia citable.
 Commits por historia, con el formato de `convenciones_codigo.md` §4:
 
 ```
-M03: registra hora de pesaje separada de hora de registro (HU-M03-01)
+M04: reconoce los seis campos del ticket con su confianza (HU-M04-01)
 ```
 
 ### 4.3 Revisión
@@ -143,8 +146,10 @@ que exige este plan. Una historia está terminada cuando:
 
 - [ ] Ninguna regla de negocio vive en `views/` ni existe únicamente en Angular.
 - [ ] `repositories/` no escribe; `services/` no consulta para presentar.
-- [ ] Las acciones de escritura registran evento en M08.
+- [ ] Las acciones de escritura registran evento en M09.
 - [ ] Ninguna entidad se borra físicamente: baja lógica o anulación con motivo.
+- [ ] Ningún valor reconocido se persiste sin confirmación del usuario; el valor reconocido y el
+      confirmado se guardan por separado.
 
 **Escalabilidad**
 
@@ -171,34 +176,40 @@ que exige este plan. Una historia está terminada cuando:
 
 | Nivel | Qué verifica | Herramienta | Responsable | Cuándo |
 |---|---|---|---|---|
-| Unitaria | Reglas de negocio y cálculos en `models/` y `services/` | pytest | Desarrollo | En cada commit |
+| Unitaria | Reglas de negocio y validaciones en `models/` y `services/` | pytest | Desarrollo | En cada commit |
 | Integración | Servicio completo contra base de datos real, con transacciones | pytest + pytest-django | Desarrollo | Al cerrar la historia |
 | Contrato de API | Códigos de estado, forma del cuerpo, cuerpo de error uniforme | pytest + cliente DRF | Desarrollo | Al cerrar la historia |
 | Permisos | Acceso y rechazo por cada rol declarado | pytest | Desarrollo | Al cerrar la historia |
-| Componente frontend | Validaciones y estados de la interfaz | Karma / Jasmine | Desarrollo | Al cerrar la historia |
+| Reconocimiento (ERA) | Exactitud de lectura del motor sobre el conjunto de tickets de prueba | Script sobre el conjunto de prueba (`plan_de_pruebas.md`) | Desarrollo + Tester | Al cerrar M04 y ante cambio de motor |
+| Validación (TDI) | Detección de cada tipo de inconsistencia sembrada | pytest + conjunto sembrado | Desarrollo | Al cerrar M05 y ante cambio de reglas |
+| Componente frontend | Validaciones y estados de la interfaz, incluida la pantalla de confirmación | Karma / Jasmine | Desarrollo | Al cerrar la historia |
 | Funcional de extremo a extremo | El criterio de aceptación tal como lo vive el usuario | Manual guiada por caso de prueba | Tester | Al pasar a preproducción |
-| Sin conexión | Captura, cola, sincronización y duplicados de M07 | Manual con red deshabilitada | Tester | Semana 4 y en cada regresión |
-| Carga | RNF de tiempo de respuesta y usuarios concurrentes | JMeter | Tester | Semana 8 y ante cambio de consultas |
+| Rendimiento | RNF de tiempo de respuesta y de reconocimiento | Herramienta de carga a definir en preproducción | Tester | Semana de estabilización y ante cambio de consultas |
 | Aceptación de usuario | Operación real con datos de planta | Manual | Jefatura de operaciones | Cierre de cada módulo |
 
 ### 6.2 Nomenclatura y trazabilidad de casos
 
-Cada caso de prueba se identifica como `CP-RF-xx-nn` y declara la historia y el criterio del que
-nace. Las pruebas automatizadas se nombran `test_<CODIGO>_<enunciado>`, por ejemplo:
+Dos niveles de caso de prueba, según `convenciones_codigo.md` §1:
+
+- **`CPnn`**, uno por requerimiento funcional (RF01 a RF10), para el indicador de la lista de
+  control de funcionalidad. Viven en `../03-pruebas/plan_de_pruebas.md`.
+- **`CP-HU-Mxx-nn-nn`**, uno por criterio de aceptación, para la cobertura de cada historia. Las
+  pruebas automatizadas se nombran `test_<CODIGO>_<enunciado>`, por ejemplo:
 
 ```python
-def test_HU_M03_01_CA03_peso_neto_se_calcula_y_no_es_editable(): ...
-def test_RN_M03_01_hora_registro_no_es_editable_por_ningun_rol(): ...
+def test_RN_M03_04_peso_neto_no_se_calcula_se_lee_del_ticket(): ...
+def test_RN_M04_02_valor_reconocido_y_confirmado_se_guardan_por_separado(): ...
 ```
 
 La cadena completa de trazabilidad es la de `convenciones_codigo.md` §5:
 
 ```
-Indicador operativo  ->  RF  ->  Módulo  ->  HU  ->  Caso de prueba  ->  Commit
+RF  ->  Módulo  ->  HU  ->  Caso de prueba  ->  Commit
 ```
 
 Cada eslabón debe poder recorrerse en ambos sentidos. Si un caso de prueba no se puede vincular a
-un criterio de aceptación, sobra o falta el requisito.
+un criterio de aceptación, sobra o falta el requisito. La relación de cada RF y cada caso con los
+indicadores de la tesis se consulta en `../02-trazabilidad/matriz_HU_RF_indicador.md`, no aquí.
 
 ### 6.3 Criterios de cobertura
 
@@ -208,6 +219,8 @@ por obligación:
 - El 100 % de las reglas de negocio (RN) tiene prueba.
 - El 100 % de los criterios de aceptación tiene caso de prueba ejecutado.
 - El 100 % de las acciones con permiso declarado tiene prueba de rechazo.
+- El 100 % de las reglas de validación (V1 a V5) tiene una prueba que sembra la inconsistencia
+  correspondiente y verifica que se detecta.
 - Los servicios de `services/` no bajan del 80 % de líneas cubiertas.
 - Las vistas y serializadores se cubren por las pruebas de contrato, no por pruebas propias.
 
@@ -215,22 +228,33 @@ por obligación:
 
 Se construyen con `factory-boy`, nunca con registros creados a mano dentro de la prueba. Existe un
 juego de datos de preproducción que reproduce un mes de operación de planta: catálogo completo,
-ingresos con y sin conexión, salidas de los tres tipos y un mes sin movimientos, porque el
-consolidado de un mes vacío es un caso de prueba obligatorio (RNF-M06-04).
+ingresos con reconocimiento exitoso y con reconocimiento fallido, ingresos con cada una de las
+inconsistencias V1 a V5, lotes en distintos puntos de su recorrido por las etapas, y un mes sin
+ingresos, porque la consolidación de un mes vacío es un caso de prueba obligatorio (RNF-M08-06).
+
+El conjunto de tickets reales para medir ERA y TDI se guarda aparte, con las inconsistencias
+sembradas documentadas en `../03-pruebas/plan_de_pruebas.md` §4 (DR-08): no se genera
+sintéticamente, porque la exactitud del reconocimiento solo es significativa sobre fotografías
+reales de tickets de la balanza.
 
 ### 6.5 Pruebas de regresión
 
 Antes de cada despliegue a producción se ejecuta la suite completa más el juego manual de
 regresión, que cubre como mínimo:
 
-1. Alta de ingreso en línea y verificación de las dos marcas de tiempo.
-2. Alta de ingreso sin conexión, sincronización y asignación de correlativo.
-3. Reintento de sincronización del mismo ingreso, que no debe duplicar.
-4. Anulación de un ingreso y su reflejo en el kardex.
-5. Consulta de stock contrastada con el cálculo manual.
-6. Generación del consolidado del mes en curso y de un mes sin movimientos.
-7. Búsqueda por correlativo y por criterios combinados.
-8. Acceso denegado a cada acción restringida, con un usuario de cada rol.
+1. Registro de un ingreso a partir de la imagen del ticket y verificación de las tres marcas de
+   tiempo como valores distintos.
+2. Reconocimiento de un ticket con un campo ilegible, que debe quedar vacío y editable, sin valor
+   inventado.
+3. Confirmación de un ingreso con una inconsistencia V4 (peso fuera de rango), que exige
+   justificación y no bloquea.
+4. Corrección de un dato de un ingreso ya registrado, con motivo y revalidación.
+5. Anulación de un ingreso y su exclusión de los totales, sin desaparecer del histórico.
+6. Consulta de un ingreso por placa y fecha, con su imagen de respaldo.
+7. Asignación de un ingreso a un lote y registro del paso por las cuatro etapas, respetando el
+   orden.
+8. Consolidado mensual de un mes con ingresos y de un mes sin ingresos, y su exportación.
+9. Acceso denegado a cada acción restringida, con un usuario de cada rol.
 
 ---
 
@@ -245,9 +269,9 @@ regresión, que cubre como mínimo:
 | Media | El criterio se cumple pero con comportamiento incorrecto en un caso secundario | Dentro de la semana siguiente |
 | Baja | Textos, presentación, comodidad de uso | Semana de estabilización |
 
-Un defecto que afecte la hora de registro, el correlativo o la cola de sincronización es **crítico
-por definición**, aunque parezca cosmético: son los tres puntos donde un error produce datos que
-parecen correctos.
+Un defecto que afecte alguna de las tres marcas de tiempo, el código único, o la separación entre
+el valor reconocido y el confirmado es **crítico por definición**, aunque parezca cosmético: son
+los puntos donde un error produce datos que parecen correctos.
 
 ### 7.2 Contenido mínimo de un reporte
 
@@ -255,9 +279,9 @@ Un defecto sin estos datos se devuelve sin analizar:
 
 ```
 ID:            DEF-nnn
-Historia:      HU-M03-01 / CA03
+Historia:      HU-M03-01 / CA07
 Entorno:       Preproducción, versión 0.4.2
-Precondición:  Usuario supervisor, catálogo cargado
+Precondición:  Usuario supervisor de planta, catálogo cargado
 Pasos:         1. ... 2. ... 3. ...
 Resultado esperado:  (texto literal del criterio de aceptación)
 Resultado obtenido:  (lo que ocurrió, con captura o respuesta de la API)
@@ -271,104 +295,105 @@ corrección no se aprueba.
 
 ## 8. Cronograma con entregables verificables
 
-Ocho semanas, coherente con `ARQ-01` §6 y `GUIA_MARCO_DE_TRABAJO.md` §7. La columna de
-verificación indica **quién** valida y **con qué evidencia**; sin esa evidencia la semana no se da
-por cerrada.
+El orden de construcción es el de `ARQ-01` §6: M01 y M02 primero, M03 después, M04 y M05 inyectados
+en M03 desde el principio, M09 junto con las operaciones que audita, y M06, M07, M08 al final,
+porque leen sobre lo que M03 ya produce. La columna de verificación indica **quién** valida y **con
+qué evidencia**; sin esa evidencia la semana no se da por cerrada.
 
 ### Semana 1 — Base técnica y M01
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
 | Esqueleto backend, PostgreSQL, ajustes por entorno | Proyecto que arranca con `runserver` y `pytest` en verde | Responsable técnico |
-| Esqueleto Angular con PWA habilitada | Aplicación que carga sin conexión con página de bienvenida | Responsable técnico |
-| M01 completo | Inicio de sesión, expiración, bloqueo por intentos, menú por rol | Tester: casos de HU-M01-01 a HU-M01-05 |
+| Esqueleto Angular | Aplicación que carga y navega entre pantallas | Responsable técnico |
+| M01 completo | Inicio y cierre de sesión, expiración, bloqueo por intentos, menú por rol | Tester: casos de HU-M01-01 a HU-M01-03 |
 | Decisiones de arquitectura firmadas | `decisiones_diseno.md` sin decisiones abiertas que bloqueen M03 | Responsable técnico |
 
-Riesgo de la semana: si la decisión sobre M07 no se cierra aquí, M03 se construirá dos veces.
+Riesgo de la semana: si D-12 (motor de reconocimiento) no tiene al menos un candidato para el
+piloto, M04 no puede arrancar en la semana 3.
 
-### Semana 2 — M02 y arranque de M03
-
-| Actividad | Entregable | Verificación |
-|---|---|---|
-| M02 catálogo maestro | Alta, edición y baja lógica de productos, vehículos y transportistas | Tester: HU-M02-01 a HU-M02-04 |
-| Titularidad como campo controlado | Filtro `?titularidad=PROPIO` operativo | Prueba de contrato automatizada |
-| Formulario de ingreso con validaciones | Formulario que reproduce el ticket de balanza | Revisión con jefatura de operaciones |
-
-### Semana 3 — M03 completo y M08
+### Semana 2 — M02 y piloto de motores de reconocimiento
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Alta, edición, listado y detalle de ingresos | Ingreso registrado con hora de pesaje y hora de registro separadas | Tester: HU-M03-01 a HU-M03-07 |
-| Asignación de correlativo en servidor | Secuencia sin saltos verificada con altas concurrentes | Prueba de integración |
-| Anulación con motivo | Ingreso anulado visible en el histórico, nunca eliminado | Tester |
-| M08 eventos de creación y modificación | Registro de evento por cada escritura, con usuario y momento | Prueba automatizada por acción |
+| M02 catálogo maestro | Alta, edición y baja lógica de vehículos, tipos de mineral y transportistas | Tester: HU-M02-01 a HU-M02-03 |
+| Capacidad de carga del vehículo | Campo disponible para que V4 lo consuma en M05 | Prueba de contrato automatizada |
+| Piloto de D-12 | Comparación de 20 a 30 tickets reales entre dos o tres motores; motor elegido y documentado | Responsable técnico |
 
-Hito de la semana: a partir de aquí el sistema ya produce el dato con el que se calcula I1.
-
-### Semana 4 — M07 sobre M03
+### Semana 3 — M03 con M04 y M05 inyectados
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Cola local y borrador del formulario | Ingreso capturado sin conexión que sobrevive al cierre de la aplicación | Tester con red deshabilitada |
-| Endpoint de lote | Sincronización que asigna correlativo definitivo y conserva la hora de captura | Prueba de integración y verificación manual |
-| Idempotencia por identificador local | Reenvío del mismo lote que no genera duplicados | Caso de prueba obligatorio |
-| Indicador de estado de conexión | Estado visible y contador de pendientes | Tester |
+| Captura de imagen y propuesta de reconocimiento | Foto del ticket que devuelve los seis campos con su confianza | Tester: HU-M04-01 |
+| Pantalla de confirmación con validación | Inconsistencias señaladas junto al campo, con mensaje literal de V1 a V5 | Tester: HU-M05-01 |
+| Registro del ingreso | Ingreso persistido con código único y tres marcas de tiempo distintas | Tester: HU-M03-01 |
+| Corrección y anulación | Corrección con motivo y revalidación; anulación excluida de totales | Tester: HU-M03-02, HU-M03-03 |
 
-Este es el entregable de mayor riesgo del proyecto. Se prueba con el dispositivo real que usará el
-supervisor, no solo con el simulador del navegador.
+Hito de la semana: a partir de aquí el sistema produce el dato completo que la ficha de observación
+de la investigación contrasta en el postest.
 
-### Semana 5 — M04 y M05
-
-| Actividad | Entregable | Verificación |
-|---|---|---|
-| Registro de salidas por venta, merma y ajuste | Salida registrada que descuenta stock | Tester: HU-M04-01 a HU-M04-03 |
-| Consulta de existencias | Stock por producto coincidente con el cálculo manual de la planta | Jefatura de operaciones, contraste con su hoja actual |
-| Kardex por producto | Movimientos ordenados con saldo resultante por línea | Tester |
-| Saldo a fecha de corte | Reconstrucción del saldo a una fecha pasada | Prueba automatizada |
-
-Precondición: el criterio de estimación de merma por humedad debe estar definido antes del inicio
-de la semana. Si no lo está, M04 se implementa igual y la interpretación de I4 queda pendiente,
-pero se anota como riesgo abierto.
-
-### Semana 6 — M09 y M08 completo
+### Semana 4 — M09 Auditoría
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Búsqueda por correlativo | Recuperación del detalle completo de un ingreso en menos de un minuto | Medición cronometrada por el tester |
-| Búsqueda por criterios combinados | Fecha, placa y producto combinables | Tester |
-| M08 vista de consulta de auditoría | Filtros por fecha, usuario y acción, solo lectura | Tester |
-| Registro de exportaciones | Evento `EXPORTAR` por cada descarga | Prueba automatizada |
+| Registro de eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección | Prueba automatizada por acción |
+| Registro de acceso rechazado | Evento por cada intento sin permiso | Tester |
+| Consulta del historial de una entidad | Historial cronológico con valores anteriores y nuevos | Tester: HU-M09-02 |
 
-### Semana 7 — M06
+### Semana 5 — M06 Trazabilidad
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Consolidado mensual | Reporte generado en dos acciones, con detalle por correlativo | Jefatura de operaciones |
-| Mes sin movimientos | Consolidado que informa ausencia de producción, sin error | Caso de prueba obligatorio |
-| Exportación a Excel y PDF | Archivos abiertos correctamente en el equipo de la empresa | Tester |
-| Formato de declaración semestral | Archivo con la estructura oficial vigente | Jefatura de operaciones |
-| Endpoint de disponibilidad histórica | Respuesta mes a mes con indicación de consolidado disponible | Prueba de contrato |
+| Gestión de lotes de proceso | Apertura, composición y cierre de un lote | Tester: HU-M06-01 |
+| Registro del paso por etapa | Secado, zarandeo, molienda y ensacado, en orden | Tester: HU-M06-02 |
+| Consulta de trazabilidad de un ingreso | Recorrido de las cuatro etapas a través del lote | Tester: HU-M06-03 |
 
-Precondición: el formato oficial debe estar en manos del equipo antes del inicio de la semana.
+Precondición: la forma real de agrupar el mineral en cancha debe verificarse con la jefatura de
+operaciones antes de esta semana. Si el vínculo directo es más fiel que el lote, este módulo se
+ajusta antes de implementarse.
 
-### Semana 8 — Estabilización, carga y despliegue
+### Semana 6 — M07 Consulta
+
+| Actividad | Entregable | Verificación |
+|---|---|---|
+| Búsqueda por placa y fecha | Recuperación del ingreso y su ticket de respaldo en menos de un minuto | Medición cronometrada por el tester |
+| Listado con filtros combinables | Fecha, tipo de mineral, vehículo, titularidad y estado | Tester |
+| Detalle completo del ingreso | Datos, imagen, reconocimiento, validaciones y trazabilidad en una vista | Tester: HU-M07-01, HU-M07-02 |
+
+### Semana 7 — M08 Consolidación
+
+| Actividad | Entregable | Verificación |
+|---|---|---|
+| Total acumulado mensual por tipo de mineral | Reporte generado a demanda, sin acumulado almacenado | Jefatura de operaciones |
+| Mes sin ingresos | Consolidado que informa ausencia de producción, sin error | Caso de prueba obligatorio |
+| Exportación a hoja de cálculo | Archivo con el mismo total que la consulta en pantalla | Tester |
+
+### Semana 8 — Estabilización e instrumentos de la variable independiente
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
 | Suite completa de regresión | Ejecución sin fallos de las pruebas automatizadas y del juego manual | Tester |
-| Pruebas de carga con JMeter en preproducción | Protocolo de carga con tiempos de respuesta por endpoint frente a los RNF | Tester y responsable técnico |
+| Lista de control de funcionalidad (RFC, CPS) | Los 10 RF y sus 10 casos de prueba superados | Tester y responsable técnico |
+| Ficha de capacidad inteligente, hojas A, B y C (ERA, TDI, TCA) | Conjunto de prueba de 50 tickets y 10 inconsistencias sembradas, ejecutado y registrado | Tester |
+| Cuestionario SUS | Aplicado a los usuarios que ejecutan las tareas T01 a T06 | Jefatura de operaciones |
 | Corrección de defectos abiertos | Ningún defecto crítico ni alto pendiente | Tester |
-| Despliegue a producción | Versión etiquetada, registro de despliegue y respaldo previo | Responsable técnico |
-| Acta de pruebas y de aceptación | Documento firmado con el resultado por módulo | Todos los roles |
+| Congelamiento de motor y reglas (D-16) | Versión del motor y de las reglas V1 a V5 fijada antes de iniciar el postest | Responsable técnico |
 
-No se desarrolla funcionalidad nueva en esta semana. Una historia que no esté terminada en la
-semana 7 se retira del alcance y se documenta, en lugar de comprimir la estabilización.
+No se desarrolla funcionalidad nueva en esta semana. Esta semana **no** aplica una prueba de carga
+con una herramienta específica de la tesis: los instrumentos que se aplican son los de la variable
+independiente (lista de control, ficha de capacidad inteligente, SUS), no un protocolo de carga
+técnico. Una historia que no esté terminada en la semana 7 se retira del alcance y se documenta, en
+lugar de comprimir la estabilización.
+
+**Condición de todo el cronograma:** el sistema queda listo al final de la semana 8, pero no entra
+en operación real en planta hasta que el pretest de la investigación —sobre el proceso manual
+actual— haya concluido (`../00-tesis/marco_tesis.md` §11).
 
 ---
 
 ## 9. Criterios de escalabilidad por entregable
 
-Cada entregable se construye pensando en el volumen de dos años de operación, no en el de la
+Cada entregable se construye pensando en el volumen de operación continuada, no en el de la
 demostración. Los controles concretos son estos:
 
 | Ámbito | Regla | Cómo se verifica |
@@ -376,13 +401,13 @@ demostración. Los controles concretos son estos:
 | Consultas | Todo listado pagina; el tamaño de página tiene tope | Prueba de contrato con más registros que el tope |
 | Índices | Los declarados en el modelo de datos se crean en la primera migración del módulo | Revisión del `sqlmigrate` en el PR |
 | Consultas repetidas | Ninguna vista genera consultas en bucle | `assertNumQueries` en la prueba del listado |
-| Saldos | El saldo se lee denormalizado, no se recalcula recorriendo el histórico | Prueba de tiempo de respuesta con histórico cargado |
+| Totales | El total mensual y el de un lote se calculan por agregación en una sola consulta, nunca recorriendo registros en el lenguaje de aplicación | Prueba de tiempo de respuesta con histórico cargado |
 | Contratos | La API se versiona en la ruta; los cambios incompatibles abren `/api/v2/` | Revisión de PR |
-| Acoplamiento | Un módulo nuevo se agrega sin modificar los existentes (exportadores, generadores) | Revisión de PR contra los ejemplos de `ARQ-03` §4 |
+| Acoplamiento | Un módulo nuevo se agrega sin modificar los existentes (motor de reconocimiento, reglas de validación, exportadores) | Revisión de PR contra los ejemplos de `ARQ-03` §4 |
 | Datos | Cantidades en decimal; sin borrado físico; sin campos de texto libre donde hay dominio cerrado | Prueba de regla de negocio |
-| Crecimiento del histórico | Las consultas de existencias y búsqueda se miden con volumen simulado de un año | Prueba de carga de la semana 8, repetida ante cambios de consulta |
+| Crecimiento del histórico | Las consultas de consulta y consolidación se miden con volumen simulado de un año | Prueba de rendimiento de la semana de estabilización, repetida ante cambios de consulta |
 
-La prueba de carga no se ejecuta una sola vez al final. Se repite cada vez que se modifica una
+La prueba de rendimiento no se ejecuta una sola vez al final. Se repite cada vez que se modifica una
 consulta que sostiene un RNF de tiempo de respuesta.
 
 ---
@@ -397,18 +422,21 @@ consulta que sostiene un RNF de tiempo de respuesta.
 | Cierre de semana | Semanal | 1 hora | Entregable verificado o causa documentada del desvío |
 | Revisión con la jefatura de operaciones | Al cierre de cada módulo | 1 hora | Acta de aceptación |
 
-### 10.2 Indicadores de seguimiento
+### 10.2 Indicadores de seguimiento del proyecto
 
 | Indicador | Cálculo | Meta |
 |---|---|---|
-| Avance de implementación | Módulos terminados sobre 9 planificados | Según cronograma semanal |
+| Avance de implementación | RF cumplidos sobre 10 (RFC) | Según cronograma semanal |
 | Historias aceptadas | Historias con acta sobre historias del módulo | 100 % antes de cerrar el módulo |
 | Defectos abiertos por severidad | Conteo vigente | Cero críticos y altos antes de desplegar |
 | Defectos escapados a producción | Defectos hallados en producción sobre total del módulo | Menor a 10 % |
 | Reglas de negocio con prueba | RN cubiertas sobre RN declaradas | 100 % |
 
-Los indicadores operativos del sistema (I1 a I6) se miden sobre la operación, no sobre el
-proyecto, y se registran aparte una vez desplegado.
+El denominador del avance son los **10 requerimientos funcionales**, no un número de módulos: un
+módulo puede cubrir varios RF y viceversa (`ARQ-01` §1). Los indicadores de la variable dependiente
+de la investigación (I1 a I6) se miden por observación directa durante el pretest y el postest, no
+sobre estos datos de seguimiento del proyecto; su relación con el sistema vive únicamente en
+`../02-trazabilidad/matriz_HU_RF_indicador.md`.
 
 ### 10.3 Control de cambios
 
@@ -425,7 +453,6 @@ razón. Ningún cambio entra por conversación informal.
 |---|---|---|
 | Matriz de trazabilidad HU-RF-indicador | `../02-trazabilidad/matriz_HU_RF_indicador.md` | Responsable técnico |
 | Plan de pruebas y casos | `../03-pruebas/plan_de_pruebas.md` | Tester |
-| Protocolo y resultados de carga | `../03-pruebas/protocolo_de_carga.md` | Tester |
 | Registro de defectos | `../03-pruebas/registro_defectos.md` | Tester |
 | Actas de aceptación por módulo | `../03-pruebas/actas/` | Jefatura de operaciones |
 | Registro de despliegues | `../04-despliegue/registro_despliegues.md` | Responsable técnico |
@@ -437,16 +464,15 @@ razón. Ningún cambio entra por conversación informal.
 ### 12.1 Caso de prueba
 
 ```
-CP-RF-01-03
-Historia:            HU-M03-01
-Criterio:            CA03
-Objetivo:            Verificar que el peso neto se calcula y no admite edición manual
-Precondiciones:      Usuario supervisor autenticado; catálogo de productos cargado
-Datos de entrada:    Peso bruto 32.50 tn; tara 12.30 tn
-Pasos:               1. Abrir el formulario de ingreso
-                     2. Registrar peso bruto y tara
-                     3. Salir del campo tara
-Resultado esperado:  El sistema muestra 20.20 tn como peso neto y el campo no es editable
+CP-HU-M05-01-02
+Historia:            HU-M05-01
+Criterio:            CA02
+Objetivo:            Verificar que un peso neto fuera del rango de carga exige justificacion
+Precondiciones:      Usuario supervisor de planta autenticado; vehiculo con capacidad_tn cargada
+Datos de entrada:    Peso neto 35.00 tn; capacidad del vehiculo 30.00 tn
+Pasos:               1. Completar el registro con los datos del ticket
+                     2. Intentar confirmar sin justificacion
+Resultado esperado:  El sistema rechaza mostrando "Debe indicar la justificacion del peso fuera de rango"
 Resultado obtenido:
 Estado:              Aprobado / Rechazado
 Ejecutado por:       Fecha:
@@ -455,9 +481,9 @@ Ejecutado por:       Fecha:
 ### 12.2 Acta de aceptación de módulo
 
 ```
-Módulo:              M03 — Registro de ingresos
+Módulo:              M04 — Reconocimiento automático del ticket
 Versión probada:     0.5.0 (preproducción)
-Historias incluidas: HU-M03-01 … HU-M03-07
+Historias incluidas: HU-M04-01, HU-M04-02
 Casos ejecutados:    n     Aprobados: n     Rechazados: n
 Defectos abiertos:   Críticos 0  Altos 0  Medios n  Bajos n
 Observaciones:
@@ -473,7 +499,7 @@ Fecha y hora:
 Entorno:      Producción
 Alcance:      Módulos y correcciones incluidas
 Respaldo:     Ruta y hora del respaldo previo
-Verificación posterior: Alta de ingreso de prueba, consulta de stock, generación de consolidado
+Verificación posterior: Registro de un ingreso de prueba, reconocimiento, consulta y consolidado
 Responsable:
 ```
 
@@ -481,9 +507,11 @@ Responsable:
 
 ## 13. Referencias
 
-- Módulos y cronograma: `../model-c4/ARQ-01_Modulos_del_Sistema.md`
+- Módulos y orden de construcción: `../model-c4/ARQ-01_Modulos_del_Sistema.md`
 - Arquitectura técnica y contrato de rutas: `../model-c4/ARQ-02_Arquitectura_Tecnica.md`
 - Flujo de trabajo por módulo y definición de terminado: `../00-arquitectura/GUIA_MARCO_DE_TRABAJO.md`
 - Convención de códigos, ramas y trazabilidad: `../00-arquitectura/convenciones_codigo.md`
 - Decisiones que condicionan la implementación: `../00-arquitectura/decisiones_diseno.md`
+- Marco de la tesis, instrumentos de la variable independiente y condición del pretest: `../00-tesis/marco_tesis.md`
 - Historias y criterios de aceptación: `../HistoriasUsuario.md`
+- Plan de pruebas: `../03-pruebas/plan_de_pruebas.md`
