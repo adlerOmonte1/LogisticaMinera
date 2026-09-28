@@ -30,7 +30,7 @@ Estructura de una prueba, espejo del criterio:
 
 ```python
 def test_ca02_tara_mayor_o_igual_que_bruto_es_rechazada(...):
-    # Dado que la tara ingresada es mayor o igual que el peso bruto (V2)
+    # Dado que la tara del vehiculo es mayor o igual que el peso bruto (V2)
     # cuando el usuario intenta confirmar
     # entonces el sistema rechaza mostrando "La tara no puede ser mayor o igual que el peso bruto"
 ```
@@ -63,14 +63,15 @@ verificable por observación directa aunque no aparezca aquí como indicador de 
 
 | Prueba | Protege |
 |---|---|
-| `fecha_hora_ticket`, `hora_inicio_registro` y `hora_fin_registro` se persisten como tres valores distintos, y los dos últimos no se pueden editar | Integridad del registro |
+| `fecha_hora_pesaje`, `hora_inicio_registro` y `hora_fin_registro` se persisten como tres valores distintos, y los dos últimos no se pueden editar | Integridad del registro |
 | Un valor propuesto por el reconocimiento no se persiste hasta la confirmación del usuario | D-13 |
 | `valor_reconocido` y `valor_confirmado` se guardan en columnas separadas, no se sobrescriben | Evidencia de si el reconocimiento funciona |
-| El peso neto se persiste tal como llega del ticket; ninguna prueba pasa si se calcula como bruto menos tara | RN-M03-04 |
+| El peso neto lo calcula el servidor como bruto menos la tara aplicada, se ignora si llega en la petición, y no cambia al modificar después la tara del vehículo | RN-M03-04, RN-M02-13 |
+| Un ingreso de un vehículo sin tara queda En proceso, sin neto, y el destare lo pasa a Registrado | RN-M03-17 a RN-M03-20 |
 | Dos confirmaciones simultáneas no producen el mismo código | Identidad única del ingreso |
 | Las cinco reglas V1 a V5 se evalúan siempre, aunque la primera ya haya fallado | RN-M05-04 |
 | Una petición directa a la API, sin pasar por el formulario, es rechazada igual que una del formulario | D-08 |
-| El total mensual excluye los ingresos anulados y coincide entre la consulta y la exportación | RN-M08-01, RN-M08-05 |
+| El total mensual considera solo los ingresos Registrados —excluye anulados y En proceso— y coincide entre la consulta y la exportación | RN-M08-01, RN-M08-05 |
 | El registro de una etapa fuera de orden es rechazado | RN-M06-06 |
 | Cada operación restringida rechaza al rol no autorizado desde el servidor, y queda registrada en auditoría | D-08, RN-M09-04 |
 
@@ -79,8 +80,8 @@ verificable por observación directa aunque no aparezca aquí como indicador de 
 No son pruebas unitarias: son un protocolo sobre un conjunto fijo de tickets reales, descrito en
 `docs/03-pruebas/plan_de_pruebas.md` §4.
 
-- **ERA** se mide comparando, campo por campo, el valor reconocido contra el valor real de 50
-  tickets, con el motor y su versión congelados durante toda la medición (D-16).
+- **ERA** se mide comparando, campo por campo, el valor reconocido contra el valor real de los tres
+  campos que imprime el ticket —placa, fecha y peso bruto— en 50 tickets (150 lecturas), con el motor y su versión congelados durante toda la medición (D-16).
 - **TDI** se mide sembrando 10 inconsistencias —2 por cada regla V1 a V5— y verificando cuántas
   detecta el sistema con la regla correcta.
 

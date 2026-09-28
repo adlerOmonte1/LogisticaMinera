@@ -18,7 +18,8 @@ sequenceDiagram
     else Periodo valido
         API->>REP: calcular(mes, anio)
         REP->>DB: Agregar peso neto y conteo por tipo de mineral
-        Note over REP,DB: Excluye ingresos anulados RN-M08-01
+        Note over REP,DB: Solo ingresos registrados RN-M08-01
+        REP->>DB: Contar ingresos en proceso del periodo
         DB-->>REP: Filas por tipo de mineral con actividad
 
         alt Sin ingresos en el periodo

@@ -42,9 +42,9 @@ dentro de otro.
 | Código | Módulo | Responsabilidad | RF que cubre |
 |---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 |
-| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad y capacidad, y transportistas | RF06 (soporte) |
-| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación y código único | RF01, RF04, RF05, RF06 |
-| M04 | Reconocimiento automático del ticket | Leer los seis campos del ticket con su nivel de confianza | RF02 |
+| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) |
+| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 |
+| M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza | RF02 |
 | M05 | Validación automática de consistencia | Aplicar las reglas V1 a V5 y registrar su resultado | RF03 |
 | M06 | Trazabilidad del proceso | Asignar ingresos a lotes y registrar su paso por cada etapa | RF07 |
 | M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |
@@ -61,15 +61,17 @@ puede atribuirse a un responsable y el registro de eventos de M09 no tiene a qui
 cambios. Cubre RF10.
 
 **M02 — Catálogo maestro.** El ingreso referencia datos que no se digitan: el vehículo, su
-titularidad y su capacidad, y el tipo de mineral. Que esos datos sean un catálogo y no texto libre
-es lo que permite derivar el tipo de vehículo de la placa (D-06) y contrastar el peso neto con la
-capacidad declarada (regla V4). Un catálogo escrito a mano en cada ingreso haría ambas cosas
-imposibles.
+titularidad, su capacidad y su tara, y el tipo de mineral. Que esos datos sean un catálogo y no texto
+libre es lo que permite derivar el tipo de vehículo de la placa (D-06), calcular el peso neto con la
+tara obtenida en el destare del primer viaje (D-17) y contrastarlo con la capacidad declarada (regla
+V4). Un catálogo escrito a mano en cada ingreso haría las tres cosas imposibles.
 
 **M03 — Registro de ingresos.** Es el núcleo. La unidad de registro del sistema es el ingreso de
 mineral a planta, y aquí se materializa: recibe la imagen, orquesta el reconocimiento y la
-validación, recoge la confirmación del usuario y persiste el ingreso con su código único y sus tres
-marcas de tiempo. M03 no lee la imagen ni aplica las reglas: las delega y decide con su resultado.
+validación, recoge la confirmación del usuario, calcula el peso neto con la tara del vehículo y
+persiste el ingreso con su código único y sus tres marcas de tiempo. Cuando el vehículo viaja por
+primera vez, el ingreso queda En proceso hasta que se registre su destare. M03 no lee la imagen ni
+aplica las reglas: las delega y decide con su resultado.
 
 **M04 — Reconocimiento automático del ticket.** Existe como módulo propio, y no como una función
 dentro de M03, por dos razones. La primera es de sustitución: el motor concreto está pendiente de

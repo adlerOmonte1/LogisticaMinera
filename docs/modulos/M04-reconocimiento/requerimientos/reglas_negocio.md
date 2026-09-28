@@ -34,6 +34,6 @@ convierte un hueco visible en un error silencioso.
 ## Nota sobre RN-M04-07 y RN-M04-08
 
 El reconocimiento es una ayuda, no un requisito del registro. Si el motor está caído, el supervisor
-escribe los seis datos y el ingreso se registra igual: lo único que se pierde es tiempo. Por eso el
+escribe los tres datos y el ingreso se registra igual: lo único que se pierde es tiempo. Por eso el
 adaptador del motor vive aislado detrás de una interfaz y su fallo se trata como un caso previsto,
 no como un error del sistema.

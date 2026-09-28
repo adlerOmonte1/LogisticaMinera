@@ -12,7 +12,7 @@
 
 | Requerimiento | Situación que resuelve |
 |---|---|
-| RU-M04-01 | Los seis datos del ticket se copian a mano, primero al papel en planta y después al computador en la oficina. Cada copia añade una oportunidad de equivocarse |
-| RU-M04-02 | Revisar los seis campos con el mismo cuidado toma tanto tiempo como escribirlos; sin una señal de qué revisar, el usuario termina revisando nada |
+| RU-M04-01 | Los datos del ticket se copian a mano, primero al papel en planta y después al computador en la oficina. Cada copia añade una oportunidad de equivocarse |
+| RU-M04-02 | Revisar todos los campos con el mismo cuidado toma tanto tiempo como escribirlos; sin una señal de qué revisar, el usuario termina revisando nada |
 | RU-M04-03, RU-M04-04 | El ticket se imprime en papel térmico y se maneja con las manos sucias: hay tickets que sencillamente no se dejan leer, y el trabajo no puede detenerse por eso |
 | RU-M04-05 | Hoy no hay forma de saber si la transcripción es fiel, porque no queda registro de qué decía el original |

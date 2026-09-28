@@ -14,35 +14,41 @@
 class Ingreso(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/")
-    fecha_hora_ticket = models.DateTimeField()
+    fecha_hora_pesaje = models.DateTimeField()
     hora_inicio_registro = models.DateTimeField(editable=False)
     hora_fin_registro = models.DateTimeField(editable=False)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
     tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
     peso_bruto_tn = models.DecimalField(max_digits=8, decimal_places=2)
-    tara_tn = models.DecimalField(max_digits=8, decimal_places=2)
-    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2)
+    tara_tn = models.DecimalField(max_digits=8, decimal_places=2, null=True, editable=False)
+    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2, null=True, editable=False)
     numero_ticket = models.CharField(max_length=20, blank=True)
-    justificacion_peso = models.TextField(blank=True)
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
-    estado = models.CharField(max_length=10, choices=ESTADOS, default=REGISTRADO)
+    estado = models.CharField(max_length=10, choices=ESTADOS)  # EN_PROCESO, REGISTRADO, ANULADO
     motivo_anulacion = models.TextField(blank=True)
 ```
 
 Decisiones no obvias:
 
-- **`peso_neto_tn` no es `editable=False` ni una propiedad calculada.** Es un dato del ticket
-  (RN-M03-04). Quien lo convierta en propiedad rompe la regla V1 sin que ninguna prueba de M03 falle:
-  la comprobación vive en M05.
+- **`peso_neto_tn` y `tara_tn` son `editable=False` y los asigna el servicio** (RN-M03-04, D-17).
+  El neto se calcula como bruto menos la tara del vehículo en el momento de confirmar, y se
+  **almacena**, no se deriva en una propiedad: una propiedad que leyera la tara del catálogo
+  reescribiría el neto de todo el histórico cuando la Gerencia actualizara la tara de un vehículo.
+- **`tara_tn` y `peso_neto_tn` admiten nulo solo en `EN_PROCESO`.** Una restricción de base lo
+  garantiza: si el estado es `REGISTRADO`, ambos son obligatorios.
+- **`fecha_hora_pesaje` combina dos orígenes**: la fecha que reconoce M04 y la hora que digita el
+  usuario. El serializer recibe ambas partes por separado y el servicio las compone; así la
+  comparación entre lo reconocido y lo confirmado se hace solo sobre la fecha, que es lo que el
+  ticket imprime.
 - **Las dos marcas del servidor son `editable=False` y las asigna el servicio**, nunca
   `auto_now_add` (D-01). `auto_now_add` fijaría la hora de inserción, que no es la del inicio real de
   la operación.
 - **`on_delete=PROTECT` en las tres claves foráneas.** Nada que tenga ingresos asociados puede
   borrarse, ni siquiera desde el admin.
-- **Restricciones en la base, además del servicio:** unicidad de `numero_ticket` condicionada a
-  `estado='REGISTRADO'`, y comprobaciones de que la tara sea menor que el bruto y de que los pesos
-  sean positivos. Son salvaguardas: la validación con mensaje para el usuario ocurre en M05.
-- **Índices desde la primera migración:** `(vehiculo, fecha_hora_ticket)`, `(fecha_hora_ticket,
+- **Restricciones en la base, además del servicio:** unicidad de `numero_ticket` entre los ingresos
+  no anulados, y comprobaciones de que la tara aplicada sea menor que el bruto y de que los pesos sean
+  positivos. Son salvaguardas: la validación con mensaje para el usuario ocurre en M05.
+- **Índices desde la primera migración:** `(vehiculo, fecha_hora_pesaje)`, `(fecha_hora_pesaje,
   tipo_mineral)` y `estado`. Añadirlos después cambiaría el comportamiento a mitad de operación.
 
 ### Reconocimiento y validación como dependencias inyectadas
@@ -64,8 +70,14 @@ pueda fijar «ahora» no puede verificarlas.
 ### Servicio: qué ocurre dentro de la transacción
 
 `registrar_ingreso()` abre `transaction.atomic()` y dentro hace, en este orden: obtener el código
-con bloqueo sobre el contador, persistir el ingreso con la hora de fin, persistir los valores
-reconocidos y confirmados de cada campo, y registrar el evento de auditoría.
+con bloqueo sobre el contador, leer la tara vigente del vehículo, calcular el neto si hay tara,
+persistir el ingreso —Registrado o En proceso— con la hora de fin, persistir los valores reconocidos
+y confirmados de cada campo, y registrar el evento de auditoría.
+
+`registrar_destare()` abre su propia transacción: pide a M02 que guarde la tara en el vehículo,
+recorre los ingresos En proceso de ese vehículo con `select_for_update()`, les asigna la tara y el
+neto, los pasa a Registrado y registra el evento. El bloqueo impide que dos usuarios destaren el
+mismo vehículo a la vez con taras distintas.
 
 Fuera de la transacción quedan el reconocimiento y la primera validación, porque ocurren antes de
 que el usuario confirme y no escriben nada del ingreso.
@@ -110,24 +122,30 @@ sí lo detecta usa el reloj inyectado para simular que entre la carga de la imag
 transcurren varios minutos, y comprueba que el inicio corresponde al primer momento y el fin al
 segundo.
 
-**Riesgo secundario:** que alguien convierta `peso_neto_tn` en un campo calculado durante una
-refactorización, por parecer redundante. Ninguna prueba de M03 fallaría. La defensa es la prueba de
-M05 que registra un ingreso cuyo neto no coincide con la resta y espera que la regla V1 lo señale;
-si el neto se calcula, esa prueba deja de poder construirse.
+**Riesgo secundario: que el neto se calcule al vuelo.** Convertir `peso_neto_tn` en una propiedad
+que lea la tara del catálogo parece más limpio y pasa todas las pruebas de registro. El defecto
+aparece solo cuando la Gerencia actualiza la tara de un vehículo: todo su histórico cambia de
+toneladas sin que nadie lo haya corregido. La prueba que lo detecta registra un ingreso, modifica
+la tara del vehículo y comprueba que el neto de ese ingreso no cambió.
+
+**Tercer riesgo: el ingreso En proceso olvidado.** Si nadie registra el destare, el ingreso queda
+fuera de todos los totales de forma indefinida. La interfaz debe mostrar siempre cuántos ingresos
+están pendientes de destare (RNF-M03-15), y el destare debe completar de una vez todos los ingresos
+En proceso del mismo vehículo (HU-M03-04 CA07).
 
 ## Dependencias
 
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución de cada operación a un usuario |
-| M02 | Vehículo vigente con titularidad y capacidad; catálogo de tipos de mineral |
-| M04 | Propuesta de los seis campos del ticket, con su confianza |
+| M02 | Vehículo vigente con titularidad, capacidad y tara; alta rápida de vehículos y registro de la tara en el destare; catálogo de tipos de mineral |
+| M04 | Propuesta de la placa, la fecha y el peso bruto del ticket, con su confianza |
 | M05 | Evaluación de las reglas V1 a V5 |
-| M09 | Registro de los eventos de creación, corrección y anulación |
+| M09 | Registro de los eventos de creación, corrección, anulación y destare |
 
 | Es requerido por | Para |
 |---|---|
-| M06 | Asignar ingresos a un lote de proceso |
+| M06 | Asignar ingresos Registrados a un lote de proceso |
 | M07 | Consultar un ingreso por placa y fecha con su respaldo |
 | M08 | Calcular el total acumulado mensual por tipo de mineral |
 
@@ -138,3 +156,4 @@ si el neto se calcula, esa prueba deja de poder construirse.
 | Medio de almacenamiento y retención de las imágenes (D-14) | Define `upload_to`, el respaldo y el acceso restringido de RNF-M03-11 |
 | Motor de reconocimiento (D-12) | No bloquea: el servicio depende de la interfaz. Sí condiciona RNF-M03-02 |
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede completarse el campo obligatorio de tipo de mineral |
+| Quién registra el destare en planta (DR-10) | Define si el Supervisor de planta mantiene el permiso de registrar destares o se reserva al Administrativo |

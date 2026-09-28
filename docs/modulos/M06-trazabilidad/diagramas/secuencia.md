@@ -31,6 +31,9 @@ sequenceDiagram
     else Ingreso anulado
         SRV-->>API: Rechazo RN-M06-03
         API-->>NG: 400 No se puede asignar un ingreso anulado
+    else Ingreso en proceso sin destare
+        SRV-->>API: Rechazo RN-M06-13
+        API-->>NG: 400 El ingreso esta en proceso falta el destare del vehiculo
     else Ingreso en lote cerrado
         SRV-->>API: Rechazo RN-M06-04
         API-->>NG: 409 El lote ya fue cerrado

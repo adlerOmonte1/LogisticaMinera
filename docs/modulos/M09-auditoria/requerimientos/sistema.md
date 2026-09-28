@@ -13,3 +13,4 @@
 | RS-M09-09 | El sistema expone la consulta del historial de una entidad, ordenado cronológicamente | RU-M09-04 |
 | RS-M09-10 | El sistema informa cuando una entidad no tiene eventos registrados | RU-M09-04 |
 | RS-M09-11 | El sistema mantiene el catálogo de acciones auditables como un conjunto cerrado y compartido por todos los módulos | — (mantenibilidad) |
+| RS-M09-12 | El sistema guarda, en las modificaciones que lo exigen —corrección de un ingreso y cambio de tara—, el motivo escrito por el usuario en una columna propia del evento | — (integridad con M02 y M03) |

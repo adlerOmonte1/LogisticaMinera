@@ -18,6 +18,7 @@
 | RN-M06-10 | Un lote sin ingresos no se cierra | Existiría una carga vacía recorriendo el proceso |
 | RN-M06-11 | El recorrido de un ingreso es el de su lote; un ingreso sin lote ha recorrido cero etapas | Un ingreso recién registrado aparecería como dato incompleto en lugar de como lo que es |
 | RN-M06-12 | El registro de una etapa queda atribuido al usuario que lo hizo | No se podría saber quién afirmó que la carga pasó por esa etapa |
+| RN-M06-13 | Un ingreso En proceso, pendiente del destare de su vehículo, no se asigna a ningún lote | La carga sumaría un ingreso sin peso neto y su total de toneladas quedaría incompleto sin advertirlo |
 
 ## Nota sobre RN-M06-01 y RN-M06-11
 

@@ -75,15 +75,54 @@ sequenceDiagram
     participant REP as RepositorioCatalogo
 
     S->>NG: Abre el formulario de registro de un ingreso
-    NG->>API: GET /api/v1/catalogo/vehiculos/?vigente=true
-    API->>REP: listar_vigentes()
-    REP-->>API: Vehiculos activos
-    API-->>NG: 200 con la lista
-
     NG->>API: GET /api/v1/catalogo/tipos-mineral/?vigente=true
     API->>REP: listar_vigentes()
     REP-->>API: Tipos de mineral activos
     API-->>NG: 200 con la lista
 
-    NG-->>S: Selectores de placa y tipo de mineral poblados
+    NG-->>S: Selector de tipo de mineral poblado
+
+    Note over NG: La placa no se elige de una lista, se reconoce del ticket
+    NG->>API: GET /api/v1/catalogo/vehiculos/?placa=reconocida
+    API->>REP: buscar_por_placa(placa)
+    alt Vehiculo registrado
+        REP-->>API: Vehiculo con titularidad capacidad y tara
+        API-->>NG: 200 con el vehiculo
+    else Placa no registrada
+        REP-->>API: Ninguno
+        API-->>NG: 200 lista vacia
+        NG-->>S: Ofrece el alta del vehiculo en la misma pantalla
+    end
+```
+
+## S-M02-04 · Modificación de la tara por el Administrador (HU-M02-01, CA10 y CA11)
+
+```mermaid
+sequenceDiagram
+    actor AD as Administrador
+    participant NG as Angular
+    participant API as Django REST
+    participant SRV as ServicioCatalogo
+    participant DB as PostgreSQL
+    participant AUD as Auditoria M09
+
+    AD->>NG: Indica la nueva tara y el motivo
+    NG->>API: PATCH /api/v1/catalogo/vehiculos/{id}/tara/
+    API->>API: Verificar rol Administrador
+
+    alt Sin motivo
+        API->>SRV: modificar_tara(id, tara, motivo vacio)
+        SRV-->>API: Error de validacion
+        API-->>NG: 400 Debe indicar el motivo del cambio de tara
+    else Con motivo
+        API->>SRV: modificar_tara(id, tara, motivo)
+        SRV->>DB: BEGIN TRANSACTION
+        SRV->>DB: Actualizar tara del vehiculo
+        SRV->>AUD: Registrar valor anterior nuevo y motivo
+        SRV->>DB: COMMIT
+        Note over SRV,DB: Los ingresos ya registrados no se tocan
+        API-->>NG: 200 Tara actualizada
+    end
+
+    NG-->>AD: Mensaje correspondiente
 ```

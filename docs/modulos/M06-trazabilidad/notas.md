@@ -67,6 +67,11 @@ consulta agregada sobre `INGRESO`, no recorriendo los ingresos en Python (RNF-M0
 excluye los ingresos anulados (RN-M06-03): un ingreso retirado del histórico no aporta toneladas,
 aunque su vínculo con el lote se conserve.
 
+La asignación filtra por `estado="REGISTRADO"` y no por «distinto de anulado» (RN-M06-13). Con el
+segundo criterio, un ingreso En proceso —sin peso neto— entraría al lote y su suma trataría el nulo
+como ausencia, dando un total menor sin ninguna señal. El selector de ingresos de la pantalla usa el
+mismo filtro.
+
 Que la suma se calcule y no se almacene es deliberado. Un total guardado en el lote quedaría
 desactualizado en cuanto un ingreso se anulara, y habría que recordarlo desde M03.
 

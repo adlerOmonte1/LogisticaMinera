@@ -27,7 +27,7 @@ sequenceDiagram
         SRV->>IMG: Guardar imagen
         SRV->>DB: Registrar hora de inicio del registro
         SRV->>REC: reconocer(imagen)
-        REC-->>SRV: Seis campos con su confianza
+        REC-->>SRV: Placa fecha y peso bruto con su confianza
         SRV->>VAL: validar(datos propuestos)
         VAL-->>SRV: Lista de inconsistencias
         SRV-->>API: Propuesta sin persistir RN-M03-02
@@ -35,10 +35,16 @@ sequenceDiagram
         NG-->>S: Resalta baja confianza e inconsistencias
     end
 
-    S->>NG: Corrige datos y elige tipo de mineral
+    S->>NG: Corrige datos digita la hora del pesaje y elige tipo de mineral
+    opt Placa sin registrar en el catalogo
+        NG-->>S: Formulario de alta del vehiculo en la misma pantalla
+        S->>NG: Completa titularidad y capacidad
+        NG->>API: POST /api/v1/catalogo/vehiculos/
+        API-->>NG: 201 vehiculo creado sin tara
+    end
     NG->>API: POST /api/v1/ingresos/
     API->>SRV: registrar_ingreso(datos confirmados, usuario)
-    SRV->>DB: Verificar vehiculo vigente RN-M03-08
+    SRV->>DB: Leer vehiculo vigente con su tara RN-M03-08
     SRV->>VAL: validar(datos confirmados)
 
     alt Regla bloqueante o advertencia sin justificar
@@ -50,13 +56,18 @@ sequenceDiagram
         SRV->>DB: BEGIN TRANSACTION
         SRV->>COR: obtener_siguiente_codigo()
         COR-->>SRV: Codigo asignado RN-M03-09
-        SRV->>DB: Persistir ingreso y hora de fin del registro
+        alt Vehiculo con tara
+            SRV->>SRV: Calcular peso neto como bruto menos tara RN-M03-04
+            SRV->>DB: Persistir ingreso Registrado con tara aplicada y hora de fin
+        else Vehiculo sin tara
+            SRV->>DB: Persistir ingreso En proceso sin neto y hora de fin RN-M03-17
+        end
         SRV->>DB: Persistir valor reconocido y confirmado por campo
         SRV->>AUD: Registrar evento CREAR
         SRV->>DB: COMMIT
         SRV-->>API: Ingreso persistido
-        API-->>NG: 201 con el codigo
-        NG-->>S: Ingreso registrado con el codigo
+        API-->>NG: 201 con el codigo y el estado
+        NG-->>S: Ingreso registrado o pendiente de destare
     end
 ```
 
@@ -139,3 +150,43 @@ sequenceDiagram
 
 La imagen del ticket no se elimina al anular: el ingreso permanece consultable con su respaldo
 (RNF-M03-10).
+
+## S-M03-04 · Registro del destare de un vehículo en su primer viaje (HU-M03-04)
+
+```mermaid
+sequenceDiagram
+    actor S as Supervisor de planta
+    participant NG as Angular
+    participant API as Django REST
+    participant SRV as ServicioIngreso
+    participant CAT as ServicioCatalogo M02
+    participant VAL as ValidadorConsistencia M05
+    participant DB as PostgreSQL
+    participant AUD as Auditoria M09
+
+    S->>NG: Elige el ingreso En proceso y digita la tara
+    NG->>API: POST /api/v1/ingresos/{id}/destare/
+    API->>SRV: registrar_destare(ingreso, tara, usuario)
+
+    alt Vehiculo ya tiene tara
+        SRV-->>API: Rechazo RN-M03-19
+        API-->>NG: 409 El vehiculo ya tiene tara registrada
+    else Tara mayor o igual que el peso bruto
+        SRV->>VAL: validar(bruto y tara)
+        VAL-->>SRV: V2 incumplida
+        API-->>NG: 400 La tara no puede ser mayor o igual que el peso bruto
+    else Tara admisible
+        SRV->>DB: BEGIN TRANSACTION
+        SRV->>CAT: registrar_tara(vehiculo, tara, usuario)
+        CAT->>DB: Guardar tara fecha de destare y usuario
+        SRV->>DB: Calcular neto de los ingresos En proceso del vehiculo
+        SRV->>DB: Pasar esos ingresos a Registrado
+        SRV->>AUD: Registrar evento MODIFICAR con la tara y los ingresos afectados
+        SRV->>DB: COMMIT
+        API-->>NG: 200 Destare registrado con el peso neto
+        NG-->>S: Peso neto del ingreso
+    end
+```
+
+La tara se guarda en el vehículo a través del servicio de M02, que es el dueño de esa entidad; M03
+no escribe directamente en la tabla de vehículos.

@@ -9,6 +9,12 @@
 
 ---
 
+> **Ajuste del 28/09/2026 (DR-09, DR-10).** El ticket real imprime solo la placa, la fecha y un
+> único peso, el bruto. Donde este documento habla de seis campos reconocidos, de un peso neto
+> leído del ticket o de V1 como diferencia de pesos, prevalecen `docs/00-tesis/marco_tesis.md` y
+> `docs/00-tesis/decisiones_reformulacion.md`: tres campos reconocidos, peso neto calculado con la
+> tara del vehículo, estado En proceso hasta el destare y V1 como ticket posiblemente duplicado.
+
 ## 0. Resumen
 
 El repositorio documenta el **Sistema de Control de Producción y Existencias**, con 9 módulos, 34 historias, RF-01 a RF-12 e indicadores I1 a I6 de una variable dependiente que ya no existe en la tesis. La tesis validada mide el **control de inventarios de ingreso de mineral** y exige un componente inteligente (reconocimiento automático del ticket y validación automática) que el repositorio declara expresamente **fuera de alcance**.

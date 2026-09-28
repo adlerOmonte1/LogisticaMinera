@@ -105,10 +105,11 @@ confirmación. Debe cumplir, además de las historias:
 
 ## Tablas y listados
 
-Angular Material. Los listados llevan paginación de 25 registros, orden por fecha y hora del ticket
+Angular Material. Los listados llevan paginación de 25 registros, orden por fecha y hora del pesaje
 descendente por defecto, y **totales del conjunto filtrado** — número de ingresos y suma de peso
-neto, excluyendo los anulados de la suma. Los ingresos anulados aparecen en la lista, señalados como
-tales: ocultarlos haría creer que un volquete nunca se registró.
+neto, que suma solo los ingresos Registrados. Los anulados y los En proceso aparecen en la lista,
+señalados como tales —el neto de un ingreso En proceso se muestra «pendiente del destare», nunca
+como cero—: ocultarlos haría creer que un volquete nunca se registró.
 
 La búsqueda por placa y fecha (M07) es la ruta más frecuente después del registro; conviene que esté
 accesible desde la pantalla inicial, sin navegar por menús (RNF-M07-07).

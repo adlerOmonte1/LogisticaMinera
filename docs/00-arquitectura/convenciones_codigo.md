@@ -75,7 +75,7 @@ develop                   Integración
 feature/M03-ingresos      Una rama por módulo
 ```
 
-Formato de commit: `M04: reconoce los seis campos del ticket con su confianza (HU-M04-01)`.
+Formato de commit: `M04: reconoce placa fecha y peso bruto del ticket (HU-M04-01)`.
 Referenciar siempre la historia de usuario permite reconstruir la trazabilidad desde el historial de
 git, evidencia útil en la revisión técnica.
 

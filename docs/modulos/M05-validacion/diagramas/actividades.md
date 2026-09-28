@@ -4,17 +4,22 @@
 
 ```mermaid
 flowchart TD
-    I([Datos del ticket recibidos]) --> C1[Obtener la capacidad del vehiculo del catalogo]
-    C1 --> V1{V1 neto igual a bruto menos tara?}
-    V1 -->|No| E1[Anotar: El peso neto no coincide con el peso bruto menos la tara]
-    V1 -->|Si| V2{V2 tara menor que bruto?}
-    E1 --> V2
+    I([Datos del ingreso recibidos]) --> C1[Obtener tara y capacidad del vehiculo del catalogo]
+    C1 --> V1{V1 existe ingreso con misma placa fecha y peso?}
+    V1 -->|Si| E1[Anotar advertencia: El ticket parece duplicado]
+    V1 -->|No| D1{El vehiculo tiene tara?}
+    E1 --> D1
+    D1 -->|No| O1[Omitir V2 y V4 hasta el destare]
+    O1 --> V3
+    D1 -->|Si| V2{V2 tara menor que bruto?}
     V2 -->|No| E2[Anotar: La tara no puede ser mayor o igual que el peso bruto]
     V2 -->|Si| V3{V3 placa con formato valido?}
     E2 --> V3
     V3 -->|No| E3[Anotar: La placa no tiene un formato valido]
-    V3 -->|Si| V4{V4 neto dentro del rango de carga?}
-    E3 --> V4
+    V3 -->|Si| D2{El vehiculo tiene tara?}
+    E3 --> D2
+    D2 -->|No| V5
+    D2 -->|Si| V4{V4 neto calculado dentro del rango de carga?}
     V4 -->|No| E4[Anotar advertencia: El peso neto esta fuera del rango de carga]
     V4 -->|Si| V5{V5 fecha del ticket no posterior al registro?}
     E4 --> V5
@@ -36,11 +41,11 @@ flowchart TD
     M1 --> L1[Usuario corrige el dato]
     L1 --> V1[Revalidar las cinco reglas]
     V1 --> I
-    D1 -->|No| D2{Hay advertencia de peso fuera de rango?}
+    D1 -->|No| D2{Hay advertencia de duplicado o de peso fuera de rango?}
     D2 -->|No| A1[Habilitar la confirmacion]
     D2 -->|Si| D3{Hay justificacion escrita?}
-    D3 -->|No| M2[Rechazar: Debe indicar la justificacion del peso fuera de rango]
-    M2 --> L2[Usuario escribe la explicacion o corrige el peso]
+    D3 -->|No| M2[Rechazar: Debe indicar la justificacion de la advertencia]
+    M2 --> L2[Usuario escribe la explicacion o corrige el dato]
     L2 --> V1
     D3 -->|Si| A1
     A1 --> F([Ingreso listo para confirmarse])

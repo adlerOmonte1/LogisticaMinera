@@ -119,7 +119,7 @@ afirmar que leyó algo que no leyó.
 
 | Es requerido por | Para |
 |---|---|
-| M03 | Proponer los seis campos del ticket al iniciar el registro |
+| M03 | Proponer la placa, la fecha y el peso bruto del ticket al iniciar el registro |
 
 ## Pendientes que afectan a este módulo
 

@@ -1,7 +1,7 @@
 # Plan de pruebas — Sistema web inteligente
 
 **Documento:** PLAN-03
-**Versión:** 1.0
+**Versión:** 1.1 — formato real del ticket y destare (DR-09, DR-10)
 **Estado:** Vigente
 **Depende de:** `../01-plan/PLAN_DE_TRABAJO.md` §6, `../00-tesis/marco_tesis.md`,
 `../00-tesis/decisiones_reformulacion.md`
@@ -32,19 +32,19 @@ casos de prueba superados); cada RF cumplido y su caso superado son lo que sosti
 
 | Campo | Detalle |
 |---|---|
-| Precondición | Usuario autenticado, catálogo de vehículos y tipos de mineral cargado |
-| Pasos | Capturar la imagen del ticket; completar los campos tras la propuesta de reconocimiento; confirmar |
-| Resultado esperado | El sistema persiste el ingreso, asigna un código único y conserva la imagen como respaldo |
-| Evidencia | Ingreso visible en el listado, con imagen recuperable desde el detalle |
+| Precondición | Usuario autenticado, catálogo de tipos de mineral cargado, un vehículo con tara registrada y una placa que no está en el catálogo |
+| Pasos | (a) Capturar el ticket de un vehículo con tara; revisar la propuesta; digitar la hora del pesaje; confirmar. (b) Capturar el ticket de la placa no registrada; dar de alta el vehículo en la misma pantalla; confirmar; registrar después su destare |
+| Resultado esperado | (a) El sistema persiste el ingreso como Registrado, calcula el peso neto con la tara del vehículo, asigna un código único y conserva la imagen. (b) El ingreso queda En proceso, sin peso neto; al registrar la tara pasa a Registrado con el neto calculado |
+| Evidencia | Ambos ingresos visibles en el listado con su estado, su imagen recuperable y su peso neto igual a peso bruto menos tara |
 
-### CP02 — Reconocimiento de los seis campos con su confianza (RF02)
+### CP02 — Reconocimiento de la placa, la fecha y el peso bruto con su confianza (RF02)
 
 | Campo | Detalle |
 |---|---|
 | Precondición | Motor de reconocimiento configurado (D-12 cerrada) |
 | Pasos | Capturar la imagen de un ticket legible del conjunto de prueba |
-| Resultado esperado | El sistema presenta placa, fecha, hora, peso bruto, tara y peso neto, cada uno con su nivel de confianza |
-| Evidencia | Los seis campos precargados; los de confianza baja resaltados |
+| Resultado esperado | El sistema presenta la placa, la fecha y el peso bruto, cada uno con su nivel de confianza; la hora del pesaje queda para digitarse, y la tara y el peso neto no se proponen |
+| Evidencia | Los tres campos precargados; los de confianza baja resaltados |
 
 ### CP03 — Detección de las cinco inconsistencias (RF03)
 
@@ -52,7 +52,7 @@ casos de prueba superados); cada RF cumplido y su caso superado son lo que sosti
 |---|---|
 | Precondición | Un ingreso por cada regla V1 a V5 sembrada (ver §4.2) |
 | Pasos | Confirmar cada ingreso sembrado |
-| Resultado esperado | El sistema señala la inconsistencia correspondiente con el mensaje literal de la regla; bloquea salvo V4, que exige justificación |
+| Resultado esperado | El sistema señala la inconsistencia correspondiente con el mensaje literal de la regla; bloquea en V2, V3 y V5, y exige justificación en V1 y V4 |
 | Evidencia | Cinco resultados de `RESULTADO_VALIDACION`, uno por regla, con su resolución |
 
 ### CP04 — Corrección manual de un dato reconocido (RF04)
@@ -78,9 +78,9 @@ casos de prueba superados); cada RF cumplido y su caso superado son lo que sosti
 | Campo | Detalle |
 |---|---|
 | Precondición | Catálogo con vehículos propios y externos, y al menos dos tipos de mineral |
-| Pasos | Registrar un ingreso con un vehículo propio y otro con un vehículo externo |
-| Resultado esperado | El tipo de vehículo se deriva de la titularidad del catálogo, sin digitarse; el tipo de mineral queda registrado como se eligió |
-| Evidencia | Detalle del ingreso mostrando ambos campos correctamente derivados |
+| Pasos | Registrar un ingreso con un vehículo propio y otro con un vehículo externo, ambos con tara registrada |
+| Resultado esperado | El tipo de vehículo y la tara se derivan del catálogo, sin digitarse; el tipo de mineral queda registrado como se eligió |
+| Evidencia | Detalle del ingreso mostrando los campos correctamente derivados y la tara aplicada |
 
 ### CP07 — Vínculo del ingreso con las cuatro etapas (RF07)
 
@@ -104,9 +104,9 @@ casos de prueba superados); cada RF cumplido y su caso superado son lo que sosti
 
 | Campo | Detalle |
 |---|---|
-| Precondición | Ingresos registrados en el mes en curso, incluido uno anulado |
+| Precondición | Ingresos registrados en el mes en curso, incluidos uno anulado y uno En proceso |
 | Pasos | Solicitar el consolidado del mes; exportarlo |
-| Resultado esperado | El total por tipo de mineral excluye el ingreso anulado; el archivo exportado coincide exactamente con la consulta en pantalla |
+| Resultado esperado | El total por tipo de mineral excluye el ingreso anulado y el En proceso, e informa que hay un ingreso pendiente del destare; el archivo exportado coincide exactamente con la consulta en pantalla |
 | Evidencia | Consulta en pantalla y archivo descargado, con los mismos números |
 
 ### CP10 — Gestión de usuarios y restricción por rol (RF10)
@@ -149,12 +149,13 @@ Los diez casos cubren los diez RF sin excepción: es la condición para que CPS 
 
 **Procedimiento:**
 
-1. Cada ticket se lee primero por una persona, que registra el valor real de los seis campos:
-   placa, fecha, hora, peso bruto, tara y peso neto.
+1. Cada ticket se lee primero por una persona, que registra el valor real de los tres campos que
+   el ticket imprime: placa, fecha y peso bruto. La hora del pesaje, la tara y el peso neto no se
+   reconocen y no entran en la medición.
 2. Cada ticket se procesa con el sistema, con el motor y la versión congelados (D-16).
 3. Se compara, campo por campo, el valor reconocido contra el valor real.
 4. ERA se calcula como el porcentaje de campos que coinciden exactamente, sobre el total de
-   50 × 6 = 300 lecturas.
+   50 × 3 = 150 lecturas.
 
 **Registro:** una fila por ticket y campo, con valor real, valor reconocido, confianza y si
 coincide. Se conserva junto con la imagen del ticket, para poder auditar cualquier discrepancia.
@@ -169,22 +170,23 @@ se reporta como limitación.
 
 | Regla | Inconsistencia sembrada 1 | Inconsistencia sembrada 2 |
 |---|---|---|
-| V1 | Peso neto 0,50 t por encima de bruto menos tara | Peso neto 0,50 t por debajo de bruto menos tara |
-| V2 | Tara igual al peso bruto | Tara mayor que el peso bruto |
+| V1 | Ticket con la misma placa, fecha y peso bruto que un ingreso ya registrado | El mismo ticket registrado por segunda vez tras una corrección de la hora del pesaje |
+| V2 | Peso bruto igual a la tara del vehículo | Peso bruto menor que la tara del vehículo, con el punto decimal mal ubicado |
 | V3 | Placa con una letra de más | Placa con formato de otro país |
-| V4 | Peso neto 20 % por encima de la capacidad del vehículo | Peso neto igual a cero |
+| V4 | Peso bruto cuyo neto calculado supera en 20 % la capacidad del vehículo | Peso bruto cuyo neto calculado supera en 50 % la capacidad del vehículo |
 | V5 | Fecha del ticket un día después del registro | Fecha del ticket un mes después del registro |
 
 **Procedimiento:**
 
 1. Se construyen 10 ingresos de prueba, cada uno con exactamente la inconsistencia sembrada
-   correspondiente y el resto de los datos correctos.
+   correspondiente y el resto de los datos correctos. Los vehículos usados tienen tara registrada,
+   para que V2 y V4 puedan evaluarse; V1 necesita además el ingreso original ya registrado.
 2. Se confirma cada ingreso en el sistema.
 3. TDI se calcula como el porcentaje de las 10 inconsistencias que el sistema señala con la regla
    correcta, sobre el total de 10.
 
-**Condición de congelamiento (D-16):** las reglas V1 a V5 y sus parámetros (tolerancia de V1,
-patrón de placa de V3) no cambian entre la primera y la última inconsistencia sembrada.
+**Condición de congelamiento (D-16):** las reglas V1 a V5 y sus parámetros (patrón de placa de
+V3) no cambian entre la primera y la última inconsistencia sembrada.
 
 ### 4.3 Umbral de confianza
 

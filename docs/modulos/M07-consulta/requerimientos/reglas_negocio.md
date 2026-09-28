@@ -10,7 +10,7 @@ presentación**: garantizan que lo que se muestra no induzca a conclusiones fals
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
 | RN-M07-01 | Los ingresos anulados aparecen en los resultados, señalados y con su motivo | Quien consulta un volquete que sí pasó por la balanza no obtendría nada y concluiría que no se registró |
-| RN-M07-02 | Los ingresos anulados no se incluyen en la suma de toneladas del conjunto filtrado | El total mostrado contradiría al de la consolidación para el mismo periodo |
+| RN-M07-02 | Solo los ingresos Registrados se incluyen en la suma de toneladas del conjunto filtrado; los anulados y los En proceso quedan fuera | El total mostrado contradiría al de la consolidación para el mismo periodo, o sumaría ingresos sin peso neto |
 | RN-M07-03 | El detalle presenta la imagen del ticket junto a los datos registrados | La consulta no permitiría contrastar lo registrado con el papel, que es su razón de ser |
 | RN-M07-04 | La ausencia del respaldo se informa explícitamente | Un detalle sin imagen parecería un problema de la pantalla y no la falta de un respaldo |
 | RN-M07-05 | La búsqueda exige al menos un criterio | Una consulta sin criterios recorrería el histórico completo y se degradaría conforme creciera |
@@ -18,6 +18,7 @@ presentación**: garantizan que lo que se muestra no induzca a conclusiones fals
 | RN-M07-07 | El detalle muestra las tres marcas de tiempo como valores distintos | Presentarlas juntas o resumidas ocultaría cuándo se pesó y cuándo se registró |
 | RN-M07-08 | La ausencia de reconocimiento, validaciones o trazabilidad se indica, no se omite | Un bloque ausente se confundiría con un elemento que el sistema no muestra |
 | RN-M07-09 | El módulo no modifica ningún dato: todas sus operaciones son de lectura | Una consulta con efectos secundarios alteraría aquello que pretende mostrar |
+| RN-M07-10 | Los ingresos En proceso aparecen en los resultados, señalados y con el peso neto indicado como pendiente del destare | Un volquete que ingresó en su primer viaje parecería no registrado, o su peso neto vacío se leería como cero |
 
 ## Nota sobre RN-M07-01 y RN-M07-02
 
@@ -26,6 +27,9 @@ preguntas distintas. «¿Se registró este volquete?» se responde mostrándolo,
 «¿cuántas toneladas ingresaron?» se responde sin él, porque el ingreso se retiró del cómputo. Un
 sistema que ocultara los anulados respondería mal la primera; uno que los sumara respondería mal la
 segunda y además contradiría a la consolidación.
+
+El ingreso En proceso sigue la misma lógica (RN-M07-10): aparece porque el volquete ingresó, y no
+suma porque su peso neto todavía no existe.
 
 ## Nota sobre RN-M07-03
 

@@ -27,7 +27,7 @@ class ResultadoReconocimiento:
     exito: bool
     motor: str
     version_motor: str
-    campos: list[CampoLeido]   # placa, fecha, hora, peso_bruto, tara, peso_neto
+    campos: list[CampoLeido]   # placa, fecha, peso_bruto: lo unico que imprime el ticket (DR-09)
 
 class CampoLeido:
     nombre: str
@@ -94,7 +94,7 @@ hubo, y ERA perdería su única fuente de verificación.
 ```python
 class Regla(Protocol):
     codigo: str            # "V1" a "V5"
-    bloqueante: bool        # False solo en V4
+    bloqueante: bool        # False en V1 y V4, que exigen justificacion
     campo: str
     mensaje: str            # literal, con marcadores como {placa}
     def datos_completos(self, datos: DatosTicket) -> bool: ...
@@ -103,10 +103,15 @@ class Regla(Protocol):
 
 | Regla | Condición | Bloqueante |
 |---|---|---|
-| V1 | \|neto − (bruto − tara)\| ≤ tolerancia | Sí |
-| V2 | tara < bruto | Sí |
+| V1 | no existe un ingreso no anulado con la misma placa, fecha y peso bruto | No — exige justificación |
+| V2 | tara del vehículo < bruto | Sí |
 | V3 | placa cumple el patrón de placa peruana | Sí |
-| V4 | neto dentro de la capacidad del vehículo | No — exige justificación |
+| V4 | neto calculado dentro de la capacidad del vehículo | No — exige justificación |
+
+La tara y la capacidad llegan en los datos, leídas del catálogo por el servicio de registro; V2 y V4
+se omiten si el vehículo aún no tiene tara y se evalúan al registrar el destare. V1 es la única regla
+que consulta otros ingresos, a través de un repositorio de lectura inyectado
+(`buscar_por_placa_fecha_peso`), para seguir probándose sin base de datos.
 | V5 | fecha del ticket ≤ fecha de registro | Sí |
 
 `ValidadorConsistencia` recorre la colección registrada de reglas y **no nombra ninguna regla
@@ -119,8 +124,8 @@ de una vez todo lo que tiene que corregir, no un error a la vez. Una regla cuyos
 faltan **se omite**, no se reporta como incumplida (RN-M05-07): un campo vacío lo reclama el
 registro, no el validador.
 
-Se aplican **dos veces por ingreso** (RN-M05-05): sobre los datos que propone el reconocimiento, y de
-nuevo sobre los que el usuario confirma. La segunda pasada existe porque el usuario pudo introducir
+Se aplican **sobre los datos que propone el reconocimiento, de nuevo sobre los que el usuario
+confirma y, en el primer viaje, al registrar el destare** (RN-M05-05). La segunda pasada existe porque el usuario pudo introducir
 una incoherencia nueva al corregir.
 
 ### Persistencia del resultado
@@ -129,14 +134,15 @@ una incoherencia nueva al corregir.
 class ResultadoValidacion(models.Model):
     ingreso = models.ForeignKey(Ingreso, on_delete=models.PROTECT)
     regla = models.CharField(max_length=2, choices=REGLAS)
-    momento = models.CharField(max_length=12, choices=MOMENTOS)  # PROPUESTA / CONFIRMACION
+    momento = models.CharField(max_length=12, choices=MOMENTOS)  # PROPUESTA / CONFIRMACION / DESTARE
     cumple = models.BooleanField()
     detalle = models.TextField(blank=True)
     resolucion = models.CharField(max_length=12, choices=RESOLUCIONES, blank=True)
+    justificacion = models.TextField(blank=True)  # obligatoria si V1 o V4 se resolvieron asi
 ```
 
 `detalle` conserva los valores concretos que motivaron el incumplimiento, no solo el hecho de que
-ocurrió: saber que V1 falló sirve de poco sin saber qué decía el ticket y qué daba la resta.
+ocurrió: saber que V2 falló sirve de poco sin saber qué peso bruto se leyó y qué tara tenía el vehículo.
 
 ## Cómo se registran los datos para ERA y TDI
 

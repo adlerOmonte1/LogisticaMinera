@@ -38,6 +38,10 @@ completó, ni una operación puede completarse sin que su evento quede registrad
 - Cada evento guarda: usuario, acción, entidad, identificador del registro afectado, fecha y hora.
 - En modificaciones: valores anteriores y nuevos del campo cambiado.
 - En creaciones: solo valores nuevos. En anulaciones: solo valores anteriores.
+- En las modificaciones que exigen motivo —corrección de un ingreso y cambio de la tara de un
+  vehículo—: el motivo escrito por el usuario.
+- El destare se registra como modificación del vehículo, que recibe su tara, y de cada ingreso que
+  pasa de En proceso a Registrado.
 - El registro del evento es automático: ningún rol lo activa ni lo omite manualmente.
 
 **Criterios de aceptación**
@@ -60,6 +64,9 @@ completó, ni una operación puede completarse sin que su evento quede registrad
 
 > **CA06.** Dado que se genera una exportación, cuando concluye, entonces el sistema registra el
 > evento con el periodo o el criterio exportado.
+
+> **CA07.** Dado que una modificación exige motivo, cuando se registra el evento, entonces el sistema
+> guarda el motivo junto con el valor anterior y el nuevo.
 
 ---
 

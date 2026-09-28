@@ -101,7 +101,7 @@ frontend. Cada paso produce evidencia citable.
 Commits por historia, con el formato de `convenciones_codigo.md` §4:
 
 ```
-M04: reconoce los seis campos del ticket con su confianza (HU-M04-01)
+M04: reconoce placa fecha y peso bruto del ticket (HU-M04-01)
 ```
 
 ### 4.3 Revisión
@@ -324,7 +324,7 @@ piloto, M04 no puede arrancar en la semana 3.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Captura de imagen y propuesta de reconocimiento | Foto del ticket que devuelve los seis campos con su confianza | Tester: HU-M04-01 |
+| Captura de imagen y propuesta de reconocimiento | Foto del ticket que devuelve la placa, la fecha y el peso bruto con su confianza | Tester: HU-M04-01 |
 | Pantalla de confirmación con validación | Inconsistencias señaladas junto al campo, con mensaje literal de V1 a V5 | Tester: HU-M05-01 |
 | Registro del ingreso | Ingreso persistido con código único y tres marcas de tiempo distintas | Tester: HU-M03-01 |
 | Corrección y anulación | Corrección con motivo y revalidación; anulación excluida de totales | Tester: HU-M03-02, HU-M03-03 |

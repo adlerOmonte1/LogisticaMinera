@@ -53,15 +53,28 @@ variable; la norma se conserva únicamente como taxonomía para clasificar los R
 
 | Dimensión | Indicador | Fórmula por ingreso | Unidad |
 |---|---|---|---|
-| D1 Oportunidad del registro | I1 Tiempo de espera del registro | Inicio del registro − fecha y hora del ticket | h |
+| D1 Oportunidad del registro | I1 Tiempo de espera del registro | Inicio del registro − fecha y hora del pesaje | h |
 | D1 Oportunidad del registro | I2 Tiempo de registro del ingreso | Fin del registro − inicio del registro | min |
 | D2 Integridad del registro | I3 Completitud del registro | Campos consignados / 7 × 100 | % |
 | D2 Integridad del registro | I4 Tiempo de recuperación del respaldo | Consulta → presentación del ticket y sus datos | min |
 | D3 Consolidación de la producción | I5 Tiempo de consolidación | Solicitud → entrega del total acumulado del mes por producto que incluye el ingreso | min |
 | D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / 4 × 100 | % |
 
-**Campos de completitud (I3):** C1 placa · C2 fecha y hora · C3 peso bruto · C4 tara · C5 peso neto ·
-C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
+**Campos de completitud (I3):** C1 placa · C2 fecha y hora del pesaje · C3 peso bruto · C4 tara ·
+C5 peso neto · C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
+
+**Origen de cada campo en el sistema (DR-09).** El ticket de balanza en uso solo imprime la placa, la
+fecha (día, mes y año) y un único peso, que es el peso bruto. Por eso:
+
+| Campo | Origen |
+|---|---|
+| C1 placa | Reconocida del ticket, editable antes de confirmar |
+| C2 fecha y hora del pesaje | La fecha se reconoce del ticket; la hora la digita el usuario, porque el ticket no la imprime |
+| C3 peso bruto | Reconocido del ticket, editable antes de confirmar |
+| C4 tara | Del catálogo del vehículo; se fija en el destare del primer viaje y se mantiene por decisión de la Gerencia |
+| C5 peso neto | Calculado por el sistema: peso bruto − tara del vehículo |
+| C6 tipo de mineral | Elegido del catálogo |
+| C7 tipo de vehículo | Derivado de la titularidad registrada en el catálogo |
 
 **Etapas del proceso (I6):** secado, zarandeo, molienda, ensacado.
 
@@ -73,8 +86,8 @@ C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
 | RF | Descripción |
 |---|---|
 | RF01 | Registrar el ingreso de mineral con la imagen del ticket de balanza |
-| RF02 | Reconocer automáticamente los datos del ticket: placa, fecha, hora, peso bruto, tara y peso neto |
-| RF03 | Validar automáticamente la consistencia de los datos del ticket: pesos, formato de placa, capacidad del vehículo y fecha |
+| RF02 | Reconocer automáticamente los datos del ticket: placa, fecha y peso bruto |
+| RF03 | Validar automáticamente la consistencia de los datos del ticket: duplicidad, pesos, formato de placa, capacidad del vehículo y fecha |
 | RF04 | Permitir el registro y la corrección manual de los datos reconocidos |
 | RF05 | Asignar un código único a cada ingreso de mineral |
 | RF06 | Registrar el tipo de mineral y el tipo de vehículo (propio o externo) |
@@ -83,8 +96,9 @@ C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
 | RF09 | Generar y exportar el total acumulado mensual por producto |
 | RF10 | Gestionar usuarios y roles de acceso |
 
-La redacción ampliada de RF03 y la inclusión de la exportación en RF09 corresponden a DR-06 y deben
-estar reflejadas en el Anexo 03 del documento de tesis **antes** del juicio de expertos. Después de
+La redacción ampliada de RF03 y la inclusión de la exportación en RF09 corresponden a DR-06; la
+reducción de RF02 a tres campos y la inclusión de la duplicidad en RF03 corresponden a DR-09. Ambas
+deben estar reflejadas en el Anexo 03 del documento de tesis **antes** del juicio de expertos. Después de
 esa validación, la lista queda fija: cualquier cambio altera el denominador de RFC.
 
 Formato del código: `RF01`, sin guion.
@@ -104,16 +118,19 @@ Formato del código: `RF01`, sin guion.
 
 | Regla | Inconsistencia | Tipo |
 |---|---|---|
-| V1 | Peso neto distinto de peso bruto menos tara (tolerancia 0,01 t) | Bloqueante |
-| V2 | Tara mayor o igual que el peso bruto | Bloqueante |
+| V1 | Ticket posiblemente duplicado: misma placa, misma fecha y mismo peso bruto que un ingreso no anulado | Exige justificación |
+| V2 | Tara del vehículo mayor o igual que el peso bruto | Bloqueante |
 | V3 | Placa con formato inválido | Bloqueante |
-| V4 | Peso neto fuera del rango de carga del vehículo, según la capacidad del catálogo | Exige justificación |
+| V4 | Peso neto calculado fuera del rango de carga del vehículo, según la capacidad del catálogo | Exige justificación |
 | V5 | Fecha del ticket posterior a la fecha de registro | Bloqueante |
 
-La tolerancia de 0,01 t es el valor adoptado; confirmarlo con la empresa antes de fijar el conjunto
-de prueba. El patrón de placa peruana se documenta en el módulo de validación.
+V1 exige justificación y no bloquea, porque un mismo vehículo puede hacer dos viajes el mismo día con
+un peso idéntico; lo que se impide es registrar dos veces el mismo pesaje sin explicación. V2 detecta
+sobre todo lecturas erróneas del peso bruto: un peso reconocido por debajo de la tara del vehículo
+produciría un peso neto negativo. El patrón de placa peruana se documenta en el módulo de validación.
 
-**Conjunto de prueba (DR-08):** ERA sobre 50 tickets reales × 6 campos. TDI sobre 10
+**Conjunto de prueba (DR-08, ajustado por DR-09):** ERA sobre 50 tickets reales × 3 campos (placa,
+fecha y peso bruto), es decir, 150 lecturas. TDI sobre 10
 inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante toda la medición.
 
 ## 8. Roles
@@ -132,9 +149,9 @@ registra en `../02-trazabilidad/matriz_HU_RF_indicador.md`, no en los documentos
 | Módulo | Nombre | Responsabilidad | RF |
 |---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 |
-| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad y capacidad, y transportistas | RF06 (soporte) |
-| M03 | Registro de ingresos | Registrar el ingreso desde la imagen del ticket, con corrección, confirmación y código único | RF01, RF04, RF05, RF06 |
-| M04 | Reconocimiento automático del ticket | Leer los seis campos del ticket con su nivel de confianza | RF02 |
+| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) |
+| M03 | Registro de ingresos | Registrar el ingreso desde la imagen del ticket, con corrección, confirmación, cálculo del peso neto y código único | RF01, RF04, RF05, RF06 |
+| M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza | RF02 |
 | M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado | RF03 |
 | M06 | Trazabilidad del proceso | Asignar ingresos a lotes y registrar su paso por cada etapa | RF07 |
 | M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |

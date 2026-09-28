@@ -23,10 +23,12 @@ entidad-relación; no los reinventes ni los renombres al escribir la migración.
 confianza de un campo reconocido `decimal(4,3)`. El error acumulado del flotante sobre cientos de
 registros se confundiría con diferencias reales entre el ticket y lo registrado.
 
-**2. `peso_neto_tn` no se calcula ni se deriva.** Es una columna que recibe el valor leído del
-ticket, igual que `peso_bruto_tn` y `tara_tn`. No lo generes como columna calculada ni como
-propiedad en el ORM: la regla V1 de M05 compara ese valor contra `peso_bruto_tn - tara_tn`, y si el
-propio esquema ya impusiera la igualdad, la comparación nunca podría fallar.
+**2. `peso_neto_tn` se calcula en el servidor y se almacena junto con la tara aplicada.** El ticket
+imprime solo el peso bruto (DR-09). `INGRESO.tara_tn` es la tara del vehículo **copiada** en el
+momento de aplicarse y `peso_neto_tn` su diferencia con el bruto (D-17). No los derives al vuelo
+del catálogo ni con una vista o una propiedad que lea `VEHICULO.tara_tn`: un cambio de tara decidido
+por la Gerencia reescribiría todo el histórico. Ambos son nulos solo si `estado = 'EN_PROCESO'`; una
+restricción `CHECK` lo garantiza, junto con `tara_tn < peso_bruto_tn`.
 
 **3. `CAMPO_RECONOCIDO` guarda dos valores por campo, no uno.** `valor_reconocido` (nulo si el
 motor no leyó nada) y `valor_confirmado` (el que el usuario aceptó o corrigió) son columnas
@@ -50,8 +52,8 @@ código para otro registro.
 | Índice | Tabla | Consulta que sostiene |
 |---|---|---|
 | `idx_ingreso_codigo` | INGRESO(codigo) | Localizar un ingreso por su código. Cubierto por `unique=True` |
-| `idx_ingreso_vehiculo_fecha` | INGRESO(id_vehiculo, fecha_hora_ticket) | Consulta por placa y fecha de M07 |
-| `idx_ingreso_fecha_mineral` | INGRESO(fecha_hora_ticket, id_tipo_mineral) | Total acumulado mensual de M08 |
+| `idx_ingreso_vehiculo_fecha` | INGRESO(id_vehiculo, fecha_hora_pesaje) | Consulta por placa y fecha de M07 |
+| `idx_ingreso_fecha_mineral` | INGRESO(fecha_hora_pesaje, id_tipo_mineral) | Total acumulado mensual de M08 |
 | `idx_ingreso_estado` | INGRESO(estado) | Excluir anulados de todo total, casi siempre combinada con otra condición |
 | `idx_paso_lote` | PASO_ETAPA(id_lote) | Etapas recorridas por un lote, de M06 |
 | `idx_evento_entidad` | EVENTO_AUDITORIA(entidad, id_entidad) | Historial de un registro concreto, de M09 |
@@ -83,7 +85,14 @@ ingreso pertenece a un lote como máximo. Si el ingreso no tiene lote, el result
 etapas marcadas como no recorridas, no un error.
 
 **Comparación de reconocimiento** (M04): `CAMPO_RECONOCIDO` filtrado por `id_reconocimiento`, con
-sus seis filas siempre presentes aunque alguna tenga `valor_reconocido` nulo.
+sus tres filas —placa, fecha y peso bruto— siempre presentes aunque alguna tenga
+`valor_reconocido` nulo.
+
+**Búsqueda de duplicados** (V1 de M05): ingreso no anulado con la misma placa, la misma fecha del
+pesaje y el mismo peso bruto. La sostiene el índice `(vehiculo, fecha_hora_pesaje)`.
+
+**Totales** (M06, M07, M08): siempre `estado = 'REGISTRADO'`, nunca «distinto de anulado»; los
+ingresos En proceso no tienen peso neto.
 
 ## Migraciones
 
@@ -99,7 +108,10 @@ explícitamente.
 ## Verificación
 
 - [ ] Ningún `FloatField` ni `double precision` en pesos, capacidades o confianzas.
-- [ ] `peso_neto_tn` no es una columna calculada ni una propiedad derivada.
+- [ ] `peso_neto_tn` y `tara_tn` se almacenan en `INGRESO`; ninguna vista ni propiedad los deriva
+      de `VEHICULO.tara_tn`.
+- [ ] `CHECK`: tara y neto nulos solo en `EN_PROCESO`; tara menor que el bruto.
+- [ ] Los totales filtran `estado = 'REGISTRADO'`.
 - [ ] `valor_reconocido` y `valor_confirmado` son columnas separadas en `CAMPO_RECONOCIDO`.
 - [ ] Ningún `ON DELETE CASCADE` hacia registros históricos, salvo la excepción documentada del
       reconocimiento sobre su ingreso.

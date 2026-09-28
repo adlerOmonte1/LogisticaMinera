@@ -5,7 +5,7 @@
 | RNF-M04-01 | Eficiencia de desempeño — comportamiento temporal | El reconocimiento de un ticket devuelve resultado en menos de 5 segundos con una imagen de hasta 5 MB | Cronometraje sobre el conjunto de tickets de prueba |
 | RNF-M04-02 | Fiabilidad — tolerancia a fallos | Si el motor no responde en 10 segundos, el sistema cancela la espera y ofrece el registro manual | Prueba automatizada con un doble de prueba que no responde |
 | RNF-M04-03 | Fiabilidad — disponibilidad | La indisponibilidad del motor no impide registrar ingresos | Prueba automatizada con el motor desactivado |
-| RNF-M04-04 | Adecuación funcional — corrección | El sistema reconoce los seis campos sobre tickets de la balanza en uso, incluidos los impresos en papel térmico con desgaste | Contraste del resultado con la lectura humana sobre el conjunto de tickets de prueba |
+| RNF-M04-04 | Adecuación funcional — corrección | El sistema reconoce los tres campos sobre tickets de la balanza en uso, incluidos los impresos en papel térmico con desgaste | Contraste del resultado con la lectura humana sobre el conjunto de tickets de prueba |
 | RNF-M04-05 | Mantenibilidad — modularidad | Sustituir el motor exige escribir un adaptador nuevo y no modificar ningún otro módulo | Inspección de código: solo `motores/` importa la librería del proveedor |
 | RNF-M04-06 | Mantenibilidad — capacidad de ser probado | Las pruebas del registro y de la validación se ejecutan sin invocar al motor real | Inspección de código: el motor se inyecta y se sustituye por un doble en las pruebas |
 | RNF-M04-07 | Seguridad — confidencialidad | Si el motor es un servicio externo, la imagen se transmite cifrada y sus credenciales viven en variables de entorno | Inspección de configuración |
@@ -15,7 +15,7 @@
 ## Nota sobre RNF-M04-01 y RNF-M04-02
 
 El reconocimiento ocurre con el supervisor de pie junto al volquete. Una espera larga anula la
-ventaja frente a escribir los seis datos, que toma alrededor de un minuto. Por eso el límite duro de
+ventaja frente a escribir los tres datos a mano. Por eso el límite duro de
 RNF-M04-02 es tan importante como el objetivo de RNF-M04-01: es preferible ofrecer el registro
 manual a los diez segundos que mantener al usuario esperando un resultado que quizá no llegue.
 

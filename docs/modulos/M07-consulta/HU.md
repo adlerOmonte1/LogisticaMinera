@@ -36,11 +36,16 @@ Los ingresos anulados aparecen en los resultados, señalados como tales y con su
 haría que una consulta sobre un volquete que sí pasó por la balanza no devolviera nada, y quien
 pregunta concluiría que no se registró.
 
+Los ingresos En proceso —primer viaje de un vehículo, pendiente del destare— también aparecen,
+señalados como tales y sin peso neto, porque todavía no lo tienen. Aparecen porque el volquete sí
+ingresó; no suman toneladas hasta que se registre el destare.
+
 **Detalles**
 - Criterios: placa, total o parcial, y fecha o rango de fechas.
 - La placa no distingue mayúsculas ni guiones.
 - Resultados ordenados por fecha del ticket, del más reciente al más antiguo.
-- Cada resultado muestra código, fecha y hora del ticket, placa, tipo de mineral, peso neto y estado.
+- Cada resultado muestra código, fecha y hora del pesaje, placa, tipo de mineral, peso bruto, peso
+  neto y estado; un ingreso En proceso muestra el peso neto como pendiente del destare.
 - El detalle muestra la imagen del ticket ampliable y las tres marcas de tiempo.
 - Roles autorizados: los tres.
 
@@ -67,6 +72,10 @@ pregunta concluiría que no se registró.
 
 > **CA07.** Dado que un ingreso se registró sin imagen recuperable, cuando se abre su detalle,
 > entonces el sistema muestra los datos e indica que el respaldo no está disponible.
+
+> **CA08.** Dado que uno de los resultados corresponde a un ingreso En proceso, cuando se muestran
+> los resultados, entonces el sistema lo incluye señalado como En proceso, con su peso bruto y con el
+> peso neto indicado como pendiente del destare.
 
 ---
 
@@ -98,7 +107,8 @@ bloque lo aporta el módulo responsable; esta historia los reúne en una sola vi
 - Filtros: rango de fechas, tipo de mineral, vehículo, titularidad y estado.
 - Los filtros se combinan entre sí.
 - Resultados paginados y ordenados por fecha del ticket descendente.
-- El listado muestra el total de ingresos y la suma de toneladas del conjunto filtrado.
+- El listado muestra el total de ingresos y la suma de toneladas del conjunto filtrado; solo suman
+  los ingresos Registrados.
 - El detalle incluye validaciones, reconocimiento y trazabilidad cuando existen.
 - Roles autorizados: los tres.
 
@@ -112,11 +122,11 @@ bloque lo aporta el módulo responsable; esta historia los reúne en una sola vi
 
 > **CA03.** Dado que el usuario ejecuta un listado, cuando el sistema muestra los resultados,
 > entonces presenta el número de ingresos y la suma de toneladas del conjunto filtrado, excluyendo
-> los anulados de esa suma.
+> de esa suma los anulados y los que están En proceso.
 
 > **CA04.** Dado que el usuario abre el detalle de un ingreso, cuando el sistema lo muestra,
 > entonces presenta los datos del ticket, la imagen, las tres marcas de tiempo como valores
-> distintos, el usuario que registró y el estado.
+> distintos, el usuario que registró, el estado, la tara aplicada y el peso neto calculado.
 
 > **CA05.** Dado que un ingreso tiene reconocimiento, validaciones o trazabilidad asociados, cuando
 > se abre su detalle, entonces el sistema los presenta en su bloque correspondiente.

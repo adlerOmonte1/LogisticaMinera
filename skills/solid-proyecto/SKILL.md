@@ -23,7 +23,7 @@ capa distinta**. Si sabes qué tipo de requisito estás implementando, ya sabes 
 | Requisito no funcional (RNF) | configuración, índices, timeouts | estrategias de captura y compresión de imagen | OCP |
 
 **La prueba para ubicar cualquier lógica:** si la validación puede enunciarse sin mencionar HTTP,
-**no** pertenece a `views/`. «El peso neto no coincide con el peso bruto menos la tara» (V1) no
+**no** pertenece a `views/`. «La tara no puede ser mayor o igual que el peso bruto» (V2) no
 menciona HTTP: va a una regla de M05. «Devolver 403 si el rol no es Administrador» sí lo menciona:
 va a `permissions.py`.
 
@@ -42,7 +42,7 @@ Una capa, un motivo de cambio.
 | `views/` | Entrada/salida HTTP (RF-*) | Todo lo demás |
 | `permissions.py` | Autorización por acción | Lógica de negocio |
 
-Ejemplo canónico del proyecto: «el peso neto no coincide con el peso bruto menos la tara» (V1) vive
+Ejemplo canónico del proyecto: «la tara no puede ser mayor o igual que el peso bruto» (V2) vive
 en una regla de M05, invocada desde el servicio de M03. **No** en el formulario Angular, **no** en el
 `IngresoViewSet`. Una petición que llegue directo a la API, sin pasar por el formulario, debe
 someterse a la misma regla — esa es la razón concreta, no una abstracción (D-08).
@@ -62,8 +62,9 @@ class Regla(Protocol):
     codigo: str
     def cumple(self, datos: DatosTicket) -> bool: ...
 
-class ReglaV1PesoNeto:
+class ReglaV1Duplicado:
     codigo = "V1"
+    def __init__(self, ingresos: BuscadorDuplicados): ...  # repositorio inyectado
     def cumple(self, datos): ...
 
 class ReglaV4Capacidad:

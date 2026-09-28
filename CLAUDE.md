@@ -7,7 +7,7 @@ documentaba un sistema distinto, de control de producción y existencias; esa mi
 ## Fuentes de verdad, en este orden
 
 1. `docs/00-tesis/marco_tesis.md` — variables, indicadores, RF01 a RF10, reglas V1 a V5, módulos.
-2. `docs/00-tesis/decisiones_reformulacion.md` — decisiones DR-01 a DR-08, ya cerradas.
+2. `docs/00-tesis/decisiones_reformulacion.md` — decisiones DR-01 a DR-10, ya cerradas.
 3. `docs/00-tesis/ejemplos_plantilla.md` — patrón de historias, requerimientos y diagramas.
 4. `docs/REFORMULACION.md` — análisis de impacto: qué cambia, dónde y por qué.
 5. `docs/PLAN_TRABAJO.md` — plan de migración por fases, con su estado.
@@ -38,7 +38,7 @@ Si dos documentos se contradicen, gana el de orden más alto y la contradicción
 - Formato de RF: `RF01`, sin guion. `RF-01` es un residuo y se corrige. <!-- migracion:ok -->
 - Nunca persistas un dato reconocido sin confirmación del usuario (D-13). Nunca borres registros:
   se anulan (D-07).
-- El ingreso guarda tres marcas de tiempo independientes: fecha y hora del ticket, inicio del
+- El ingreso guarda tres marcas de tiempo independientes: fecha y hora del pesaje, inicio del
   registro y fin del registro. Las dos últimas las asigna el servidor y nadie las edita (D-01).
 - Mermaid: sin tildes, eñes ni signos de apertura dentro del bloque; sin paréntesis ni comas dentro
   de `[ ]` o `{ }`; sin HTML.

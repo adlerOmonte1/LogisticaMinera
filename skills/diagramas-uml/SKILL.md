@@ -169,30 +169,43 @@ Los mensajes describen **qué se hace**, no cómo: `obtener_siguiente_codigo()`,
 Uno o más diagramas, titulados `## A-M{nn}-{nn} · {Proceso} ({reglas que verifica})`.
 
 ```markdown
-## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-08)
+## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-10, RN-M03-16, RN-M03-17)
 
 ```mermaid
 flowchart TD
-    Start([Supervisor captura la foto del ticket]) --> A1[Asignar hora de inicio del registro]
-    A1 --> R1[Reconocer seis campos]
+    I([Supervisor junto a la balanza]) --> C1[Capturar foto del ticket]
+    C1 --> V1{Formato y tamano admitidos?}
+    V1 -->|No| E1[Rechazar: La imagen debe estar en formato JPG o PNG y no superar los 10 MB]
+    E1 --> C1
+    V1 -->|Si| A1[Guardar imagen y asignar hora de inicio]
+    A1 --> R1[Reconocer placa fecha y peso bruto]
     R1 --> D1{Imagen legible?}
-    D1 -->|No| L1[Ingresar datos manualmente]
-    D1 -->|Si| C1[Mostrar campos con su confianza]
+    D1 -->|No| L1[Ingresar placa fecha y peso bruto manualmente]
+    D1 -->|Si| C2[Mostrar campos con su confianza]
     L1 --> L2[Revisar y corregir datos]
-    C1 --> L2
-    L2 --> L3[Elegir tipo de mineral]
-    L3 --> V1[Validar reglas V1 a V5]
-    V1 --> D2{Inconsistencia sin resolver?}
-    D2 -->|Si| E1[Senalar campo y mensaje de la regla]
-    E1 --> L2
-    D2 -->|No| D3{Placa en catalogo?}
-    D3 -->|No| E2[Rechazar: La placa no esta registrada en el catalogo de vehiculos]
+    C2 --> L2
+    L2 --> L3[Digitar la hora del pesaje]
+    L3 --> D2{Placa en el catalogo?}
+    D2 -->|No| L4[Dar de alta el vehiculo en la misma pantalla]
+    L4 --> L5[Elegir tipo de mineral]
+    D2 -->|Si| L5
+    L5 --> V2[Validar reglas V1 a V5]
+    V2 --> D3{Inconsistencia sin resolver?}
+    D3 -->|Si| E2[Senalar campo con el mensaje de la regla]
     E2 --> L2
-    D3 -->|Si| T1[Iniciar transaccion]
+    D3 -->|No| V3{Numero de ticket ya registrado?}
+    V3 -->|Si| E3[Rechazar: El ticket ya fue registrado en otro ingreso]
+    E3 --> L2
+    V3 -->|No| T1[Iniciar transaccion]
     T1 --> A2[Asignar codigo y hora de fin]
-    A2 --> P1[Persistir ingreso imagen y auditoria]
-    P1 --> T2[Confirmar transaccion]
-    T2 --> Fin([Fin])
+    A2 --> D4{El vehiculo tiene tara?}
+    D4 -->|Si| A3[Calcular peso neto con la tara del vehiculo]
+    A3 --> P1[Persistir ingreso Registrado con la tara aplicada]
+    D4 -->|No| P2[Persistir ingreso En proceso sin peso neto]
+    P1 --> P3[Guardar valores reconocidos y confirmados y auditar]
+    P2 --> P3
+    P3 --> T2[Confirmar transaccion]
+    T2 --> F([Ingreso con su codigo])
 ```
 ```
 

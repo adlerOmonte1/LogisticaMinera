@@ -2,7 +2,8 @@
 
 **RF asociado:** RF02 · **Historias:** 2
 
-> Módulo que convierte la fotografía del ticket de balanza en seis datos con su nivel de confianza.
+> Módulo que convierte la fotografía del ticket de balanza en tres datos —placa, fecha y peso bruto—
+> con su nivel de confianza.
 > Entrega una propuesta, nunca un dato definitivo: quien decide qué se guarda es el usuario a través
 > de M03. El motor concreto queda detrás de la interfaz `ReconocedorTicket`, de modo que sustituirlo
 > no afecta a ningún otro módulo.
@@ -24,8 +25,9 @@ de su fotografía, para no transcribirlos a mano y terminar el registro en menos
 
 **Descripción**
 
-El motor procesa la imagen y devuelve seis campos —placa, fecha, hora, peso bruto, tara y peso
-neto—, cada uno con un nivel de confianza entre 0 y 1. Los campos cuya confianza queda por debajo
+El ticket de balanza imprime la placa, la fecha y un único peso, que es el peso bruto; el resto del
+papel —quién recibe, la tarifa del pesaje, el concepto y las firmas— no se registra. El motor procesa
+la imagen y devuelve esos tres campos, cada uno con un nivel de confianza entre 0 y 1. Los campos cuya confianza queda por debajo
 del umbral se presentan resaltados, para que el usuario los verifique antes de confirmar.
 
 El resultado es una propuesta. Nada de lo que devuelve el motor se guarda como dato del ingreso
@@ -38,7 +40,10 @@ valor aproximado: un dato inventado con apariencia de lectura es peor que un cam
 el usuario podría aceptarlo sin verificarlo.
 
 **Detalles**
-- Campos reconocidos: placa, fecha, hora, peso bruto, tara y peso neto.
+- Campos reconocidos: placa, fecha y peso bruto.
+- Campos que no se reconocen: la hora del pesaje, que el ticket no imprime y digita el usuario; la
+  tara, que viene del catálogo del vehículo; y el peso neto, que calcula el sistema. La anotación
+  manuscrita del destare tampoco se reconoce: la tara se digita (DR-10).
 - Confianza por campo: valor entre 0 y 1; vacía si no hubo lectura.
 - Umbral de confianza: configurable, 0,80 por defecto.
 - Motor y versión: se registran en cada reconocimiento y no cambian durante la operación.
@@ -46,7 +51,7 @@ el usuario podría aceptarlo sin verificarlo.
 
 **Criterios de aceptación**
 
-> **CA01.** Dado que la imagen es legible, cuando el sistema la procesa, entonces presenta los seis
+> **CA01.** Dado que la imagen es legible, cuando el sistema la procesa, entonces presenta los tres
 > campos precargados junto con su nivel de confianza.
 
 > **CA02.** Dado que un campo tiene una confianza inferior al umbral, cuando se presentan los
@@ -68,7 +73,7 @@ el usuario podría aceptarlo sin verificarlo.
 > persistido ninguno de esos valores como dato del ingreso.
 
 > **CA07.** Dado que el usuario confirma el ingreso, cuando el sistema lo persiste, entonces guarda
-> para cada uno de los seis campos el valor reconocido, el valor confirmado y la confianza, junto
+> para cada uno de los tres campos el valor reconocido, el valor confirmado y la confianza, junto
 > con el motor y su versión.
 
 ---
@@ -105,7 +110,7 @@ campo y no en el motor en conjunto.
 **Criterios de aceptación**
 
 > **CA01.** Dado que un ingreso tiene reconocimiento asociado, cuando el usuario consulta su
-> detalle, entonces el sistema muestra los seis campos con su valor reconocido, su valor confirmado
+> detalle, entonces el sistema muestra los tres campos con su valor reconocido, su valor confirmado
 > y su confianza.
 
 > **CA02.** Dado que un campo fue corregido por el usuario, cuando se muestra la comparación,

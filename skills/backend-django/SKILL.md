@@ -73,20 +73,21 @@ para capacidad de vehículo, `decimal(4,3)` para confianza.
 class Ingreso(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/")
-    fecha_hora_ticket = models.DateTimeField()                     # leida del ticket, editable
+    fecha_hora_pesaje = models.DateTimeField()                     # leida del ticket, editable
     hora_inicio_registro = models.DateTimeField(editable=False)    # la asigna el servicio (D-01)
     hora_fin_registro = models.DateTimeField(editable=False)       # la asigna el servicio (D-01)
-    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2)  # leido, no calculado
+    peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2,
+                                       null=True, editable=False)  # calculado (D-17)
 ```
 
 `auto_now_add` fijaría la hora de inserción en la base, que no es necesariamente el hecho que cada
 marca debe describir (cuándo llegó la imagen, cuándo se confirmó). El servicio las asigna
 explícitamente a través de un `Reloj` inyectado (D-01, ver `solid-proyecto`).
 
-**3. `peso_neto_tn` no se calcula.** Es un dato del ticket, igual que el bruto y la tara. Calcularlo
-como `peso_bruto_tn - tara_tn` haría que la regla V1 de M05 —que compara justamente esos dos
-valores— nunca pudiera detectar un ticket incoherente, porque la comparación siempre daría cero
-(RN-M03-04).
+**3. `peso_neto_tn` se calcula y se almacena.** El ticket imprime solo el peso bruto (DR-09). El neto
+lo calcula `Ingreso.aplicar_tara()` como bruto menos la tara del vehículo, y el ingreso guarda la
+tara aplicada; no es una propiedad derivada del catálogo, porque un cambio de tara reescribiría el
+histórico (RN-M03-04, D-17). Sin tara, el ingreso queda `EN_PROCESO` hasta el destare (DR-10).
 
 **4. El valor reconocido y el confirmado se guardan por separado.** `CampoReconocido` tiene
 `valor_reconocido` y `valor_confirmado` como columnas distintas; nunca se sobrescribe la primera con

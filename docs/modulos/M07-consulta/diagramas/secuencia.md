@@ -92,7 +92,7 @@ sequenceDiagram
     REP->>DB: Consulta paginada con los filtros aplicados
     DB-->>REP: Pagina de resultados
     REP->>DB: Consulta agregada de conteo y suma de pesos netos
-    Note over REP,DB: La suma excluye los anulados RN-M07-02
+    Note over REP,DB: Solo suman los registrados RN-M07-02
     DB-->>REP: Total de ingresos y de toneladas
     REP-->>API: Pagina y totales en un numero fijo de consultas
     API-->>NG: 200 con resultados y totales

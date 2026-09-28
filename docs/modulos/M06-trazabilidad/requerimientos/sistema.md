@@ -5,7 +5,7 @@
 | RS-M06-01 | El sistema registra lotes de proceso con `codigo` asignado por el servidor, `id_tipo_mineral`, `fecha_apertura` y `estado` | RU-M06-01 |
 | RS-M06-02 | El sistema asigna ingresos a un lote mediante `id_lote` en el ingreso, admitiendo como máximo un lote por ingreso | RU-M06-01 |
 | RS-M06-03 | El sistema exige que el tipo de mineral del ingreso coincida con el del lote para permitir la asignación | RU-M06-01 |
-| RS-M06-04 | El sistema impide asignar a un lote ingresos anulados | — (integridad con M03) |
+| RS-M06-04 | El sistema admite asignar a un lote solo ingresos en estado `REGISTRADO`, e impide asignar los anulados y los que están En proceso | — (integridad con M03) |
 | RS-M06-05 | El sistema permite reasignar un ingreso entre lotes mientras ambos estén abiertos | RU-M06-01 |
 | RS-M06-06 | El sistema impide modificar la composición de un lote cerrado | RU-M06-01 |
 | RS-M06-07 | El sistema calcula y expone, por lote, el número de ingresos asignados y la suma de sus pesos netos | RU-M06-05 |

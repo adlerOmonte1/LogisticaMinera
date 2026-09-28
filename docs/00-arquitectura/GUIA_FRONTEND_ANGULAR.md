@@ -234,14 +234,21 @@ peso es irrelevante para leer un ticket impreso (RNF-M03-04).
 
 ### 5.2 Confirmación
 
-La pantalla que sigue a la captura muestra los seis campos que propone el reconocimiento, cada uno
-con su nivel de confianza, y las inconsistencias que ya señala la validación sobre esos datos
+La pantalla que sigue a la captura muestra los tres campos que propone el reconocimiento —placa,
+fecha y peso bruto—, cada uno con su nivel de confianza, y las inconsistencias que ya señala la validación sobre esos datos
 propuestos. Es una sola pantalla, no dos: el usuario revisa lectura e inconsistencia al mismo
 tiempo, porque corregir un dato puede resolver ambas cosas a la vez.
 
 - Los campos con confianza por debajo del umbral se resaltan sin depender solo del color.
 - Un campo sin lectura se muestra vacío y editable, nunca con un valor inventado.
 - Las inconsistencias se muestran junto al campo afectado, con el mensaje literal de la regla.
+- La hora del pesaje se digita en un campo sin valor precargado: el ticket no la imprime y un valor
+  por defecto se confirmaría sin mirarlo.
+- La tara y el peso neto se muestran como referencia, no como campos editables: la tara viene del
+  catálogo y el neto lo calcula el servidor. Si el vehículo no tiene tara, la pantalla lo indica y
+  anuncia que el ingreso quedará En proceso.
+- Si la placa no está en el catálogo, el formulario del vehículo se abre como panel dentro de la
+  misma pantalla; al guardarlo, el registro continúa con todo lo capturado.
 - **Nada de esto se ha persistido.** El envío ocurre solo cuando el usuario confirma; hasta entonces
   todo vive en el estado del componente (D-13).
 
@@ -307,8 +314,8 @@ Lo que se pierde al separarlos hay que reponerlo con disciplina. Tres reglas:
 repositorio del frontend lleva un `README.md` que enlaza a él y no repite ni requerimientos ni
 historias. Dos copias de una historia divergen y la trazabilidad muere ahí.
 
-**2. Misma convención de commits, en ambos repositorios.** `M04: reconoce los seis campos del ticket
-con su confianza (HU-M04-01)`. La cadena `RF → módulo → HU → caso de prueba → commit` tiene que
+**2. Misma convención de commits, en ambos repositorios.** `M04: reconoce placa fecha y peso bruto del ticket
+(HU-M04-01)`. La cadena `RF → módulo → HU → caso de prueba → commit` tiene que
 poder reconstruirse aunque los commits estén repartidos en dos historiales.
 
 **3. Etiqueta las dos puntas cuando el par de módulo esté cerrado.** `git tag M03-cerrado` en los

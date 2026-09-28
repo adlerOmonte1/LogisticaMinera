@@ -27,8 +27,8 @@ class RepositorioConsulta:
         if placa:
             qs = qs.filter(vehiculo__placa__icontains=normalizar_placa(placa))
         if fecha:
-            qs = qs.filter(fecha_hora_ticket__date__range=(fecha, fecha_fin or fecha))
-        return qs.order_by("-fecha_hora_ticket")
+            qs = qs.filter(fecha_hora_pesaje__date__range=(fecha, fecha_fin or fecha))
+        return qs.order_by("-fecha_hora_pesaje")
 ```
 
 Decisiones no obvias:
@@ -69,7 +69,7 @@ bloque omitido.
 def totales(self, filtros) -> TotalesConjunto:
     return (
         self.buscar_con_filtros(filtros)
-        .exclude(estado="ANULADO")
+        .filter(estado=Ingreso.Estado.REGISTRADO)
         .aggregate(cantidad=Count("id"), toneladas=Sum("peso_neto_tn"))
     )
 ```
@@ -77,6 +77,10 @@ def totales(self, filtros) -> TotalesConjunto:
 RNF-M07-03 exige que el listado no dependa del número de resultados: el conteo y la suma se calculan
 con `aggregate()` sobre el mismo `QuerySet` filtrado, no recorriendo la página en Python. Es el mismo
 principio que aplica el total de un lote en M06.
+
+El criterio es «solo Registrados» y no «distinto de anulado». Con el segundo, un ingreso En proceso
+entraría en el conteo y su peso neto nulo desaparecería de la suma sin aviso: el listado diría seis
+ingresos y sumaría cinco.
 
 ### La imagen del ticket
 
@@ -93,8 +97,9 @@ propagar una excepción (RNF-M07-09): el detalle debe seguir mostrándose sin la
   detrás de un menú: es la operación más frecuente del módulo.
 - La miniatura de la lista usa una versión reducida de la imagen; la resolución original se pide
   solo al ampliar (RNF-M07-04), con una petición separada a `.../ticket/`.
-- El estado anulado se distingue en la lista con una marca visible, sin depender de abrir el
-  detalle (RNF-M07-08).
+- Los estados anulado y En proceso se distinguen en la lista con una marca visible, sin depender de
+  abrir el detalle (RNF-M07-08). El peso neto de un ingreso En proceso se muestra como «pendiente del
+  destare», nunca como cero ni como celda vacía.
 - El detalle es un componente que compone cuatro bloques independientes (`ui/reconocimiento`,
   `ui/validaciones`, `ui/trazabilidad`, `ui/datos-ticket`), cada uno capaz de mostrar su propio
   estado «sin datos». Ninguno asume que los otros existen.
@@ -103,15 +108,17 @@ propagar una excepción (RNF-M07-09): el detalle debe seguir mostrándose sin la
 
 **El riesgo principal es que el total del listado deje de coincidir con el de M08.**
 
-Ambos módulos calculan una suma de toneladas sobre el mismo criterio —ingresos no anulados de un
-periodo— pero desde repositorios distintos. Si M07 excluyera los anulados con una condición y M08 con
-otra ligeramente diferente (por ejemplo, una que compare contra `"ANULADO"` como texto y otra contra
-una constante), los dos totales podrían divergir para el mismo mes sin que ninguna prueba aislada de
-un módulo lo detecte, porque cada una prueba solo su propio cálculo.
+Ambos módulos calculan una suma de toneladas sobre el mismo criterio —ingresos Registrados de un
+periodo— pero desde repositorios distintos. Si M07 filtrara con una condición y M08 con otra
+ligeramente diferente (por ejemplo, una que excluya `"ANULADO"` y otra que filtre `REGISTRADO`), los
+dos totales divergirían en cuanto hubiera un ingreso En proceso en el mes, sin que ninguna prueba
+aislada de un módulo lo detecte, porque cada una prueba solo su propio cálculo. La forma de evitarlo
+es que ambos usen el mismo método del gestor de `Ingreso` que devuelve los ingresos computables.
 
 La prueba que sí lo detecta compara, sobre el mismo conjunto de datos sintéticos, el total que
 devuelve el listado de M07 para un mes con el total acumulado que devuelve M08 para ese mismo mes, y
-exige que coincidan exactamente.
+exige que coincidan exactamente. El conjunto debe incluir al menos un ingreso anulado y uno En
+proceso.
 
 **Riesgo secundario:** que la búsqueda sin criterios se bloquee solo en el frontend. Si la validación
 de RN-M07-05 viviera únicamente en el formulario Angular, una petición directa a la API recorrería el

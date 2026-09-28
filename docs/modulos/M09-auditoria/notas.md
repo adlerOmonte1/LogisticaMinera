@@ -26,6 +26,7 @@ class EventoAuditoria(models.Model):
     id_entidad = models.PositiveIntegerField(editable=False)
     valores_anteriores = models.JSONField(null=True, blank=True, editable=False)
     valores_nuevos = models.JSONField(null=True, blank=True, editable=False)
+    motivo = models.TextField(blank=True, editable=False)
     fecha_hora = models.DateTimeField(editable=False)
     direccion_ip = models.GenericIPAddressField(null=True, blank=True, editable=False)
 
@@ -44,16 +45,23 @@ Decisiones no obvias:
 - **`Accion.OPCIONES` vive en `common/eventos.py`**, no en `apps/auditoria/models/`. Es el
   catálogo único que exige RN-M09-05: todos los módulos importan de ahí, ninguno declara sus
   propias constantes de acción.
+- **`motivo` es una columna propia y no una clave dentro de `valores_nuevos`.** El motivo no es un
+  valor del registro afectado sino la explicación del cambio; mezclarlo con los valores haría que
+  el historial lo mostrara como si fuera un campo del ingreso o del vehículo. Lo exigen la corrección
+  de un ingreso y el cambio de tara; el servicio que lo pide valida que no llegue vacío.
+- **El destare no tiene acción propia.** Se registra como `MODIFICAR` sobre el vehículo —la tara pasa
+  de nula a su valor— y sobre cada ingreso que pasa de En proceso a Registrado, con la tara y el peso
+  neto como valores nuevos. Así el catálogo de acciones no crece por cada operación del dominio.
 
 ### El servicio como única puerta de escritura
 
 ```python
 class ServicioAuditoria:
     def registrar(self, *, usuario, accion, entidad, id_entidad,
-                   valores_anteriores=None, valores_nuevos=None, direccion_ip=None):
+                   valores_anteriores=None, valores_nuevos=None, motivo="", direccion_ip=None):
         EventoAuditoria.objects.create(
             usuario=usuario, accion=accion, entidad=entidad, id_entidad=id_entidad,
-            valores_anteriores=valores_anteriores, valores_nuevos=valores_nuevos,
+            valores_anteriores=valores_anteriores, valores_nuevos=valores_nuevos, motivo=motivo,
             fecha_hora=timezone.now(), direccion_ip=direccion_ip,
         )
 ```
