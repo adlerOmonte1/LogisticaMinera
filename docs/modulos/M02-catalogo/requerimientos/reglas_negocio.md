@@ -28,6 +28,12 @@ más que como un dato del vehículo; su propósito completo solo se entiende en 
 lee para decidir si un peso neto es razonable. Un vehículo con capacidad cero o negativa haría que
 esa regla fallara o se volviera inservible para ese vehículo.
 
+## Nota sobre RN-M02-10
+
+La unidad única simplifica el alcance del sistema y es coherente con la operación real: el ticket de
+balanza reporta en toneladas. Si en el futuro se incorporara un tipo de mineral medido en otra
+unidad, esta regla debe revisarse antes de que el sistema acepte el registro.
+
 ## Nota sobre RN-M02-11 a RN-M02-13
 
 La tara es el dato del catálogo con más efecto sobre las toneladas: el ticket de balanza solo imprime
@@ -36,9 +42,3 @@ registra una sola vez, a partir de un pesaje real del vehículo vacío, y su cam
 decisión de la Gerencia que ejecuta el Administrador y queda explicada por su motivo. Que el cambio
 no alcance a los ingresos anteriores es lo que permite que un total mensual ya consolidado siga
 siendo el mismo al consultarlo después.
-
-## Nota sobre RN-M02-10
-
-La unidad única simplifica el alcance del sistema y es coherente con la operación real: el ticket de
-balanza reporta en toneladas. Si en el futuro se incorporara un tipo de mineral medido en otra
-unidad, esta regla debe revisarse antes de que el sistema acepte el registro.

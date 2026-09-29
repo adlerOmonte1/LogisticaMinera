@@ -13,8 +13,8 @@
 | RS-M07-09 | El sistema ofrece un listado con filtros combinables por rango de fechas, tipo de mineral, vehículo, titularidad y estado | RU-M07-04 |
 | RS-M07-10 | El sistema pagina los resultados del listado | RU-M07-04 |
 | RS-M07-11 | El sistema calcula el número de ingresos y la suma de pesos netos del conjunto filtrado considerando solo los ingresos en estado `REGISTRADO` | RU-M07-04 |
-| RS-M07-12 | El sistema incluye los ingresos En proceso en los resultados, señalados como tales y con el peso neto indicado como pendiente del destare | RU-M07-04 |
 | RS-M07-12 | El sistema rechaza un rango de fechas cuyo inicio sea posterior a su fin | RU-M07-04 |
 | RS-M07-13 | El sistema compone el detalle de un ingreso con sus validaciones, su reconocimiento y su trazabilidad cuando existen | — (integridad con M04, M05, M06) |
 | RS-M07-14 | El sistema indica la ausencia de cada uno de esos elementos en lugar de omitir su bloque | RU-M07-03 |
 | RS-M07-15 | El sistema no escribe ningún dato: todas sus operaciones son de lectura | — (D-10) |
+| RS-M07-16 | El sistema incluye los ingresos En proceso en los resultados, señalados como tales y con el peso neto indicado como pendiente del destare | RU-M07-04 |

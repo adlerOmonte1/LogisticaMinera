@@ -1,7 +1,7 @@
 # Requerimientos funcionales — M05 Validación automática de consistencia
 
-**RF asociado:** **RF03** — Validar automáticamente la consistencia de los datos del ticket: pesos,
-formato de placa, capacidad del vehículo y fecha.
+**RF asociado:** **RF03** — Validar automáticamente la consistencia de los datos del ticket: duplicidad,
+pesos, formato de placa, capacidad del vehículo y fecha.
 
 | Función | Descripción | HU | Endpoint |
 |---|---|---|---|
