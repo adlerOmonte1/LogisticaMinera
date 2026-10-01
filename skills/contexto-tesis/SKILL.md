@@ -170,11 +170,10 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 Añadir un módulo consiste en crear su carpeta, agregar una fila a esta tabla y sus filas a la
 matriz de trazabilidad. No se renumera nada ni se toca otro módulo.
 
-> **Nota sobre la renumeración.** Los módulos se renumeraron el 21/09/2026. Las cuatro carpetas
-> de `docs/modulos/` con la numeración antigua M04 a M07 (salidas y movimientos, inventario por
-> producto, consolidados y reportes, captura local) y las apps del backend que no figuran en el
-> mapa (`apps/salidas` entre ellas) corresponden al sistema anterior y se retiran en las fases 7
-> y 10 del plan de migración. Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
+> **Nota sobre la renumeración.** Los módulos se renumeraron el 21/09/2026. Las carpetas de
+> `docs/modulos/` con la numeración antigua ya se retiraron. Las apps del backend que no figuran en
+> el mapa (`apps/salidas` entre ellas) corresponden al sistema anterior y se retiran en la
+> preparación del repositorio (`docs/01-plan/PLAN_DE_TRABAJO.md` §8). Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
 > esa fecha se refieren a Salidas, no a Reconocimiento. No documentes nada sobre esas carpetas ni
 > cites sus historias.
 
@@ -225,8 +224,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 
 ## Decisiones de reformulación asumidas
 
-Del Anexo B del plan de migración, tomadas con su recomendación mientras el autor no indique lo
-contrario: DR-01 borrador ante pérdida de conexión como RNF, sin historias propias · DR-02 motor
+Registradas en `docs/00-tesis/decisiones_reformulacion.md`: DR-01 borrador ante pérdida de conexión como RNF, sin historias propias · DR-02 motor
 detrás de `ReconocedorTicket` · DR-03 un solo catálogo de tipo de mineral, usado al registrar y al
 consolidar · DR-04 vínculo ingreso–etapa mediante lote de proceso · DR-05 una placa que no está en
 el catálogo es el primer viaje del vehículo, que se da de alta en la misma pantalla del registro

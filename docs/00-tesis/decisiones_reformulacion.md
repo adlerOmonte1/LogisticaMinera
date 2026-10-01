@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Documento | Decisiones DR-01 a DR-10 |
-| Origen | Anexo B de `../PLAN_TRABAJO.md` |
+| Origen | Reformulación del alcance del sistema, septiembre de 2026 |
 | Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) |
 | Estado | Todas aceptadas; DR-09 y DR-10 a partir del formato real del ticket, informado por el autor |
 

@@ -12,10 +12,10 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 
 ## Estado del proyecto
 
-El repositorio está en migración de un alcance anterior (control de producción y existencias) al
-sistema web inteligente descrito arriba. La reformulación se documenta en
-[`docs/REFORMULACION.md`](docs/REFORMULACION.md) y se ejecuta por fases según
-[`docs/PLAN_TRABAJO.md`](docs/PLAN_TRABAJO.md).
+La documentación del sistema está completa: nueve módulos, 22 historias de usuario, sus
+requerimientos y diagramas. El backend conserva apps de un alcance anterior que se retiran en la
+preparación del repositorio, antes de construir los módulos
+([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).
 
 | Rama | Contenido |
 |---|---|

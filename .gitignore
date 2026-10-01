@@ -24,3 +24,6 @@ Thumbs.db
 
 # Artefacto intermedio del generador del PDF de historias de usuario
 docs/03-pruebas/_build_hu.html
+
+# Archivos temporales de Office
+~$*

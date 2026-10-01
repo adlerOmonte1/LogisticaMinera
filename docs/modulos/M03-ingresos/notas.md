@@ -5,8 +5,8 @@
 **App:** `apps/ingresos/`
 
 > La app existe con el diseño anterior —peso neto calculado, marca de tiempo única y campos de
-> captura local— y se refactoriza, no se recrea. El cambio se aplica en la fase de limpieza del
-> backend del plan de migración.
+> captura local— y se refactoriza, no se recrea. El cambio se aplica en la preparación del
+> repositorio heredado, antes de construir los módulos.
 
 ### Modelo
 

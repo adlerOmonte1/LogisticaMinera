@@ -14,8 +14,8 @@ patrones='Producci[oó]n y Existencias|RF-[0-9]{2}|\bstock\b|kardex|\bmerma\b|de
 # Se usa solo para instrucciones que nombran el termino para prohibirlo, y para el historial
 # de decisiones retiradas.
 
-# Documentos que describen la propia migracion y deben conservar la terminologia antigua.
-exclusiones='docs/REFORMULACION.md|docs/PLAN_TRABAJO.md|docs/00-tesis/auditoria_migracion.md|scripts/verificar_migracion.sh'
+# El propio script nombra los terminos retirados.
+exclusiones='scripts/verificar_migracion.sh'
 
 hallazgos=$(grep -rnE "$patrones" docs skills --include=*.md 2>/dev/null \
   | grep -vE "$exclusiones" \
