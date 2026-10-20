@@ -54,3 +54,19 @@ imprimía seis datos, y el ticket real imprime tres. Medir la exactitud del reco
 campos que el papel no contiene, o sembrar una inconsistencia entre un neto impreso y una resta que
 no existe, produciría resultados sin sentido. Los instrumentos deben describir el ticket que la
 planta usa.
+
+
+## Decisiones nuevas (registrar como DR-11 a DR-18 en `docs/00-tesis/decisiones_reformulacion.md` con Fecha 20/10/2026)
+ 
+| Código | Decisión | Afecta |
+|---|---|---|
+| DR-11 | Se mantienen tres marcas de tiempo. La **fecha y hora del pesaje** es la del pesaje real: la fecha se reconoce del ticket y la hora la indica el usuario (propuesta con la hora actual, editable). El **inicio y el fin del registro** los marca el servidor automáticamente. Ejemplo: pesaje a las 16:00, inicio a las 16:05 y fin a las 16:06 → 5 min de espera (I1) y 1 min de registro (I2). Se conserva DR-09 | M03, I1, I2 |
+| DR-12 | No hay un "número de ticket" aparte: el código único del ingreso (RF05) lo identifica | M03 |
+| DR-13 | Registro manual de respaldo: si el ticket se extravía o no se puede fotografiar, se registra sin foto con motivo obligatorio. Es una excepción documentada como regla de negocio, no un RF nuevo; el ingreso queda marcado "sin respaldo fotográfico" | M03, M07 |
+| DR-14 | Cierre del lote: cuando todo su mineral está ensacado, el Administrador cierra definitivamente el lote con el resumen de su proceso y registra el destino: **venta** o **traslado a otro punto** (por ejemplo, por ley baja). No incluye guía, facturación ni precios. Es una historia de M06 (RF07), no un módulo nuevo | M06, M01 |
+| DR-15 | Bigbags, peso aproximado, diferencia frente a lo registrado y horas de molienda (t/h) son **datos descriptivos de gestión**. No son inventario de producto terminado, no miden pérdidas y no forman parte de los indicadores de la tesis | M06 |
+| DR-16 | Las etapas no son obligatorias para todos los lotes: la **ruta** de cada lote o parte se decide (secado común; luego zarandeo, molienda o ambos; y ensacado). **I6 se reformula:** etapas vinculadas ÷ etapas de la ruta decidida × 100. Exige actualizar el marco (§4) y la ficha de observación (Anexo 02) **antes del juicio de expertos** | Marco, Anexo 02, M06, matriz |
+| DR-17 | El rol Supervisor de planta registra ingresos, vehículos nuevos, destares y etapas, y consulta. Aclarar el texto del marco (§8) | Marco, M01 |
+| DR-18 | **División de un lote por proporción, no por toneladas:** el mineral acumulado no se pesa, se estima a la vista. El usuario indica la fracción de cada parte (por ejemplo, 1/3 molido y 2/3 zaranda; también para tres partes o más). El sistema calcula las toneladas aproximadas de cada parte (fracción × total) solo para estimar el peso de los bigbags | M06 |
+ 
+Para confirmar en la próxima sesión: si el reparto de un ingreso que llega después del secado también se hace por proporción. Se propone usar por defecto las fracciones del lote, editables.
