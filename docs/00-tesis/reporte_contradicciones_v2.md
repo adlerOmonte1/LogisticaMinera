@@ -4,9 +4,9 @@
 |---|---|
 | Documento | Reporte de contradicciones de la Fase 3 de `plan_version2.md` |
 | Fecha | 21/10/2026 |
-| Fuentes contrastadas | `marco_tesis.md`, `decisiones_reformulacion.md` (DR-01 a DR-22) y los nueve módulos de `docs/modulos/` en su versión 2 |
+| Fuentes contrastadas | `marco_tesis.md`, `decisiones_reformulacion.md` (DR-01 a DR-23) y los nueve módulos de `docs/modulos/` en su versión 2 |
 | Documentos revisados | `00-arquitectura/`, `model-c4/` y las skills que los repiten |
-| Estado | Para decisión del autor. **Ningún archivo de arquitectura se modificó** |
+| Estado | **Resuelto** el 21/10/2026, salvo O-03 y O-04. El autor levantó la exclusión de `00-arquitectura/` y `model-c4/` y decidió que los roles se rigen por el catálogo (DR-23). Ver §7 |
 
 El plan de la versión 2 excluye `00-arquitectura/`, `model-c4/` y `backend/`, y en esta fase solo
 pide reportar. Por el orden de las fuentes de verdad de `CLAUDE.md`, las decisiones DR prevalecen
@@ -82,3 +82,16 @@ Quien implemente M03 o M06 siguiendo `modelo_datos_entidad_relacion.md` construi
 número de ticket y sin la posibilidad de registrarse sin foto, y un lote de dos estados sin ruta ni
 partes. El código contradiría las historias de usuario aprobadas, y las pruebas de aceptación CP07,
 CP11 y CP12 fallarían por diseño, no por defecto de implementación.
+
+## 7. Resolución
+
+| Contradicciones | Cómo se resolvieron | Archivos |
+|---|---|---|
+| C-01, C-02, C-04 | D-01 con la hora propuesta y editable y el inicio del registro sin foto; D-13 con la excepción del registro sin foto; D-07 extendida a los lotes; D-14 con la imagen ausente solo en el registro sin foto | `00-arquitectura/decisiones_diseno.md` |
+| C-03, C-05 a C-11 | Modelo de datos versión 3.0: respaldo o motivo en `INGRESO`, sin `numero_ticket`; lote con nombre, ruta, ciclo Abierto, En recorrido y Cerrado, y destino; entidades `PARTE_LOTE`, `REPARTO_INGRESO` y `BIGBAG`; `PASO_ETAPA` por parte y por ingreso tardío; unicidades de M02; además, `fecha_destare` indicada por el usuario y `EVENTO_AUDITORIA.ingresos_relacionados`, que exigían M03 y M09 | `00-arquitectura/modelo_datos_entidad_relacion.md` |
+| C-12, C-13 | Hora propuesta, registro sin foto y menú por rol en la guía Angular; modelo `Ingreso` de ejemplo sin número de ticket, con estado En proceso y restricción de respaldo | `00-arquitectura/GUIA_FRONTEND_ANGULAR.md`, `00-arquitectura/GUIA_MARCO_DE_TRABAJO.md` |
+| C-14 a C-16 | ARQ-01, ARQ-02 y ARQ-03 versión 3.0: responsabilidad de M03 y M06 del marco, alcance de los tres roles, contrato de la API y nivel 4 con el registro sin foto y el destare por vehículo | `model-c4/` |
+| C-17, C-18 | Unicidades y restricciones de la versión 2; registro sin foto sin `ReconocedorTicket` | `skills/base-datos-postgresql`, `skills/reconocimiento-validacion` |
+| O-01, O-02 | DR-23: el Administrativo gestiona los catálogos y compone los lotes, como especifican M02 y M06; el uso de los roles se valida con los usuarios antes de implementar M01 | `decisiones_reformulacion.md`, `marco_tesis.md` §8, `skills/contexto-tesis` |
+
+**Siguen abiertas:** O-03 (P-03) y O-04 (`Historias_de_Usuario_v1.1.docx`).

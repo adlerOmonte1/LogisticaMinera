@@ -177,5 +177,4 @@ En proceso del mismo vehículo (HU-M03-04 CA07).
 | Medio de almacenamiento y retención de las imágenes (D-14) | Define `upload_to`, el respaldo y el acceso restringido de RNF-M03-11 |
 | Motor de reconocimiento (D-12) | No bloquea: el servicio depende de la interfaz. Sí condiciona RNF-M03-02 |
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede completarse el campo obligatorio de tipo de mineral; el alta desde el registro reduce el bloqueo |
-| Modelo de datos sin actualizar a la versión 2 (`mapa_limpieza_v2.md` §3) | `modelo_datos_entidad_relacion.md` aún tiene `numero_ticket` y no tiene la marca de ingreso sin respaldo ni la fecha del destare indicada por el usuario. El modelo de esta nota prevalece hasta que se actualice |
 | Tratamiento del ingreso sin foto en la ficha de observación (P-03) | No cambia el sistema; condiciona cómo se usa el ingreso en la medición |

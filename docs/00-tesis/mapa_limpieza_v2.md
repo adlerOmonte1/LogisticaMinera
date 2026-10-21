@@ -98,8 +98,8 @@ decisiones nuevas, y los módulos remiten a ellos:
 
 ## 6. Decisiones que se necesitan del autor
 
-1. Si se levanta la exclusión de `00-arquitectura/` y `model-c4/` al menos para el modelo de datos, la
-   decisión D-01 y la fila de M06 de ARQ-01 (sección 3).
+1. ~~Si se levanta la exclusión de `00-arquitectura/` y `model-c4/`~~ — **resuelto**: se levantó y la
+   arquitectura se actualizó (`reporte_contradicciones_v2.md` §7).
 2. Qué hacer con `Historias_de_Usuario_v1.1.docx` (sección 1).
-3. Si se versiona el mockup en `docs/mockup/` (sección 4).
-4. Los pendientes P-01 a P-04 de `decisiones_reformulacion.md`.
+3. ~~Si se versiona el mockup~~ — **resuelto**: se versionó en `Mockup/index.html`, en la raíz.
+4. P-01, P-02 y P-04 están resueltos (DR-19 a DR-21). Queda P-03 de `decisiones_reformulacion.md`.
