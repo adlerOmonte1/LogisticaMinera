@@ -21,8 +21,8 @@ entidad de catálogo —alta, edición, listado y baja lógica— es una sola hi
 aceptación por operación. Se reserva historia propia para lo que tiene lógica dedicada: el
 reconocimiento, la validación, la anulación con motivo, el destare, la exportación.
 
-Por eso el backlog tiene **27 historias** y no las 34 del sistema anterior, pese a cubrir más
-funcionalidad. La versión 2 añadió cinco: la división del lote y su cierre con destino (M06), el
+Por eso el backlog tiene **26 historias** y no las 34 del sistema anterior, pese a cubrir más
+funcionalidad. La versión 2 añadió cuatro: la división del lote y su cierre con destino (M06), el
 calendario de llegadas (M07) y la separación entre el historial de un ingreso y la auditoría del
 sistema (M09). El registro sin foto no es una historia nueva: es una excepción de HU-M03-01 (DR-13).
 
@@ -66,7 +66,7 @@ sistema (M09). El registro sin foto no es una historia nueva: es una excepción 
 | HU-M09-02 | Historial de un ingreso | Supervisor de planta | Media | — | — | — | — |
 | HU-M09-03 | Consulta de la auditoría del sistema | Administrador | Media | — | — | — | — |
 
-**Total: 27 historias.**
+**Total: 26 historias.**
 
 ## 3. Comprobación: cada RF tiene al menos una historia
 

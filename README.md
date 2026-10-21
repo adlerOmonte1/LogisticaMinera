@@ -12,7 +12,7 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 
 ## Estado del proyecto
 
-La documentación del sistema está en su **versión 2**: nueve módulos, 27 historias de usuario, sus
+La documentación del sistema está en su **versión 2**: nueve módulos, 26 historias de usuario, sus
 requerimientos y diagramas, reformulados a partir de la revisión del prototipo navegable
 ([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-22. La versión 1 queda en
 la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
