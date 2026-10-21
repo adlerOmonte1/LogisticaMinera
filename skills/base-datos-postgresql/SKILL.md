@@ -81,8 +81,10 @@ agrupando por `tipo_mineral` y excluyendo `estado='ANULADO'` **antes** de agrega
 tipo de mineral sin ingresos en el periodo se omite del resultado, no aparece con total en cero.
 
 **Trazabilidad de un ingreso** (M06): parte de `INGRESO.id_lote`, no de una tabla intermedia —un
-ingreso pertenece a un lote como máximo. Si el ingreso no tiene lote, el resultado son las cuatro
-etapas marcadas como no recorridas, no un error.
+ingreso pertenece a un lote como máximo. El denominador son las etapas de la ruta del lote o, si se
+dividió, la unión de las rutas de sus partes (DR-21). Si el ingreso no tiene lote, el resultado es
+ninguna etapa recorrida, no un error. Las fracciones de las partes se guardan como numerador y
+denominador enteros, nunca como decimal, para que su suma sea exacta.
 
 **Comparación de reconocimiento** (M04): `CAMPO_RECONOCIDO` filtrado por `id_reconocimiento`, con
 sus tres filas —placa, fecha y peso bruto— siempre presentes aunque alguna tenga
