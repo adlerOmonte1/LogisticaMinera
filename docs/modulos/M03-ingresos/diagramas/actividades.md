@@ -1,10 +1,11 @@
 # Diagramas de actividades — M03 Registro de ingresos
 
-## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-10, RN-M03-16, RN-M03-17)
+## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-09, RN-M03-16, RN-M03-17, RN-M03-21, RN-M03-22, RN-M03-24)
 
 ```mermaid
 flowchart TD
-    I([Supervisor junto a la balanza]) --> C1[Capturar foto del ticket]
+    I([Supervisor junto a la balanza]) --> D0{Hay ticket para fotografiar?}
+    D0 -->|Si| C1[Capturar foto del ticket]
     C1 --> V1{Formato y tamano admitidos?}
     V1 -->|No| E1[Rechazar: La imagen debe estar en formato JPG o PNG y no superar los 10 MB]
     E1 --> C1
@@ -13,21 +14,30 @@ flowchart TD
     R1 --> D1{Imagen legible?}
     D1 -->|No| L1[Ingresar placa fecha y peso bruto manualmente]
     D1 -->|Si| C2[Mostrar campos con su confianza]
-    L1 --> L2[Revisar y corregir datos]
-    C2 --> L2
-    L2 --> L3[Digitar la hora del pesaje]
-    L3 --> D2{Placa en el catalogo?}
+    D0 -->|No| S1[Elegir registro sin foto y asignar hora de inicio]
+    S1 --> S2[Elegir el motivo de la lista]
+    S2 --> S3[Ingresar placa fecha y peso bruto]
+    L1 --> H1[Proponer la hora actual como hora del pesaje]
+    C2 --> H1
+    S3 --> H1
+    H1 --> L2[Revisar corregir datos y ajustar la hora]
+    L2 --> D2{Placa en el catalogo?}
     D2 -->|No| L4[Dar de alta el vehiculo en la misma pantalla]
-    L4 --> L5[Elegir tipo de mineral]
-    D2 -->|Si| L5
-    L5 --> V2[Validar reglas V1 a V5]
+    D2 -->|De baja| E3[Rechazar: El vehiculo esta dado de baja]
+    E3 --> L2
+    D2 -->|Si| L5{Tipo de mineral en el catalogo?}
+    L4 --> L5
+    L5 -->|No| D5{Rol Administrativo o Administrador?}
+    D5 -->|Si| L6[Dar de alta el tipo de mineral en la misma pantalla]
+    D5 -->|No| E4[Indicar que lo registre un administrativo]
+    E4 --> F2([Registro detenido sin perder lo capturado])
+    L6 --> L7[Elegir tipo de mineral]
+    L5 -->|Si| L7
+    L7 --> V2[Validar reglas V1 a V5]
     V2 --> D3{Inconsistencia sin resolver?}
     D3 -->|Si| E2[Senalar campo con el mensaje de la regla]
     E2 --> L2
-    D3 -->|No| V3{Numero de ticket ya registrado?}
-    V3 -->|Si| E3[Rechazar: El ticket ya fue registrado en otro ingreso]
-    E3 --> L2
-    V3 -->|No| T1[Iniciar transaccion]
+    D3 -->|No| T1[Iniciar transaccion]
     T1 --> A2[Asignar codigo y hora de fin]
     A2 --> D4{El vehiculo tiene tara?}
     D4 -->|Si| A3[Calcular peso neto con la tara del vehiculo]
@@ -40,9 +50,12 @@ flowchart TD
 ```
 
 Un vehículo dado de alta en la misma pantalla nunca tiene tara todavía, de modo que su ingreso
-siempre termina En proceso: la tara llega con el destare (A-M03-04).
+siempre termina En proceso: la tara llega con el destare (A-M03-04). El registro sin foto omite el
+reconocimiento, pero no la validación: sus datos pasan por las mismas reglas (RN-M03-22) y el
+ingreso queda marcado sin respaldo fotográfico, con su motivo. La hora del pesaje se propone en
+los tres caminos y el usuario la ajusta antes de confirmar.
 
-## A-M03-02 · Decisión entre corregir y anular (RN-M03-11 a RN-M03-14)
+## A-M03-02 · Decisión entre corregir y anular (RN-M03-11 a RN-M03-14, RN-M03-25 a RN-M03-27)
 
 ```mermaid
 flowchart TD
@@ -51,7 +64,10 @@ flowchart TD
     D2 -->|No| E1[Rechazar: Accion no autorizada]
     D2 -->|Si| L1[Indicar motivo de anulacion]
     L1 --> P1[Marcar como anulado y auditar]
-    P1 --> F1([Queda fuera de los totales y visible en el detalle])
+    P1 --> D7{El lote todavia reune ingresos?}
+    D7 -->|Si| P4[Retirar el ingreso del lote]
+    D7 -->|No o sin lote| F1([Queda fuera de los totales y visible en el detalle])
+    P4 --> F1
 
     D1 -->|Si| D3{El dato equivocado es corregible?}
     D3 -->|No| M1[Informar que el codigo la imagen y las horas del servidor no se modifican]
@@ -61,12 +77,18 @@ flowchart TD
     D4 -->|Si| D5{Ingreso anulado?}
     D5 -->|Si| E2[Rechazar: No se puede corregir un ingreso anulado]
     D5 -->|No| L2[Indicar motivo de la correccion]
-    L2 --> V1[Validar reglas V1 a V5 sobre los datos corregidos]
+    L2 --> D8{Cambia el tipo de mineral de un ingreso en lote?}
+    D8 -->|Si y difiere del lote| E4[Rechazar: El ingreso corresponde a otro tipo de mineral que el lote]
+    E4 --> L2
+    D8 -->|No| V1[Validar reglas V1 a V5 sobre los datos corregidos]
     V1 --> D6{Regla bloqueante incumplida?}
     D6 -->|Si| E3[Senalar campo con el mensaje de la regla]
     E3 --> L2
-    D6 -->|No| P2[Actualizar y auditar valores anteriores]
+    D6 -->|No| D9{El vehiculo corregido tiene tara?}
+    D9 -->|Si| P2[Recalcular peso neto actualizar y auditar]
+    D9 -->|No| P3[Dejar el ingreso En proceso sin neto y auditar]
     P2 --> F3([Ingreso corregido con historial del cambio])
+    P3 --> F3
 ```
 
 ## A-M03-03 · Conservación del borrador ante pérdida de conexión (RNF-M03-05)
@@ -89,31 +111,37 @@ flowchart TD
 El borrador vive solo en el dispositivo y no es un ingreso: no tiene código ni figura en ninguna
 consulta hasta confirmarse contra el servidor.
 
-## A-M03-04 · Registro del destare de un vehículo en su primer viaje (RN-M03-19, RN-M03-20)
+## A-M03-04 · Registro del destare de un vehículo en su primer viaje (RN-M03-19, RN-M03-20, RN-M03-23)
 
 ```mermaid
 flowchart TD
     I([Volquete descargado se pesa vacio]) --> C1[Abrir ingresos pendientes de destare]
-    C1 --> L1[Elegir el ingreso En proceso del vehiculo]
+    C1 --> D0{Hay ingresos En proceso?}
+    D0 -->|No| M0[Informar: No hay vehiculos pendientes de destare]
+    M0 --> F0([Sin destare])
+    D0 -->|Si| L1[Elegir el vehiculo]
     L1 --> V1{El vehiculo ya tiene tara?}
     V1 -->|Si| E1[Rechazar: El vehiculo ya tiene tara registrada]
-    V1 -->|No| L2[Digitar la tara del vehiculo vacio]
+    V1 -->|No| L2[Digitar la tara y ajustar la fecha y hora propuestas]
     L2 --> V2{Tara indicada?}
     V2 -->|No| E2[Rechazar: Debe indicar la tara del vehiculo]
     E2 --> L2
-    V2 -->|Si| V3{Tara menor que el peso bruto?}
+    V2 -->|Si| V5{Fecha posterior al registro?}
+    V5 -->|Si| E5[Rechazar: La fecha del destare no puede ser posterior a la fecha actual]
+    E5 --> L2
+    V5 -->|No| V3{Tara menor que el peso bruto de cada ingreso?}
     V3 -->|No| E3[Rechazar: La tara no puede ser mayor o igual que el peso bruto]
     E3 --> L2
-    V3 -->|Si| A1[Calcular peso neto]
-    A1 --> V4{Neto dentro del rango de carga?}
-    V4 -->|No| L3[Escribir justificacion del peso fuera de rango]
+    V3 -->|Si| A1[Calcular el peso neto de cada ingreso En proceso]
+    A1 --> V4{Algun neto fuera del rango de carga?}
+    V4 -->|Si| L3[Escribir la justificacion de cada ingreso fuera de rango]
     L3 --> T1
-    V4 -->|Si| T1[Iniciar transaccion]
-    T1 --> P1[Guardar tara fecha y usuario en el vehiculo]
-    P1 --> P2[Calcular neto de todos sus ingresos En proceso]
+    V4 -->|No| T1[Iniciar transaccion]
+    T1 --> P1[Guardar tara fecha del destare y usuario en el vehiculo]
+    P1 --> P2[Aplicar la tara y el neto a todos sus ingresos En proceso]
     P2 --> P3[Pasar esos ingresos a Registrado y auditar]
     P3 --> T2[Confirmar transaccion]
-    T2 --> F([Destare registrado y neto disponible])
+    T2 --> F([Destare registrado con la lista de ingresos completados])
 ```
 
 La tara se digita, no se reconoce de la imagen: de ella depende el peso neto de todos los viajes

@@ -14,9 +14,11 @@
 | RNF-M03-10 | Seguridad — no repudio | La imagen del ticket se conserva sin alteración mientras el ingreso exista, incluso si este se anula | Consulta de verificación sobre el almacén de imágenes tras una anulación |
 | RNF-M03-11 | Seguridad — confidencialidad | La imagen solo es accesible para usuarios autenticados con permiso sobre el ingreso; no se sirve desde una ruta pública adivinable | Inspección de configuración e intento de acceso sin sesión |
 | RNF-M03-12 | Mantenibilidad — modularidad | Cambiar el motor de reconocimiento o añadir una regla de validación no obliga a modificar el servicio de registro | Inspección de código: el servicio depende de las interfaces, no de implementaciones |
-| RNF-M03-13 | Usabilidad — operabilidad | El alta de un vehículo nuevo se completa en la misma pantalla del registro, sin navegar a otra y sin perder la imagen ni los campos ya capturados | Inspección en dispositivo real registrando el primer viaje de un vehículo |
-| RNF-M03-14 | Usabilidad — protección contra errores del usuario | La hora del pesaje se ingresa con un control de hora, sin valor precargado, para que el usuario la escriba en lugar de aceptar la hora actual por descuido | Inspección en dispositivo real |
+| RNF-M03-13 | Usabilidad — operabilidad | El alta de un vehículo nuevo o de un tipo de mineral se completa en la misma pantalla del registro, sin navegar a otra y sin perder la imagen ni los campos ya capturados | Inspección en dispositivo real registrando el primer viaje de un vehículo y un tipo de mineral nuevo |
+| RNF-M03-14 | Usabilidad — protección contra errores del usuario | La hora del pesaje se propone con la hora en que se abre la revisión, se muestra marcada como propuesta junto a la fecha reconocida y se edita con un control de hora | Inspección en dispositivo real |
 | RNF-M03-15 | Usabilidad — reconocibilidad | Los ingresos En proceso se distinguen de los Registrados en toda lista, y el sistema muestra cuántos están pendientes de destare | Inspección en dispositivo real |
+| RNF-M03-16 | Usabilidad — reconocibilidad | Los ingresos sin respaldo fotográfico se distinguen en toda lista sin abrir el detalle, y el detalle muestra el motivo en lugar de la imagen | Inspección en dispositivo real |
+| RNF-M03-17 | Usabilidad — operabilidad | El registro sin foto se elige desde la misma pantalla de captura, sin navegar a otra | Inspección en dispositivo real |
 
 ## Nota sobre RNF-M03-02 y RNF-M03-04
 
@@ -35,7 +37,12 @@ código único y la validación viven allí (D-02, D-08).
 
 ## Nota sobre RNF-M03-14
 
-La hora del pesaje es el único dato del registro que no sale del ticket ni del sistema: la digita
-el usuario (DR-09). Precargarla con la hora actual parece una comodidad, pero la volvería igual al
-inicio del registro cada vez que el usuario no la corrija, y la primera marca de tiempo dejaría de
-describir el pesaje.
+La hora del pesaje es el único dato del registro que no sale del ticket ni del sistema: la indica el
+usuario (DR-09, DR-11). El sistema la propone con la hora en que se abre la revisión porque, cuando
+el registro se hace junto a la balanza, esa hora está a pocos minutos del pesaje y el usuario solo
+la ajusta.
+
+La propuesta tiene un costo que debe controlarse: si el usuario la acepta sin ajustarla, la fecha y
+hora del pesaje queda casi igual al inicio del registro y el tiempo de espera entre ambos parece
+nulo. Por eso la hora se muestra **marcada como propuesta** y no como un dato reconocido, y la
+verificación en dispositivo comprueba que el usuario la distingue de la fecha leída del ticket.

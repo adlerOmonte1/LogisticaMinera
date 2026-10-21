@@ -10,9 +10,11 @@
 | RU-M03-06 | Quiero que la foto del ticket quede guardada con el ingreso, para poder mostrarla cuando alguien pregunte |
 | RU-M03-07 | Si me equivoqué en un dato, quiero arreglarlo sin tener que borrar el registro y hacerlo de nuevo |
 | RU-M03-08 | Si un ingreso no debió registrarse, quiero sacarlo de las cuentas pero que no desaparezca |
-| RU-M03-09 | Como el ticket no dice la hora, quiero anotarla yo cuando registro el ingreso |
+| RU-M03-09 | Como el ticket no dice la hora, quiero que el sistema me la proponga y poder ajustarla a la hora real del pesaje |
 | RU-M03-10 | Si llega un carro nuevo, quiero agregarlo ahí mismo, sin cambiar de pantalla |
 | RU-M03-11 | Cuando un carro viene por primera vez, quiero anotar su tara al destararlo, y que después el sistema saque el neto solo |
+| RU-M03-12 | Si el ticket se pierde o no lo puedo fotografiar, quiero registrar igual el ingreso, explicando por qué no tiene foto |
+| RU-M03-13 | Si llega un mineral que no está en la lista, quiero que alguien de la oficina pueda agregarlo sin que yo pierda el registro |
 
 ## Contexto del diagnóstico
 
@@ -24,4 +26,6 @@
 | RU-M03-06 | El respaldo en papel se archiva en desorden y recuperarlo para verificar un ingreso concreto puede tomar mucho tiempo o resultar imposible |
 | RU-M03-07, RU-M03-08 | Hoy corregir significa tachar el papel, y no queda constancia de qué decía antes ni de quién lo cambió |
 | RU-M03-09 | El ticket de balanza solo imprime el día, el mes y el año: la hora del pesaje no queda escrita en ningún lado |
+| RU-M03-12 | El ticket térmico se pierde, se moja o se borra, y en algunos puntos de pesaje no hay cámara ni señal; hoy ese ingreso queda sin registrar o se anota de memoria |
+| RU-M03-13 | Cuando entra mineral de una procedencia nueva, el registro se detiene hasta que alguien defina cómo llamarlo |
 | RU-M03-10, RU-M03-11 | El ticket imprime un único peso. La tara de cada carro se obtiene en su primer viaje, cuando se lo pesa vacío y el operador de la balanza hace la resta a mano; desde entonces se mantiene por decisión de la Gerencia |
