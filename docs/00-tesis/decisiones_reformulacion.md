@@ -2,10 +2,10 @@
 
 | Campo | Valor |
 |---|---|
-| Documento | Decisiones DR-01 a DR-18 |
+| Documento | Decisiones DR-01 a DR-22 |
 | Origen | Reformulación del alcance del sistema, septiembre de 2026 |
-| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) · 20/10/2026 (DR-11 a DR-18) |
-| Estado | Todas aceptadas. DR-09 y DR-10 parten del formato real del ticket; DR-11 a DR-18, de la revisión del mockup del sistema (versión 2) |
+| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) · 20/10/2026 (DR-11 a DR-18) · 21/10/2026 (DR-19 a DR-22) |
+| Estado | Todas aceptadas. DR-09 y DR-10 parten del formato real del ticket; DR-11 a DR-18, de la revisión del mockup del sistema (versión 2); DR-19 a DR-22 resuelven los pendientes P-01, P-02 y P-04 |
 
 Estas decisiones resuelven las ambigüedades que la reformulación dejó abiertas. Son previas al
 diseño: cada una condiciona un módulo, una entidad o un instrumento. Reabrir cualquiera exige
@@ -33,6 +33,10 @@ justificación escrita y revisión de los documentos que dependen de ella.
 | DR-16 | Ruta del lote e I6 | Las etapas no son obligatorias para todos los lotes: se decide la **ruta** de cada lote o de cada parte (secado común; luego zarandeo, molienda o ambos; y ensacado). **I6 se reformula** como etapas vinculadas ÷ etapas de la ruta decidida × 100 | Marco §4, Anexo 02, M06, matriz de trazabilidad |
 | DR-17 | Alcance del Supervisor de planta | El Supervisor de planta registra ingresos, vehículos nuevos, destares y el paso del lote por las etapas, y consulta | Marco §8, M01 |
 | DR-18 | División de un lote por proporción | El mineral acumulado no se pesa: se estima a la vista. Para dividir un lote, el usuario indica la **fracción** de cada parte (por ejemplo, 1/3 a molienda y 2/3 a zarandeo; también tres partes o más). El sistema calcula las toneladas aproximadas de cada parte (fracción × total) solo para estimar el peso de los bigbags | M06 |
+| DR-19 | Términos del ciclo del lote | Se distinguen dos acciones. El **inicio del recorrido** marca que el lote deja de reunir ingresos y empieza su secado. El **cierre del lote** es solo el cierre definitivo de DR-14, con su destino. Los estados del lote son Abierto, En recorrido y Cerrado. Resuelve P-04 | M06, M03 |
+| DR-20 | Reparto de los ingresos tardíos | Un ingreso agregado a un lote dividido se reparte entre las partes por fracciones. El sistema propone las fracciones del lote y el usuario puede editarlas; deben sumar la unidad. Si el ingreso llega después del secado del lote, tiene además su propio secado. Resuelve P-01 | M06 |
+| DR-21 | I6 en un lote dividido | Cuando el lote de un ingreso se divide en partes con rutas distintas, el denominador de I6 es la unión de las etapas de las rutas de esas partes. Ejemplo: una parte molida y otra zarandeada dan secado, zarandeo, molienda y ensacado, es decir, cuatro etapas. Resuelve P-02 | Marco §4, Anexo 02, M06, matriz de trazabilidad |
+| DR-22 | Retiro de ingresos de un lote | Un ingreso solo puede retirarse de un lote, o trasladarse a otro, mientras el lote está Abierto. Desde el inicio del recorrido, el lote admite ingresos tardíos, pero no los devuelve a cancha | M06 |
 
 ---
 
@@ -50,7 +54,7 @@ No son decisiones pendientes, sino trabajo que se deriva de las ya tomadas:
 | DR-07 | Retirar las apps del backend del alcance anterior; las carpetas de módulo ya se retiraron | Preparación del repositorio, `../01-plan/PLAN_DE_TRABAJO.md` §8 |
 | DR-12 | Retirar el número de ticket de M03 y del modelo de datos | Fase 2 del plan de la versión 2 (M03); el modelo de datos, según el mapa de limpieza |
 | DR-14, DR-15, DR-18 | Incorporar a M06 el nombre del lote, la ruta, la división por proporción, los ingresos agregados después del cierre, los datos descriptivos y el cierre con destino | Fase 2 del plan de la versión 2 (M06) |
-| DR-16 | Actualizar la ficha de observación (Anexo 02) con la nueva fórmula de I6; el marco ya está actualizado | **Antes del juicio de expertos** |
+| DR-16, DR-21 | Actualizar la ficha de observación (Anexo 02) con la nueva fórmula de I6 y su cálculo en lotes divididos; el marco ya está actualizado | **Antes del juicio de expertos** |
 | DR-16 | Reformular I6 en la matriz de trazabilidad | Fase 3 del plan de la versión 2 |
 | DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | Fase 2 del plan de la versión 2 (M01) |
 
@@ -83,7 +87,7 @@ No son decisiones tomadas. Se registran para resolverlas antes de la fase indica
 
 | N.° | Pendiente | Propuesta | Antes de |
 |---|---|---|---|
-| P-01 | Si el ingreso que llega después del secado se reparte entre las partes por proporción | Usar por defecto las fracciones del lote, editables | Fase 2, M06 |
-| P-02 | Cómo se calcula I6 para un ingreso cuyo lote se dividió en partes con rutas distintas | Tomar como denominador la unión de las etapas de las rutas de sus partes | Fase 3 y Anexo 02 |
+| P-01 | *Resuelto por DR-20* | — | — |
+| P-02 | *Resuelto por DR-21* | — | — |
 | P-03 | Cómo registra la ficha de observación un ingreso sin respaldo fotográfico (DR-13) en I3 e I4 | Registrarlo como caso aparte, sin tiempo de recuperación del respaldo | Anexo 02 |
-| P-04 | Término para las dos acciones de cierre que muestra el mockup: «cerrar e iniciar recorrido» (deja de reunir ingresos) y el cierre definitivo con destino de DR-14, que el mockup llama «dar de alta» | Reservar «cierre» para el cierre definitivo de DR-14 y llamar a la primera acción «inicio del recorrido» | Fase 2, M06 |
+| P-04 | *Resuelto por DR-19* | — | — |

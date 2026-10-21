@@ -7,7 +7,7 @@
 |---|---|
 | Documento | Marco de tesis |
 | Origen | Anexos 01 a 05 de la tesis, validados por juicio de expertos |
-| Fecha | 21/09/2026 · actualizado el 20/10/2026 con DR-11 a DR-18 |
+| Fecha | 21/09/2026 · actualizado el 20/10/2026 con DR-11 a DR-18 y el 21/10/2026 con DR-21 |
 | Estado | Vigente |
 
 ---
@@ -79,8 +79,8 @@ fecha (día, mes y año) y un único peso, que es el peso bruto. Por eso:
 **Etapas del proceso y ruta (I6, DR-16):** secado, zarandeo, molienda y ensacado. Las etapas no son
 obligatorias para todos los lotes: la planta decide la **ruta** de cada lote o de cada parte del lote.
 El secado es común; después, zarandeo, molienda o ambos; al final, ensacado. El denominador de I6 son
-las etapas de esa ruta, no las cuatro etapas del catálogo. [PENDIENTE: cómo se calcula I6 para un
-ingreso cuyo lote se dividió en partes con rutas distintas (P-02 de `decisiones_reformulacion.md`).]
+las etapas de esa ruta, no las cuatro etapas del catálogo. Si el lote se divide en partes con rutas
+distintas, el denominador es la unión de las etapas de esas rutas (DR-21).
 
 **Ingreso sin respaldo fotográfico (DR-13).** Si el ticket se extravía o no puede fotografiarse, el
 ingreso se registra sin foto, con motivo obligatorio, y queda marcado «sin respaldo fotográfico». Es
