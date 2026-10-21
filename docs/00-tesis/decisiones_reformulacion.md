@@ -2,10 +2,10 @@
 
 | Campo | Valor |
 |---|---|
-| Documento | Decisiones DR-01 a DR-22 |
+| Documento | Decisiones DR-01 a DR-23 |
 | Origen | Reformulación del alcance del sistema, septiembre de 2026 |
-| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) · 20/10/2026 (DR-11 a DR-18) · 21/10/2026 (DR-19 a DR-22) |
-| Estado | Todas aceptadas. DR-09 y DR-10 parten del formato real del ticket; DR-11 a DR-18, de la revisión del mockup del sistema (versión 2); DR-19 a DR-22 resuelven los pendientes P-01, P-02 y P-04 |
+| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) · 20/10/2026 (DR-11 a DR-18) · 21/10/2026 (DR-19 a DR-23) |
+| Estado | Todas aceptadas. DR-09 y DR-10 parten del formato real del ticket; DR-11 a DR-18, de la revisión del mockup del sistema (versión 2); DR-19 a DR-22 resuelven los pendientes P-01, P-02 y P-04; DR-23 alinea el alcance del Administrativo con el catálogo y la trazabilidad |
 
 Estas decisiones resuelven las ambigüedades que la reformulación dejó abiertas. Son previas al
 diseño: cada una condiciona un módulo, una entidad o un instrumento. Reabrir cualquiera exige
@@ -37,6 +37,7 @@ justificación escrita y revisión de los documentos que dependen de ella.
 | DR-20 | Reparto de los ingresos tardíos | Un ingreso agregado a un lote dividido se reparte entre las partes por fracciones. El sistema propone las fracciones del lote y el usuario puede editarlas; deben sumar la unidad. Si el ingreso llega después del secado del lote, tiene además su propio secado. Resuelve P-01 | M06 |
 | DR-21 | I6 en un lote dividido | Cuando el lote de un ingreso se divide en partes con rutas distintas, el denominador de I6 es la unión de las etapas de las rutas de esas partes. Ejemplo: una parte molida y otra zarandeada dan secado, zarandeo, molienda y ensacado, es decir, cuatro etapas. Resuelve P-02 | Marco §4, Anexo 02, M06, matriz de trazabilidad |
 | DR-22 | Retiro de ingresos de un lote | Un ingreso solo puede retirarse de un lote, o trasladarse a otro, mientras el lote está Abierto. Desde el inicio del recorrido, el lote admite ingresos tardíos, pero no los devuelve a cancha | M06 |
+| DR-23 | Alcance del Administrativo | El alcance de los roles se rige por el catálogo (M02) y por la trazabilidad (M06), que especifican el modelo. El Administrativo, además de registro, corrección, consultas, consolidación y exportación, **gestiona los catálogos** —salvo modificar una tara ya registrada— y **compone los lotes**: los abre, asigna y retira ingresos, inicia el recorrido y los divide. El Administrador conserva la gestión de usuarios, la modificación de la tara, las anulaciones y el cierre del lote con su destino. El uso de los roles se revisará y validará con los usuarios de la empresa antes de implementar M01 | Marco §8, M01, M02, M03, M06 |
 
 ---
 
@@ -57,6 +58,7 @@ No son decisiones pendientes, sino trabajo que se deriva de las ya tomadas:
 | DR-16, DR-21 | Actualizar la ficha de observación (Anexo 02) con la nueva fórmula de I6 y su cálculo en lotes divididos; el marco ya está actualizado | **Antes del juicio de expertos** |
 | DR-16 | Reformular I6 en la matriz de trazabilidad | Fase 3 del plan de la versión 2 |
 | DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | Fase 2 del plan de la versión 2 (M01) |
+| DR-23 | Revisar y validar con los usuarios de la empresa el uso de los tres roles y la matriz de permisos de M01 | Antes de implementar M01 |
 
 ## Nota sobre DR-06 y DR-09
 

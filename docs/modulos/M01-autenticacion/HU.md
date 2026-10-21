@@ -140,7 +140,7 @@ Tres roles:
   de una tara ya registrada, las anulaciones y el cierre del lote con su destino.
 - **Administrativo:** registro, corrección, consultas, consolidación y exportación; además gestiona
   los catálogos y la composición de los lotes (apertura, asignación de ingresos, inicio del
-  recorrido y división).
+  recorrido y división), según el catálogo y la trazabilidad (DR-23).
 - **Supervisor de planta:** registro de ingresos, con foto o sin ella; alta del vehículo nuevo desde
   el registro; registro del destare; paso del lote por las etapas; y consulta (DR-17).
 

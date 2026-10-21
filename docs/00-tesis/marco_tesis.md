@@ -150,7 +150,7 @@ inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante toda l
 | Rol | Alcance |
 |---|---|
 | Administrador | Acceso total, incluidos usuarios, catálogos, anulaciones y el cierre del lote con su destino |
-| Administrativo | Registro, corrección, consultas, consolidación y exportación |
+| Administrativo | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos, salvo modificar una tara ya registrada, y composición de lotes: apertura, asignación, inicio del recorrido y división (DR-23) |
 | Supervisor de planta | Registro de ingresos, de vehículos nuevos, de destares y del paso del lote por las etapas; consulta (DR-17) |
 
 ## 9. Módulos
