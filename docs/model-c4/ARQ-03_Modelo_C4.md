@@ -1,8 +1,8 @@
 # ARQ-03 — Modelo C4 del sistema
 
 **Documento:** ARQ-03
-**Versión:** 2.0
-**Estado:** Aprobado
+**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
+**Estado:** En revisión
 **Alcance:** los cuatro niveles de abstracción del sistema, con la justificación de cada elemento
 **Deriva de:** `ARQ-01_Modulos_del_Sistema.md` y `ARQ-02_Arquitectura_Tecnica.md`
 
@@ -42,9 +42,9 @@ flowchart TB
     BAL["Balanza de plataforma - equipo externo no integrado"]
     MOT["Motor de reconocimiento - local o servicio externo segun D-12"]
 
-    SUP -->|Fotografia el ticket registra y consulta| SIS
-    ADV -->|Corrige consulta consolida y exporta| SIS
-    ADM -->|Gestiona usuarios catalogos y anulaciones| SIS
+    SUP -->|Registra ingresos destares y etapas y consulta| SIS
+    ADV -->|Corrige gestiona catalogos y lotes consolida y exporta| SIS
+    ADM -->|Gestiona usuarios anula y cierra lotes con destino| SIS
 
     BAL -.->|Ticket de balanza impreso en papel| SUP
     SIS -.->|Envia la imagen del ticket a reconocer| MOT
@@ -55,9 +55,9 @@ flowchart TB
 
 | Elemento | Por qué está | Qué pasaría sin él |
 |---|---|---|
-| **Supervisor de planta** | Es quien está en el punto de pesaje cuando llega el volquete, y quien fotografía el ticket | El registro volvería a depender de que alguien transcriba el papel más tarde, la causa raíz de la espera que I1 mide |
-| **Administrativo** | Corrige datos reconocidos, consulta, consolida y exporta | Sin esta operación, un dato mal leído por el motor quedaría sin forma de corregirse fuera del momento del registro |
-| **Administrador** | Gestiona usuarios, catálogos y anulaciones | Sin gestión de catálogo con titularidad y capacidad, el tipo de vehículo y la regla V4 quedarían sin base (D-06) |
+| **Supervisor de planta** | Está en el punto de pesaje y en la cancha: fotografía el ticket —o registra sin foto, con motivo—, da de alta el vehículo nuevo, registra el destare y el paso del lote por las etapas (DR-17) | El registro y el recorrido volverían a depender de que alguien transcriba el papel más tarde, que es la causa de la espera entre el pesaje y el registro |
+| **Administrativo** | Corrige datos reconocidos, gestiona los catálogos, compone y divide los lotes, consulta, consolida y exporta (DR-23) | Un dato mal leído por el motor quedaría sin forma de corregirse fuera del momento del registro, y los lotes no tendrían quién decidir su composición |
+| **Administrador** | Gestiona usuarios, modifica taras, anula ingresos y cierra los lotes con su destino (DR-14) | Sin gestión de usuarios y sin un responsable del cierre, ni las operaciones serían atribuibles ni el destino del mineral tendría quien responda de él |
 | **Balanza de plataforma** | Frontera declarada: **no hay integración** | — |
 | **Motor de reconocimiento** | Sistema externo o local que lee la imagen; el sistema depende de su contrato, no de su implementación (D-12) | Sin él, el registro sería manual y RF02 no tendría cómo cumplirse |
 
@@ -69,8 +69,9 @@ una carencia que haya que disculpar: es lo que **hace existir la medición de op
 registro**.
 
 Porque el pesaje y el registro son actos separados, hay tres marcas de tiempo distintas —la del
-ticket, leída de la fotografía; el inicio del registro, cuando llega la imagen; y el fin del
-registro, cuando se confirma— y las diferencias entre ellas son lo que el sistema busca reducir
+pesaje, con la fecha leída de la fotografía y la hora que el usuario ajusta sobre la propuesta del
+sistema (DR-11); el inicio del registro, cuando llega la imagen o se elige el registro sin foto; y el
+fin del registro, cuando se confirma— y las diferencias entre ellas son lo que el sistema busca reducir
 (D-01). Si la balanza estuviera integrada, esas marcas coincidirían por construcción y no habría
 nada que observar.
 
@@ -121,7 +122,7 @@ flowchart TB
 | **Nginx** | Nginx | Sirve el build de Angular y enruta `/api/` al backend | Un solo origen para el navegador, sin abrir CORS en producción; termina HTTPS |
 | **API REST** | Django 5 + DRF | Reglas de negocio, casos de uso y autorización | Autoridad única de validación (D-08): toda petición, venga de donde venga, se somete a las mismas reglas |
 | **PostgreSQL 16** | PostgreSQL | Persistencia | Transacciones ACID, necesarias para asignar el código bajo concurrencia (D-02) y para que el reconocimiento, la validación y la auditoría se persistan en el mismo acto que el ingreso |
-| **Almacén de imágenes** | A definir con D-14 | Conserva la fotografía del ticket como respaldo del ingreso | Sostiene RN-M03-01 (ningún ingreso sin imagen) y la consulta de M07; separado de PostgreSQL porque el volumen y el patrón de acceso de archivos binarios difieren del de filas relacionales |
+| **Almacén de imágenes** | A definir con D-14 | Conserva la fotografía del ticket como respaldo del ingreso | Sostiene RN-M03-01 (ningún ingreso sin imagen, salvo el registro sin foto con motivo de DR-13) y la consulta de M07; separado de PostgreSQL porque el volumen y el patrón de acceso de archivos binarios difieren del de filas relacionales |
 | **Motor de reconocimiento** | A definir con D-12 | Lee la placa, la fecha y el peso bruto del ticket a partir de la imagen | Se accede exclusivamente a través de `ReconocedorTicket`; el contenedor puede vivir dentro del servidor o fuera de él sin que el resto del sistema lo note |
 
 No hay Service Worker ni almacén local con cola de reintento en segundo plano: ese componente
@@ -146,7 +147,9 @@ lista de control de funcionalidad; uno construido y no dibujado aparece como sor
 ## 4. Nivel 3 — Componentes
 
 Se dibuja solo para M03, M04 y M05: son los módulos que se explican en sustentación y donde vive la
-inversión de dependencias que defiende el diseño.
+inversión de dependencias que defiende el diseño. M06, el otro módulo con lógica propia —ciclo del
+lote, rutas, división por fracciones, bigbags y cierre—, sigue la misma estructura transversal de
+§4.1; su modelo y sus servicios están en `docs/modulos/M06-trazabilidad/notas.md`.
 
 ### 4.1 Componentes del contenedor API — estructura transversal
 
@@ -205,7 +208,7 @@ flowchart TB
     GEN["GeneradorCodigo - abstraccion"]
     REL["Reloj - abstraccion"]
     IMG["AlmacenImagenes - abstraccion"]
-    MOD["Modelo Ingreso - RN-M03-01 a RN-M03-15"]
+    MOD["Modelo Ingreso - RN-M03-01 a RN-M03-27"]
     SEL["SelectorIngresos - listado filtros y totales"]
     AUD["ServicioAuditoria - contenedor M09"]
     DB[("PostgreSQL")]
@@ -229,7 +232,7 @@ flowchart TB
 | `ReconocedorTicket` como **abstracción** | D-12 deja abierta la elección del motor. Se inyecta en el servicio, no se instancia dentro: así se sustituye por un doble determinista en pruebas sin depender de un servicio externo |
 | `ValidadorConsistencia` como abstracción | Las reglas V1 a V5 viven en M05 y se aplican sobre lo propuesto, sobre lo confirmado y, en el primer viaje de un vehículo, al registrar el destare. El servicio de M03 no conoce las reglas concretas, solo el contrato |
 | `Reloj` como abstracción | Las tres marcas de tiempo son el núcleo del registro. Un servicio que llama a `timezone.now()` internamente no se puede probar controlando el instante exacto de cada una |
-| `AlmacenImagenes` como abstracción | D-14 no ha fijado el medio de almacenamiento; el servicio guarda a través de la interfaz sin saber si el destino es un volumen local o un servicio de objetos |
+| `AlmacenImagenes` como abstracción | D-14 no ha fijado el medio de almacenamiento; el servicio guarda a través de la interfaz sin saber si el destino es un volumen local o un servicio de objetos. En el registro sin foto no se invoca, y tampoco `ReconocedorTicket`; `ValidadorConsistencia` sí |
 | `SelectorIngresos` | Listado con filtros combinables y totales del conjunto filtrado, sin recorrer resultados en Python |
 | Dependencia de `ServicioAuditoria` | Es de M09. Se dibuja porque la transacción lo abarca: la trazabilidad entre módulos no es opcional |
 
@@ -325,11 +328,11 @@ classDiagram
         -validador ValidadorConsistencia
         -generador GeneradorCodigo
         -reloj Reloj
-        +iniciar_registro(imagen, usuario) Propuesta
+        +iniciar_registro(imagen_o_motivo, usuario) Propuesta
         +registrar_ingreso(datos, usuario) Ingreso
         +corregir_ingreso(id, cambios, motivo, usuario) Ingreso
         +anular_ingreso(id, motivo, usuario) Ingreso
-        +registrar_destare(id, tara, usuario) Ingreso
+        +registrar_destare(id_vehiculo, tara, fecha_hora, usuario) list~Ingreso~
     }
     class Ingreso {
         +codigo str
@@ -339,6 +342,7 @@ classDiagram
         +peso_bruto_tn Decimal
         +tara_tn Decimal
         +peso_neto_tn Decimal
+        +sin_respaldo_fotografico bool
         +estado str
         +aplicar_tara(tara)
         +validar_invariantes()
@@ -381,7 +385,8 @@ classDiagram
 | 3 | `ReconocedorTicket` inyectado | M03, M04 | RF02 | D-12 |
 | 3 | `ValidadorConsistencia` inyectado | M03, M05 | RF03 | D-08 |
 | 3 | `repositories` separado | M07, M08 | RF08, RF09 | D-09 |
-| 4 | `Reloj` inyectado | M03 | RF01 | D-01 |
+| 4 | `Reloj` inyectado, también para proponer la hora del pesaje | M03 | RF01 | D-01, DR-11 |
+| 4 | Registro sin foto por el mismo `registrar_ingreso` | M03 | RF01 | D-13, DR-13 |
 
 ---
 
