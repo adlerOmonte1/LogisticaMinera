@@ -22,7 +22,7 @@ preparación del repositorio, antes de construir los módulos
 | Rama | Contenido |
 |---|---|
 | `main` | Última versión estable: backend con M01 y M02 implementados, bajo el diseño anterior |
-| `docs/version-2` | Documentación de la versión 2 (`docs/00-tesis/plan_version2.md`); el backend todavía no se tocó |
+| `docs/version-2` | Documentación de la versión 2, reformulada con las decisiones DR-11 a DR-23; el backend todavía no se tocó |
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|

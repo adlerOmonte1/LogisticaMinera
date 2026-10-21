@@ -53,12 +53,13 @@ No son decisiones pendientes, sino trabajo que se deriva de las ya tomadas:
 | DR-09 | Actualizar en el documento de tesis: RF02 a tres campos y RF03 con la duplicidad (Anexo 03); la hoja A de ERA a tres campos y la hoja B con la nueva V1 (Anexo 04); y el origen de C2, C4 y C5 en la ficha de observación (Anexo 02) | **Antes del juicio de expertos** |
 | DR-10 | Definir con la Gerencia quién registra el destare en planta y cómo se comunica al supervisor que un vehículo está pendiente de destarar | Antes de implementar M03 |
 | DR-07 | Retirar las apps del backend del alcance anterior; las carpetas de módulo ya se retiraron | Preparación del repositorio, `../01-plan/PLAN_DE_TRABAJO.md` §8 |
-| DR-12 | Retirar el número de ticket de M03 y del modelo de datos | Fase 2 del plan de la versión 2 (M03); el modelo de datos, según el mapa de limpieza |
-| DR-14, DR-15, DR-18 | Incorporar a M06 el nombre del lote, la ruta, la división por proporción, los ingresos agregados después del cierre, los datos descriptivos y el cierre con destino | Fase 2 del plan de la versión 2 (M06) |
+| DR-12 | Retirar el número de ticket de M03 y del modelo de datos | **Hecho** en la versión 2: M03 y modelo de datos 3.0 |
+| DR-14, DR-15, DR-18 | Incorporar a M06 el nombre del lote, la ruta, la división por proporción, los ingresos agregados después del cierre, los datos descriptivos y el cierre con destino | **Hecho** en la versión 2 (M06 y modelo de datos 3.0) |
 | DR-16, DR-21 | Actualizar la ficha de observación (Anexo 02) con la nueva fórmula de I6 y su cálculo en lotes divididos; el marco ya está actualizado | **Antes del juicio de expertos** |
-| DR-16 | Reformular I6 en la matriz de trazabilidad | Fase 3 del plan de la versión 2 |
-| DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | Fase 2 del plan de la versión 2 (M01) |
+| DR-16 | Reformular I6 en la matriz de trazabilidad | **Hecho** en la versión 2 |
+| DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | **Hecho** en la versión 2 |
 | DR-23 | Revisar y validar con los usuarios de la empresa el uso de los tres roles y la matriz de permisos de M01 | Antes de implementar M01 |
+| DR-14, DR-18 | Ajustar la maqueta (`Mockup/index.html`): divide el lote en toneladas y no en fracciones | Opcional, antes de validar la interfaz con los usuarios |
 
 ## Nota sobre DR-06 y DR-09
 
