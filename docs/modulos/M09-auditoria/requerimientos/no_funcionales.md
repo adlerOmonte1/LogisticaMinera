@@ -6,8 +6,10 @@
 | RNF-M09-02 | Seguridad — no repudio | Ningún evento puede modificarse ni eliminarse a través de la API, con independencia del rol | Prueba automatizada que intenta editar y borrar eventos con cada rol |
 | RNF-M09-03 | Fiabilidad — capacidad de recuperación | Si el registro del evento falla, la operación completa se revierte: no queda un cambio sin su evento | Prueba automatizada que fuerza el fallo del registro de auditoría |
 | RNF-M09-04 | Eficiencia de desempeño — capacidad | El volumen de eventos generado durante la ventana de operación no degrada el tiempo de respuesta de las operaciones auditadas | Prueba de carga con el volumen esperado de eventos |
-| RNF-M09-05 | Usabilidad — reconocibilidad | El historial de una entidad distingue visualmente las acciones de escritura de los accesos rechazados | Inspección en dispositivo real |
+| RNF-M09-05 | Usabilidad — reconocibilidad | La consulta de la auditoría distingue visualmente las acciones de escritura de los accesos rechazados | Inspección en dispositivo real |
 | RNF-M09-06 | Mantenibilidad — modularidad | Añadir una acción auditable al catálogo no exige modificar el modelo de `EVENTO_AUDITORIA` | Inspección de código |
+| RNF-M09-07 | Eficiencia de desempeño — comportamiento temporal | El historial de un ingreso, con los eventos de su lote, se compone en menos de 2 segundos con el volumen de eventos de la ventana de operación | Prueba automatizada con datos sintéticos |
+| RNF-M09-08 | Seguridad — confidencialidad | Un usuario que no es Administrador no obtiene, ni por el historial de un ingreso ni por petición directa, eventos de usuarios, de catálogos ni accesos rechazados | Prueba automatizada con cada rol |
 
 ## Nota sobre RNF-M09-03
 

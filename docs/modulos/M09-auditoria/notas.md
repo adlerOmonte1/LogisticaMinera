@@ -12,7 +12,7 @@ apps/auditoria/
 ├── models/          EVENTO_AUDITORIA
 ├── migrations/
 ├── services/         ServicioAuditoria, el unico punto de escritura
-├── repositories/     historial por entidad e identificador
+├── repositories/     historial de un ingreso y consulta de la auditoria con filtros
 ├── serializers/  views/  permissions.py  filters.py  urls.py  tests/
 ```
 
@@ -81,10 +81,27 @@ en el punto donde el `ViewSet` deniega la operación, antes de que cualquier ló
 ejecute. Ese registro no está dentro de una transacción de escritura del dominio, porque no hay
 ningún cambio de dominio que proteger: es una operación de solo auditoría.
 
+### Historial de un ingreso
+
+El historial de un ingreso reúne sus propios eventos y los de su lote que lo afectan (RN-M09-07).
+Buscar los segundos por texto en el detalle —el código del ingreso escrito en la descripción— sería
+frágil y lento. Por eso cada evento de lote guarda los identificadores de los ingresos que afecta en
+una columna propia:
+
+```python
+ingresos_relacionados = ArrayField(models.PositiveIntegerField(), default=list, editable=False)
+```
+
+con un índice GIN. La consulta del historial es entonces la unión de los eventos con
+`entidad="INGRESO"` y ese identificador, y los eventos con `entidad="LOTE"` cuyo arreglo lo contiene.
+Los eventos de usuarios, de catálogos y de accesos rechazados nunca entran en esa consulta
+(RS-M09-15): no es un filtro de la interfaz, sino del repositorio.
+
 ## Frontend (Angular)
 
-**Feature:** `features/auditoria/` — solo la consulta del historial; el registro de eventos no tiene
-ninguna interfaz, porque no lo activa el usuario.
+**Feature:** `features/auditoria/` — la consulta de la auditoría para el Administrador. El historial
+de un ingreso es un componente de `ui/` que M07 presenta como pestaña del detalle. El registro de
+eventos no tiene ninguna interfaz, porque no lo activa el usuario.
 
 - La línea de tiempo distingue visualmente los eventos de escritura de los de acceso rechazado
   (RNF-M09-05), por ejemplo con un color de acento distinto, no solo con el texto de la acción.
@@ -126,7 +143,8 @@ operativa, nunca eliminar.
 | M03 | Registrar creación, corrección y anulación de ingresos |
 | M04 | Registrar el reconocimiento y la corrección de datos propuestos |
 | M05 | Registrar el resultado de la validación de un ingreso |
-| M06 | Registrar la apertura, el cierre y el paso de un lote por etapa |
+| M06 | Registrar las operaciones sobre un lote, con los ingresos que afectan |
+| M07 | Presentar el historial de un ingreso en su detalle |
 | M08 | Registrar cada exportación |
 
 ## Pendientes que afectan a este módulo
@@ -134,3 +152,4 @@ operativa, nunca eliminar.
 | Pendiente | Efecto |
 |---|---|
 | Volumen esperado de eventos durante la ventana de operación | Condiciona si conviene una política de archivado antes de que RNF-M09-04 se vuelva difícil de sostener |
+| Modelo de datos sin actualizar a la versión 2 (`mapa_limpieza_v2.md` §3) | `EVENTO_AUDITORIA` no tiene aún la columna de ingresos relacionados; el modelo de esta nota prevalece hasta que se actualice |

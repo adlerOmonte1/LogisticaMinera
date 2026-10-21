@@ -6,7 +6,8 @@ resta en el avance).
 | Función | Descripción | HU | Endpoint |
 |---|---|---|---|
 | Registrar evento | Persiste un evento dentro de la transacción de la operación que audita | HU-M09-01 | (interno, invocado por todos los módulos de escritura) |
-| Consultar historial de una entidad | Eventos de un registro concreto, ordenados cronológicamente | HU-M09-02 | `GET /api/v1/auditoria/{entidad}/{id}/` |
+| Consultar historial de un ingreso | Eventos del ingreso y de su lote que lo afectan, ordenados cronológicamente | HU-M09-02 | `GET /api/v1/ingresos/{id}/historial/` |
+| Consultar la auditoría | Todos los eventos, con filtros por usuario, acción, y referencia o detalle | HU-M09-03 | `GET /api/v1/auditoria/` |
 
 El registro de eventos no se expone como operación que el usuario active: es un efecto de cada
 operación de escritura del sistema, invocado internamente por el módulo que la realiza.
@@ -16,8 +17,8 @@ operación de escritura del sistema, invocado internamente por el módulo que la
 M09 es el dueño de la entidad `EVENTO_AUDITORIA` y del catálogo de acciones auditables.
 
 **Lo que hace.** Ofrece un servicio de registro que cualquier módulo invoca al completar una
-operación de escritura, y una consulta que reconstruye el historial de una entidad a partir de esos
-eventos.
+operación de escritura, el historial de cada ingreso para los tres roles y la consulta de toda la
+auditoría para el Administrador.
 
 **Lo que recibe.**
 
@@ -39,11 +40,14 @@ permite mantener el catálogo de acciones en un solo lugar (RN-M09-05).
 | Función | Administrador | Administrativo | Supervisor de planta |
 |---|:---:|:---:|:---:|
 | Registrar evento (automático, dentro de otra operación) | — | — | — |
-| Consultar historial de una entidad | Sí | No | No |
+| Consultar historial de un ingreso | Sí | Sí | Sí |
+| Consultar la auditoría del sistema | Sí | No | No |
 
 El registro de eventos no tiene permiso propio: ocurre como parte de una operación ya autorizada por
-su propio módulo. La consulta del historial queda reservada al Administrador, porque expone
-información de todos los usuarios y todas las entidades.
+su propio módulo. El historial de un ingreso lo ven los tres roles, porque responde por un registro
+que todos manejan y no contiene eventos de usuarios ni accesos rechazados. La auditoría completa
+queda reservada al Administrador, porque expone información de todos los usuarios y todas las
+entidades.
 
 ## Dependencias
 
@@ -58,5 +62,6 @@ información de todos los usuarios y todas las entidades.
 | M03 | Registrar creación, corrección y anulación de ingresos |
 | M04 | Registrar el reconocimiento y la corrección de datos propuestos |
 | M05 | Registrar el resultado de la validación de un ingreso |
-| M06 | Registrar la apertura, el cierre y el paso de un lote por etapa |
+| M06 | Registrar las operaciones sobre un lote, con los ingresos que afectan |
+| M07 | Presentar el historial de un ingreso en su detalle |
 | M08 | Registrar cada exportación |

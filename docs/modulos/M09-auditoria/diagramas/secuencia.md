@@ -52,20 +52,20 @@ sequenceDiagram
 El intento rechazado se registra con el mismo rigor que uno completado: RN-M09-04 exige que el
 control de acceso pueda demostrarse, no solo asumirse.
 
-## S-M09-03 · Consulta del historial de una entidad (HU-M09-02)
+## S-M09-03 · Historial de un ingreso (HU-M09-02)
 
 ```mermaid
 sequenceDiagram
-    actor D as Administrador
+    actor D as Supervisor de planta
     participant NG as Angular
     participant API as Django REST
     participant REP as RepositorioAuditoria
     participant DB as PostgreSQL
 
-    D->>NG: Indica entidad e identificador
-    NG->>API: GET /api/v1/auditoria/{entidad}/{id}/
-    API->>REP: historial(entidad, id)
-    REP->>DB: Leer eventos por indice de entidad e identificador
+    D->>NG: Abre la pestana de historial del ingreso
+    NG->>API: GET /api/v1/ingresos/{id}/historial/
+    API->>REP: historial_de_ingreso(id)
+    REP->>DB: Eventos del ingreso y eventos de lote que lo incluyen
     DB-->>REP: Eventos ordenados cronologicamente
 
     alt Sin eventos
@@ -74,6 +74,35 @@ sequenceDiagram
     else Con eventos
         REP-->>API: Eventos con autor accion y valores del cambio
         API-->>NG: 200 con el historial completo
-        NG-->>D: Linea de tiempo del registro
+        NG-->>D: Linea de tiempo del ingreso
     end
 ```
+
+## S-M09-04 · Consulta de la auditoría del sistema (HU-M09-03)
+
+```mermaid
+sequenceDiagram
+    actor D as Administrador
+    participant NG as Angular
+    participant API as Django REST
+    participant REP as RepositorioAuditoria
+    participant DB as PostgreSQL
+    participant AUD as ServicioAuditoria
+
+    D->>NG: Indica usuario accion o referencia
+    NG->>API: GET /api/v1/auditoria/?usuario&accion&q
+    API->>API: Verificar rol Administrador
+
+    alt Rol distinto de Administrador
+        API->>AUD: Registrar acceso rechazado
+        API-->>NG: 403 Accion no autorizada
+    else Administrador
+        API->>REP: buscar(filtros)
+        REP->>DB: Eventos que cumplen todos los filtros
+        DB-->>REP: Eventos del mas reciente al mas antiguo
+        REP-->>API: Eventos con entidad referencia autor y cambio
+        API-->>NG: 200 con los eventos o vacia
+        NG-->>D: Eventos con los accesos rechazados distinguidos
+    end
+```
+
