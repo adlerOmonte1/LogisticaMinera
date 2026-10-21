@@ -134,15 +134,30 @@ la responsabilidad sobre cada registro sea siempre atribuible.
 
 **Descripción**
 
-Tres roles: Administrador (acceso total, incluidos usuarios, catálogos y anulaciones), Administrativo
-(registro, corrección, consultas, consolidación y exportación) y Supervisor de planta (registro y
-consulta). El control se aplica en el servidor, no solo en la interfaz: ocultar un botón no es un
+Tres roles:
+
+- **Administrador:** acceso total, incluidos la gestión de usuarios, los catálogos, la modificación
+  de una tara ya registrada, las anulaciones y el cierre del lote con su destino.
+- **Administrativo:** registro, corrección, consultas, consolidación y exportación; además gestiona
+  los catálogos y la composición de los lotes (apertura, asignación de ingresos, inicio del
+  recorrido y división).
+- **Supervisor de planta:** registro de ingresos, con foto o sin ella; alta del vehículo nuevo desde
+  el registro; registro del destare; paso del lote por las etapas; y consulta (DR-17).
+
+Solo el Administrador cierra un lote con su destino, porque decide a dónde se entrega el mineral
+(DR-14). El control se aplica en el servidor, no solo en la interfaz: ocultar un botón no es un
 control de acceso.
+
+**Detalles**
+- La matriz de permisos por acción se define una sola vez, en el servidor (RN-M01-09).
+- El detalle de cada operación vive en la sección «Permisos» del `funcionales.md` de su módulo; la
+  tabla general de `requerimientos/funcionales.md` de este módulo los resume.
 
 **Criterios de aceptación**
 
 > **CA01.** Dado que un usuario con rol Supervisor de planta inicia sesión, cuando se carga el menú,
-> entonces el sistema muestra únicamente las opciones de registro de ingreso y consulta.
+> entonces el sistema muestra únicamente el registro de ingresos, el registro de destares, los lotes
+> con el registro del paso por las etapas y la consulta.
 
 > **CA02.** Dado que un usuario invoca directamente un endpoint fuera de las operaciones de su rol,
 > cuando el servidor recibe la solicitud, entonces la rechaza con código 403 y el mensaje "Acción no
@@ -153,3 +168,11 @@ control de acceso.
 
 > **CA04.** Dado que una operación se rechaza por falta de autorización, cuando concluye el rechazo,
 > entonces el sistema registra el evento en auditoría con el usuario y la operación intentada.
+
+> **CA05.** Dado que un supervisor de planta registra un ingreso cuya placa no está en el catálogo,
+> cuando da de alta el vehículo desde el registro o registra después su destare, entonces el sistema
+> permite la operación aunque el rol no gestione el catálogo.
+
+> **CA06.** Dado que un usuario con rol Administrativo o Supervisor de planta solicita cerrar un lote
+> con su destino, cuando el servidor recibe la solicitud, entonces la rechaza mostrando "Acción no
+> autorizada", sin modificar el lote.

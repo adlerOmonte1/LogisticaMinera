@@ -11,3 +11,5 @@
 | RS-M01-07 | El sistema aplica baja lógica a los usuarios: `activo` pasa a falso y el registro persiste | RU-M01-04 |
 | RS-M01-08 | El sistema registra en auditoría los eventos de inicio de sesión, cierre de sesión, cambio de rol y acceso rechazado | RU-M01-01 |
 | RS-M01-09 | El sistema permite a cualquier usuario autenticado cambiar su propia contraseña, sin exigir el permiso de gestión de usuarios | RU-M01-05 |
+| RS-M01-10 | El sistema concede al Supervisor de planta los permisos de registro de ingreso, alta de vehículo desde el registro, registro de destare, registro del paso por etapa y consulta, y le niega la gestión de catálogos, la corrección, la anulación, la composición de lotes, la consolidación y la gestión de usuarios | RU-M01-03, RU-M01-06 |
+| RS-M01-11 | El sistema autoriza el cierre del lote con su destino únicamente al rol Administrador | RU-M01-07 |

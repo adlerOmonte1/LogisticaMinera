@@ -29,9 +29,9 @@ flowchart LR
 
 | Actor | Descripción |
 |---|---|
-| Administrador | Acceso total, incluidos usuarios, catálogos y anulaciones |
-| Administrativo | Registro, corrección, consultas, consolidación y exportación |
-| Supervisor de planta | Registro y consulta, típicamente desde teléfono |
+| Administrador | Acceso total, incluidos usuarios, catálogos, la modificación de una tara ya registrada, las anulaciones y el cierre del lote con su destino |
+| Administrativo | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de los lotes |
+| Supervisor de planta | Registro de ingresos, de vehículos nuevos, de destares y del paso del lote por las etapas; consulta. Opera típicamente desde teléfono |
 
 Los tres actores son transversales al sistema y se referencian desde los demás módulos sin volver a
 definirse: este es el diagrama que fija su definición canónica.
