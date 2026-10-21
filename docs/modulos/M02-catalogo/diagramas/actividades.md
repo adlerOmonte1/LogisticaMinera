@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     Start([Solicitud de alta de vehiculo]) --> V1{Campos obligatorios completos?}
-    V1 -->|No| E1[Rechazar: Complete los campos obligatorios]
+    V1 -->|No| E1[Rechazar: Debe completar los campos obligatorios]
     E1 --> Fin([Fin])
     V1 -->|Si| V2{Formato de placa valido?}
     V2 -->|No| E2[Rechazar: El formato de la placa no es valido]
