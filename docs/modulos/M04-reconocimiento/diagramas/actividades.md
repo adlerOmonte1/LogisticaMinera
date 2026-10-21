@@ -33,7 +33,7 @@ propuesta en memoria hasta que el usuario confirma el ingreso.
 ```mermaid
 flowchart TD
     I([Usuario confirma el ingreso]) --> D1{Hubo reconocimiento?}
-    D1 -->|No| A1[Registrar el ingreso como manual con su motivo]
+    D1 -->|No| A1[Registrar el ingreso como manual o sin foto con su motivo]
     A1 --> F1([Sin reconocimiento asociado])
     D1 -->|Si| T1[Entrar en la transaccion del ingreso]
     T1 --> P1[Persistir cabecera con motor version y umbral]
