@@ -19,7 +19,7 @@ Fuentes: `docs/00-tesis/marco_tesis.md`, `docs/00-tesis/decisiones_reformulacion
 
 ## Fase 1. Fuentes de verdad y limpieza (PR 1)
 
-- `decisiones_reformulacion.md`: DR-11 a DR-18 (ver `v2_decisiones_y_plan.md`).
+- `decisiones_reformulacion.md`: DR-11 a DR-18, a partir del bloque de decisiones nuevas registrado en ese mismo archivo.
 - `marco_tesis.md`: I6 por ruta decidida (§4), rol Supervisor (§8) y la excepción de registro sin foto.
 - **Mapa de limpieza:** tabla con cada archivo de `docs/` y su destino (conservar, fusionar o eliminar). Cubre notas obsoletas, PDFs generados que quedarán desactualizados, duplicados y restos de la migración.
 - Revisar si las plantillas de `skills/` siguen sirviendo para la versión 2.
