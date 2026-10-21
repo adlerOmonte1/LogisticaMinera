@@ -129,7 +129,11 @@ faltan **se omite**, no se reporta como incumplida (RN-M05-07): un campo vacío 
 registro, no el validador.
 
 Se aplican **sobre los datos que propone el reconocimiento, de nuevo sobre los que el usuario
-confirma y, en el primer viaje, al registrar el destare** (RN-M05-05). La segunda pasada existe porque el usuario pudo introducir
+confirma y, en el primer viaje, al registrar el destare** (RN-M05-05). En el **registro sin foto**
+(DR-13) no hay reconocimiento ni pasada sobre lo propuesto: `ReconocedorTicket` no se invoca y las
+cinco reglas se aplican sobre los datos que digita el usuario al confirmar, igual que en cualquier
+otro ingreso. V5 compara la fecha indicada con la del registro; la hora del pesaje propuesta por el
+sistema (DR-11) no altera la regla. La segunda pasada existe porque el usuario pudo introducir
 una incoherencia nueva al corregir.
 
 ### Persistencia del resultado
@@ -172,6 +176,8 @@ reconocimientos de un periodo comparten el mismo `motor` y `version_motor`.
 - [ ] Un campo sin lectura tiene `valor_reconocido` y `confianza` nulos, nunca cero ni vacío.
 - [ ] `fue_corregido` es una propiedad derivada, no una columna escribible.
 - [ ] El fallo del motor no impide registrar el ingreso.
+- [ ] El registro sin foto no invoca `ReconocedorTicket` ni crea `RECONOCIMIENTO_TICKET`, pero sí
+      `RESULTADO_VALIDACION` para las cinco reglas.
 - [ ] Cada regla de M05 es una clase independiente, registrada en una colección que el validador
       recorre sin nombrarlas.
 - [ ] Las cinco reglas se evalúan siempre, y una con datos incompletos se omite en vez de fallar.
