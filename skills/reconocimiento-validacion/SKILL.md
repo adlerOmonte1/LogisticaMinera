@@ -89,6 +89,10 @@ class CampoReconocido(models.Model):
 (RN-M04-10): si el cliente pudiera declararla, podría afirmar que no hubo corrección cuando sí la
 hubo, y ERA perdería su única fuente de verificación.
 
+**Registro sin foto (DR-13).** Cuando el ingreso se registra sin imagen, M03 no invoca a
+`ReconocedorTicket` y no se crea `RECONOCIMIENTO_TICKET` para ese ingreso (RS-M04-13, RN-M04-11). No
+simules una lectura vacía ni reutilices la de otro ingreso: la ausencia de reconocimiento es el dato.
+
 ## M05 — Una clase por regla, nunca un `if` por regla en el servicio
 
 ```python

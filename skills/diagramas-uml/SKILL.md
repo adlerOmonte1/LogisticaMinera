@@ -81,7 +81,7 @@ Los actores se definen en `../../M01-autenticacion/diagramas/caso_uso.md` y no s
 Uno o más diagramas, cada uno titulado `## S-M{nn}-{nn} · {Escenario} (HU-M{nn}-{nn})`.
 
 ```markdown
-## S-M03-01 · Registro de un ingreso con reconocimiento y validación (HU-M03-01, HU-M04-01, HU-M05-01)
+## S-M03-01 · Registro de un ingreso con reconocimiento y validación (HU-M03-01)
 
 ```mermaid
 sequenceDiagram
@@ -97,34 +97,66 @@ sequenceDiagram
     participant AUD as Auditoria M09
 
     S->>NG: Captura la foto del ticket
-    NG->>API: POST /api/v1/reconocimientos/
+    NG->>NG: Reduce la imagen RNF-M03-04
+    NG->>API: POST /api/v1/ingresos/borradores/
     API->>SRV: iniciar_registro(imagen, usuario)
-    SRV->>IMG: Guardar imagen
-    SRV->>DB: Persistir hora_inicio_registro
-    SRV->>REC: reconocer(imagen)
-    REC-->>SRV: Seis campos con confianza
-    SRV->>VAL: validar(datos propuestos)
-    VAL-->>SRV: Lista de inconsistencias
-    API-->>NG: 200 con campos e inconsistencias
-    NG-->>S: Muestra campos resaltados
-    S->>NG: Corrige datos y elige tipo de mineral
+
+    alt Formato o tamano no admitido
+        SRV-->>API: Error de validacion RNF-M03-01
+        API-->>NG: 400 La imagen debe estar en formato JPG o PNG
+    else Imagen admitida
+        SRV->>IMG: Guardar imagen
+        SRV->>DB: Registrar hora de inicio del registro
+        SRV->>REC: reconocer(imagen)
+        REC-->>SRV: Placa fecha y peso bruto con su confianza
+        SRV->>SRV: Proponer la hora actual como hora del pesaje
+        SRV->>VAL: validar(datos propuestos)
+        VAL-->>SRV: Lista de inconsistencias
+        SRV-->>API: Propuesta sin persistir RN-M03-02
+        API-->>NG: 200 con campos confianza hora propuesta e inconsistencias
+        NG-->>S: Resalta baja confianza e inconsistencias
+    end
+
+    S->>NG: Corrige datos ajusta la hora del pesaje y elige tipo de mineral
+    opt Placa sin registrar en el catalogo
+        NG-->>S: Formulario de alta del vehiculo en la misma pantalla
+        S->>NG: Completa titularidad y capacidad
+        NG->>API: POST /api/v1/catalogo/vehiculos/
+        API-->>NG: 201 vehiculo creado sin tara
+    end
+    opt Tipo de mineral nuevo y rol Administrativo o Administrador
+        NG->>API: POST /api/v1/catalogo/tipos-mineral/
+        API-->>NG: 201 tipo de mineral creado y elegido
+    end
     NG->>API: POST /api/v1/ingresos/
     API->>SRV: registrar_ingreso(datos confirmados, usuario)
-    SRV->>VAL: validar(datos confirmados) RN-M03-01 a 05
+    SRV->>DB: Leer vehiculo vigente con su tara RN-M03-08
+    SRV->>VAL: validar(datos confirmados)
 
-    alt Regla bloqueante incumplida o V4 sin justificar
-        VAL-->>SRV: Rechazo con mensaje
-        API-->>NG: 400 con detalle del campo
-        NG-->>S: Mensaje en el campo correspondiente
+    alt Vehiculo dado de baja
+        SRV-->>API: Rechazo RN-M03-08
+        API-->>NG: 400 El vehiculo esta dado de baja
+    else Regla bloqueante o advertencia sin justificar
+        VAL-->>SRV: Rechazo con mensaje literal
+        SRV-->>API: Error de dominio RN-M03-05
+        API-->>NG: 400 con el campo afectado
+        NG-->>S: Mensaje junto al campo
     else Datos coherentes
         SRV->>DB: BEGIN TRANSACTION
         SRV->>COR: obtener_siguiente_codigo()
-        SRV->>DB: Persistir ingreso con valores reconocidos y confirmados
-        SRV->>DB: Persistir hora_fin_registro del servidor
+        COR-->>SRV: Codigo asignado RN-M03-09
+        alt Vehiculo con tara
+            SRV->>SRV: Calcular peso neto como bruto menos tara RN-M03-04
+            SRV->>DB: Persistir ingreso Registrado con tara aplicada y hora de fin
+        else Vehiculo sin tara
+            SRV->>DB: Persistir ingreso En proceso sin neto y hora de fin RN-M03-17
+        end
+        SRV->>DB: Persistir valor reconocido y confirmado por campo
         SRV->>AUD: Registrar evento CREAR
         SRV->>DB: COMMIT
-        API-->>NG: 201 con codigo
-        NG-->>S: Ingreso registrado con el codigo
+        SRV-->>API: Ingreso persistido
+        API-->>NG: 201 con el codigo y el estado
+        NG-->>S: Ingreso registrado o pendiente de destare
     end
 ```
 ```
@@ -169,11 +201,12 @@ Los mensajes describen **qué se hace**, no cómo: `obtener_siguiente_codigo()`,
 Uno o más diagramas, titulados `## A-M{nn}-{nn} · {Proceso} ({reglas que verifica})`.
 
 ```markdown
-## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-10, RN-M03-16, RN-M03-17)
+## A-M03-01 · Registro de un ingreso a partir del ticket (RN-M03-01 a RN-M03-09, RN-M03-16, RN-M03-17, RN-M03-21, RN-M03-22, RN-M03-24)
 
 ```mermaid
 flowchart TD
-    I([Supervisor junto a la balanza]) --> C1[Capturar foto del ticket]
+    I([Supervisor junto a la balanza]) --> D0{Hay ticket para fotografiar?}
+    D0 -->|Si| C1[Capturar foto del ticket]
     C1 --> V1{Formato y tamano admitidos?}
     V1 -->|No| E1[Rechazar: La imagen debe estar en formato JPG o PNG y no superar los 10 MB]
     E1 --> C1
@@ -182,21 +215,30 @@ flowchart TD
     R1 --> D1{Imagen legible?}
     D1 -->|No| L1[Ingresar placa fecha y peso bruto manualmente]
     D1 -->|Si| C2[Mostrar campos con su confianza]
-    L1 --> L2[Revisar y corregir datos]
-    C2 --> L2
-    L2 --> L3[Digitar la hora del pesaje]
-    L3 --> D2{Placa en el catalogo?}
+    D0 -->|No| S1[Elegir registro sin foto y asignar hora de inicio]
+    S1 --> S2[Elegir el motivo de la lista]
+    S2 --> S3[Ingresar placa fecha y peso bruto]
+    L1 --> H1[Proponer la hora actual como hora del pesaje]
+    C2 --> H1
+    S3 --> H1
+    H1 --> L2[Revisar corregir datos y ajustar la hora]
+    L2 --> D2{Placa en el catalogo?}
     D2 -->|No| L4[Dar de alta el vehiculo en la misma pantalla]
-    L4 --> L5[Elegir tipo de mineral]
-    D2 -->|Si| L5
-    L5 --> V2[Validar reglas V1 a V5]
+    D2 -->|De baja| E3[Rechazar: El vehiculo esta dado de baja]
+    E3 --> L2
+    D2 -->|Si| L5{Tipo de mineral en el catalogo?}
+    L4 --> L5
+    L5 -->|No| D5{Rol Administrativo o Administrador?}
+    D5 -->|Si| L6[Dar de alta el tipo de mineral en la misma pantalla]
+    D5 -->|No| E4[Indicar que lo registre un administrativo]
+    E4 --> F2([Registro detenido sin perder lo capturado])
+    L6 --> L7[Elegir tipo de mineral]
+    L5 -->|Si| L7
+    L7 --> V2[Validar reglas V1 a V5]
     V2 --> D3{Inconsistencia sin resolver?}
     D3 -->|Si| E2[Senalar campo con el mensaje de la regla]
     E2 --> L2
-    D3 -->|No| V3{Numero de ticket ya registrado?}
-    V3 -->|Si| E3[Rechazar: El ticket ya fue registrado en otro ingreso]
-    E3 --> L2
-    V3 -->|No| T1[Iniciar transaccion]
+    D3 -->|No| T1[Iniciar transaccion]
     T1 --> A2[Asignar codigo y hora de fin]
     A2 --> D4{El vehiculo tiene tara?}
     D4 -->|Si| A3[Calcular peso neto con la tara del vehiculo]
