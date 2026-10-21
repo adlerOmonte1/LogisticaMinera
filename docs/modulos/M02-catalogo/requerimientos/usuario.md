@@ -8,6 +8,7 @@
 | RU-M02-04 | Si dejamos de trabajar con un transportista o un vehículo, no quiero que desaparezca lo que ya movió |
 | RU-M02-05 | La tara de cada volquete se saca una vez, cuando viene por primera vez, y ya no se cambia salvo que lo decida la Gerencia |
 | RU-M02-06 | Cuando llega un volquete nuevo, quiero registrarlo ahí mismo, sin salir del registro del ingreso |
+| RU-M02-07 | Si el mineral que llegó no está en la lista, quiero agregarlo desde el mismo registro, sin tener que inventar un código |
 
 ## Contexto del diagnóstico
 
@@ -18,3 +19,4 @@
 | RU-M02-03, RU-M02-04 | Los transportistas y vehículos se identificaban de forma libre, sin un registro que sobreviviera a los cambios de personal |
 | RU-M02-05 | La tara obtenida en el destare del primer viaje se conocía en planta, pero no quedaba registrada en un lugar común; el peso neto se restaba a mano |
 | RU-M02-06 | Un volquete nuevo obligaba a interrumpir el registro para darlo de alta en otro lugar, o a anotarlo para después |
+| RU-M02-07 | Un mineral de una procedencia nueva obligaba a anotarlo con un nombre provisional que después no coincidía con la consolidación |
