@@ -6,8 +6,10 @@
 |---|---|---|---|
 | Buscar por placa y fecha | Búsqueda por placa total o parcial y fecha o rango | HU-M07-01 | `GET /api/v1/consulta/ingresos/` |
 | Listar ingresos con filtros | Listado paginado con filtros combinables y totales del conjunto | HU-M07-02 | `GET /api/v1/consulta/ingresos/?filtros` |
-| Consultar detalle completo | Datos, imagen, marcas de tiempo, validaciones, reconocimiento y trazabilidad | HU-M07-01, HU-M07-02 | `GET /api/v1/consulta/ingresos/{id}/` |
+| Consultar detalle completo | Datos, imagen o motivo de su ausencia, marcas de tiempo, validaciones, reconocimiento, trazabilidad e historial | HU-M07-01, HU-M07-02 | `GET /api/v1/consulta/ingresos/{id}/` |
 | Obtener la imagen del ticket | Entrega el respaldo con control de acceso | HU-M07-01 | `GET /api/v1/consulta/ingresos/{id}/ticket/` |
+| Consultar el calendario de un mes | Llegadas y toneladas por día, marcas y resumen del mes | HU-M07-03 | `GET /api/v1/consulta/calendario/?anio&mes` |
+| Listar los ingresos de un día | Ingresos de una fecha del pesaje | HU-M07-03 | `GET /api/v1/consulta/ingresos/?fecha` |
 
 La búsqueda y el listado comparten endpoint: son la misma operación con distintos filtros.
 Separarlos obligaría a mantener dos consultas sobre la misma entidad, con el riesgo de que
@@ -18,8 +20,8 @@ divergieran.
 M07 **no tiene entidad propia**: lee sobre `INGRESO`, que pertenece a M03 (D-10).
 
 **Lo que hace.** Responde por un ingreso concreto a partir de la placa y la fecha, entrega su
-respaldo con control de acceso, y compone el detalle completo reuniendo lo que aportan los demás
-módulos.
+respaldo con control de acceso, muestra el recorrido de su mineral, compone el detalle completo
+reuniendo lo que aportan los demás módulos y presenta el calendario de llegadas de un mes.
 
 **Lo que delega.**
 
@@ -28,7 +30,8 @@ módulos.
 | M03 Registro | Lectura de ingresos | Los datos del ingreso, su estado y la referencia de su imagen |
 | M04 Reconocimiento | Lectura del reconocimiento | La comparación entre lo reconocido y lo confirmado |
 | M05 Validación | Lectura de resultados | Las reglas evaluadas y su resolución |
-| M06 Trazabilidad | Lectura del recorrido | Las etapas recorridas por el lote del ingreso |
+| M06 Trazabilidad | Lectura del recorrido | El lote del ingreso y las etapas recorridas de su ruta |
+| M09 Auditoría | Lectura del historial | Los eventos del ingreso y de su lote, en orden cronológico |
 
 **Lo que no hace.** No escribe ningún dato, no agrega por periodo —eso es M08— y no interpreta lo
 que muestra: presenta lo que cada módulo aporta, sin recalcularlo. Si el detalle mostrara un total
@@ -41,6 +44,7 @@ calculado por su cuenta, podría contradecir al del módulo responsable.
 | Buscar y listar | Sí | Sí | Sí |
 | Consultar detalle | Sí | Sí | Sí |
 | Obtener la imagen del ticket | Sí | Sí | Sí |
+| Consultar el calendario de llegadas | Sí | Sí | Sí |
 
 Los tres roles consultan, porque la consulta no modifica nada y responder por un ingreso es parte
 del trabajo de todos. El control de acceso a la imagen existe frente a peticiones sin sesión, no
@@ -55,7 +59,8 @@ para distinguir entre roles.
 | M03 | Los ingresos y sus imágenes |
 | M04 | La comparación entre lo reconocido y lo confirmado |
 | M05 | El resultado de las validaciones |
-| M06 | El recorrido del proceso |
+| M06 | El lote y el recorrido del proceso |
+| M09 | El historial del ingreso |
 
 | Es requerido por | Para |
 |---|---|

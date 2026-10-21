@@ -29,6 +29,9 @@ sequenceDiagram
         else Con coincidencias
             API-->>NG: 200 con los resultados
             NG-->>A: Lista con los anulados senalados
+            NG->>API: GET /api/v1/ingresos/{id}/trazabilidad/
+            API-->>NG: 200 con el lote y el recorrido de su ruta
+            NG-->>A: Resultado con su ticket y su trazabilidad
         end
     end
 ```
@@ -45,6 +48,7 @@ sequenceDiagram
     participant REC as RepositorioReconocimiento M04
     participant VAL as RepositorioValidacion M05
     participant TRZ as RepositorioTrazabilidad M06
+    participant AUD as RepositorioAuditoria M09
     participant IMG as Almacen de imagenes
 
     A->>NG: Abre un resultado
@@ -53,7 +57,8 @@ sequenceDiagram
     SRV->>ING: Datos del ingreso y tres marcas de tiempo
     SRV->>REC: Comparacion reconocido y confirmado
     SRV->>VAL: Reglas evaluadas y su resolucion
-    SRV->>TRZ: Etapas recorridas por el lote
+    SRV->>TRZ: Lote y etapas recorridas de su ruta
+    SRV->>AUD: Historial del ingreso y de su lote
     SRV-->>API: Detalle con los bloques disponibles
     API-->>NG: 200 con los bloques y sus ausencias indicadas
     NG-->>A: Detalle completo con miniatura del ticket
@@ -64,6 +69,8 @@ sequenceDiagram
 
     alt Sin sesion valida
         API-->>NG: 401 sin entregar la imagen
+    else Ingreso registrado sin foto
+        API-->>NG: 200 indicando que no tiene respaldo fotografico y su motivo
     else Almacen sin respuesta
         API->>IMG: Solicitar imagen
         IMG--xAPI: Sin respuesta
@@ -98,3 +105,34 @@ sequenceDiagram
     API-->>NG: 200 con resultados y totales
     NG-->>A: Listado paginado con el resumen del conjunto
 ```
+
+## S-M07-04 · Calendario de llegadas (HU-M07-03)
+
+```mermaid
+sequenceDiagram
+    actor A as Administrativo
+    participant NG as Angular
+    participant API as Django REST
+    participant REP as RepositorioConsulta
+    participant DB as PostgreSQL
+
+    A->>NG: Abre el calendario de un mes
+    NG->>API: GET /api/v1/consulta/calendario/?anio&mes
+    API->>REP: calendario(anio, mes)
+    REP->>DB: Consulta agregada por dia de la fecha del pesaje
+    Note over REP,DB: Cuenta los no anulados y suma solo los Registrados
+    DB-->>REP: Ingresos toneladas y marcas por dia
+    REP-->>API: Dias del mes y resumen
+    API-->>NG: 200 con el calendario
+    NG-->>A: Mes con llegadas y toneladas por dia
+
+    A->>NG: Elige un dia
+    NG->>API: GET /api/v1/consulta/ingresos/?fecha
+    API->>REP: listar(fecha)
+    REP->>DB: Ingresos de esa fecha del pesaje
+    DB-->>REP: Ingresos del dia
+    REP-->>API: Lista del dia
+    API-->>NG: 200 con la lista o vacia
+    NG-->>A: Ingresos del dia o No llegaron volquetes este dia
+```
+
