@@ -1,6 +1,8 @@
 # Matriz de trazabilidad — HU · RF · indicador · tarea · caso de prueba
 
-**Versión:** 1.1 · **Estado:** Aprobado · **Cambio:** formato real del ticket y destare (DR-09, DR-10)
+**Versión:** 2.0 · **Estado:** En revisión · **Cambio:** versión 2 del sistema: registro sin foto,
+ruta del lote, división por fracciones, cierre con destino, calendario de llegadas, historial y
+auditoría visibles por rol, e I6 reformulado (DR-11 a DR-22)
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../model-c4/ARQ-01_Modulos_del_Sistema.md`
 
 Este es el **único documento del repositorio donde el sistema se relaciona con los indicadores de la
@@ -19,8 +21,10 @@ entidad de catálogo —alta, edición, listado y baja lógica— es una sola hi
 aceptación por operación. Se reserva historia propia para lo que tiene lógica dedicada: el
 reconocimiento, la validación, la anulación con motivo, el destare, la exportación.
 
-Por eso el backlog tiene **22 historias** y no las 34 del sistema anterior, pese a cubrir más
-funcionalidad.
+Por eso el backlog tiene **27 historias** y no las 34 del sistema anterior, pese a cubrir más
+funcionalidad. La versión 2 añadió cinco: la división del lote y su cierre con destino (M06), el
+calendario de llegadas (M07) y la separación entre el historial de un ingreso y la auditoría del
+sistema (M09). El registro sin foto no es una historia nueva: es una excepción de HU-M03-01 (DR-13).
 
 ## 2. Matriz
 
@@ -35,7 +39,7 @@ funcionalidad.
 | HU-M02-02 | Gestión del catálogo de tipos de mineral | Administrativo | Crítica | RF06 | I3 (C6), I5 | — | CP06 |
 | HU-M02-03 | Gestión de transportistas | Administrativo | Media | RF06 | — | — | CP06 |
 | **M03 — Registro de ingresos** |
-| HU-M03-01 | Registro de un ingreso a partir del ticket de balanza | Supervisor de planta | Crítica | RF01, RF04, RF05, RF06 | I1, I2, I3 | T01, T02 | CP01, CP05 |
+| HU-M03-01 | Registro de un ingreso a partir del ticket de balanza, con la excepción del registro sin foto | Supervisor de planta | Crítica | RF01, RF04, RF05, RF06 | I1, I2, I3 | T01, T02 | CP01, CP05, CP11 |
 | HU-M03-02 | Corrección de un ingreso registrado | Administrativo | Alta | RF04 | I3 | T02 | CP04 |
 | HU-M03-03 | Anulación de un ingreso | Administrador | Alta | — | — | — | CP04 |
 | HU-M03-04 | Registro del destare de un vehículo en su primer viaje | Supervisor de planta | Crítica | RF01 | I3 (C4, C5), TDI (V2, V4) | T01 | CP01 |
@@ -46,19 +50,23 @@ funcionalidad.
 | HU-M05-01 | Detección y resolución de inconsistencias del ticket | Supervisor de planta | Crítica | RF03 | TDI | T02 | CP03 |
 | **M06 — Trazabilidad del proceso** |
 | HU-M06-01 | Gestión de lotes de proceso | Administrativo | Alta | RF07 | I6 | — | CP07 |
-| HU-M06-02 | Registro del paso de un lote por una etapa | Supervisor de planta | Crítica | RF07 | I6 | T04 | CP07 |
+| HU-M06-02 | Registro del paso de un lote por una etapa de su ruta | Supervisor de planta | Crítica | RF07 | I6 | T04 | CP07 |
 | HU-M06-03 | Consulta de la trazabilidad de un ingreso | Administrativo | Media | RF07 | I6 | T04 | CP07 |
+| HU-M06-04 | División de un lote por fracciones | Administrativo | Alta | RF07 | I6 (denominador en lotes divididos) | — | CP07 |
+| HU-M06-05 | Cierre del lote con su destino | Administrador | Alta | RF07 | — | — | CP12 |
 | **M07 — Consulta de ingresos y respaldo** |
 | HU-M07-01 | Consulta de un ingreso por placa y fecha con su respaldo | Administrativo | Crítica | RF08 | I4 | T03 | CP08 |
 | HU-M07-02 | Listado y detalle de ingresos | Administrativo | Alta | RF08 | I4 | T03 | CP08 |
+| HU-M07-03 | Calendario de llegadas | Administrativo | Media | RF08 | — | — | CP08 |
 | **M08 — Consolidación de la producción** |
 | HU-M08-01 | Total acumulado mensual por tipo de mineral | Administrativo | Crítica | RF09 | I5 | T05 | CP09 |
 | HU-M08-02 | Exportación del total acumulado mensual | Administrativo | Alta | RF09 | I5 | T06 | CP09 |
 | **M09 — Auditoría** |
 | HU-M09-01 | Registro de eventos del sistema | Administrador | Alta | — | — | — | — |
-| HU-M09-02 | Consulta del historial de un registro | Administrador | Media | — | — | — | — |
+| HU-M09-02 | Historial de un ingreso | Supervisor de planta | Media | — | — | — | — |
+| HU-M09-03 | Consulta de la auditoría del sistema | Administrador | Media | — | — | — | — |
 
-**Total: 22 historias.**
+**Total: 27 historias.**
 
 ## 3. Comprobación: cada RF tiene al menos una historia
 
@@ -70,14 +78,15 @@ funcionalidad.
 | RF04 | Registro y corrección manual de los datos reconocidos | HU-M03-01, HU-M03-02 | M03 |
 | RF05 | Asignar un código único a cada ingreso | HU-M03-01 | M03 |
 | RF06 | Registrar el tipo de mineral y el tipo de vehículo | HU-M03-01, HU-M02-01, HU-M02-02 | M03, M02 |
-| RF07 | Vincular cada ingreso con las etapas del proceso | HU-M06-01, HU-M06-02, HU-M06-03 | M06 |
-| RF08 | Consultar un ingreso por placa y fecha con su respaldo | HU-M07-01, HU-M07-02 | M07 |
+| RF07 | Vincular cada ingreso con las etapas del proceso | HU-M06-01 a HU-M06-05 | M06 |
+| RF08 | Consultar un ingreso por placa y fecha con su respaldo | HU-M07-01, HU-M07-02, HU-M07-03 | M07 |
 | RF09 | Generar y exportar el total acumulado mensual | HU-M08-01, HU-M08-02 | M08 |
 | RF10 | Gestionar usuarios y roles de acceso | HU-M01-01, HU-M01-02, HU-M01-03 | M01 |
 
 **Resultado: los diez RF están cubiertos.** Ninguna historia queda sin RF salvo HU-M03-03
-(anulación) y las dos de M09, que sostienen la integridad del histórico y no pertenecen a la lista
-de control: no suman ni restan en el avance.
+(anulación) y las tres de M09, que sostienen la integridad del histórico y no pertenecen a la lista
+de control: no suman ni restan en el avance. HU-M06-05 (cierre con destino) se asocia a RF07 por
+DR-14, que la declara historia de M06 y no un RF nuevo; tampoco amplía el denominador del avance.
 
 ## 4. Comprobación: cada tarea tiene al menos una historia
 
@@ -86,7 +95,7 @@ de control: no suman ni restan en el avance.
 | T01 | Registrar un ingreso a partir de la imagen del ticket | HU-M03-01, HU-M03-04, HU-M04-01 |
 | T02 | Corregir un dato reconocido de forma incorrecta | HU-M03-01, HU-M03-02, HU-M05-01 |
 | T03 | Consultar un ingreso por placa y fecha | HU-M07-01, HU-M07-02 |
-| T04 | Vincular un ingreso con una etapa del proceso | HU-M06-02, HU-M06-03 |
+| T04 | Vincular un ingreso con una etapa del proceso | HU-M06-02, HU-M06-03; HU-M06-04 cuando el lote está dividido |
 | T05 | Obtener el total acumulado mensual por producto | HU-M08-01 |
 | T06 | Exportar el total acumulado mensual por producto | HU-M08-02 |
 
@@ -100,10 +109,11 @@ la respalde y la tarea debería cambiarse en el instrumento.
 |---|---|
 | I1 Tiempo de espera del registro | HU-M03-01: fecha y hora del pesaje e inicio del registro como valores distintos |
 | I2 Tiempo de registro del ingreso | HU-M03-01: inicio y fin del registro asignados por el servidor |
-| I3 Completitud del registro | HU-M03-01 exige los siete campos; HU-M02-01 aporta C4 y C7 y HU-M02-02 aporta C6 desde el catálogo; en el primer viaje de un vehículo, C4 y C5 se completan con el destare (HU-M03-04) |
-| I4 Tiempo de recuperación del respaldo | HU-M07-01 y HU-M07-02: consulta por placa y fecha con la imagen del ticket |
-| I5 Tiempo de consolidación | HU-M08-01: total del mes por tipo de mineral, a demanda |
-| I6 Grado de trazabilidad | HU-M06-01 a HU-M06-03: lote, paso por etapa y consulta |
+| I1 y I2, precisión | La hora del pesaje la propone el sistema con la hora actual y el usuario la ajusta a la del pesaje real (DR-11); el inicio y el fin del registro los asigna el servidor. Las tres marcas siguen siendo independientes |
+| I3 Completitud del registro | HU-M03-01 exige los siete campos; HU-M02-01 aporta C4 y C7 y HU-M02-02 aporta C6 desde el catálogo; en el primer viaje de un vehículo, C4 y C5 se completan con el destare (HU-M03-04). En un ingreso sin foto, C1, C2 y C3 los digita el usuario [PENDIENTE: P-03, tratamiento del ingreso sin respaldo fotográfico en la ficha de observación] |
+| I4 Tiempo de recuperación del respaldo | HU-M07-01 y HU-M07-02: consulta por placa y fecha con la imagen del ticket. Un ingreso sin foto no tiene imagen que recuperar; HU-M07-01 lo presenta con su marca «sin respaldo fotográfico» y su motivo [PENDIENTE: P-03] |
+| I5 Tiempo de consolidación | HU-M08-01: total del mes por tipo de mineral, a demanda; el ingreso sin foto suma igual que los demás |
+| I6 Grado de trazabilidad | Etapas vinculadas ÷ etapas de la ruta decidida × 100 (DR-16). HU-M06-01 forma el lote; HU-M06-02 registra cada etapa de la ruta; HU-M06-04 fija la ruta de cada parte y, en un lote dividido, el denominador es la unión de las etapas de las rutas de sus partes (DR-21); HU-M06-03 presenta el recorrido de un ingreso con sus etapas vinculadas y las de su ruta. HU-M06-05 cierra el lote, pero el cierre no es una etapa y no entra en la fórmula |
 | ERA Exactitud del reconocimiento | HU-M04-01 y HU-M04-02: valor reconocido y confirmado de la placa, la fecha y el peso bruto, guardados por separado |
 | TDI Detección de inconsistencias | HU-M05-01: las cinco reglas V1 a V5 y el registro de su resultado; V2 y V4 se evalúan también en el destare (HU-M03-04) |
 | RFC Requerimientos cumplidos | Sección 3: los diez RF con sus historias |
@@ -124,10 +134,19 @@ Un caso por RF, para el indicador CPS. Los casos por criterio de aceptación lle
 | CP04 | Corrección manual de un dato reconocido | RF04 |
 | CP05 | Asignación del código único, sin duplicados | RF05 |
 | CP06 | Registro del tipo de mineral y del tipo de vehículo | RF06 |
-| CP07 | Vínculo del ingreso con las cuatro etapas | RF07 |
+| CP07 | Vínculo del ingreso con las etapas de la ruta decidida de su lote o de su parte | RF07 |
 | CP08 | Consulta por placa y fecha con presentación del ticket | RF08 |
 | CP09 | Total acumulado mensual y su exportación | RF09 |
 | CP10 | Gestión de usuarios y restricción por rol | RF10 |
+
+La lista de control tiene diez casos, uno por RF, y ese es el denominador de CPS. Los casos de la
+versión 2 que verifican excepciones o historias sin RF propio se ejecutan con el plan de pruebas,
+pero **no** entran en ese denominador:
+
+| Caso | Verifica | Relación |
+|---|---|---|
+| CP11 | Registro de un ingreso sin foto, con motivo y marca «sin respaldo fotográfico» | Excepción de RF01 (DR-13) |
+| CP12 | Cierre del lote con su destino, reservado al Administrador | Historia de RF07 (DR-14) |
 
 ## 7. Historias del sistema anterior
 
