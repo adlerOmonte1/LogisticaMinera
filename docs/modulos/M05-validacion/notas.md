@@ -62,7 +62,8 @@ registro: esas reglas no consultan la base.
 
 V1 es la excepción: para saber si un ticket está duplicado necesita buscar otros ingresos. No lo
 hace por su cuenta, sino a través de un repositorio de lectura que recibe inyectado
-(`buscar_por_placa_fecha_peso`), de modo que la regla sigue probándose sin base de datos con un doble
+(`buscar_por_placa_fecha_peso`, que admite excluir un ingreso: en una corrección se excluye el
+propio, RN-M05-13), de modo que la regla sigue probándose sin base de datos con un doble
 de ese repositorio.
 
 ### Persistencia del resultado
