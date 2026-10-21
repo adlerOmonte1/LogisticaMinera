@@ -95,11 +95,11 @@ logistica-minera-frontend/
       features/
         auth/               M01
         catalogo/            M02
-        ingresos/             M03 (incluye las pantallas de reconocimiento y validacion, M04 y M05)
-        trazabilidad/         M06
-        consulta/             M07
+        ingresos/             M03 (incluye reconocimiento y validacion, M04 y M05, registro sin foto y destare)
+        trazabilidad/         M06 (lotes, ruta, division por fracciones, etapas, bigbags y cierre)
+        consulta/             M07 (busqueda, listado, detalle y calendario de llegadas)
         consolidacion/        M08
-        auditoria/            M09
+        auditoria/            M09 (historial de un ingreso y auditoria del sistema)
       app.config.ts   app.routes.ts   app.component.ts
     environments/
       environment.ts               desarrollo
@@ -117,6 +117,14 @@ pantallas para una sola operación, lo que fragmentaría un flujo que el usuario
 
 Simetría con el backend: M07 y M08 tampoco tienen `models/` propios aquí — consumen los de M03, M04,
 M05 y M06 (D-10).
+
+**El menú se construye con el rol que devuelve el inicio de sesión**, no con una lista fija. El
+Supervisor de planta ve el registro de ingresos, el registro de destares, los lotes —solo para
+registrar el paso por las etapas— y la consulta (DR-17); el Administrativo ve además la corrección,
+los catálogos, la composición de lotes y la consolidación (DR-23); el Administrador lo ve todo,
+incluidos usuarios, auditoría y el cierre del lote con su destino. Ocultar una opción no reemplaza
+el control del servidor: `rol.guard.ts` evita navegar a una pantalla vacía, pero quien decide es la
+API (HU-M01-03).
 
 ---
 
@@ -242,8 +250,15 @@ tiempo, porque corregir un dato puede resolver ambas cosas a la vez.
 - Los campos con confianza por debajo del umbral se resaltan sin depender solo del color.
 - Un campo sin lectura se muestra vacío y editable, nunca con un valor inventado.
 - Las inconsistencias se muestran junto al campo afectado, con el mensaje literal de la regla.
-- La hora del pesaje se digita en un campo sin valor precargado: el ticket no la imprime y un valor
-  por defecto se confirmaría sin mirarlo.
+- La hora del pesaje llega propuesta por el servidor con la hora actual y es editable (DR-11): el
+  ticket no la imprime y el usuario la ajusta a la del pesaje real. El campo se muestra junto a la
+  fecha reconocida, con una indicación visible de que es una propuesta, para que no se confirme sin
+  mirarla. La propuesta no la calcula el navegador: viene en la respuesta de `iniciarRegistro`.
+- Si el ticket se extravió o no puede fotografiarse, la pantalla ofrece el **registro sin foto**: el
+  usuario elige el motivo de una lista cerrada y digita placa, fecha, hora y peso bruto. No hay
+  reconocimiento ni campos de confianza, pero las inconsistencias se muestran igual. El ingreso
+  aparece después, en toda lista y en su detalle, con la marca «sin respaldo fotográfico» y su
+  motivo (DR-13).
 - La tara y el peso neto se muestran como referencia, no como campos editables: la tara viene del
   catálogo y el neto lo calcula el servidor. Si el vehículo no tiene tara, la pantalla lo indica y
   anuncia que el ingreso quedará En proceso.
