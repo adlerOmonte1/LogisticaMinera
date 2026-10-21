@@ -259,8 +259,8 @@ llegaran a `main`.
 | D-13 *(anterior)* | Cada serie de correlativos tiene su propia tabla de contadores | Existía porque había dos series, ingresos y salidas. Con una sola serie la decisión pierde objeto. El código **D-13 se reasignó** a la confirmación del dato reconocido |
 
 Las decisiones D-12 y D-13 anteriores solo existieron en la rama `feature/M03-ingresos` y nunca
-llegaron a `main`; las únicas referencias a ellas están en `apps/salidas`, que se retira en la fase
-10 del plan de migración.
+llegaron a `main`; las únicas referencias a ellas están en `apps/salidas`, que se retira en la
+preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8).
 
 ## Pendientes que bloquean decisiones
 

@@ -7,7 +7,7 @@
 |---|---|
 | Documento | Marco de tesis |
 | Origen | Anexos 01 a 05 de la tesis, validados por juicio de expertos |
-| Fecha | 21/09/2026 |
+| Fecha | 21/09/2026 · actualizado el 20/10/2026 con DR-11 a DR-18 |
 | Estado | Vigente |
 
 ---
@@ -58,25 +58,35 @@ variable; la norma se conserva únicamente como taxonomía para clasificar los R
 | D2 Integridad del registro | I3 Completitud del registro | Campos consignados / 7 × 100 | % |
 | D2 Integridad del registro | I4 Tiempo de recuperación del respaldo | Consulta → presentación del ticket y sus datos | min |
 | D3 Consolidación de la producción | I5 Tiempo de consolidación | Solicitud → entrega del total acumulado del mes por producto que incluye el ingreso | min |
-| D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / 4 × 100 | % |
+| D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / etapas de la ruta decidida × 100 | % |
 
 **Campos de completitud (I3):** C1 placa · C2 fecha y hora del pesaje · C3 peso bruto · C4 tara ·
 C5 peso neto · C6 tipo de mineral · C7 tipo de vehículo (propio o externo).
 
-**Origen de cada campo en el sistema (DR-09).** El ticket de balanza en uso solo imprime la placa, la
+**Origen de cada campo en el sistema (DR-09, DR-11).** El ticket de balanza en uso solo imprime la placa, la
 fecha (día, mes y año) y un único peso, que es el peso bruto. Por eso:
 
 | Campo | Origen |
 |---|---|
 | C1 placa | Reconocida del ticket, editable antes de confirmar |
-| C2 fecha y hora del pesaje | La fecha se reconoce del ticket; la hora la digita el usuario, porque el ticket no la imprime |
+| C2 fecha y hora del pesaje | La fecha se reconoce del ticket; la hora la indica el usuario, porque el ticket no la imprime. El sistema la propone con la hora actual y es editable |
 | C3 peso bruto | Reconocido del ticket, editable antes de confirmar |
 | C4 tara | Del catálogo del vehículo; se fija en el destare del primer viaje y se mantiene por decisión de la Gerencia |
 | C5 peso neto | Calculado por el sistema: peso bruto − tara del vehículo |
 | C6 tipo de mineral | Elegido del catálogo |
 | C7 tipo de vehículo | Derivado de la titularidad registrada en el catálogo |
 
-**Etapas del proceso (I6):** secado, zarandeo, molienda, ensacado.
+**Etapas del proceso y ruta (I6, DR-16):** secado, zarandeo, molienda y ensacado. Las etapas no son
+obligatorias para todos los lotes: la planta decide la **ruta** de cada lote o de cada parte del lote.
+El secado es común; después, zarandeo, molienda o ambos; al final, ensacado. El denominador de I6 son
+las etapas de esa ruta, no las cuatro etapas del catálogo. [PENDIENTE: cómo se calcula I6 para un
+ingreso cuyo lote se dividió en partes con rutas distintas (P-02 de `decisiones_reformulacion.md`).]
+
+**Ingreso sin respaldo fotográfico (DR-13).** Si el ticket se extravía o no puede fotografiarse, el
+ingreso se registra sin foto, con motivo obligatorio, y queda marcado «sin respaldo fotográfico». Es
+una excepción regulada como regla de negocio del registro, no un RF adicional: no altera la lista de
+la sección 5 ni el denominador de RFC. [PENDIENTE: cómo se trata ese ingreso en I3 e I4 de la ficha
+de observación (P-03).]
 
 > Los indicadores I1 a I6 del sistema anterior llevaban la misma numeración con otro significado.
 > Ninguna referencia a aquellos debe sobrevivir en el repositorio.
@@ -98,7 +108,9 @@ fecha (día, mes y año) y un único peso, que es el peso bruto. Por eso:
 
 La redacción ampliada de RF03 y la inclusión de la exportación en RF09 corresponden a DR-06; la
 reducción de RF02 a tres campos y la inclusión de la duplicidad en RF03 corresponden a DR-09. Ambas
-deben estar reflejadas en el Anexo 03 del documento de tesis **antes** del juicio de expertos. Después de
+deben estar reflejadas en el Anexo 03 del documento de tesis **antes** del juicio de expertos. El
+registro sin foto de DR-13 es una excepción de RF01, no un RF nuevo, y el cierre del lote con su
+destino de DR-14 forma parte de RF07. Después de
 esa validación, la lista queda fija: cualquier cambio altera el denominador de RFC.
 
 Formato del código: `RF01`, sin guion.
@@ -137,9 +149,9 @@ inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante toda l
 
 | Rol | Alcance |
 |---|---|
-| Administrador | Acceso total, incluidos usuarios, catálogos y anulaciones |
+| Administrador | Acceso total, incluidos usuarios, catálogos, anulaciones y el cierre del lote con su destino |
 | Administrativo | Registro, corrección, consultas, consolidación y exportación |
-| Supervisor de planta | Registro y consulta |
+| Supervisor de planta | Registro de ingresos, de vehículos nuevos, de destares y del paso del lote por las etapas; consulta (DR-17) |
 
 ## 9. Módulos
 
@@ -150,18 +162,20 @@ registra en `../02-trazabilidad/matriz_HU_RF_indicador.md`, no en los documentos
 |---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 |
 | M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) |
-| M03 | Registro de ingresos | Registrar el ingreso desde la imagen del ticket, con corrección, confirmación, cálculo del peso neto y código único | RF01, RF04, RF05, RF06 |
+| M03 | Registro de ingresos | Registrar el ingreso desde la imagen del ticket —o sin ella, con motivo—, con corrección, confirmación, cálculo del peso neto y código único | RF01, RF04, RF05, RF06 |
 | M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza | RF02 |
 | M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado | RF03 |
-| M06 | Trazabilidad del proceso | Asignar ingresos a lotes y registrar su paso por cada etapa | RF07 |
+| M06 | Trazabilidad del proceso | Agrupar ingresos en lotes, decidir la ruta de cada lote o parte, registrar su paso por las etapas y cerrar el lote con su destino | RF07 |
 | M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |
 | M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 |
 | M09 | Auditoría | Registrar quién hizo qué y cuándo, incluidos reconocimiento y corrección | — (transversal) |
 
 ## 10. Fuera de alcance
 
-Salidas y ventas · inventario de producto terminado, sus movimientos internos y las pérdidas por
-humedad · reportes normativos periódicos · facturación, precios y fletes · contabilidad y planillas ·
+Salidas y ventas: el sistema registra el destino del lote cerrado —venta o traslado—, pero no la
+venta, la guía, la facturación ni los precios (DR-14) · inventario de producto terminado, sus
+movimientos internos y las pérdidas por humedad: los bigbags, su peso aproximado y las horas de
+molienda se registran solo como datos descriptivos del lote (DR-15) · reportes normativos periódicos · facturación, precios y fletes · contabilidad y planillas ·
 actividad en la mina · mineral sulfuro · integración con la balanza · predicción de demanda o
 pronósticos · aplicación móvil nativa · operación sin señal de red, salvo la conservación del
 borrador · operación multiempresa · balance metalúrgico y determinación de leyes.

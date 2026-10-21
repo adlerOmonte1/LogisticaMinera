@@ -27,14 +27,6 @@ día con un peso idéntico. Bloquear obligaría al usuario a falsear un dato par
 es lo contrario de lo que el sistema busca. Exigir la justificación conserva el hecho y su
 explicación.
 
-## Nota sobre RN-M05-12
-
-V1 existe porque el registro parte de una fotografía, y una misma fotografía puede cargarse dos
-veces. El ticket en uso no imprime un número que lo identifique de forma única (DR-09), así que la
-coincidencia de placa, fecha y peso bruto —exacto al kilogramo— es la mejor señal disponible de que
-se trata del mismo pesaje. Se compara solo contra ingresos no anulados: si el primer
-registro se anuló por un error, el segundo es precisamente su reemplazo.
-
 ## Nota sobre RN-M05-04 y RN-M05-07
 
 Ambas gobiernan qué se le muestra al usuario y cuándo. RN-M05-04 evita el ciclo de corregir un error
@@ -49,3 +41,11 @@ incorporar otras —una placa que no está en el catálogo, un tipo de mineral i
 vehículo— sin rehacer lo existente. Por eso cada regla es una clase independiente que se registra en
 una colección, y el servicio recorre esa colección sin conocer sus miembros. Durante la ventana de
 operación controlada, sin embargo, el conjunto queda congelado (RN-M05-09).
+
+## Nota sobre RN-M05-12
+
+V1 existe porque el registro parte de una fotografía, y una misma fotografía puede cargarse dos
+veces. El ticket en uso no imprime un número que lo identifique de forma única (DR-09), así que la
+coincidencia de placa, fecha y peso bruto —exacto al kilogramo— es la mejor señal disponible de que
+se trata del mismo pesaje. Se compara solo contra ingresos no anulados: si el primer
+registro se anuló por un error, el segundo es precisamente su reemplazo.

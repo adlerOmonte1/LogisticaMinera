@@ -44,16 +44,16 @@ observa el propio sistema y por eso no se editan (D-01). RN-M03-07 impide la ún
 las tres juntas no detectarían por sí solas: un pesaje fechado después del momento en que se
 registra.
 
-## Nota sobre RN-M03-17 a RN-M03-20
-
-Cubren el primer viaje de un vehículo (DR-10). El ingreso se confirma con lo que se sabe en ese
-momento —placa, fecha, hora, peso bruto, tipo de mineral— y queda En proceso hasta que el vehículo,
-ya descargado, se pesa vacío. La tara se digita en lugar de reconocerse porque, a diferencia de un
-dato del ticket, un error en ella no afecta un solo ingreso sino todos los futuros del vehículo.
-
 ## Nota sobre RN-M03-13
 
 Anular y corregir resuelven problemas distintos. La corrección arregla un dato equivocado de un
 ingreso que sí ocurrió; la anulación retira un ingreso que no debió existir. Un ingreso anulado ya
 no participa en ningún total, de modo que corregirlo no tendría efecto sobre nada y solo añadiría
 ruido al historial.
+
+## Nota sobre RN-M03-17 a RN-M03-20
+
+Cubren el primer viaje de un vehículo (DR-10). El ingreso se confirma con lo que se sabe en ese
+momento —placa, fecha, hora, peso bruto, tipo de mineral— y queda En proceso hasta que el vehículo,
+ya descargado, se pesa vacío. La tara se digita en lugar de reconocerse porque, a diferencia de un
+dato del ticket, un error en ella no afecta un solo ingreso sino todos los futuros del vehículo.

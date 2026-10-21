@@ -22,7 +22,7 @@ y confirma, y solo entonces el servidor asigna el código único y conserva la i
 **Formato real del ticket (DR-09).** El ticket imprime la placa, la fecha (día, mes y año) y un
 único peso, que es el **peso bruto**; además trae datos del cobro del pesaje y firmas, que el
 sistema no usa. No imprime hora, tara ni peso neto. Por eso el reconocimiento lee **tres campos**;
-la hora del pesaje la digita el usuario; la **tara** es un atributo del vehículo que se obtiene en
+la hora del pesaje la indica el usuario —el sistema la propone con la hora actual— (DR-11); la **tara** es un atributo del vehículo que se obtiene en
 el destare de su primer viaje y se mantiene por decisión de la Gerencia (DR-10); y el **peso neto lo
 calcula el servidor** como bruto menos tara, conservando la tara aplicada (D-17). Si el vehículo aún
 no tiene tara, el ingreso queda **En proceso** hasta el destare y no cuenta en ningún total.
@@ -75,13 +75,16 @@ conservar marcas de tiempo confiables porque sirven para triangular el postest.
 | D2 Integridad del registro | I3 Completitud del registro | Campos consignados / 7 × 100 | % |
 | D2 Integridad del registro | I4 Tiempo de recuperación del respaldo | Consulta → presentación del ticket y sus datos | min |
 | D3 Consolidación de la producción | I5 Tiempo de consolidación | Solicitud → entrega del total acumulado del mes por producto que incluye el ingreso | min |
-| D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / 4 × 100 | % |
+| D3 Consolidación de la producción | I6 Grado de trazabilidad | Etapas vinculadas / etapas de la ruta decidida × 100 | % |
 
 **Campos de completitud:** C1 placa · C2 fecha y hora del pesaje · C3 peso bruto · C4 tara ·
 C5 peso neto · C6 tipo de mineral · C7 tipo de vehículo (propio o externo). C1, C3 y la fecha de C2
-se reconocen del ticket; la hora de C2 se digita; C4 y C7 vienen del catálogo; C5 lo calcula el
+se reconocen del ticket; la hora de C2 la indica el usuario sobre una propuesta editable; C4 y C7 vienen del catálogo; C5 lo calcula el
 sistema.
-**Etapas del proceso:** secado, zarandeo, molienda, ensacado.
+**Etapas del proceso y ruta (DR-16):** secado, zarandeo, molienda y ensacado. Cada lote o parte del
+lote sigue una **ruta decidida** —secado común; zarandeo, molienda o ambos; ensacado—, y el
+denominador de I6 son las etapas de esa ruta. Un lote se divide por **fracciones**, no por toneladas
+(DR-18). Un ingreso puede registrarse **sin foto**, con motivo, como excepción de RF01 (DR-13).
 
 **Tareas de usabilidad (hoja C):** T01 registrar un ingreso a partir de la imagen del ticket ·
 T02 corregir un dato reconocido de forma incorrecta · T03 consultar un ingreso por placa y fecha ·
@@ -116,7 +119,7 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 1. **Nada se elimina.** Baja lógica y anulación con motivo; jamás `DELETE` físico.
 2. **Todo queda atribuido.** Usuario y marca de tiempo en cada operación.
 3. **El ingreso guarda tres marcas de tiempo independientes.** `fecha_hora_pesaje` combina la
-   fecha reconocida del ticket y la hora que digita el usuario, y es editable antes de confirmar; `hora_inicio_registro` y `hora_fin_registro` las asigna
+   fecha reconocida del ticket y la hora que indica el usuario sobre una propuesta editable, y es editable antes de confirmar; `hora_inicio_registro` y `hora_fin_registro` las asigna
    el servidor y ningún rol las edita. Colapsarlas «para simplificar» destruye la medición.
 4. **Ningún dato reconocido se persiste sin confirmación del usuario** (D-13). El resultado del
    reconocimiento es una propuesta; el sistema conserva por separado el valor reconocido y el
@@ -128,9 +131,9 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 
 | Rol | Código | Alcance |
 |---|---|---|
-| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos y anulaciones |
+| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos, anulaciones y el cierre del lote con su destino |
 | Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación |
-| Supervisor de planta | `SUPERVISOR` | Registro y consulta |
+| Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta (DR-17) |
 
 ## Requerimientos funcionales
 
@@ -170,11 +173,10 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 Añadir un módulo consiste en crear su carpeta, agregar una fila a esta tabla y sus filas a la
 matriz de trazabilidad. No se renumera nada ni se toca otro módulo.
 
-> **Nota sobre la renumeración.** Los módulos se renumeraron el 21/09/2026. Las cuatro carpetas
-> de `docs/modulos/` con la numeración antigua M04 a M07 (salidas y movimientos, inventario por
-> producto, consolidados y reportes, captura local) y las apps del backend que no figuran en el
-> mapa (`apps/salidas` entre ellas) corresponden al sistema anterior y se retiran en las fases 7
-> y 10 del plan de migración. Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
+> **Nota sobre la renumeración.** Los módulos se renumeraron el 21/09/2026. Las carpetas de
+> `docs/modulos/` con la numeración antigua ya se retiraron. Las apps del backend que no figuran en
+> el mapa (`apps/salidas` entre ellas) corresponden al sistema anterior y se retiran en la
+> preparación del repositorio (`docs/01-plan/PLAN_DE_TRABAJO.md` §8). Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
 > esa fecha se refieren a Salidas, no a Reconocimiento. No documentes nada sobre esas carpetas ni
 > cites sus historias.
 
@@ -225,20 +227,25 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 
 ## Decisiones de reformulación asumidas
 
-Del Anexo B del plan de migración, tomadas con su recomendación mientras el autor no indique lo
-contrario: DR-01 borrador ante pérdida de conexión como RNF, sin historias propias · DR-02 motor
+Registradas en `docs/00-tesis/decisiones_reformulacion.md`: DR-01 borrador ante pérdida de conexión como RNF, sin historias propias · DR-02 motor
 detrás de `ReconocedorTicket` · DR-03 un solo catálogo de tipo de mineral, usado al registrar y al
 consolidar · DR-04 vínculo ingreso–etapa mediante lote de proceso · DR-05 una placa que no está en
 el catálogo es el primer viaje del vehículo, que se da de alta en la misma pantalla del registro
 (ajustada por DR-10) · DR-06 RF03 cubre V1 a V5 y RF09 incluye la exportación · DR-07 módulos
 renumerados M01 a M09 · DR-08 conjunto de prueba de 50 tickets × 3 campos y 10 inconsistencias ·
 DR-09 formato real del ticket: se reconocen placa, fecha y peso bruto · DR-10 la tara se registra
-en el destare del primer viaje; hasta entonces el ingreso queda En proceso.
+en el destare del primer viaje; hasta entonces el ingreso queda En proceso · DR-11 hora del pesaje
+propuesta y editable · DR-12 sin número de ticket: el código del ingreso lo identifica · DR-13
+registro sin foto con motivo · DR-14 cierre del lote con destino, venta o traslado · DR-15 bigbags y
+horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
+del Supervisor de planta · DR-18 división del lote por fracciones. Pendientes P-01 a P-04 en el
+mismo archivo.
 
 ## Fuera de alcance — declarado
 
-Salidas y ventas · inventario de producto terminado (saldos, movimientos internos y pérdidas
-por humedad) · reportes normativos periódicos · facturación, precios y fletes · contabilidad y
+Salidas y ventas (se registra solo el destino del lote cerrado, DR-14) · inventario de producto
+terminado (saldos, movimientos internos y pérdidas por humedad; los bigbags son datos descriptivos,
+DR-15) · reportes normativos periódicos · facturación, precios y fletes · contabilidad y
 planillas · actividad en la mina · mineral sulfuro · integración con la balanza · predicción de
 demanda o pronósticos · aplicación móvil nativa · operación sin señal de red (solo se conserva el
 borrador) · multiempresa · balance metalúrgico y leyes.

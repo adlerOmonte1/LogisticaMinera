@@ -73,7 +73,7 @@ todavía referencia.**
 
 Si `apps/salidas` no se hubiera retirado antes de esta migración, `Cliente` tendría una clave
 foránea activa desde `Salida` y la migración fallaría o, peor, se forzaría con `CASCADE` sin que
-nadie lo advirtiera. Por eso el orden de la fase de limpieza del backend importa: primero se retira
+nadie lo advirtiera. Por eso el orden de la preparación del repositorio importa: primero se retira
 `apps/salidas` por completo, y solo entonces se elimina `Cliente` de `apps/catalogo`.
 
 **Riesgo secundario:** renombrar `Producto` a `TipoMineral` sin renombrar también sus referencias en
@@ -98,5 +98,5 @@ que el valor no cambie, y otro como Administrador sin motivo y espera el rechazo
 | Pendiente | Efecto |
 |---|---|
 | Valores del catálogo de tipos de mineral, a definir con la empresa (DR-03) | Bloquea la carga inicial de datos, no la estructura del modelo |
-| Orden de la fase de limpieza del backend: salidas antes que Cliente | Evita una migración fallida o forzada |
+| Orden de la preparación del repositorio: salidas antes que Cliente | Evita una migración fallida o forzada |
 | Carga de la tara de los vehículos que ya operan antes de la puesta en marcha | Sin ella, todos sus primeros ingresos quedarán En proceso hasta un nuevo destare |

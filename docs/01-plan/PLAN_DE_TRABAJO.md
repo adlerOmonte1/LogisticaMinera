@@ -1,7 +1,7 @@
 # PLAN-01 — Plan de trabajo, pruebas y entrega
 
 **Documento:** PLAN-01
-**Versión:** 2.0
+**Versión:** 2.1
 **Estado:** Vigente
 **Alcance:** Sistema web inteligente de control de inventarios de ingreso de mineral (M01 a M09,
 ver `../model-c4/ARQ-01_Modulos_del_Sistema.md`)
@@ -300,6 +300,25 @@ en M03 desde el principio, M09 junto con las operaciones que audita, y M06, M07,
 porque leen sobre lo que M03 ya produce. La columna de verificación indica **quién** valida y **con
 qué evidencia**; sin esa evidencia la semana no se da por cerrada.
 
+### Antes de la semana 1 — Preparación del repositorio heredado
+
+El backend de la rama de trabajo conserva apps del alcance anterior. Antes de construir los módulos
+se deja en un estado coherente con la documentación. No se implementa lógica de negocio en esta
+etapa.
+
+| Actividad | Entregable | Verificación |
+|---|---|---|
+| Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | Apps eliminadas, con su migración de retiro cuando corresponda | `makemigrations --check` sin cambios pendientes |
+| Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
+| Refactorizar `apps/ingresos` al modelo vigente de `INGRESO` | Tres marcas de tiempo, tara aplicada, peso neto calculado y estado En proceso, según `modelo_datos_entidad_relacion.md` | Revisión contra el modelo de datos |
+| Crear los esqueletos de `reconocimiento`, `validacion` y `trazabilidad`; renombrar `busqueda` a `consulta` y `reportes` a `consolidacion` | Apps con la estructura de capas de `catalogo` | Responsable técnico |
+| Ajustes del proyecto | `LOCAL_APPS` actualizado, `MEDIA_ROOT`, límite de carga de imágenes y Pillow en `requirements/base.txt` | `pytest` en verde |
+| Auditoría final de la documentación y fusión | `verificar_migracion.sh` sin hallazgos; rama de reformulación fusionada en `main` | Revisión humana del PR |
+
+```bash
+cd backend && python manage.py makemigrations --check --dry-run && pytest -q
+```
+
 ### Semana 1 — Base técnica y M01
 
 | Actividad | Entregable | Verificación |
@@ -317,7 +336,7 @@ piloto, M04 no puede arrancar en la semana 3.
 | Actividad | Entregable | Verificación |
 |---|---|---|
 | M02 catálogo maestro | Alta, edición y baja lógica de vehículos, tipos de mineral y transportistas | Tester: HU-M02-01 a HU-M02-03 |
-| Capacidad de carga del vehículo | Campo disponible para que V4 lo consuma en M05 | Prueba de contrato automatizada |
+| Capacidad de carga y tara del vehículo | Capacidad disponible para V4; tara que nace vacía, se registra en el destare y solo modifica el Administrador con motivo | Prueba de contrato automatizada; Tester: HU-M02-01 |
 | Piloto de D-12 | Comparación de 20 a 30 tickets reales entre dos o tres motores; motor elegido y documentado | Responsable técnico |
 
 ### Semana 3 — M03 con M04 y M05 inyectados
@@ -328,6 +347,7 @@ piloto, M04 no puede arrancar en la semana 3.
 | Pantalla de confirmación con validación | Inconsistencias señaladas junto al campo, con mensaje literal de V1 a V5 | Tester: HU-M05-01 |
 | Registro del ingreso | Ingreso persistido con código único y tres marcas de tiempo distintas | Tester: HU-M03-01 |
 | Corrección y anulación | Corrección con motivo y revalidación; anulación excluida de totales | Tester: HU-M03-02, HU-M03-03 |
+| Primer viaje y destare | Alta del vehículo en la misma pantalla, ingreso En proceso y registro del destare con cálculo del peso neto | Tester: HU-M03-04 |
 
 Hito de la semana: a partir de aquí el sistema produce el dato completo que la ficha de observación
 de la investigación contrasta en el postest.
@@ -469,7 +489,7 @@ Historia:            HU-M05-01
 Criterio:            CA02
 Objetivo:            Verificar que un peso neto fuera del rango de carga exige justificacion
 Precondiciones:      Usuario supervisor de planta autenticado; vehiculo con capacidad_tn cargada
-Datos de entrada:    Peso neto 35.00 tn; capacidad del vehiculo 30.00 tn
+Datos de entrada:    Peso bruto 39.00 tn; tara del vehiculo 4.00 tn (neto calculado 35.00 tn); capacidad 30.00 tn
 Pasos:               1. Completar el registro con los datos del ticket
                      2. Intentar confirmar sin justificacion
 Resultado esperado:  El sistema rechaza mostrando "Debe indicar la justificacion del peso fuera de rango"

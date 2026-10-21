@@ -118,17 +118,15 @@ Revisión de fondo, la que decide si la documentación sirve. Para cada módulo:
 
 El repositorio documentó antes otro alcance, retirado en la reformulación del 21/09/2026. Ningún
 término de aquel sistema debe sobrevivir en la documentación vigente. El patrón de búsqueda está
-centralizado en un solo lugar —`scripts/verificar_migracion.sh`, Anexo F del plan de migración—
+centralizado en un solo lugar —`scripts/verificar_migracion.sh`—
 para no duplicarlo ni reintroducir los términos retirados en esta skill:
 
 ```bash
 bash scripts/verificar_migracion.sh
 ```
 
-El script excluye los documentos que describen la propia migración, porque esos sí deben conservar
-la terminología antigua. Cualquier otra coincidencia es un residuo: repórtala como bloqueante
-indicando archivo y línea. Si el script aún no existe, toma su patrón del Anexo F del plan y
-ejecútalo tal cual, sin transcribirlo a este archivo.
+Cualquier coincidencia es un residuo: repórtala como bloqueante indicando archivo y línea. Una
+línea que nombra un término para prohibirlo se exime con el comentario `<!-- migracion:ok -->`.
 
 Revisa además que no se citen las carpetas de módulo retiradas en la renumeración ni sus historias,
 y que los módulos M01 a M09 correspondan al mapa de `contexto-tesis`.

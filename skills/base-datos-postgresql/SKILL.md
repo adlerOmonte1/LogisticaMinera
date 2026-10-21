@@ -100,7 +100,7 @@ Una migración por cambio con nombre descriptivo. Nunca edites una migración ya
 producción: durante la ventana de operación controlada cualquier cambio de esquema debe quedar
 registrado como despliegue.
 
-La migración que retira `Cliente` del catálogo (fase de limpieza del backend) se ejecuta **después**
+La migración que retira `Cliente` del catálogo (preparación del repositorio heredado) se ejecuta **después**
 de retirar `apps/salidas`, que es quien mantenía la clave foránea hacia esa entidad; en el orden
 contrario, la migración falla o exige forzar el borrado en cascada sin que nadie lo decida
 explícitamente.

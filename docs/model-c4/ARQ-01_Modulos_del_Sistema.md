@@ -161,6 +161,6 @@ registro.
 ## 9. Nota sobre la numeración anterior
 
 Los módulos se renumeraron el 21/09/2026 (DR-07). Las carpetas de `docs/modulos/` con la numeración
-antigua M04 a M07 y las apps del backend que no figuran en la sección 3 pertenecen al alcance
-anterior y se retiran en las fases 7 y 10 del plan de migración. Los commits `M04:` anteriores a esa
+antigua ya se retiraron; las apps del backend que no figuran en la sección 3 pertenecen al alcance
+anterior y se retiran en la preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8). Los commits `M04:` anteriores a esa
 fecha se refieren al módulo de salidas, hoy fuera de alcance.

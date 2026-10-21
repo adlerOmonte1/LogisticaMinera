@@ -2,10 +2,10 @@
 
 | Campo | Valor |
 |---|---|
-| Documento | Decisiones DR-01 a DR-10 |
-| Origen | Anexo B de `../PLAN_TRABAJO.md` |
-| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) |
-| Estado | Todas aceptadas; DR-09 y DR-10 a partir del formato real del ticket, informado por el autor |
+| Documento | Decisiones DR-01 a DR-18 |
+| Origen | Reformulación del alcance del sistema, septiembre de 2026 |
+| Fecha de cierre | 22/09/2026 (DR-01 a DR-08) · 28/09/2026 (DR-09 y DR-10) · 20/10/2026 (DR-11 a DR-18) |
+| Estado | Todas aceptadas. DR-09 y DR-10 parten del formato real del ticket; DR-11 a DR-18, de la revisión del mockup del sistema (versión 2) |
 
 Estas decisiones resuelven las ambigüedades que la reformulación dejó abiertas. Son previas al
 diseño: cada una condiciona un módulo, una entidad o un instrumento. Reabrir cualquiera exige
@@ -23,8 +23,16 @@ justificación escrita y revisión de los documentos que dependen de ella.
 | DR-06 | RF03, RF09 y tarea T06 | RF03 cubre los cinco tipos de inconsistencia V1 a V5. RF09 es generar **y exportar** el total acumulado mensual por producto. T06 es exportar ese total | Anexo 03 y Anexo 04 del documento de tesis |
 | DR-07 | Numeración de módulos | Renumerar M01 a M09 según el marco. M01 y M02 conservan su número y su código | Todo `docs/modulos/`, backend |
 | DR-08 | Conjunto de prueba | *Ajustada por DR-09.* ERA: 50 tickets reales × 3 campos (150 lecturas). TDI: 10 inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante la medición (D-16) | Plan de pruebas |
-| DR-09 | Formato real del ticket de balanza | El ticket en uso imprime: «Recibí», «La suma de» (tarifa del pesaje), «Concepto», **Peso**, **Placa**, **día, mes y año**, y firmas. No imprime hora, tara ni peso neto. En consecuencia: el reconocimiento lee tres campos —placa, fecha y peso bruto—; la hora del pesaje la digita el usuario; la tara proviene del catálogo del vehículo; el peso neto lo calcula el sistema como peso bruto menos tara. La tarifa, el receptor, el concepto y las firmas no se registran: la tarifa está fuera de alcance. V1 pasa a detectar un ticket posiblemente duplicado, porque la comparación entre neto impreso y resta deja de existir | RF02, RF03, M03, M04, M05, modelo de datos, Anexos 02, 03 y 04 |
+| DR-09 | Formato real del ticket de balanza | *Precisada por DR-11 en la hora del pesaje.* El ticket en uso imprime: «Recibí», «La suma de» (tarifa del pesaje), «Concepto», **Peso**, **Placa**, **día, mes y año**, y firmas. No imprime hora, tara ni peso neto. En consecuencia: el reconocimiento lee tres campos —placa, fecha y peso bruto—; la hora del pesaje la digita el usuario; la tara proviene del catálogo del vehículo; el peso neto lo calcula el sistema como peso bruto menos tara. La tarifa, el receptor, el concepto y las firmas no se registran: la tarifa está fuera de alcance. V1 pasa a detectar un ticket posiblemente duplicado, porque la comparación entre neto impreso y resta deja de existir | RF02, RF03, M03, M04, M05, modelo de datos, Anexos 02, 03 y 04 |
 | DR-10 | Primer viaje y destare | La tara de un vehículo se obtiene una sola vez, en el destare de su primer viaje: tras descargar, el vehículo se pesa vacío y el usuario **digita** la tara, sin reconocimiento automático, por seguridad del dato. La tara queda en el catálogo y se mantiene por decisión de la Gerencia; solo el Administrador puede modificarla, con motivo. Mientras el vehículo no tiene tara, su ingreso queda en estado **En proceso**: tiene código, peso bruto y marcas de tiempo, pero no peso neto, y no cuenta en ningún total. Al registrar la tara, el sistema calcula el neto y el ingreso pasa a Registrado | M02, M03, M06, M07, M08, modelo de datos |
+| DR-11 | Marcas de tiempo del ingreso | Se mantienen las tres marcas de tiempo y se conserva DR-09. La **fecha y hora del pesaje** es la del pesaje real: la fecha se reconoce del ticket y la hora la indica el usuario; el sistema la propone con la hora actual y es editable. El **inicio y el fin del registro** los asigna el servidor. Ejemplo: pesaje a las 16:00, inicio del registro a las 16:05 y fin a las 16:06 dan 5 minutos de espera y 1 minuto de registro | M03, I1, I2 |
+| DR-12 | Identificación del ingreso | No existe un número de ticket aparte: el código único del ingreso (RF05) lo identifica | M03, modelo de datos |
+| DR-13 | Registro manual de respaldo | Si el ticket se extravía o no puede fotografiarse, el ingreso se registra sin foto, con motivo obligatorio, y queda marcado «sin respaldo fotográfico». Es una excepción documentada como regla de negocio, no un RF nuevo | M03, M07 |
+| DR-14 | Cierre del lote con su destino | Cuando todo el mineral del lote está ensacado, el Administrador cierra definitivamente el lote con el resumen de su proceso y registra su destino: **venta** o **traslado a otro punto** (por ejemplo, por ley baja). No incluye guía, facturación ni precios. Es una historia de M06 (RF07), no un módulo nuevo | M06, M01 |
+| DR-15 | Datos descriptivos del lote | Los bigbags, su peso aproximado, la diferencia frente a lo registrado y las horas de molienda (t/h) son **datos descriptivos de gestión**. No son inventario de producto terminado, no miden pérdidas y no forman parte de los indicadores | M06 |
+| DR-16 | Ruta del lote e I6 | Las etapas no son obligatorias para todos los lotes: se decide la **ruta** de cada lote o de cada parte (secado común; luego zarandeo, molienda o ambos; y ensacado). **I6 se reformula** como etapas vinculadas ÷ etapas de la ruta decidida × 100 | Marco §4, Anexo 02, M06, matriz de trazabilidad |
+| DR-17 | Alcance del Supervisor de planta | El Supervisor de planta registra ingresos, vehículos nuevos, destares y el paso del lote por las etapas, y consulta | Marco §8, M01 |
+| DR-18 | División de un lote por proporción | El mineral acumulado no se pesa: se estima a la vista. Para dividir un lote, el usuario indica la **fracción** de cada parte (por ejemplo, 1/3 a molienda y 2/3 a zarandeo; también tres partes o más). El sistema calcula las toneladas aproximadas de cada parte (fracción × total) solo para estimar el peso de los bigbags | M06 |
 
 ---
 
@@ -39,7 +47,12 @@ No son decisiones pendientes, sino trabajo que se deriva de las ya tomadas:
 | DR-06 | Actualizar el Anexo 03 y el Anexo 04 del documento de tesis | **Antes del juicio de expertos** |
 | DR-09 | Actualizar en el documento de tesis: RF02 a tres campos y RF03 con la duplicidad (Anexo 03); la hoja A de ERA a tres campos y la hoja B con la nueva V1 (Anexo 04); y el origen de C2, C4 y C5 en la ficha de observación (Anexo 02) | **Antes del juicio de expertos** |
 | DR-10 | Definir con la Gerencia quién registra el destare en planta y cómo se comunica al supervisor que un vehículo está pendiente de destarar | Antes de implementar M03 |
-| DR-07 | Retirar las carpetas de módulo y las apps del alcance anterior | Fases 7 y 10 del plan |
+| DR-07 | Retirar las apps del backend del alcance anterior; las carpetas de módulo ya se retiraron | Preparación del repositorio, `../01-plan/PLAN_DE_TRABAJO.md` §8 |
+| DR-12 | Retirar el número de ticket de M03 y del modelo de datos | Fase 2 del plan de la versión 2 (M03); el modelo de datos, según el mapa de limpieza |
+| DR-14, DR-15, DR-18 | Incorporar a M06 el nombre del lote, la ruta, la división por proporción, los ingresos agregados después del cierre, los datos descriptivos y el cierre con destino | Fase 2 del plan de la versión 2 (M06) |
+| DR-16 | Actualizar la ficha de observación (Anexo 02) con la nueva fórmula de I6; el marco ya está actualizado | **Antes del juicio de expertos** |
+| DR-16 | Reformular I6 en la matriz de trazabilidad | Fase 3 del plan de la versión 2 |
+| DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | Fase 2 del plan de la versión 2 (M01) |
 
 ## Nota sobre DR-06 y DR-09
 
@@ -54,3 +67,23 @@ imprimía seis datos, y el ticket real imprime tres. Medir la exactitud del reco
 campos que el papel no contiene, o sembrar una inconsistencia entre un neto impreso y una resta que
 no existe, produciría resultados sin sentido. Los instrumentos deben describir el ticket que la
 planta usa.
+
+## Nota sobre DR-16
+
+Con la fórmula anterior, etapas vinculadas ÷ 4 × 100, un lote que por decisión de la planta no pasa
+por molienda nunca superaría el 75 %, aunque hubiera recorrido completa la ruta que le corresponde. El
+indicador mediría entonces una decisión operativa y no la trazabilidad del ingreso. Al tomar como
+denominador las etapas de la ruta decidida, I6 mide lo que debe medir: si cada etapa que el mineral
+efectivamente recorre queda vinculada. Por la misma razón que DR-06 y DR-09, el cambio debe estar en
+la ficha de observación antes del juicio de expertos.
+
+## Pendientes de confirmar
+
+No son decisiones tomadas. Se registran para resolverlas antes de la fase indicada.
+
+| N.° | Pendiente | Propuesta | Antes de |
+|---|---|---|---|
+| P-01 | Si el ingreso que llega después del secado se reparte entre las partes por proporción | Usar por defecto las fracciones del lote, editables | Fase 2, M06 |
+| P-02 | Cómo se calcula I6 para un ingreso cuyo lote se dividió en partes con rutas distintas | Tomar como denominador la unión de las etapas de las rutas de sus partes | Fase 3 y Anexo 02 |
+| P-03 | Cómo registra la ficha de observación un ingreso sin respaldo fotográfico (DR-13) en I3 e I4 | Registrarlo como caso aparte, sin tiempo de recuperación del respaldo | Anexo 02 |
+| P-04 | Término para las dos acciones de cierre que muestra el mockup: «cerrar e iniciar recorrido» (deja de reunir ingresos) y el cierre definitivo con destino de DR-14, que el mockup llama «dar de alta» | Reservar «cierre» para el cierre definitivo de DR-14 y llamar a la primera acción «inicio del recorrido» | Fase 2, M06 |

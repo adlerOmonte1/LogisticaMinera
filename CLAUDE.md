@@ -1,16 +1,17 @@
 # Instrucciones para el agente — LogisticaMinera
 
 Este repositorio documenta e implementa un **sistema web inteligente para el control de inventarios
-de ingreso de mineral** (tesis 2027, empresa Construcción y Minería, Huánuco). Hasta el 21/09/2026
-documentaba un sistema distinto, de control de producción y existencias; esa migración está en curso.
+de ingreso de mineral** (tesis 2027, empresa Construcción y Minería, Huánuco). La documentación se reformuló entre el
+21/09/2026 y el 28/09/2026 desde un alcance anterior; queda pendiente la preparación del backend
+heredado (`docs/01-plan/PLAN_DE_TRABAJO.md` §8).
 
 ## Fuentes de verdad, en este orden
 
 1. `docs/00-tesis/marco_tesis.md` — variables, indicadores, RF01 a RF10, reglas V1 a V5, módulos.
 2. `docs/00-tesis/decisiones_reformulacion.md` — decisiones DR-01 a DR-10, ya cerradas.
-3. `docs/00-tesis/ejemplos_plantilla.md` — patrón de historias, requerimientos y diagramas.
-4. `docs/REFORMULACION.md` — análisis de impacto: qué cambia, dónde y por qué.
-5. `docs/PLAN_TRABAJO.md` — plan de migración por fases, con su estado.
+3. `docs/00-arquitectura/decisiones_diseno.md` — decisiones de diseño D-nn del sistema.
+4. `docs/modulos/` — especificación de cada módulo. El patrón de redacción es el de las skills
+   `historias-usuario`, `requisitos-modulo` y `diagramas-uml`; el ejemplo de referencia es M03.
 
 Si dos documentos se contradicen, gana el de orden más alto y la contradicción **se reporta**.
 

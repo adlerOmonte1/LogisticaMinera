@@ -18,7 +18,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 
-# Modulos reescritos para el sistema web inteligente (fases 5 a 7 del plan de migracion).
+# Modulos del sistema web inteligente.
 MODULOS_VIGENTES = [
     "M01-autenticacion", "M02-catalogo", "M03-ingresos", "M04-reconocimiento",
     "M05-validacion", "M06-trazabilidad", "M07-consulta", "M08-consolidacion",
