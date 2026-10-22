@@ -64,7 +64,7 @@ No son decisiones pendientes, sino trabajo que se deriva de las ya tomadas:
 | DR-16 | Reformular I6 en la matriz de trazabilidad | **Hecho** en la versión 2 |
 | DR-17 | Ajustar la matriz de roles de M01 al alcance del Supervisor de planta | **Hecho** en la versión 2 |
 | DR-23 | Revisar y validar con los usuarios de la empresa el uso de los tres roles y la matriz de permisos de M01 | Antes de implementar M01 |
-| DR-14, DR-18 | Ajustar la maqueta (`Mockup/index.html`): divide el lote en toneladas y no en fracciones | Opcional, antes de validar la interfaz con los usuarios |
+| DR-14, DR-18 | Ajustar la maqueta (`Mockup/index.html`): divide el lote en toneladas y no en fracciones | **Hecho** el 22/10/2026: la maqueta divide por fracciones y sigue el ciclo documentado del lote, con su cierre por venta o traslado (DR-24) |
 
 ## Nota sobre DR-06 y DR-09
 

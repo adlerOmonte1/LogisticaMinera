@@ -2,13 +2,14 @@
 
 Este repositorio documenta e implementa un **sistema web inteligente para el control de inventarios
 de ingreso de mineral** (tesis 2027, empresa Construcción y Minería, Huánuco). La documentación se reformuló entre el
-21/09/2026 y el 28/09/2026 desde un alcance anterior; queda pendiente la preparación del backend
-heredado (`docs/01-plan/PLAN_DE_TRABAJO.md` §8).
+21/09/2026 y el 22/10/2026 desde un alcance anterior. La preparación del backend heredado está en
+curso: ya se retiraron `salidas`, `sincronizacion` y `Cliente`; el resto sigue pendiente
+(`docs/01-plan/PLAN_DE_TRABAJO.md` §8).
 
 ## Fuentes de verdad, en este orden
 
 1. `docs/00-tesis/marco_tesis.md` — variables, indicadores, RF01 a RF10, reglas V1 a V5, módulos.
-2. `docs/00-tesis/decisiones_reformulacion.md` — decisiones DR-01 a DR-10, ya cerradas.
+2. `docs/00-tesis/decisiones_reformulacion.md` — decisiones DR-01 a DR-28, ya cerradas.
 3. `docs/00-arquitectura/decisiones_diseno.md` — decisiones de diseño D-nn del sistema.
 4. `docs/modulos/` — especificación de cada módulo. El patrón de redacción es el de las skills
    `historias-usuario`, `requisitos-modulo` y `diagramas-uml`; el ejemplo de referencia es M03.
@@ -59,7 +60,11 @@ docs/02-trazabilidad/ Matriz HU → RF → indicador → tarea → caso de prueb
 docs/03-pruebas/      Plan de pruebas y guías de prueba manual
 skills/               Skills del repositorio; contexto-tesis es la fuente para el agente
 backend/              Django 5 + DRF, una app por módulo
-scripts/              verificar_migracion.sh
+Mockup/               Prototipo navegable de la interfaz (index.html)
+scripts/              verificar_migracion.sh y validar_docs.py (verificación),
+                      reporte_trazabilidad.py (pruebas por regla y criterio),
+                      indexar_docs.py (docs/INDICE.md), generar_pdf_hu.py,
+                      generar_pdf_requerimientos.py y md_a_pdf.py (PDF)
 ```
 
 Todos los módulos usan la carpeta `requerimientos/`, nunca `requisitos/`.

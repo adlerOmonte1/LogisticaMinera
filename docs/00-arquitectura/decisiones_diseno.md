@@ -283,6 +283,6 @@ preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8).
 | Piloto de motores de reconocimiento | D-12, implementación de M04 | Antes de implementar M04 |
 | Medio de almacenamiento y política de retención de imágenes | D-14, implementación de M03 | Junto con el despliegue |
 | Valores del catálogo de tipo de mineral, a definir con la empresa | M02, M08 | Antes de implementar M02 |
-| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10) | M03, D-17 | Antes de implementar M03 |
-| Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte | M06, alcance de DR-04 y DR-16 | Antes de implementar M06 |
+| ~~Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10)~~ — **resuelto por DR-25**: cualquiera de los tres roles, sin plazo; la lista de pendientes de destare (HU-M03-04) es el aviso | — | — |
+| ~~Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte~~ — **resuelto el 22/10/2026** (`../REVISION_TECNICA_V2.md` §7, Q-10): la agrupación se hace en el sistema, con los lotes de M06 y según los roles (DR-23) | — | — |
 | Validación con los usuarios del uso de los tres roles y su matriz de permisos (DR-23) | M01 | Antes de implementar M01 |

@@ -399,9 +399,9 @@ de la investigación contrasta en el postest.
 | Consulta de trazabilidad de un ingreso | Etapas recorridas sobre las etapas de la ruta del lote o de la unión de las rutas de sus partes | Tester: HU-M06-03 |
 | Cierre del lote con su destino | Cierre por el Administrador con venta o traslado, solo con todo el mineral ensacado | Tester: HU-M06-05, CP12 |
 
-Precondición: la forma real de agrupar el mineral en cancha y de decidir la ruta debe verificarse con
-la jefatura de operaciones antes de esta semana (DR-04, DR-16). Si el vínculo directo es más fiel
-que el lote, este módulo se ajusta antes de implementarse.
+Precondición resuelta el 22/10/2026 (`../REVISION_TECNICA_V2.md` §7, Q-10): la agrupación del
+mineral se hace en el sistema, con los lotes de M06 y según los roles (DR-23); el lote admite varios
+tipos de mineral (DR-27) y la ruta de cada lote o parte se registra según DR-16.
 
 ### Semana 6 — M07 Consulta
 
