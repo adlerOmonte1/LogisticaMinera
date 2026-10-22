@@ -16,9 +16,14 @@ El ingreso registra tres momentos distintos, y ninguno se deriva de otro:
 
 | Marca | Origen | Editable |
 |---|---|---|
-| Fecha y hora del pesaje | La fecha se reconoce del ticket; la hora la digita el usuario, porque el ticket no la imprime (DR-09) | Sí, antes de confirmar |
-| Inicio del registro | Asignada por el servidor al recibir la imagen | No |
+| Fecha y hora del pesaje | La fecha se reconoce del ticket —en el registro sin foto la digita el usuario—; la hora la indica el usuario sobre una propuesta del sistema con la hora actual, porque el ticket no la imprime (DR-09, DR-11) | Sí, antes de confirmar |
+| Inicio del registro | Asignada por el servidor al recibir la imagen o, en el registro sin foto, cuando el usuario elige esa opción (DR-13) | No |
 | Fin del registro | Asignada por el servidor cuando el usuario confirma el ingreso | No |
+
+La propuesta de hora la calcula el servidor con su reloj al abrir la revisión, no el navegador.
+Proponer la hora actual no colapsa la primera marca con las otras dos: el usuario la ajusta a la del
+pesaje real, y el sistema conserva las tres como valores distintos. Ejemplo de DR-11: pesaje a las
+16:00, inicio del registro a las 16:05 y fin a las 16:06.
 
 La primera dice cuándo se pesó el volquete; la segunda, cuándo alguien empezó a registrarlo; la
 tercera, cuándo el dato quedó disponible. Son tres hechos distintos del proceso y responden
@@ -60,10 +65,13 @@ clasificable y V4 no tendría contra qué comparar el peso neto.
 
 ## D-07. El sistema no borra ingresos: los anula
 
-**Módulos afectados:** M03, M09
+**Módulos afectados:** M03, M06, M09
 
 Un ingreso registrado no se elimina físicamente. Se marca como anulado, con motivo y responsable, y
 permanece en el histórico. Los totales lo excluyen; el detalle lo conserva.
+
+El mismo criterio alcanza al lote de proceso, a sus partes, a sus pasos por etapa y a sus bigbags
+(M06): todas sus claves foráneas son `PROTECT`, y un lote Cerrado no admite cambios.
 
 **Si se revierte.** No se podría demostrar que el histórico no fue depurado retroactivamente, y
 cualquier total sería indefendible.
@@ -185,6 +193,11 @@ confianza inferior al umbral y señala las inconsistencias, pero no guarda nada 
 hasta que el usuario revisa y confirma. Al persistir, se conservan **por separado** el valor
 reconocido y el valor confirmado de cada campo, junto con la confianza, el motor y su versión.
 
+**Registro sin foto (DR-13).** Cuando el ticket se extravió o no puede fotografiarse, no hay
+reconocimiento: el usuario digita los datos, el ingreso no tiene `RECONOCIMIENTO_TICKET` y queda
+marcado «sin respaldo fotográfico» con su motivo. Las reglas V1 a V5 se aplican igual (D-08). D-13
+no se relaja: no hay propuesta que persistir sin confirmar.
+
 **Si se revierte.** Un error de lectura se convertiría en dato oficial sin que nadie lo revisara, y
 después sería imposible distinguir qué leyó el motor de qué escribió la persona.
 
@@ -214,7 +227,8 @@ cambio de tara reescribiría en silencio el histórico de toneladas.
 
 **Módulos afectados:** M03, M07
 
-La imagen es el respaldo del ingreso y debe conservarse íntegra mientras el ingreso exista. Está
+La imagen es el respaldo del ingreso y debe conservarse íntegra mientras el ingreso exista. Solo
+falta en el ingreso registrado sin foto, que lleva su marca y su motivo (DR-13). Está
 pendiente decidir el medio —volumen del servidor o almacenamiento de objetos—, la compresión
 admisible sin perder legibilidad, la política de retención y el respaldo.
 
@@ -270,4 +284,5 @@ preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8).
 | Medio de almacenamiento y política de retención de imágenes | D-14, implementación de M03 | Junto con el despliegue |
 | Valores del catálogo de tipo de mineral, a definir con la empresa | M02, M08 | Antes de implementar M02 |
 | Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10) | M03, D-17 | Antes de implementar M03 |
-| Forma real de agrupar el mineral en cancha | M06, alcance de DR-04 | Antes de implementar M06 |
+| Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte | M06, alcance de DR-04 y DR-16 | Antes de implementar M06 |
+| Validación con los usuarios del uso de los tres roles y su matriz de permisos (DR-23) | M01 | Antes de implementar M01 |

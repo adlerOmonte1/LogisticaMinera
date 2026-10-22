@@ -13,6 +13,9 @@
 | RN-M08-05 | El total exportado es el mismo que se muestra en pantalla para el mismo periodo | Dos cifras distintas para el mismo mes serían indefendibles ante cualquiera que las contraste |
 | RN-M08-06 | Añadir un formato de exportación no modifica el cálculo del total ni los formatos existentes | Cada formato nuevo arriesgaría introducir una discrepancia en el número que reporta |
 | RN-M08-07 | El resultado informa cuántos ingresos del periodo siguen En proceso, en pantalla y en el archivo exportado | Un total con ingresos pendientes de destare se reportaría como definitivo |
+| RN-M08-08 | Un ingreso Registrado sin respaldo fotográfico suma en el total como cualquier otro ingreso Registrado | El total del mes omitiría mineral que sí ingresó a planta, solo porque su ticket se extravió |
+| RN-M08-09 | El total se calcula sobre los ingresos y no sobre los lotes: la división, los bigbags y el cierre del lote con su destino no lo alteran | El total de ingreso a planta se confundiría con el producto procesado o entregado, que está fuera del alcance del sistema |
+| RN-M08-10 | Un ingreso pertenece al mes de su fecha del pesaje, no al de su registro | Un ingreso pesado el último día del mes y registrado al día siguiente se contaría en el mes equivocado |
 
 ## Nota sobre RN-M08-02
 

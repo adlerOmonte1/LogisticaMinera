@@ -13,3 +13,5 @@
 | RS-M02-09 | El sistema registra la tara de cada vehículo en toneladas, con la fecha del destare y el usuario que la registró, y la deja vacía al dar de alta el vehículo | RU-M02-05 |
 | RS-M02-10 | El sistema restringe la modificación de una tara registrada al rol Administrador y exige un motivo, que se registra en auditoría junto con el valor anterior y el nuevo | RU-M02-05 |
 | RS-M02-11 | El sistema ofrece el alta de un vehículo como servicio invocable desde el registro de ingresos, con las mismas validaciones que el alta desde el catálogo | RU-M02-06 |
+| RS-M02-12 | El sistema ofrece el alta de un tipo de mineral como servicio invocable desde el registro de ingresos, restringido al Administrativo y al Administrador, y genera el código cuando no se indica | RU-M02-07 |
+| RS-M02-13 | El sistema valida la unicidad del nombre del tipo de mineral sin distinguir mayúsculas, el formato de su código y la unicidad del RUC antes de persistir | RU-M02-02, RU-M02-03 |

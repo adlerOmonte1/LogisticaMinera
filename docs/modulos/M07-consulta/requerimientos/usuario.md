@@ -7,6 +7,9 @@
 | RU-M07-03 | Quiero ver la foto del ticket, no solo los números, para poder comparar |
 | RU-M07-04 | Quiero revisar los ingresos de una semana o de un mes filtrando por mineral o por vehículo |
 | RU-M07-05 | Si un ingreso fue anulado, quiero que igual aparezca en la búsqueda y que diga por qué |
+| RU-M07-06 | Cuando busco un volquete, quiero ver también en qué carga está su mineral y por dónde va |
+| RU-M07-07 | Quiero ver en un calendario cuántos carros llegaron cada día y cuántas toneladas trajeron |
+| RU-M07-08 | Quiero ver todo lo que le pasó a un ingreso: quién lo registró, quién lo corrigió y por qué |
 
 ## Contexto del diagnóstico
 
@@ -16,3 +19,6 @@
 | RU-M07-03 | Ver el número transcrito no resuelve la duda cuando lo que se discute es si la transcripción fue correcta |
 | RU-M07-04 | Revisar el trabajo de un periodo obliga a recorrer el archivo completo, porque el papel no admite filtros |
 | RU-M07-05 | Si un ingreso anulado no apareciera, quien pregunta concluiría que el volquete nunca se registró |
+| RU-M07-06 | Saber dónde está el mineral de un volquete obliga hoy a cruzar el ticket con lo que se anotó en planta, si se anotó |
+| RU-M07-07 | El ritmo de llegadas se conoce solo de memoria; no hay forma rápida de ver qué días llegó más mineral |
+| RU-M07-08 | Cuando un dato cambia, hoy no queda rastro de quién lo cambió ni de qué decía antes |

@@ -16,6 +16,7 @@
 | RN-M04-08 | El código de negocio no depende de un motor concreto, sino de la interfaz `ReconocedorTicket` | Cambiar de motor obligaría a modificar el servicio de registro y a rehacer sus pruebas |
 | RN-M04-09 | Un ingreso tiene como máximo un reconocimiento | Habría varias lecturas candidatas para el mismo ticket y ninguna sería la de referencia |
 | RN-M04-10 | El indicador de corrección se deriva de comparar los dos valores y no se acepta desde el cliente | El cliente podría declarar que no hubo corrección cuando sí la hubo |
+| RN-M04-11 | Un ingreso registrado sin foto no tiene reconocimiento: no se inventa una lectura ni se le asocia la de otro ingreso | La comparación entre lo reconocido y lo confirmado mezclaría ingresos que el motor nunca leyó |
 
 ## Nota sobre RN-M04-02
 

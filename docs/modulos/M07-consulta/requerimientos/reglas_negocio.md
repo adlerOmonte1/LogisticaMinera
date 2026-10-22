@@ -12,13 +12,16 @@ presentación**: garantizan que lo que se muestra no induzca a conclusiones fals
 | RN-M07-01 | Los ingresos anulados aparecen en los resultados, señalados y con su motivo | Quien consulta un volquete que sí pasó por la balanza no obtendría nada y concluiría que no se registró |
 | RN-M07-02 | Solo los ingresos Registrados se incluyen en la suma de toneladas del conjunto filtrado; los anulados y los En proceso quedan fuera | El total mostrado contradiría al de la consolidación para el mismo periodo, o sumaría ingresos sin peso neto |
 | RN-M07-03 | El detalle presenta la imagen del ticket junto a los datos registrados | La consulta no permitiría contrastar lo registrado con el papel, que es su razón de ser |
-| RN-M07-04 | La ausencia del respaldo se informa explícitamente | Un detalle sin imagen parecería un problema de la pantalla y no la falta de un respaldo |
+| RN-M07-04 | La ausencia del respaldo se informa explícitamente, distinguiendo el ingreso registrado sin foto, con su motivo, del respaldo que existe y no puede recuperarse | Un detalle sin imagen parecería un problema de la pantalla y no la falta de un respaldo |
 | RN-M07-05 | La búsqueda exige al menos un criterio | Una consulta sin criterios recorrería el histórico completo y se degradaría conforme creciera |
 | RN-M07-06 | La imagen solo se sirve a usuarios autenticados con permiso sobre el ingreso | El respaldo quedaría accesible desde una ruta adivinable, sin control de acceso |
 | RN-M07-07 | El detalle muestra las tres marcas de tiempo como valores distintos | Presentarlas juntas o resumidas ocultaría cuándo se pesó y cuándo se registró |
 | RN-M07-08 | La ausencia de reconocimiento, validaciones o trazabilidad se indica, no se omite | Un bloque ausente se confundiría con un elemento que el sistema no muestra |
 | RN-M07-09 | El módulo no modifica ningún dato: todas sus operaciones son de lectura | Una consulta con efectos secundarios alteraría aquello que pretende mostrar |
 | RN-M07-10 | Los ingresos En proceso aparecen en los resultados, señalados y con el peso neto indicado como pendiente del destare | Un volquete que ingresó en su primer viaje parecería no registrado, o su peso neto vacío se leería como cero |
+| RN-M07-11 | El calendario ubica cada ingreso en el día de su fecha del pesaje, no en el de su registro | El calendario describiría cuándo se trabajó en el sistema y no cuándo llegaron los volquetes |
+| RN-M07-12 | El calendario cuenta los ingresos no anulados y suma solo los Registrados, con el mismo criterio que el listado y la consolidación | El mismo mes tendría dos totales distintos según la pantalla que se mire |
+| RN-M07-13 | La trazabilidad que muestra la consulta es la de M06, sin recalcularla | La consulta podría contradecir al módulo responsable del recorrido |
 
 ## Nota sobre RN-M07-01 y RN-M07-02
 
@@ -43,3 +46,11 @@ Es la única regla del módulo motivada por el rendimiento y no por la correcci�
 criterios devuelve el histórico completo: funciona hoy, con pocos registros, y se degrada de forma
 continua hasta volverse inútil. Exigir un criterio evita esa degradación desde el principio, y no
 supone ningún obstáculo real, porque quien consulta siempre sabe al menos la fecha.
+
+## Nota sobre RN-M07-11 y RN-M07-12
+
+El calendario responde cuándo llegaron los volquetes, por eso usa la fecha del pesaje. Si usara la
+del registro, un ingreso registrado al día siguiente de llegar aparecería en el día equivocado. Y
+como el calendario muestra toneladas, debe sumar con el mismo criterio que el listado y la
+consolidación: el total de un mes es uno solo, se mire desde donde se mire.
+

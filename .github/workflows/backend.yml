@@ -1,0 +1,93 @@
+# Etapas 2 y 3 del pipeline: calidad del backend y trazabilidad de sus pruebas.
+# Las pruebas corren sobre PostgreSQL 16, el motor de produccion: el modelo usa
+# arreglos, unicidad condicional y select_for_update, que SQLite no tiene.
+name: Backend
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "docs/modulos/**"
+      - "scripts/reporte_trazabilidad.py"
+      - ".github/workflows/backend.yml"
+  push:
+    branches: [main, staging]
+    paths:
+      - "backend/**"
+      - "scripts/reporte_trazabilidad.py"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Lint, migraciones y pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: logistica
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: logistica_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U logistica"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DJANGO_SECRET_KEY: clave-solo-para-ci-no-se-usa-fuera-de-las-pruebas
+      DATABASE_URL: postgres://logistica:ci@localhost:5432/logistica_ci
+      TEST_DATABASE_URL: postgres://logistica:ci@localhost:5432/logistica_ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements/*.txt
+
+      - name: Dependencias
+        run: pip install -r requirements/dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Migraciones completas
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Pruebas sobre PostgreSQL 16
+        run: pytest --cov=apps --cov=common --cov-report=term-missing:skip-covered
+
+  trazabilidad:
+    name: Trazabilidad de las pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Solo informa mientras el backend conserve pruebas del diseño anterior.
+      # Tras la preparacion del repositorio (PLAN_DE_TRABAJO.md §8) se pasa a --estricto.
+      - name: Reglas y criterios con prueba
+        run: python3 scripts/reporte_trazabilidad.py | tee -a "$GITHUB_STEP_SUMMARY"

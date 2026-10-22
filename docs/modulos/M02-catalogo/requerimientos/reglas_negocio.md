@@ -20,6 +20,10 @@
 | RN-M02-12 | Una tara ya registrada solo la modifica el Administrador, con motivo obligatorio, y el cambio se registra en auditoría con el valor anterior y el nuevo | La tara, de la que depende el peso neto, cambiaría sin que nadie pudiera explicar por qué |
 | RN-M02-13 | El cambio de tara no altera los ingresos ya registrados: solo se aplica a los siguientes | Un cambio de tara reescribiría en silencio las toneladas ya consolidadas (D-17) |
 | RN-M02-14 | El alta de un vehículo desde el registro de un ingreso aplica las mismas reglas RN-M02-01 a RN-M02-05 que el alta desde el catálogo | El registro se convertiría en una puerta trasera para crear vehículos incompletos o duplicados |
+| RN-M02-15 | El nombre de un tipo de mineral es único, sin distinguir mayúsculas | El mismo mineral figuraría dos veces con códigos distintos y su total mensual se repartiría entre ambos |
+| RN-M02-16 | El código de un tipo de mineral tiene de dos a seis letras o números y no se modifica después del alta | Un cambio de código desconectaría la clasificación de los ingresos ya consolidados de su etiqueta |
+| RN-M02-17 | El alta de un tipo de mineral desde el registro de un ingreso la hacen solo el Administrativo y el Administrador, con las reglas RN-M02-06, RN-M02-15 y RN-M02-16; si no se indica el código, el sistema genera uno que no se repite | El catálogo crecería con denominaciones creadas en planta sin control administrativo |
+| RN-M02-18 | El RUC de un transportista es único | Dos registros del mismo proveedor dividirían sus vehículos entre ambos |
 
 ## Nota sobre RN-M02-05
 

@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     Start([Solicitud de alta de vehiculo]) --> V1{Campos obligatorios completos?}
-    V1 -->|No| E1[Rechazar: Complete los campos obligatorios]
+    V1 -->|No| E1[Rechazar: Debe completar los campos obligatorios]
     E1 --> Fin([Fin])
     V1 -->|Si| V2{Formato de placa valido?}
     V2 -->|No| E2[Rechazar: El formato de la placa no es valido]
@@ -66,3 +66,33 @@ flowchart TD
 
 La primera tara no sigue este flujo: se registra desde el destare del ingreso En proceso
 (A-M03-04 de M03). Este flujo solo cubre el cambio de una tara que ya existía.
+
+## A-M02-04 · Alta de un tipo de mineral desde el registro de un ingreso (RN-M02-15 a RN-M02-17)
+
+```mermaid
+flowchart TD
+    Start([Mineral ausente de la lista en el registro]) --> V1{Rol Administrador o Administrativo?}
+    V1 -->|No| E1[Mostrar: Si no esta en la lista pida a un administrativo que lo registre]
+    E1 --> Fin([Fin])
+    V1 -->|Si| D1[/Usuario indica nombre y opcionalmente codigo/]
+    D1 --> V2{Nombre indicado?}
+    V2 -->|No| E2[Rechazar: Debe indicar el nombre del tipo de mineral]
+    E2 --> D1
+    V2 -->|Si| V3{Nombre ya existe?}
+    V3 -->|Si| E3[Rechazar: Ya existe un tipo de mineral con ese nombre]
+    E3 --> D1
+    V3 -->|No| V4{Codigo indicado?}
+    V4 -->|No| G1[Generar codigo que no se repite]
+    V4 -->|Si| V5{Codigo valido y libre?}
+    V5 -->|No| E4[Rechazar: codigo con formato invalido o ya registrado]
+    E4 --> D1
+    V5 -->|Si| P1[Registrar tipo de mineral activo]
+    G1 --> P1
+    P1 --> A1[Registrar evento en auditoria]
+    A1 --> R1[Volver al registro con el tipo de mineral elegido y los datos capturados intactos]
+    R1 --> Fin
+```
+
+El alta desde el registro invoca el mismo servicio que el alta desde el catálogo; la única diferencia
+es que el código puede omitirse. El Supervisor de planta no ve la opción, y si invoca el servicio
+directamente el servidor responde "Acción no autorizada".

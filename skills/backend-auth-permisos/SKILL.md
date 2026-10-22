@@ -15,9 +15,13 @@ completo.
 
 | Rol | Alcance |
 |---|---|
-| **Administrador** | Todo, incluida gestión de usuarios, catálogos, anulaciones y ajustes |
-| **Administrativo** | Registro, corrección, consultas, consolidación y exportación |
-| **Supervisor de planta** | Registro y consulta |
+| **Administrador** | Todo, incluida gestión de usuarios, catálogos, modificación de una tara ya registrada, anulaciones y el cierre del lote con su destino (DR-14) |
+| **Administrativo** | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes |
+| **Supervisor de planta** | Registro de ingresos con foto o sin ella, alta del vehículo nuevo desde el registro, destare, paso del lote por las etapas y consulta (DR-17) |
+
+El permiso se concede por operación, no por módulo (RN-M01-09): el Supervisor registra ingresos, pero
+no los corrige ni los anula; registra el paso por etapa, pero no compone ni cierra lotes. La matriz
+completa está en `docs/modulos/M01-autenticacion/notas.md`.
 
 El rol se modela como entidad `ROL` con FK desde `USUARIO`, no como un campo de texto ni como grupos
 de Django sin respaldo en el modelo entidad-relación.

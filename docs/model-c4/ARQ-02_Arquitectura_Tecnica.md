@@ -1,7 +1,7 @@
 # ARQ-02 — Arquitectura técnica (Django + Angular)
 
 **Documento:** ARQ-02
-**Versión:** 2.0
+**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
 **Alcance:** organización del código, capas, y aplicación de los principios SOLID
 **Deriva de:** `ARQ-01_Modulos_del_Sistema.md`
 
@@ -66,13 +66,13 @@ backend/
   apps/
     accounts/         M01   usuarios, roles, autenticación
     catalogo/         M02   vehículos, tipos de mineral, transportistas
-    ingresos/         M03   registro de ingresos a partir del ticket
+    ingresos/         M03   registro de ingresos a partir del ticket o sin foto, destare
     reconocimiento/    M04   lectura automática de los datos del ticket
     validacion/        M05   reglas V1 a V5 de consistencia del ticket
-    trazabilidad/      M06   lotes de proceso y paso por etapas
-    consulta/          M07   búsqueda por placa y fecha, con respaldo
+    trazabilidad/      M06   lotes, rutas, division por fracciones, etapas, bigbags y cierre
+    consulta/          M07   búsqueda por placa y fecha, con respaldo; calendario de llegadas
     consolidacion/     M08   total acumulado mensual por tipo de mineral
-    auditoria/         M09   registro de eventos
+    auditoria/         M09   registro de eventos, historial de un ingreso y consulta
   utils/                  utilidades transversales, excepciones de dominio
   manage.py
   .env.example            versionado; .env nunca se versiona
@@ -200,8 +200,12 @@ de lectura son intercambiables sin romper a quien los consume. Cualquier impleme
 `ReconocedorTicket` puede sustituir a otra en el punto donde M03 la inyecta.
 
 **I — Segregación de interfaces.** Los permisos se declaran por acción, no por un objeto monolítico
-de "usuario con todos los permisos". El rol Supervisor de planta obtiene únicamente las interfaces
-de registro y consulta; no se le inyecta la de gestión de usuarios ni la de consolidación.
+de "usuario con todos los permisos". El rol Supervisor de planta obtiene las interfaces de registro de
+ingresos, alta del vehículo desde el registro, destare, paso del lote por las etapas y consulta
+(DR-17); no se le inyectan la gestión de usuarios, la de catálogos, la corrección, la anulación, la
+composición o el cierre de lotes ni la consolidación. Los permisos se definen una sola vez en
+`apps/accounts/permissions.py` (RN-M01-09); la matriz completa está en
+`docs/modulos/M01-autenticacion/notas.md`.
 
 **D — Inversión de dependencias.** Los servicios dependen de abstracciones, no de implementaciones
 concretas. `ServicioIngreso` recibe `ReconocedorTicket`, `ValidadorConsistencia` y un generador de
@@ -213,21 +217,36 @@ de uso.
 Convención de rutas, coherente con los códigos de módulo:
 
 ```
-POST   /api/v1/auth/login/                       M01
-GET    /api/v1/catalogo/vehiculos/                M02
-GET    /api/v1/catalogo/tipos-mineral/            M02
-POST   /api/v1/ingresos/borradores/               M03
-POST   /api/v1/ingresos/                          M03
-GET    /api/v1/ingresos/{id}/                     M03
-GET    /api/v1/reconocimientos/{id}/              M04
-GET    /api/v1/ingresos/{id}/validaciones/        M05
-POST   /api/v1/lotes/                             M06
-POST   /api/v1/lotes/{id}/etapas/                 M06
-GET    /api/v1/ingresos/{id}/trazabilidad/        M06
-GET    /api/v1/consulta/ingresos/                 M07
-GET    /api/v1/consolidacion/mensual/             M08
-GET    /api/v1/auditoria/{entidad}/{id}/          M09
+POST   /api/v1/auth/login/                            M01
+GET    /api/v1/catalogo/vehiculos/                     M02
+POST   /api/v1/catalogo/vehiculos/                     M02  tambien desde el registro
+PATCH  /api/v1/catalogo/vehiculos/{id}/tara/           M02  solo Administrador
+GET    /api/v1/catalogo/tipos-mineral/                 M02
+POST   /api/v1/catalogo/tipos-mineral/                 M02  tambien desde el registro
+POST   /api/v1/ingresos/borradores/                    M03
+POST   /api/v1/ingresos/                               M03  con imagen o sin foto con motivo
+GET    /api/v1/ingresos/{id}/                          M03
+PATCH  /api/v1/ingresos/{id}/anular/                   M03
+POST   /api/v1/ingresos/destares/                      M03
+GET    /api/v1/reconocimientos/{id}/                   M04
+GET    /api/v1/ingresos/{id}/validaciones/             M05
+POST   /api/v1/lotes/                                  M06
+POST   /api/v1/lotes/{id}/ingresos/                    M06
+PATCH  /api/v1/lotes/{id}/iniciar-recorrido/           M06
+POST   /api/v1/lotes/{id}/division/                    M06
+POST   /api/v1/lotes/{id}/etapas/                      M06
+POST   /api/v1/lotes/{id}/bigbags/                     M06
+PATCH  /api/v1/lotes/{id}/cerrar/                      M06  solo Administrador
+GET    /api/v1/ingresos/{id}/trazabilidad/             M06
+GET    /api/v1/consulta/ingresos/                      M07
+GET    /api/v1/consulta/calendario/?anio&mes           M07
+GET    /api/v1/consolidacion/mensual/                  M08
+GET    /api/v1/ingresos/{id}/historial/                M09  los tres roles
+GET    /api/v1/auditoria/                              M09  solo Administrador
 ```
+
+La lista es representativa; el contrato completo de cada módulo está en la tabla de funciones de su
+`requerimientos/funcionales.md`, que prevalece si difieren.
 
 Todas las respuestas de error devuelven un cuerpo uniforme: `{"codigo": "...", "mensaje": "...",
 "detalles": {...}}`. Los mensajes visibles al usuario están en español y coinciden literalmente con

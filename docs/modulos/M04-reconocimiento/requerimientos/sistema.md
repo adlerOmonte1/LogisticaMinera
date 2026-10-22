@@ -14,3 +14,4 @@
 | RS-M04-10 | El sistema deriva `fue_corregido` de la diferencia entre el valor reconocido y el confirmado, y no lo acepta como dato de entrada | RU-M04-05 |
 | RS-M04-11 | El sistema expone la consulta de un reconocimiento con sus tres campos, el motor y la versión | RU-M04-05 |
 | RS-M04-12 | El sistema mantiene un reconocimiento como máximo por ingreso | — (integridad del registro) |
+| RS-M04-13 | El sistema no invoca `ReconocedorTicket` en el registro sin foto y no crea reconocimiento para ese ingreso | — (integridad con M03) |

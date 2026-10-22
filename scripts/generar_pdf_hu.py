@@ -393,9 +393,9 @@ def referencia():
 <table>
 <thead><tr><th style="width:42mm">Rol</th><th>Alcance</th></tr></thead>
 <tbody>
-<tr><td><strong>Administrador</strong></td><td>Acceso total, incluidos usuarios, catálogos y anulaciones</td></tr>
-<tr><td><strong>Administrativo</strong></td><td>Registro, corrección, consultas, consolidación y exportación</td></tr>
-<tr><td><strong>Supervisor de planta</strong></td><td>Registro y consulta</td></tr>
+<tr><td><strong>Administrador</strong></td><td>Acceso total, incluidos usuarios, catálogos, modificación de la tara, anulaciones y cierre del lote con su destino</td></tr>
+<tr><td><strong>Administrativo</strong></td><td>Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes</td></tr>
+<tr><td><strong>Supervisor de planta</strong></td><td>Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta</td></tr>
 </tbody></table>
 
 <h3>Reglas de validación del ticket</h3>

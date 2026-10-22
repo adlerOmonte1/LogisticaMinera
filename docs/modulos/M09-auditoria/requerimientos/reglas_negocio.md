@@ -12,6 +12,8 @@
 | RN-M09-04 | Un intento de operación rechazado por falta de autorización se registra igual que uno completado | No se podría demostrar que el control de acceso funciona, solo que existe |
 | RN-M09-05 | El catálogo de acciones auditables es único y compartido por todos los módulos | Cada módulo con su propio catálogo de acciones haría el historial incomparable entre entidades |
 | RN-M09-06 | El usuario de un evento es el que ejecutó la operación, nunca uno indicado por el cliente | Un evento con autor falso invalidaría la atribución de todo el histórico |
+| RN-M09-07 | El historial de un ingreso lo ven los tres roles y reúne solo los eventos del ingreso y los de su lote que lo afectan | Quien está en planta no podría responder por un ingreso, o vería información de otros usuarios que no le corresponde |
+| RN-M09-08 | La consulta de toda la auditoría, incluidos los accesos rechazados y los eventos de usuarios, es exclusiva del Administrador | La actividad de cada usuario quedaría expuesta a todos los demás |
 
 ## Nota sobre RN-M09-01
 

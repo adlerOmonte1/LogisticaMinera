@@ -334,12 +334,16 @@ from utils.modelos import ModeloBase
 
 class Ingreso(ModeloBase):
     class Estado(models.TextChoices):
+        EN_PROCESO = "EN_PROCESO", "En proceso"
         REGISTRADO = "REGISTRADO", "Registrado"
         ANULADO = "ANULADO", "Anulado"
 
-    codigo = models.CharField(max_length=20, unique=True, editable=False)
-    imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/")
-    fecha_hora_pesaje = models.DateTimeField()                     # fecha reconocida + hora digitada (D-01)
+    codigo = models.CharField(max_length=20, unique=True, editable=False)  # sin numero de ticket (DR-12)
+    imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/", null=True, blank=True)
+    sin_respaldo_fotografico = models.BooleanField(default=False, editable=False)  # DR-13
+    motivo_sin_respaldo = models.CharField(max_length=60, choices=MOTIVOS_SIN_FOTO, blank=True,
+                                           editable=False)
+    fecha_hora_pesaje = models.DateTimeField()                     # fecha reconocida + hora propuesta y ajustada (D-01, DR-11)
     hora_inicio_registro = models.DateTimeField(editable=False)    # del servidor (D-01)
     hora_fin_registro = models.DateTimeField(editable=False)       # del servidor (D-01)
     vehiculo = models.ForeignKey("catalogo.Vehiculo", on_delete=models.PROTECT)
@@ -349,7 +353,6 @@ class Ingreso(ModeloBase):
                                   null=True, editable=False)       # tara aplicada (D-17)
     peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2,
                                        null=True, editable=False)  # calculado (D-17)
-    numero_ticket = models.CharField(max_length=20, blank=True)
     lote = models.ForeignKey("trazabilidad.LoteProceso", null=True, blank=True,
                               on_delete=models.PROTECT)
     usuario_registro = models.ForeignKey("accounts.Usuario", on_delete=models.PROTECT,
@@ -363,6 +366,15 @@ class Ingreso(ModeloBase):
             models.Index(fields=["vehiculo", "fecha_hora_pesaje"], name="idx_ingreso_vehiculo_fecha"),
             models.Index(fields=["fecha_hora_pesaje", "tipo_mineral"], name="idx_ingreso_fecha_mineral"),
             models.Index(fields=["estado"], name="idx_ingreso_estado"),
+        ]
+        constraints = [
+            # RN-M03-01, DR-13: imagen, o marca de sin respaldo con motivo; nunca ninguna de las dos
+            models.CheckConstraint(
+                name="ingreso_respaldo_o_motivo",
+                check=(models.Q(sin_respaldo_fotografico=False, imagen_ticket__isnull=False)
+                       & ~models.Q(imagen_ticket=""))
+                | (models.Q(sin_respaldo_fotografico=True) & ~models.Q(motivo_sin_respaldo="")),
+            ),
         ]
 
     def clean(self):
@@ -410,13 +422,20 @@ class ServicioIngreso:
         self._reloj = reloj
         self._auditoria = auditoria
 
-    def iniciar_registro(self, *, imagen, usuario):
-        """RS-M03-01, RS-M03-03. No persiste el ingreso: devuelve una propuesta."""
+    def iniciar_registro(self, *, imagen=None, usuario):
+        """RS-M03-01, RS-M03-03. No persiste el ingreso: devuelve una propuesta.
+
+        Sin imagen es el registro sin foto (DR-13): el inicio se fija igual, pero no hay
+        reconocimiento que proponer. La hora del pesaje se propone con el reloj del servidor (DR-11).
+        """
         hora_inicio = self._reloj.ahora()
+        if imagen is None:
+            return Propuesta(hora_inicio=hora_inicio, resultado=None, inconsistencias=[],
+                             hora_pesaje_propuesta=hora_inicio)
         resultado = self._reconocedor.reconocer(imagen)
         inconsistencias = self._validador.validar(resultado.datos)
         return Propuesta(hora_inicio=hora_inicio, resultado=resultado,
-                          inconsistencias=inconsistencias)
+                          inconsistencias=inconsistencias, hora_pesaje_propuesta=hora_inicio)
 
     @transaction.atomic
     def registrar_ingreso(self, *, datos, hora_inicio, usuario):
@@ -686,7 +705,7 @@ export const routes: Routes = [
 export interface Ingreso {
   id: number;
   codigo: string;
-  imagenTicket: string;       // URL del respaldo
+  imagenTicket: string | null; // URL del respaldo; nula solo en el registro sin foto
   fechaHoraPesaje: string;    // ISO
   horaInicioRegistro: string;
   horaFinRegistro: string;
@@ -695,9 +714,10 @@ export interface Ingreso {
   pesoBrutoTn: number;
   taraTn: number;
   pesoNetoTn: number;
-  numeroTicket?: string;
+  sinRespaldoFotografico: boolean;
+  motivoSinRespaldo?: string;
   justificacionPeso?: string;
-  estado: 'REGISTRADO' | 'ANULADO';
+  estado: 'EN_PROCESO' | 'REGISTRADO' | 'ANULADO';
 }
 ```
 

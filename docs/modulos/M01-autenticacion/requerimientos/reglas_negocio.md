@@ -15,3 +15,5 @@
 | RN-M01-06 | Solo el rol Administrador crea, modifica o desactiva usuarios | La segregación entre quien administra y quien opera desaparecería |
 | RN-M01-07 | El contador de intentos fallidos se reinicia únicamente tras un acceso exitoso o transcurrido el bloqueo | El bloqueo sería evadible esperando entre intentos sin agotar el conteo |
 | RN-M01-08 | El cambio de la propia contraseña exige la contraseña actual | Cualquiera con una sesión abierta y sin vigilancia podría apropiarse de la cuenta |
+| RN-M01-09 | El permiso se concede por operación, no por módulo: un rol que registra ingresos no obtiene por ello la corrección ni la anulación | El Supervisor de planta, que debe registrar en planta, podría corregir o anular ingresos ajenos sin trazabilidad de la decisión |
+| RN-M01-10 | Solo el rol Administrador cierra un lote con su destino | El destino del mineral, venta o traslado, quedaría decidido por quien no responde de él ante la gerencia |

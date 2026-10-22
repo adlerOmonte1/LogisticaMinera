@@ -2,19 +2,17 @@
 
 ## Backend (Django)
 
-**App:** `apps/catalogo/` — implementada y con pruebas. Ajustes pendientes de esta reformulación,
-sin recrear la app:
+**App:** `apps/catalogo/` — implementada y con pruebas. El retiro de `Cliente` y el cambio de
+`Producto` a `TipoMineral` son tareas de la preparación del repositorio y figuran en
+`../../01-plan/PLAN_DE_TRABAJO.md` §8. Lo que este módulo exige del modelo, una vez hecha esa
+preparación:
 
-- **Retirar `models/cliente.py`, su serializer, su servicio, su vista, sus rutas, su factory y sus
-  pruebas.** `CLIENTE` pertenecía al alcance de salidas y ventas, retirado por la reformulación.
-  Requiere una migración nueva que elimine la tabla; no se edita `0001_initial`.
-- **Renombrar `models/producto.py` a `models/tipo_mineral.py`** (DR-03): mismo mecanismo, catálogo
-  único usado al registrar el ingreso y al consolidar. El campo `nombre` pasa de valores fijos
-  (Saranda, Molido) a los que defina la empresa.
-- **`models/vehiculo.py` conserva `tipo_titularidad` y `capacidad_tn`** y añade `tara_tn`,
-  `fecha_destare` y `usuario_destare` (DR-10, D-17), en una migración nueva; cambia el comentario
-  que citaba el indicador anterior.
-- **`models/transportista.py` sin cambios.**
+- **`TipoMineral`** (DR-03) con `codigo` único de dos a seis caracteres, no editable tras el alta, y
+  `nombre` único sin distinguir mayúsculas (RN-M02-15, RN-M02-16). El servicio `crear_tipo_mineral()`
+  genera el código cuando no se indica y es el mismo que invoca el registro de M03.
+- **`Vehiculo`** conserva `tipo_titularidad` y `capacidad_tn` y añade `tara_tn`, `fecha_destare` y
+  `usuario_destare` (DR-10, D-17), en una migración nueva.
+- **`Transportista`** con `ruc` único (RN-M02-18).
 
 ### Modelo de vehículo
 
@@ -68,18 +66,15 @@ Decisiones no obvias:
 
 ## Riesgo de implementación identificado
 
-**El riesgo principal es que la migración que retira `Cliente` arrastre datos que otro módulo
-todavía referencia.**
+**El riesgo principal es que el alta desde el registro se implemente como un camino abreviado con
+menos controles que el catálogo.**
 
-Si `apps/salidas` no se hubiera retirado antes de esta migración, `Cliente` tendría una clave
-foránea activa desde `Salida` y la migración fallaría o, peor, se forzaría con `CASCADE` sin que
-nadie lo advirtiera. Por eso el orden de la preparación del repositorio importa: primero se retira
-`apps/salidas` por completo, y solo entonces se elimina `Cliente` de `apps/catalogo`.
-
-**Riesgo secundario:** renombrar `Producto` a `TipoMineral` sin renombrar también sus referencias en
-`apps/ingresos` (el campo `producto` de `Ingreso`) dejaría el código en un estado mixto donde el
-modelo se llama de una forma y las variables de otra, lo que dificulta encontrar todas las
-referencias en una búsqueda posterior.
+La pantalla de registro necesita dar de alta un vehículo o un tipo de mineral sin salir de ella, y es
+tentador resolverlo con un endpoint propio de M03 que cree la entidad con los datos mínimos. Ese
+atajo permitiría placas duplicadas, vehículos externos sin transportista o nombres de mineral
+repetidos. La defensa es que M03 invoque los mismos servicios `crear_vehiculo()` y
+`crear_tipo_mineral()` de M02, y que las pruebas del alta desde el registro reutilicen los casos de
+rechazo del alta desde el catálogo.
 
 ## Dependencias
 
@@ -97,6 +92,6 @@ que el valor no cambie, y otro como Administrador sin motivo y espera el rechazo
 
 | Pendiente | Efecto |
 |---|---|
-| Valores del catálogo de tipos de mineral, a definir con la empresa (DR-03) | Bloquea la carga inicial de datos, no la estructura del modelo |
-| Orden de la preparación del repositorio: salidas antes que Cliente | Evita una migración fallida o forzada |
+| Valores del catálogo de tipos de mineral, a definir con la empresa (DR-03) | Bloquea la carga inicial de datos, no la estructura del modelo; el alta desde el registro reduce el bloqueo |
+| Preparación del repositorio (`PLAN_DE_TRABAJO.md` §8): retiro de `Cliente` y cambio de `Producto` a `TipoMineral` | El modelo descrito en estas notas supone esa preparación hecha |
 | Carga de la tara de los vehículos que ya operan antes de la puesta en marcha | Sin ella, todos sus primeros ingresos quedarán En proceso hasta un nuevo destare |

@@ -41,7 +41,12 @@ Decisiones no obvias:
   ingresos computables. Es el mismo criterio que usa el total de M07 y debe venir del mismo método
   del gestor de `Ingreso`.
 - **El número de ingresos En proceso del periodo se obtiene con una segunda consulta de conteo**
-  (RN-M08-07) y viaja con el resultado, también al exportador.
+  (RN-M08-07) y viaja con el resultado, también al exportador, junto con sus códigos y el número de
+  anulados excluidos (RS-M08-13).
+- **No hay filtro por `sin_respaldo_fotografico` ni unión con el lote.** El ingreso sin foto es
+  computable (RN-M08-08) y el lote no interviene en el total (RN-M08-09). Una unión con
+  `REPARTO_INGRESO` de M06 «para mostrar el destino» duplicaría filas cuando el lote está dividido
+  en partes.
 - **No hay tabla de acumulado ni tarea programada que la actualice.** Es la traducción directa de
   RN-M08-02: cualquier mecanismo de caché o precálculo reintroduce el riesgo de desincronización que
   la regla existe para evitar. Si el rendimiento lo exigiera más adelante, la vía es un índice, no

@@ -37,17 +37,22 @@ identificador del motor y su versión.
 
 Cuando el motor no logra leer un campo, el sistema deja ese campo vacío y editable. No propone un
 valor aproximado: un dato inventado con apariencia de lectura es peor que un campo en blanco, porque
-el usuario podría aceptarlo sin verificarlo.
+el usuario podría aceptarlo sin verificarlo. Si el ticket entero resulta ilegible, el usuario ingresa
+los datos a mano y la fotografía se conserva igual como respaldo del ingreso.
+
+Cuando el ingreso se registra sin foto (DR-13), no hay imagen que procesar: el reconocimiento no se
+invoca y el ingreso no tiene resultado de reconocimiento asociado.
 
 **Detalles**
 - Campos reconocidos: placa, fecha y peso bruto.
-- Campos que no se reconocen: la hora del pesaje, que el ticket no imprime y digita el usuario; la
-  tara, que viene del catálogo del vehículo; y el peso neto, que calcula el sistema. La anotación
+- Campos que no se reconocen: la hora del pesaje, que el ticket no imprime y que el sistema propone
+  para que el usuario la ajuste; la tara, que viene del catálogo del vehículo; y el peso neto, que
+  calcula el sistema. La anotación
   manuscrita del destare tampoco se reconoce: la tara se digita (DR-10).
 - Confianza por campo: valor entre 0 y 1; vacía si no hubo lectura.
 - Umbral de confianza: configurable, 0,80 por defecto.
 - Motor y versión: se registran en cada reconocimiento y no cambian durante la operación.
-- Un reconocimiento por ingreso.
+- Un reconocimiento por ingreso con foto; ninguno en el ingreso registrado sin foto.
 
 **Criterios de aceptación**
 
@@ -75,6 +80,9 @@ el usuario podría aceptarlo sin verificarlo.
 > **CA07.** Dado que el usuario confirma el ingreso, cuando el sistema lo persiste, entonces guarda
 > para cada uno de los tres campos el valor reconocido, el valor confirmado y la confianza, junto
 > con el motor y su versión.
+
+> **CA08.** Dado que el usuario eligió el registro sin foto, cuando confirma el ingreso, entonces el
+> sistema no invoca el reconocimiento ni guarda valores reconocidos para ese ingreso.
 
 ---
 
@@ -116,9 +124,9 @@ campo y no en el motor en conjunto.
 > **CA02.** Dado que un campo fue corregido por el usuario, cuando se muestra la comparación,
 > entonces el sistema lo señala como corregido.
 
-> **CA03.** Dado que un ingreso se registró manualmente porque la imagen era ilegible, cuando el
-> usuario consulta su detalle, entonces el sistema indica que no hubo reconocimiento y muestra el
-> motivo.
+> **CA03.** Dado que un ingreso se registró manualmente porque la imagen era ilegible o porque se
+> registró sin foto, cuando el usuario consulta su detalle, entonces el sistema indica que no hubo
+> reconocimiento y muestra el motivo.
 
 > **CA04.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta consultar la
 > comparación, entonces el sistema rechaza la operación mostrando "Acción no autorizada".

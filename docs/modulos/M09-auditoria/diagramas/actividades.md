@@ -17,12 +17,13 @@ flowchart TD
     E1 --> F2([Ni la operacion ni el evento quedan registrados])
 ```
 
-## A-M09-02 · Reconstrucción del historial de una entidad (RU-M09-04)
+## A-M09-02 · Reconstrucción del historial de un ingreso (RN-M09-07)
 
 ```mermaid
 flowchart TD
-    I([Administrador indica entidad e identificador]) --> C1[Consultar eventos por ese indice]
-    C1 --> D1{Existen eventos?}
+    I([Usuario abre el historial de un ingreso]) --> C1[Consultar eventos del ingreso]
+    C1 --> C0[Agregar eventos de su lote que lo afectan]
+    C0 --> D1{Existen eventos?}
     D1 -->|No| M1[Informar: Sin eventos registrados para este registro]
     D1 -->|Si| C2[Ordenar cronologicamente del primero al mas reciente]
     C2 --> C3[Para cada evento anadir su autor y su accion]
@@ -51,3 +52,19 @@ flowchart TD
 
 Ambas ramas terminan con un evento registrado. La diferencia no está en si se audita, sino en qué se
 audita: una es un cambio sobre los datos, la otra es la constancia de que el cambio no se permitió.
+
+## A-M09-04 · Consulta de la auditoría del sistema (RN-M09-08)
+
+```mermaid
+flowchart TD
+    I([Usuario abre la auditoria]) --> V1{Rol Administrador?}
+    V1 -->|No| E1[Rechazar: Accion no autorizada y registrar el acceso rechazado]
+    V1 -->|Si| L1[Indicar usuario accion o referencia]
+    L1 --> C1[Consultar eventos que cumplen todos los filtros]
+    C1 --> D1{Hay eventos?}
+    D1 -->|No| M1[Informar: Sin eventos registrados para este registro]
+    D1 -->|Si| C2[Ordenar del mas reciente al mas antiguo]
+    C2 --> C3[Distinguir escrituras y accesos rechazados]
+    C3 --> F([Eventos con entidad referencia autor y cambio])
+```
+

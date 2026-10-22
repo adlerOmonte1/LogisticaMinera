@@ -12,30 +12,33 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 
 ## Estado del proyecto
 
-La documentación del sistema está completa: nueve módulos, 22 historias de usuario, sus
-requerimientos y diagramas. El backend conserva apps de un alcance anterior que se retiran en la
+La documentación del sistema está en su **versión 2**: nueve módulos, 26 historias de usuario, sus
+requerimientos y diagramas, reformulados a partir de la revisión del prototipo navegable
+([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-22. La versión 1 queda en
+la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
 preparación del repositorio, antes de construir los módulos
 ([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).
 
 | Rama | Contenido |
 |---|---|
 | `main` | Última versión estable: backend con M01 y M02 implementados, bajo el diseño anterior |
-| `docs/reformulacion/sistema-inteligente` | Documentación reescrita para el sistema nuevo (fases 0 a 9 completas); el backend todavía no se tocó |
+| `docs/version-2` | Documentación de la versión 2, reformulada con las decisiones DR-11 a DR-23; el backend todavía no se tocó |
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|
-| M01 | Autenticación y roles | Reescrita | Implementado, sin cambios de fondo |
-| M02 | Catálogo maestro | Reescrita | Implementado; pendiente retirar `Cliente` y renombrar `Producto` a `TipoMineral` |
-| M03 | Registro de ingresos | Reescrita | Implementado con el diseño anterior; pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Escrita | Sin código |
-| M05 | Validación automática de consistencia | Escrita | Sin código |
-| M06 | Trazabilidad del proceso | Escrita | Sin código |
-| M07 | Consulta de ingresos y respaldo | Escrita | Sin código |
-| M08 | Consolidación de la producción | Escrita | Sin código |
-| M09 | Auditoría | Escrita | Esqueleto, sin lógica |
+| M01 | Autenticación y roles | Versión 2 | Implementado; falta ampliar la matriz de permisos al alcance del Supervisor de planta |
+| M02 | Catálogo maestro | Versión 2 | Implementado; pendiente retirar `Cliente` y renombrar `Producto` a `TipoMineral` |
+| M03 | Registro de ingresos | Versión 2 | Implementado con el diseño anterior; pendiente de refactor |
+| M04 | Reconocimiento automático del ticket | Versión 2 | Sin código |
+| M05 | Validación automática de consistencia | Versión 2 | Sin código |
+| M06 | Trazabilidad del proceso | Versión 2 | Sin código |
+| M07 | Consulta de ingresos y respaldo | Versión 2 | Sin código |
+| M08 | Consolidación de la producción | Versión 2 | Sin código |
+| M09 | Auditoría | Versión 2 | Esqueleto, sin lógica |
 
 La limpieza del backend (retirar `apps/salidas`, `apps/existencias`, `apps/sincronizacion`, refactorizar
-`apps/ingresos`, crear las apps nuevas) es la Fase 10 del plan y todavía no se ejecutó.
+`apps/ingresos`, crear las apps nuevas) es la preparación del repositorio de
+`PLAN_DE_TRABAJO.md` §8 y todavía no se ejecutó.
 
 ---
 
@@ -44,6 +47,7 @@ La limpieza del backend (retirar `apps/salidas`, `apps/existencias`, `apps/sincr
 ```
 LogisticaMinera/
 ├── backend/          Django 5 + Django REST Framework, una app por módulo
+├── Mockup/           Prototipo navegable de la interfaz, fuente de las decisiones DR-11 a DR-22
 ├── docs/             Documentación completa del sistema y de la tesis
 │   ├── 00-tesis/            Marco de tesis, decisiones de reformulación, plantillas
 │   ├── 00-arquitectura/     Decisiones de diseño, modelo de datos, guías, convenciones
@@ -53,7 +57,7 @@ LogisticaMinera/
 │   ├── 01-plan/             Cronograma
 │   └── 03-pruebas/          Guías de prueba
 ├── skills/           Skills del repositorio; contexto-tesis es la fuente para el agente
-├── scripts/          verificar_migracion.sh, generar_pdf_hu.py
+├── scripts/          verificar_migracion.sh, generar_pdf_hu.py, generar_pdf_requerimientos.py
 └── CLAUDE.md         Instrucciones para trabajar con un agente de IA en este repositorio
 ```
 
@@ -154,6 +158,17 @@ bash scripts/verificar_migracion.sh
 Detecta conceptos del alcance anterior (stock, kardex, captura sin conexión, indicadores antiguos,
 formato `RF-01`) que no deberían sobrevivir en `docs/` ni en `skills/`. Se ejecuta antes de cada
 commit de documentación.
+
+```bash
+python3 scripts/validar_docs.py
+```
+
+Comprueba las reglas de Mermaid, los enlaces, que toda referencia (HU, RN, RS, RU, RNF, D, DR)
+exista y que las historias coincidan entre cada `HU.md`, el índice y la matriz de trazabilidad.
+
+Ambas corren en el CI de GitHub Actions junto con el lint, las migraciones y las pruebas del
+backend sobre PostgreSQL. El pipeline completo está en
+[`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §6.6.
 
 ---
 

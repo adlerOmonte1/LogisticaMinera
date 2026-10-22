@@ -197,7 +197,7 @@ Dos niveles de caso de prueba, según `convenciones_codigo.md` §1:
   pruebas automatizadas se nombran `test_<CODIGO>_<enunciado>`, por ejemplo:
 
 ```python
-def test_RN_M03_04_peso_neto_no_se_calcula_se_lee_del_ticket(): ...
+def test_RN_M03_04_peso_neto_se_calcula_con_la_tara_del_vehiculo(): ...
 def test_RN_M04_02_valor_reconocido_y_confirmado_se_guardan_por_separado(): ...
 ```
 
@@ -229,7 +229,8 @@ por obligación:
 Se construyen con `factory-boy`, nunca con registros creados a mano dentro de la prueba. Existe un
 juego de datos de preproducción que reproduce un mes de operación de planta: catálogo completo,
 ingresos con reconocimiento exitoso y con reconocimiento fallido, ingresos con cada una de las
-inconsistencias V1 a V5, lotes en distintos puntos de su recorrido por las etapas, y un mes sin
+inconsistencias V1 a V5, ingresos registrados sin foto, lotes Abiertos, En recorrido y Cerrados
+con rutas distintas, al menos un lote dividido por fracciones con un ingreso tardío, y un mes sin
 ingresos, porque la consolidación de un mes vacío es un caso de prueba obligatorio (HU-M08-01 CA03).
 
 El conjunto de tickets reales para medir ERA y TDI se guarda aparte, con las inconsistencias
@@ -242,19 +243,45 @@ reales de tickets de la balanza.
 Antes de cada despliegue a producción se ejecuta la suite completa más el juego manual de
 regresión, que cubre como mínimo:
 
-1. Registro de un ingreso a partir de la imagen del ticket y verificación de las tres marcas de
-   tiempo como valores distintos.
-2. Reconocimiento de un ticket con un campo ilegible, que debe quedar vacío y editable, sin valor
+1. Registro de un ingreso a partir de la imagen del ticket, con la hora del pesaje propuesta y
+   ajustada, y verificación de las tres marcas de tiempo como valores distintos.
+2. Registro de un ingreso sin foto, con motivo, y su marca de sin respaldo fotográfico en la
+   consulta.
+3. Reconocimiento de un ticket con un campo ilegible, que debe quedar vacío y editable, sin valor
    inventado.
-3. Confirmación de un ingreso con una inconsistencia V4 (peso fuera de rango), que exige
+4. Confirmación de un ingreso con una inconsistencia V4 (peso fuera de rango), que exige
    justificación y no bloquea.
-4. Corrección de un dato de un ingreso ya registrado, con motivo y revalidación.
-5. Anulación de un ingreso y su exclusión de los totales, sin desaparecer del histórico.
-6. Consulta de un ingreso por placa y fecha, con su imagen de respaldo.
-7. Asignación de un ingreso a un lote y registro del paso por las cuatro etapas, respetando el
-   orden.
-8. Consolidado mensual de un mes con ingresos y de un mes sin ingresos, y su exportación.
-9. Acceso denegado a cada acción restringida, con un usuario de cada rol.
+5. Corrección de un dato de un ingreso ya registrado, con motivo y revalidación.
+6. Anulación de un ingreso y su exclusión de los totales, sin desaparecer del histórico.
+7. Consulta de un ingreso por placa y fecha, con su imagen de respaldo.
+8. Asignación de un ingreso a un lote, inicio del recorrido y registro del paso por las etapas de la
+   ruta decidida, respetando el orden; división de un lote por fracciones y cierre con su destino
+   por el Administrador.
+9. Consolidado mensual de un mes con ingresos y de un mes sin ingresos, y su exportación.
+10. Acceso denegado a cada acción restringida, con un usuario de cada rol.
+
+### 6.6 Integración continua
+
+GitHub Actions ejecuta en cada pull request las comprobaciones que no dependen de una persona. Un
+PR con alguna etapa en rojo no se fusiona.
+
+| Etapa | Workflow | Cuándo corre | Qué verifica | Estado |
+|---|---|---|---|---|
+| 1. Documentación | `.github/workflows/docs.yml` | Cambios en `docs/` o `skills/` | `verificar_migracion.sh` y `validar_docs.py`: reglas de Mermaid, enlaces, referencias cruzadas e historias coherentes entre módulos, índice y matriz | Activa |
+| 2. Backend | `.github/workflows/backend.yml` | Cambios en `backend/` | `ruff`, `makemigrations --check` y `pytest` con cobertura sobre PostgreSQL 16 | Activa |
+| 3. Trazabilidad | `.github/workflows/backend.yml` | Cambios en `backend/` o `docs/modulos/` | `reporte_trazabilidad.py`: qué reglas y criterios tienen prueba, y qué pruebas citan códigos que la documentación no define | Activa, solo informa; pasa a `--estricto` tras la preparación del repositorio |
+| 4. PDF | Por definir | Al fusionar en la rama de documentación | Regenera los PDF de historias y de requerimientos | Pendiente |
+| 5. Preproducción | Por definir | Al fusionar en la rama de integración | Imágenes Docker, despliegue en preproducción y prueba de arranque | Pendiente: rama de integración y servidor por definir |
+| 6. Producción | Por definir | Al etiquetar `main`, con aprobación manual | Despliegue y registro automático en la bitácora de despliegues | Pendiente: servidor y D-14 por definir |
+| 7. Congelamiento (D-16) | Por definir | Todo PR durante la ventana de medición | Rechaza cambios en el motor de reconocimiento y en las reglas V1 a V5 sin justificación escrita | Pendiente |
+
+Las pruebas locales siguen usando SQLite en memoria salvo que se defina `TEST_DATABASE_URL`; el CI
+siempre la define. Antes de abrir un PR conviene correr lo mismo que el CI:
+
+```bash
+bash scripts/verificar_migracion.sh && python3 scripts/validar_docs.py
+cd backend && ruff check . && python manage.py makemigrations --check --dry-run && pytest
+```
 
 ---
 
@@ -310,6 +337,7 @@ etapa.
 |---|---|---|
 | Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | Apps eliminadas, con su migración de retiro cuando corresponda | `makemigrations --check` sin cambios pendientes |
 | Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
+| Cambiar `Producto` por `TipoMineral` en `apps/catalogo` (DR-03), con sus referencias en `apps/ingresos` | Modelo `tipo_mineral.py` con código y nombre únicos; el campo `producto` de `Ingreso` renombrado en la misma migración, para no dejar el código en un estado mixto | `grep -rn producto backend/apps` sin resultados de dominio; `pytest` en verde |
 | Refactorizar `apps/ingresos` al modelo vigente de `INGRESO` | Tres marcas de tiempo, tara aplicada, peso neto calculado y estado En proceso, según `modelo_datos_entidad_relacion.md` | Revisión contra el modelo de datos |
 | Crear los esqueletos de `reconocimiento`, `validacion` y `trazabilidad`; renombrar `busqueda` a `consulta` y `reportes` a `consolidacion` | Apps con la estructura de capas de `catalogo` | Responsable técnico |
 | Ajustes del proyecto | `LOCAL_APPS` actualizado, `MEDIA_ROOT`, límite de carga de imágenes y Pillow en `requirements/base.txt` | `pytest` en verde |
@@ -358,19 +386,22 @@ de la investigación contrasta en el postest.
 |---|---|---|
 | Registro de eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección | Prueba automatizada por acción |
 | Registro de acceso rechazado | Evento por cada intento sin permiso | Tester |
-| Consulta del historial de una entidad | Historial cronológico con valores anteriores y nuevos | Tester: HU-M09-02 |
+| Historial de un ingreso | Historial cronológico con valores anteriores y nuevos, visible para los tres roles | Tester: HU-M09-02 |
+| Consulta de la auditoría del sistema | Eventos filtrables por usuario, entidad, acción y periodo, solo para el Administrador | Tester: HU-M09-03 |
 
 ### Semana 5 — M06 Trazabilidad
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Gestión de lotes de proceso | Apertura, composición y cierre de un lote | Tester: HU-M06-01 |
-| Registro del paso por etapa | Secado, zarandeo, molienda y ensacado, en orden | Tester: HU-M06-02 |
-| Consulta de trazabilidad de un ingreso | Recorrido de las cuatro etapas a través del lote | Tester: HU-M06-03 |
+| Gestión de lotes de proceso | Apertura con nombre, asignación y retiro de ingresos con el lote Abierto, inicio del recorrido e ingresos tardíos | Tester: HU-M06-01 |
+| Registro del paso por etapa | Secado común, elección de la ruta y etapas de esa ruta en orden; horas de molienda y bigbags como datos descriptivos | Tester: HU-M06-02 |
+| División de un lote | Partes por fracciones que suman la unidad, cada una con su ruta; reparto de un ingreso tardío | Tester: HU-M06-04 |
+| Consulta de trazabilidad de un ingreso | Etapas recorridas sobre las etapas de la ruta del lote o de la unión de las rutas de sus partes | Tester: HU-M06-03 |
+| Cierre del lote con su destino | Cierre por el Administrador con venta o traslado, solo con todo el mineral ensacado | Tester: HU-M06-05, CP12 |
 
-Precondición: la forma real de agrupar el mineral en cancha debe verificarse con la jefatura de
-operaciones antes de esta semana. Si el vínculo directo es más fiel que el lote, este módulo se
-ajusta antes de implementarse.
+Precondición: la forma real de agrupar el mineral en cancha y de decidir la ruta debe verificarse con
+la jefatura de operaciones antes de esta semana (DR-04, DR-16). Si el vínculo directo es más fiel
+que el lote, este módulo se ajusta antes de implementarse.
 
 ### Semana 6 — M07 Consulta
 
@@ -378,7 +409,8 @@ ajusta antes de implementarse.
 |---|---|---|
 | Búsqueda por placa y fecha | Recuperación del ingreso y su ticket de respaldo en menos de un minuto | Medición cronometrada por el tester |
 | Listado con filtros combinables | Fecha, tipo de mineral, vehículo, titularidad y estado | Tester |
-| Detalle completo del ingreso | Datos, imagen, reconocimiento, validaciones y trazabilidad en una vista | Tester: HU-M07-01, HU-M07-02 |
+| Detalle completo del ingreso | Datos, imagen o marca de sin respaldo fotográfico, reconocimiento, validaciones y trazabilidad en una vista | Tester: HU-M07-01, HU-M07-02 |
+| Calendario de llegadas | Número de volquetes y toneladas por día del mes, con acceso a los ingresos del día | Tester: HU-M07-03 |
 
 ### Semana 7 — M08 Consolidación
 

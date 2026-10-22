@@ -114,13 +114,22 @@ que los ingresos y la consolidación mensual se clasifiquen de forma consistente
 
 Es un solo catálogo, usado tanto al registrar el ingreso como al consolidar la producción del mes.
 Sus valores concretos se definen con la empresa; lo que fija esta historia es el mecanismo, no la
-lista final. Cada tipo tiene código único, nombre y la unidad de medida, siempre toneladas.
+lista final. Cada tipo tiene código único, nombre único y la unidad de medida, siempre toneladas.
+
+Un tipo de mineral puede darse de alta desde este catálogo o desde la pantalla de registro de un
+ingreso, cuando el mineral que trajo el volquete aún no figura en la lista (HU-M03-01). Desde el
+registro solo lo hacen el Administrativo y el Administrador; el alta aplica las mismas reglas que la
+del catálogo, con una diferencia de forma: el código puede omitirse y el sistema lo genera a partir
+del nombre.
 
 **Detalles**
-- Código: obligatorio, único.
-- Nombre: obligatorio.
+- Código: obligatorio en el catálogo, de dos a seis letras o números, único; no se modifica después
+  del alta. Desde el registro es opcional: si se omite, el sistema genera uno que no se repite.
+- Nombre: obligatorio, único sin distinguir mayúsculas.
 - Unidad de medida: toneladas.
 - Baja: lógica; un tipo de mineral con ingresos asociados se desactiva, nunca se elimina.
+- Alta: desde el catálogo o desde el registro de un ingreso, por el Administrativo o el
+  Administrador.
 
 **Criterios de aceptación**
 
@@ -136,6 +145,22 @@ lista final. Cada tipo tiene código único, nombre y la unidad de medida, siemp
 
 > **CA04.** Dado que un tipo de mineral está desactivado, cuando se abre el formulario de registro
 > de un ingreso, entonces no aparece entre las opciones seleccionables.
+
+> **CA05.** Dado que ya existe un tipo de mineral con el mismo nombre, cuando el usuario intenta
+> guardar, entonces el sistema rechaza la operación mostrando "Ya existe un tipo de mineral con ese
+> nombre".
+
+> **CA06.** Dado que el código indicado no tiene de dos a seis letras o números, cuando el usuario
+> intenta guardar, entonces el sistema lo rechaza mostrando "El código debe tener de 2 a 6 letras o
+> números".
+
+> **CA07.** Dado que el Administrativo o el Administrador da de alta un tipo de mineral desde el
+> registro de un ingreso sin indicar el código, cuando guarda, entonces el sistema genera un código
+> que no se repite, registra el tipo de mineral en estado activo y lo deja elegido para el ingreso.
+
+> **CA08.** Dado que el usuario da de alta un tipo de mineral desde el registro sin indicar el
+> nombre, cuando intenta guardar, entonces el sistema rechaza la operación mostrando "Debe indicar el
+> nombre del tipo de mineral".
 
 ---
 
@@ -159,6 +184,7 @@ del que depende un vehículo con titularidad externa.
 **Detalles**
 - Razón social: obligatoria.
 - RUC: obligatorio, once dígitos, único.
+- Vehículos activos: el listado muestra cuántos vehículos activos tiene cada transportista.
 - Baja: lógica; un transportista con vehículos asociados se desactiva, nunca se elimina.
 
 **Criterios de aceptación**
@@ -172,3 +198,6 @@ del que depende un vehículo con titularidad externa.
 > **CA03.** Dado que un transportista tiene vehículos asociados, cuando el usuario intenta
 > eliminarlo, entonces el sistema lo desactiva y muestra "El transportista se desactivó porque tiene
 > vehículos asociados".
+
+> **CA04.** Dado que el RUC ya está registrado para otro transportista, cuando el usuario intenta
+> guardar, entonces el sistema rechaza la operación mostrando "El RUC ya está registrado".

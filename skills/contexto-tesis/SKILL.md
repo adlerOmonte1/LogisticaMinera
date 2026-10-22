@@ -83,8 +83,10 @@ se reconocen del ticket; la hora de C2 la indica el usuario sobre una propuesta 
 sistema.
 **Etapas del proceso y ruta (DR-16):** secado, zarandeo, molienda y ensacado. Cada lote o parte del
 lote sigue una **ruta decidida** —secado común; zarandeo, molienda o ambos; ensacado—, y el
-denominador de I6 son las etapas de esa ruta. Un lote se divide por **fracciones**, no por toneladas
-(DR-18). Un ingreso puede registrarse **sin foto**, con motivo, como excepción de RF01 (DR-13).
+denominador de I6 son las etapas de esa ruta; en un lote dividido, la unión de las etapas de las
+rutas de sus partes (DR-21). Un lote se divide por **fracciones**, no por toneladas (DR-18). Su ciclo
+es Abierto → En recorrido → Cerrado: «inicio del recorrido» y «cierre del lote» son acciones
+distintas (DR-19). Un ingreso puede registrarse **sin foto**, con motivo, como excepción de RF01 (DR-13).
 
 **Tareas de usabilidad (hoja C):** T01 registrar un ingreso a partir de la imagen del ticket ·
 T02 corregir un dato reconocido de forma incorrecta · T03 consultar un ingreso por placa y fecha ·
@@ -132,7 +134,7 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 | Rol | Código | Alcance |
 |---|---|---|
 | Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos, anulaciones y el cierre del lote con su destino |
-| Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación |
+| Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes (DR-23) |
 | Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta (DR-17) |
 
 ## Requerimientos funcionales
@@ -238,8 +240,9 @@ en el destare del primer viaje; hasta entonces el ingreso queda En proceso · DR
 propuesta y editable · DR-12 sin número de ticket: el código del ingreso lo identifica · DR-13
 registro sin foto con motivo · DR-14 cierre del lote con destino, venta o traslado · DR-15 bigbags y
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
-del Supervisor de planta · DR-18 división del lote por fracciones. Pendientes P-01 a P-04 en el
-mismo archivo.
+del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
+cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
+DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

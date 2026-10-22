@@ -36,8 +36,10 @@ el destare.
 
 Las reglas se ejecutan dos veces: sobre los valores que propone el reconocimiento, para señalar de
 inmediato lo que no cuadra, y de nuevo sobre los valores que el usuario confirma, porque entre una y
-otra el usuario pudo haber introducido un error nuevo. Se ejecutan siempre en el servidor: la
-interfaz solo muestra el resultado.
+otra el usuario pudo haber introducido un error nuevo. En el registro sin foto no hay valores
+propuestos: las reglas se aplican sobre lo que el usuario ingresa y otra vez al confirmar, igual que
+a un ingreso con foto. En una corrección, V1 no compara el ingreso consigo mismo. Se ejecutan
+siempre en el servidor: la interfaz solo muestra el resultado.
 
 Tres de las cinco reglas bloquean la confirmación. Las otras dos no bloquean, pero exigen una
 justificación escrita: la del posible duplicado, porque un mismo vehículo puede hacer dos viajes el
@@ -55,7 +57,7 @@ si la hubo, de modo que después pueda saberse qué se revisó y cómo se resolv
 | V2 | La tara del vehículo es mayor o igual que el peso bruto | "La tara no puede ser mayor o igual que el peso bruto" | Bloquea |
 | V3 | La placa no corresponde al patrón de placa peruana | "La placa no tiene un formato válido" | Bloquea |
 | V4 | El peso neto calculado supera la capacidad del vehículo | "El peso neto está fuera del rango de carga del vehículo {placa}" | Exige justificación |
-| V5 | La fecha del ticket es posterior al momento del registro | "La fecha del ticket no puede ser posterior a la fecha de registro" | Bloquea |
+| V5 | La fecha y hora del pesaje son posteriores al momento del registro | "La fecha del ticket no puede ser posterior a la fecha de registro" | Bloquea |
 
 - Criterio de V1: coincidencia exacta de placa, fecha del pesaje y peso bruto con un ingreso no
   anulado.
@@ -63,6 +65,7 @@ si la hubo, de modo que después pueda saberse qué se revisó y cómo se resolv
   registrar el destare.
 - Capacidad de V4: la declarada para el vehículo en el catálogo.
 - Justificación de V1 y V4: texto obligatorio para poder confirmar con la advertencia presente.
+- Fecha de V5: la fecha y hora del pesaje confirmadas, con la hora ajustada por el usuario.
 - Las reglas no se evalúan sobre campos vacíos: un campo sin dato lo reclama el registro, no el
   validador.
 
@@ -102,3 +105,10 @@ si la hubo, de modo que después pueda saberse qué se revisó y cómo se resolv
 
 > **CA11.** Dado que el vehículo todavía no tiene tara, cuando el sistema valida el registro,
 > entonces omite V2 y V4, y las evalúa al registrarse el destare.
+
+> **CA12.** Dado que el ingreso se registra sin foto, cuando el usuario confirma, entonces el sistema
+> aplica las cinco reglas sobre los datos ingresados y guarda su resultado igual que en un ingreso con
+> foto.
+
+> **CA13.** Dado que se corrige un ingreso ya registrado, cuando el sistema evalúa V1, entonces no lo
+> compara consigo mismo y solo advierte un duplicado frente a otro ingreso no anulado.

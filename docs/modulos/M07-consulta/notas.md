@@ -2,14 +2,14 @@
 
 ## Backend (Django)
 
-**App:** `apps/consulta/` — no existe todavía; se crea en la fase de preparación del backend.
+**App:** `apps/consulta/` — no existe todavía; se crea en la preparación del repositorio.
 
 ### Estructura
 
 ```
 apps/consulta/
-├── repositories/    buscar_por_placa_fecha, listar_con_filtros, obtener_detalle
-├── services/        composicion del detalle a partir de los repositorios de M03 a M06
+├── repositories/    buscar_por_placa_fecha, listar_con_filtros, obtener_detalle, calendario
+├── services/        composicion del detalle a partir de los repositorios de M03 a M06 y M09
 ├── serializers/  views/  permissions.py  filters.py  urls.py  tests/
 ```
 
@@ -45,7 +45,7 @@ Decisiones no obvias:
 
 ```python
 class ServicioConsulta:
-    def __init__(self, ingresos, reconocimientos, validaciones, trazabilidad):
+    def __init__(self, ingresos, reconocimientos, validaciones, trazabilidad, historial):
         ...
 
     def componer_detalle(self, id_ingreso):
@@ -55,11 +55,12 @@ class ServicioConsulta:
             reconocimiento=self.reconocimientos.obtener_por_ingreso(id_ingreso),
             validaciones=self.validaciones.listar_por_ingreso(id_ingreso),
             trazabilidad=self.trazabilidad.obtener_recorrido(ingreso),
+            historial=self.historial.del_ingreso(id_ingreso),
         )
 ```
 
-Los cuatro repositorios se inyectan: M07 no importa modelos de M04, M05 ni M06 directamente, solo
-sus interfaces de lectura. Cada uno puede devolver «sin datos» —un reconocimiento inexistente, un
+Los cinco repositorios se inyectan: M07 no importa modelos de M04, M05, M06 ni M09 directamente,
+solo sus interfaces de lectura. El historial lo compone M09 (HU-M09-02); M07 solo lo presenta. Cada uno puede devolver «sin datos» —un reconocimiento inexistente, un
 ingreso sin lote— y el servicio lo traduce en el bloque «ausente» que exige RN-M07-08, nunca en un
 bloque omitido.
 
@@ -89,6 +90,36 @@ que comprueba sesión y permiso antes de leer del almacén (RN-M07-06, RNF-M07-0
 responde, la vista captura el error y devuelve el indicador de «respaldo no disponible» en lugar de
 propagar una excepción (RNF-M07-09): el detalle debe seguir mostrándose sin la imagen.
 
+Un ingreso registrado sin foto (DR-13) no llega a consultar el almacén: la vista lee
+`sin_respaldo_fotografico` y devuelve el motivo. Son dos indicadores distintos y la interfaz los
+muestra distintos (RN-M07-04): «sin respaldo fotográfico» es un hecho del registro; «respaldo no
+disponible» es una falla momentánea del almacén.
+
+### El calendario en una consulta agregada
+
+```python
+def calendario(self, anio: int, mes: int):
+    return (
+        Ingreso.objects
+        .filter(fecha_hora_pesaje__year=anio, fecha_hora_pesaje__month=mes)
+        .exclude(estado=Ingreso.Estado.ANULADO)
+        .values(dia=TruncDate("fecha_hora_pesaje"))
+        .annotate(
+            ingresos=Count("id"),
+            toneladas=Sum("peso_neto_tn", filter=Q(estado=Ingreso.Estado.REGISTRADO)),
+            en_proceso=Count("id", filter=Q(estado=Ingreso.Estado.EN_PROCESO)),
+        )
+    )
+```
+
+Una sola consulta agregada por mes, agrupada por día (RNF-M07-10). La marca de anulados se obtiene
+con una segunda agregación que solo cuenta los anulados por día, porque la primera los excluye. La
+suma de toneladas usa el mismo criterio que el total del listado y que M08 (RN-M07-12): conviene que
+las tres consultas tomen el filtro de Registrados del mismo método del gestor de `Ingreso`.
+
+`TruncDate` debe aplicarse en la zona horaria de la planta. Si se trunca en UTC, un ingreso pesado a
+las 20:00 de un día aparece en el día siguiente (RN-M07-11).
+
 ## Frontend (Angular)
 
 **Feature:** `features/consulta/`
@@ -100,9 +131,13 @@ propagar una excepción (RNF-M07-09): el detalle debe seguir mostrándose sin la
 - Los estados anulado y En proceso se distinguen en la lista con una marca visible, sin depender de
   abrir el detalle (RNF-M07-08). El peso neto de un ingreso En proceso se muestra como «pendiente del
   destare», nunca como cero ni como celda vacía.
-- El detalle es un componente que compone cuatro bloques independientes (`ui/reconocimiento`,
-  `ui/validaciones`, `ui/trazabilidad`, `ui/datos-ticket`), cada uno capaz de mostrar su propio
-  estado «sin datos». Ninguno asume que los otros existen.
+- El detalle se organiza en pestañas —datos, ticket, reconocimiento, validación, trazabilidad e
+  historial—, cada una un componente independiente capaz de mostrar su propio estado «sin datos».
+  Ninguno asume que los otros existen.
+- El resultado de la búsqueda por placa y fecha muestra, junto al ticket, el lote y el recorrido del
+  ingreso (RS-M07-17).
+- El calendario muestra en cada día el número de ingresos y las toneladas como texto; el color solo
+  refuerza esa lectura, y las marcas de En proceso y anulados tienen leyenda (RNF-M07-11).
 
 ## Riesgo de implementación identificado
 
@@ -133,7 +168,8 @@ histórico completo sin límite.
 | M03 | Los ingresos y sus imágenes |
 | M04 | La comparación entre lo reconocido y lo confirmado |
 | M05 | El resultado de las validaciones |
-| M06 | El recorrido del proceso |
+| M06 | El lote y el recorrido del proceso |
+| M09 | El historial del ingreso |
 
 | Es requerido por | Para |
 |---|---|
@@ -145,3 +181,4 @@ histórico completo sin límite.
 |---|---|
 | Medio de almacenamiento de las imágenes (D-14) | Define cómo `ServicioConsulta` accede al respaldo y qué errores debe capturar |
 | Volumen esperado de ingresos en producción | Condiciona si la estrategia de paginación e índices de RNF-M07-01 y RNF-M07-03 es suficiente |
+| Exportación del listado de ingresos que muestra el mockup | No está en ninguna decisión ni RF; no se documenta hasta que se decida |

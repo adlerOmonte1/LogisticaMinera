@@ -34,14 +34,19 @@ uno.
 
 | Módulo | Administrador | Administrativo | Supervisor de planta |
 |---|:---:|:---:|:---:|
-| M02 Catálogo maestro | Sí | Sí | Consulta |
-| M03 Registro de ingresos | Sí | Sí | Sí |
-| M04 Reconocimiento | Sí | Sí | Sí |
-| M05 Validación | Sí | Sí | Sí |
-| M06 Trazabilidad | Sí | Sí | Registro de etapa |
+| M02 Catálogo maestro | Sí | Sí, salvo modificar una tara ya registrada | Consulta; alta del vehículo desde el registro y primera tara |
+| M03 Registro de ingresos | Sí | Sí, salvo anular | Registro con foto o sin ella, destare y consulta; no corrige ni anula |
+| M04 Reconocimiento | Sí | Sí | Solo dentro del registro |
+| M05 Validación | Sí | Sí | Solo dentro del registro, con justificación de V1 y V4 |
+| M06 Trazabilidad | Sí | Sí, salvo cerrar el lote con su destino | Paso por etapa, secado de un ingreso tardío, bigbags y consulta |
 | M07 Consulta | Sí | Sí | Sí |
 | M08 Consolidación | Sí | Sí | No |
-| M09 Auditoría | Sí | No | No |
+| M09 Auditoría | Sí | Historial de un ingreso | Historial de un ingreso |
+
+El alcance del Supervisor de planta sigue DR-17: registra en planta lo que ocurre en planta
+(ingresos, vehículos nuevos, destares y etapas) y consulta. El cierre del lote con su destino es
+exclusivo del Administrador (DR-14). Si esta tabla y la sección «Permisos» de un módulo difieren,
+prevalece la del módulo y la diferencia se reporta.
 
 ## Dependencias
 

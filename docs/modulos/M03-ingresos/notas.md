@@ -4,16 +4,15 @@
 
 **App:** `apps/ingresos/`
 
-> La app existe con el diseño anterior —peso neto calculado, marca de tiempo única y campos de
-> captura local— y se refactoriza, no se recrea. El cambio se aplica en la preparación del
-> repositorio heredado, antes de construir los módulos.
-
 ### Modelo
 
 ```python
 class Ingreso(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
-    imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/")
+    imagen_ticket = models.ImageField(upload_to="tickets/%Y/%m/", null=True, blank=True)
+    sin_respaldo_fotografico = models.BooleanField(default=False, editable=False)
+    motivo_sin_respaldo = models.CharField(max_length=60, choices=MOTIVOS_SIN_FOTO, blank=True,
+                                           editable=False)
     fecha_hora_pesaje = models.DateTimeField()
     hora_inicio_registro = models.DateTimeField(editable=False)
     hora_fin_registro = models.DateTimeField(editable=False)
@@ -22,7 +21,6 @@ class Ingreso(models.Model):
     peso_bruto_tn = models.DecimalField(max_digits=8, decimal_places=2)
     tara_tn = models.DecimalField(max_digits=8, decimal_places=2, null=True, editable=False)
     peso_neto_tn = models.DecimalField(max_digits=8, decimal_places=2, null=True, editable=False)
-    numero_ticket = models.CharField(max_length=20, blank=True)
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
     estado = models.CharField(max_length=10, choices=ESTADOS)  # EN_PROCESO, REGISTRADO, ANULADO
     motivo_anulacion = models.TextField(blank=True)
@@ -36,18 +34,25 @@ Decisiones no obvias:
   reescribiría el neto de todo el histórico cuando la Gerencia actualizara la tara de un vehículo.
 - **`tara_tn` y `peso_neto_tn` admiten nulo solo en `EN_PROCESO`.** Una restricción de base lo
   garantiza: si el estado es `REGISTRADO`, ambos son obligatorios.
-- **`fecha_hora_pesaje` combina dos orígenes**: la fecha que reconoce M04 y la hora que digita el
-  usuario. El serializer recibe ambas partes por separado y el servicio las compone; así la
-  comparación entre lo reconocido y lo confirmado se hace solo sobre la fecha, que es lo que el
-  ticket imprime.
+- **`fecha_hora_pesaje` combina dos orígenes**: la fecha que reconoce M04 y la hora que indica el
+  usuario sobre la propuesta del sistema (DR-11). El serializer recibe ambas partes por separado y
+  el servicio las compone; así la comparación entre lo reconocido y lo confirmado se hace solo sobre
+  la fecha, que es lo que el ticket imprime. La propuesta de hora la calcula el servidor con el
+  `Reloj` inyectado al abrir la revisión, no el navegador, para que todos los clientes propongan la
+  misma referencia.
+- **La imagen admite nulo solo si `sin_respaldo_fotografico` es verdadero** (DR-13). Una restricción
+  de base exige exactamente una de las dos cosas: imagen, o marca con motivo. Ambos campos son
+  `editable=False`: la marca no se retira por corrección, porque la imagen no es corregible.
+  `MOTIVOS_SIN_FOTO` es la lista cerrada de la HU; «Otro» forma parte de ella.
 - **Las dos marcas del servidor son `editable=False` y las asigna el servicio**, nunca
   `auto_now_add` (D-01). `auto_now_add` fijaría la hora de inserción, que no es la del inicio real de
   la operación.
 - **`on_delete=PROTECT` en las tres claves foráneas.** Nada que tenga ingresos asociados puede
   borrarse, ni siquiera desde el admin.
-- **Restricciones en la base, además del servicio:** unicidad de `numero_ticket` entre los ingresos
-  no anulados, y comprobaciones de que la tara aplicada sea menor que el bruto y de que los pesos sean
-  positivos. Son salvaguardas: la validación con mensaje para el usuario ocurre en M05.
+- **No hay número de ticket** (DR-12): el código del ingreso es su único identificador, y el pesaje
+  registrado dos veces lo advierte V1. No se crea la columna ni su índice de unicidad.
+- **Restricciones en la base, además del servicio:** que la tara aplicada sea menor que el bruto y
+  que los pesos sean positivos. Son salvaguardas: la validación con mensaje para el usuario ocurre en M05.
 - **Índices desde la primera migración:** `(vehiculo, fecha_hora_pesaje)`, `(fecha_hora_pesaje,
   tipo_mineral)` y `estado`. Añadirlos después cambiaría el comportamiento a mitad de operación.
 
@@ -74,10 +79,20 @@ con bloqueo sobre el contador, leer la tara vigente del vehículo, calcular el n
 persistir el ingreso —Registrado o En proceso— con la hora de fin, persistir los valores reconocidos
 y confirmados de cada campo, y registrar el evento de auditoría.
 
-`registrar_destare()` abre su propia transacción: pide a M02 que guarde la tara en el vehículo,
-recorre los ingresos En proceso de ese vehículo con `select_for_update()`, les asigna la tara y el
-neto, los pasa a Registrado y registra el evento. El bloqueo impide que dos usuarios destaren el
+`registrar_destare()` recibe el vehículo, no un ingreso: el usuario elige el vehículo entre los que
+tienen ingresos En proceso. Abre su propia transacción, pide a M02 que guarde la tara con la fecha y
+hora del destare que indicó el usuario, recorre los ingresos En proceso de ese vehículo con
+`select_for_update()`, les asigna la tara y el neto, los pasa a Registrado y registra el evento. El bloqueo impide que dos usuarios destaren el
 mismo vehículo a la vez con taras distintas.
+
+`registrar_ingreso()` atiende también el registro sin foto: recibe el motivo en lugar de la imagen,
+no persiste valores reconocidos —no los hay— y aplica la misma validación. No existe un servicio
+aparte para ese caso; separarlo duplicaría las reglas del registro y tarde o temprano divergirían.
+
+`corregir_ingreso()` vuelve a leer la tara del vehículo corregido: si no la tiene, deja el ingreso En
+proceso (RN-M03-26). Antes de cambiar el tipo de mineral consulta el lote del ingreso a través del
+repositorio de M06 (RN-M03-25). `anular_ingreso()` pide al servicio de M06 que retire el ingreso de
+su lote cuando este todavía reúne ingresos (RN-M03-27).
 
 Fuera de la transacción quedan el reconocimiento y la primera validación, porque ocurren antes de
 que el usuario confirme y no escriben nada del ingreso.
@@ -101,6 +116,12 @@ aceptable y se limpia con una tarea periódica; un ingreso sin imagen, no.
   ticket (RNF-M03-04).
 - **Formulario reactivo con los campos precargados** desde la propuesta, cada uno con su indicador
   de confianza. Los campos por debajo del umbral se resaltan (RNF-M03-08).
+- **La hora del pesaje se presenta como propuesta**, con un estilo distinto del de los datos
+  reconocidos y un control de hora para ajustarla (RNF-M03-14).
+- **El registro sin foto es una opción de la pantalla de captura** (RNF-M03-17); abre el mismo
+  formulario de revisión, sin visor de imagen y con el motivo como primer campo.
+- **El alta del tipo de mineral solo se ofrece al Administrativo y al Administrador**; al Supervisor
+  de planta se le muestra el aviso de la HU. La restricción vale igual en el servidor.
 - **Los campos derivados y asignados por el servidor se muestran `readonly`, nunca `disabled`:** un
   control deshabilitado no viaja en el payload y el valor se perdería.
 - **Borrador en almacenamiento local del navegador**, guardado con cada cambio y descartado al
@@ -155,5 +176,5 @@ En proceso del mismo vehículo (HU-M03-04 CA07).
 |---|---|
 | Medio de almacenamiento y retención de las imágenes (D-14) | Define `upload_to`, el respaldo y el acceso restringido de RNF-M03-11 |
 | Motor de reconocimiento (D-12) | No bloquea: el servicio depende de la interfaz. Sí condiciona RNF-M03-02 |
-| Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede completarse el campo obligatorio de tipo de mineral |
-| Quién registra el destare en planta (DR-10) | Define si el Supervisor de planta mantiene el permiso de registrar destares o se reserva al Administrativo |
+| Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede completarse el campo obligatorio de tipo de mineral; el alta desde el registro reduce el bloqueo |
+| Tratamiento del ingreso sin foto en la ficha de observación (P-03) | No cambia el sistema; condiciona cómo se usa el ingreso en la medición |

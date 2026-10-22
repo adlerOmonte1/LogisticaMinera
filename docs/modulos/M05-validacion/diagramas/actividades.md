@@ -55,8 +55,11 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    I([Imagen del ticket procesada]) --> V1[Validar los datos propuestos por el reconocimiento]
+    I([Inicio del registro]) --> D0{Hay imagen del ticket?}
+    D0 -->|Si| V1[Validar los datos propuestos por el reconocimiento]
     V1 --> M1[Mostrar inconsistencias junto a los campos]
+    D0 -->|No por registro sin foto| L0[Usuario ingresa los datos y el motivo]
+    L0 --> M1
     M1 --> L1[Usuario revisa corrige y elige el tipo de mineral]
     L1 --> A1[Usuario confirma]
     A1 --> V2[Validar los datos confirmados en el servidor]
@@ -67,5 +70,7 @@ flowchart TD
     P1 --> F([Queda registro de lo evaluado antes y despues de corregir])
 ```
 
-La segunda evaluación no es redundante: entre una y otra el usuario editó los datos, y esa edición
+En el registro sin foto no hay propuesta que evaluar: las inconsistencias se muestran a medida que el
+usuario ingresa los datos y la evaluación que se persiste es la de la confirmación. La segunda
+evaluación no es redundante: entre una y otra el usuario editó los datos, y esa edición
 puede haber introducido una incoherencia que la primera no podía conocer.

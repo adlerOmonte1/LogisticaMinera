@@ -56,15 +56,23 @@ código para otro registro.
 | `idx_ingreso_fecha_mineral` | INGRESO(fecha_hora_pesaje, id_tipo_mineral) | Total acumulado mensual de M08 |
 | `idx_ingreso_estado` | INGRESO(estado) | Excluir anulados de todo total, casi siempre combinada con otra condición |
 | `idx_paso_lote` | PASO_ETAPA(id_lote) | Etapas recorridas por un lote, de M06 |
+| `idx_ingreso_lote` | INGRESO(id_lote) | Composición de un lote y recorrido de un ingreso, de M06 |
+| `idx_parte_lote` | PARTE_LOTE(id_lote) | Partes de un lote dividido, de M06 |
 | `idx_evento_entidad` | EVENTO_AUDITORIA(entidad, id_entidad) | Historial de un registro concreto, de M09 |
 
 **Se crean en la primera migración, no se añaden al final.** Un índice agregado a mitad de la
 ventana de observación controlada cambia las condiciones de trabajo a mitad de la medición.
 
 Restricciones de unicidad que exigen las historias: `username`, `placa`, `codigo` de tipo de
-mineral, `ruc`, `codigo` del ingreso, y `numero_ticket` **entre los ingresos no anulados** —
-unicidad parcial, para que un ticket mal transcrito pueda reutilizarse tras anular el registro
-erróneo. También `(id_lote, id_etapa)` en `PASO_ETAPA`: una etapa se registra una sola vez por lote.
+mineral, `nombre` de tipo de mineral sin distinguir mayúsculas, `ruc`, `codigo` del ingreso y
+`nombre` del lote. No hay número de ticket (DR-12): el código del ingreso es su identificador. En
+`PASO_ETAPA`, tres restricciones de unicidad **condicionales** —para el lote, para cada parte y para
+el secado propio de un ingreso tardío—: una etapa se registra una sola vez en cada caso.
+
+Restricciones de comprobación: el ingreso tiene imagen **o** la marca de sin respaldo fotográfico con
+motivo (DR-13); la tara y el neto solo admiten nulo en `EN_PROCESO`; las fracciones de
+`PARTE_LOTE` y `REPARTO_INGRESO` se guardan como numerador y denominador enteros, nunca como decimal
+(DR-18).
 
 ## Consultas
 
@@ -81,8 +89,10 @@ agrupando por `tipo_mineral` y excluyendo `estado='ANULADO'` **antes** de agrega
 tipo de mineral sin ingresos en el periodo se omite del resultado, no aparece con total en cero.
 
 **Trazabilidad de un ingreso** (M06): parte de `INGRESO.id_lote`, no de una tabla intermedia —un
-ingreso pertenece a un lote como máximo. Si el ingreso no tiene lote, el resultado son las cuatro
-etapas marcadas como no recorridas, no un error.
+ingreso pertenece a un lote como máximo. El denominador son las etapas de la ruta del lote o, si se
+dividió, la unión de las rutas de sus partes (DR-21). Si el ingreso no tiene lote, el resultado es
+ninguna etapa recorrida, no un error. Las fracciones de las partes se guardan como numerador y
+denominador enteros, nunca como decimal, para que su suma sea exacta.
 
 **Comparación de reconocimiento** (M04): `CAMPO_RECONOCIDO` filtrado por `id_reconocimiento`, con
 sus tres filas —placa, fecha y peso bruto— siempre presentes aunque alguna tenga
@@ -115,7 +125,8 @@ explícitamente.
 - [ ] `valor_reconocido` y `valor_confirmado` son columnas separadas en `CAMPO_RECONOCIDO`.
 - [ ] Ningún `ON DELETE CASCADE` hacia registros históricos, salvo la excepción documentada del
       reconocimiento sobre su ingreso.
-- [ ] Los seis índices de la tabla están en la primera migración de su módulo.
-- [ ] La unicidad de `numero_ticket` es parcial (solo no anulados).
+- [ ] Los índices de la tabla están en la primera migración de su módulo.
+- [ ] No existe columna `numero_ticket` (DR-12).
+- [ ] Un ingreso sin imagen solo existe con `sin_respaldo_fotografico` y motivo (DR-13).
 - [ ] El total mensual de M08 coincide entre la consulta y la exportación para el mismo periodo.
 - [ ] La estrategia del código único está implementada con bloqueo o secuencia, y documentada.

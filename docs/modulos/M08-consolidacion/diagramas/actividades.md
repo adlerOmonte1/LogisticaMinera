@@ -7,9 +7,10 @@ flowchart TD
     I([Usuario solicita el total de un mes]) --> V1{Periodo posterior al mes en curso?}
     V1 -->|Si| E1[Rechazar: No se puede consolidar un periodo futuro]
     E1 --> I
-    V1 -->|No| C1[Agregar peso neto y conteo por tipo de mineral]
-    C1 --> C2[Considerar solo los ingresos registrados]
-    C2 --> C4[Contar aparte los ingresos en proceso del periodo]
+    V1 -->|No| C0[Tomar los ingresos por mes de la fecha del pesaje]
+    C0 --> C1[Agregar peso neto y conteo por tipo de mineral]
+    C1 --> C2[Considerar solo los ingresos registrados con o sin foto]
+    C2 --> C4[Contar aparte los ingresos en proceso y los anulados del periodo]
     C4 --> D1{Algun tipo de mineral con ingresos?}
     D1 -->|No| M1[Informar: No hay ingresos registrados para el periodo indicado]
     M1 --> F1([Sin resultado para el periodo])

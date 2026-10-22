@@ -10,7 +10,7 @@
 | RN-M05-02 | Un ingreso no se confirma con una regla bloqueante incumplida | Se registrarían toneladas que el ticket no respalda |
 | RN-M05-03 | V1 y V4 no bloquean, pero exigen justificación escrita para confirmar | Un posible duplicado o una sobrecarga quedarían registrados sin explicación, indistinguibles de un error |
 | RN-M05-04 | Las cinco reglas se evalúan siempre; ninguna se omite porque otra ya haya fallado | El usuario corregiría un error por intento, y un trabajo de segundos se convertiría en varios ciclos |
-| RN-M05-05 | Las reglas se aplican sobre los datos propuestos, de nuevo sobre los confirmados y, en el primer viaje, al registrar el destare | Un error introducido al corregir, o una tara incoherente con el peso bruto, entraría sin comprobarse |
+| RN-M05-05 | Las reglas se aplican sobre los datos propuestos, de nuevo sobre los confirmados y, en el primer viaje, al registrar el destare. El registro sin foto no tiene datos propuestos, pero sí la evaluación al confirmar | Un error introducido al corregir, o una tara incoherente con el peso bruto, entraría sin comprobarse |
 | RN-M05-06 | El resultado de cada regla aplicada se persiste junto al ingreso, con su momento y su resolución | No se podría reconstruir qué se revisó, ni quién justificó una advertencia ni con qué explicación |
 | RN-M05-07 | Una regla cuyos datos necesarios faltan no se evalúa ni se reporta como incumplida | Un campo vacío produciría dos mensajes contradictorios: uno que pide el dato y otro que lo declara incoherente |
 | RN-M05-08 | El mensaje de cada regla es literal y no se reformula en la interfaz | Las pruebas que comprueban el texto exacto dejarían de valer y el usuario vería mensajes distintos según la pantalla |
@@ -18,6 +18,7 @@
 | RN-M05-10 | V2 y V4 toman la tara y la capacidad del vehículo del catálogo, nunca un valor fijo en el código | Un vehículo se evaluaría contra una tara o un límite que no le corresponden |
 | RN-M05-11 | Añadir una regla nueva no modifica las existentes ni el servicio que las compone | Cada regla añadida arriesgaría romper las anteriores, y el conjunto se volvería frágil |
 | RN-M05-12 | V1 compara contra ingresos no anulados, por coincidencia exacta de placa, fecha del pesaje y peso bruto | Un ingreso anulado bloquearía el registro correcto que lo reemplaza, o una coincidencia parcial generaría advertencias falsas |
+| RN-M05-13 | En una corrección, V1 busca duplicados entre los demás ingresos no anulados, nunca en el propio ingreso | Todo ingreso corregido se señalaría como duplicado de sí mismo y la advertencia perdería sentido |
 
 ## Nota sobre RN-M05-03
 
