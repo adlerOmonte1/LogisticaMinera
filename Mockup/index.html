@@ -449,6 +449,7 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:34px;backgrou
   #toast-root{top:calc(66px + env(safe-area-inset-top,0px))}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}.viewer .scan{display:none}}
+.tbl tr.grp td{background:var(--surface-2);border-top:1px solid var(--sep)}
 </style>
 </head>
 <body>
@@ -526,6 +527,7 @@ const ic=(k,s=18)=>'<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24
 
 /* ================= Datos iniciales ================= */
 const ETAPAS=['Secado','Zarandeo','Molienda','Ensacado'];
+const DEST={venta:'Venta',traslado:'Traslado a otro punto'},DEST_TXT={venta:'El mineral se entrega al comprador',traslado:'Por ejemplo, por ley baja, a otra planta o cancha'};
 function seed(){
   const d=(dd,mm,h,mi,s)=>new Date(2027,mm-1,dd,h,mi,s||0).toISOString();
   const add=(iso,sec)=>new Date(new Date(iso).getTime()+sec*1000).toISOString();
@@ -558,6 +560,7 @@ function seed(){
   const i144=I(144,10,3,14,49,'A7M-309','MOB',26.4,'jcondor');
   I(145,10,3,14,51,'A7M-309','MOB',26.4,'jcondor');
   const i146=I(146,11,3,10,18,'B5A-812','MOB',29.8,'jcondor',{corr:true});
+  i146.hist=[{t:d(11,3,15,2),u:'mvasquez',mot:'el peso bruto se leyó mal; se verificó con la imagen del ticket',prev:{placa:'B5A-812',fecha:i146.fecha,bruto:29.3,min:'MOB',tara:12.6,neto:16.7,estado:'reg',val:Object.assign({},i146.val),just:{}}}];
   I(147,11,3,16,5,'V2K-841','MOA',27.65,'jcondor');
   const i148=I(148,12,3,7,42,'C9K-741','MOA',28.4,'rpalomino',{ini:d(12,3,7,46,3),fin:d(12,3,7,49,12)});
   i148.ocr={placa:['C9K-741',0.96],fecha:[i148.fecha,0.97],bruto:[28.1,0.71]};i148.val.V4='warn';i148.just={V4:'Carga con humedad por lluvia en la mina; se verificó el volquete en cancha antes de confirmar.'};
@@ -567,7 +570,7 @@ function seed(){
   const g=c=>ingresos.find(i=>i.cod===c);
   const C=n=>'ING-2027-00'+n;
   const lotes=[
-    {cod:'LOT-2027-016',nombre:'Lote Pingüino Febrero',min:'MOA',ap:d(16,2,8,0),ci:d(27,2,17,30),estado:'cerrado',alta:{f:d(5,3,10,0),u:'rpalomino',obs:'Despachado al comprador en 86 bigbags'},ing:[C(131),C(133),C(135),C(137),C(139)],tarde:[],comp:[],
+    {cod:'LOT-2027-016',nombre:'Lote Pingüino Febrero',min:'MOA',ap:d(16,2,8,0),ci:d(27,2,17,30),estado:'cerrado',alta:{f:d(5,3,10,0),u:'rpalomino',dest:'venta',obs:'Despachado al comprador en 86 bigbags'},ing:[C(131),C(133),C(135),C(137),C(139)],tarde:[],comp:[],
       comunes:[{e:'Secado',f:d(28,2,9,10),u:'jcondor'}],
       lineas:[{id:'A',nombre:'Lote Pingüino Febrero',ruta:'completo',ton:null,etapas:[{e:'Zarandeo',f:d(1,3,10,0),u:'jcondor'},{e:'Molienda',f:d(2,3,11,20),u:'jcondor',horas:9},{e:'Ensacado',f:d(3,3,15,40),u:'jcondor'}]}],
       bb:[{lin:'A',etapa:'Ensacado',cant:86,peso:1,rec:true,ref:87.75,pref:'PF',ini:1,f:d(3,3,15,40),u:'jcondor'}]},
@@ -577,9 +580,9 @@ function seed(){
       bb:[{lin:'A',etapa:'Ensacado',cant:80,peso:1,rec:true,ref:81.65,pref:'OBF',ini:1,f:d(3,3,16,0),u:'jcondor'}]},
     {cod:'LOT-2027-018',nombre:'Lote Pique Pingüino',min:'MOA',ap:d(9,3,8,45),ci:d(12,3,8,10),estado:'cerrado',ing:[C(141),C(143),C(147),C(148),C(150)],tarde:[C(150)],comp:[{id:'K1',ing:C(150),etapas:[],partes:[]}],
       comunes:[{e:'Secado',f:d(12,3,9,10),u:'jcondor',obs:'Cancha 2, secado al sol'}],
-      lineas:[{id:'A',nombre:'Lote Pique Pingüino Molido',ruta:'molido',ton:40,etapas:[]},{id:'B',nombre:'Lote Pique Pingüino Zaranda',ruta:'zaranda',ton:24.25,etapas:[{e:'Zarandeo',f:d(12,3,9,55),u:'jcondor'},{e:'Ensacado',f:d(12,3,10,20),u:'jcondor',obs:'Ensacado sin moler'}]}],
-      bb:[{lin:'B',etapa:'Ensacado',cant:24,peso:1,rec:true,ref:24.25,pref:'PPZ',ini:1,f:d(12,3,10,20),u:'jcondor'}]},
-    {cod:'LOT-2027-019',nombre:'Lote Cancha 2 Óxido B',min:'MOB',ap:d(11,3,17,0),ci:null,estado:'abierto',ing:[C(142),C(145)],tarde:[],comunes:[],lineas:[{id:'A',nombre:'Lote Cancha 2 Óxido B',ruta:null,ton:null,etapas:[]}],bb:[],comp:[]}];
+      lineas:[{id:'A',nombre:'Lote Pique Pingüino Molido',ruta:'molido',frac:'5/8',ton:40.16,etapas:[]},{id:'B',nombre:'Lote Pique Pingüino Zaranda',ruta:'zaranda',frac:'3/8',ton:24.09,etapas:[{e:'Zarandeo',f:d(12,3,9,55),u:'jcondor'},{e:'Ensacado',f:d(12,3,10,20),u:'jcondor',obs:'Ensacado sin moler'}]}],
+      bb:[{lin:'B',etapa:'Ensacado',cant:24,peso:1,rec:true,ref:24.09,pref:'PPZ',ini:1,f:d(12,3,10,20),u:'jcondor'}]},
+    {cod:'LOT-2027-019',nombre:'Lote Cancha 2 Óxido B',min:'MOB',mins:['MOB','MOA'],ap:d(11,3,17,0),ci:null,estado:'abierto',ing:[C(142),C(145)],tarde:[],comunes:[],lineas:[{id:'A',nombre:'Lote Cancha 2 Óxido B',ruta:null,ton:null,etapas:[]}],bb:[],comp:[]}];
   lotes.forEach(l=>l.ing.forEach(c=>{g(c).lote=l.cod;}));
   // Auditoría
   const audit=[];let ev=0;
@@ -593,13 +596,14 @@ function seed(){
   L(i144.anul.t,'rpalomino','Ingreso anulado','Ingreso','ING-2027-00144','Motivo: '+i144.anul.motivo,{estado:'Registrado'},{estado:'Anulado'});
   lotes.forEach(l=>{L(l.ap,'mvasquez','Lote abierto','Lote',l.cod,l.nombre+', '+minName0(minerales,l.min));
     L(add(l.ap,600),'mvasquez','Ingresos asignados','Lote',l.cod,l.ing.filter(c=>!l.tarde.includes(c)).join(', '));
-    if(l.tarde.length)L(d(12,3,10,12),'mvasquez','Ingresos agregados después del cierre','Lote',l.cod,l.tarde.join(', ')+', con secado propio');
-    if(l.ci)L(l.ci,'mvasquez','Lote cerrado','Lote',l.cod,l.ing.length+' ingresos');
+    if(l.tarde.length)L(d(12,3,10,12),'mvasquez','Ingresos tardíos agregados','Lote',l.cod,l.tarde.join(', ')+', con secado propio');
+    if(l.ci)L(l.ci,'mvasquez','Recorrido iniciado','Lote',l.cod,l.ing.length+' ingresos');
     l.comunes.forEach(e=>L(e.f,e.u,'Etapa registrada','Lote',l.cod,e.e+' de '+l.nombre));
-    if(l.lineas.length>1)L(add(l.comunes[0].f,240),'rpalomino','Lote dividido','Lote',l.cod,l.lineas.map(x=>x.nombre+' ('+num(x.ton)+' t)').join(' y '));
+    if(l.lineas.length>1)L(add(l.comunes[0].f,240),'rpalomino','Lote dividido','Lote',l.cod,l.lineas.map(x=>x.nombre+' ('+(x.frac||'')+', ≈ '+num(x.ton)+' t)').join(' y '));
+    if((l.mins||[]).length>1)L(add(l.ap,300),'mvasquez','Mineral agregado al lote','Lote',l.cod,l.mins.slice(1).map(m=>minName0(minerales,m)).join(', '));
     l.lineas.forEach(x=>x.etapas.forEach(e=>L(e.f,e.u,'Etapa registrada','Lote',l.cod,e.e+' de '+x.nombre)));
     l.bb.forEach(b=>L(add(b.f,30),b.u,'Bigbags asociados','Lote',l.cod,b.cant+' bigbags ('+bbRange(b)+')'));
-    if(l.alta)L(l.alta.f,l.alta.u,'Lote dado de alta','Lote',l.cod,l.nombre+(l.alta.obs?'. '+l.alta.obs:''));});
+    if(l.alta)L(l.alta.f,l.alta.u,'Lote cerrado con destino','Lote',l.cod,l.nombre+', destino: '+DEST[l.alta.dest]+(l.alta.obs?'. '+l.alta.obs:''));});
   L(d(12,3,8,50),'mvasquez','Vehículo registrado','Vehículo','E4R-208','Alta sin tara: se registrará en el destare',null,{placa:'E4R-208',titularidad:'Propio',capacidad:17.5});
   L(d(3,3,16,20),'mvasquez','Consolidación exportada','Consolidación','2027-02','Febrero de 2027, formato XLSX');
   L(d(12,3,7,44),'mvasquez','Inicio de sesión','Usuario','mvasquez','');
@@ -607,14 +611,14 @@ function seed(){
   L(d(12,3,9,38),'jcondor','Inicio de sesión','Usuario','jcondor','');
   L(d(12,3,9,52),'jcondor','Acceso rechazado','Usuario','jcondor','Intentó abrir Administración sin autorización');
   audit.sort((a,b)=>b.t.localeCompare(a.t));
-  return {v:5,users,transportistas,minerales,vehiculos,ingresos,lotes,audit,seq:{ing:150,lot:19,ev,tk:4819},session:null,lastNow:null};
+  return {v:6,users,transportistas,minerales,vehiculos,ingresos,lotes,audit,seq:{ing:150,lot:19,ev,tk:4819},session:null,lastNow:null};
 }
 function minName0(ms,c){const m=ms.find(x=>x.cod===c);return m?m.nombre:c;}
 
 /* ================= Estado y persistencia ================= */
-const KEY='consmin-sistema-demo-v5', TKEY='consmin-tema';
+const KEY='consmin-sistema-demo-v6', TKEY='consmin-tema';
 let S=null;const IMG={};
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x&&x.v===5)S=x;}}catch(e){}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x&&x.v===6)S=x;}}catch(e){}
   if(!S)S=seed();clockBase=Math.max(DEFAULT_NOW,S.lastNow?new Date(S.lastNow).getTime():0);T0=Date.now();}
 function save(){S.lastNow=now().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function applyTheme(){let t='auto';try{t=localStorage.getItem(TKEY)||'auto';}catch(e){}if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);return t;}
@@ -628,6 +632,19 @@ const minName=c=>minName0(S.minerales,c);
 const transp=id=>S.transportistas.find(t=>t.id===id);
 const ing=c=>S.ingresos.find(i=>i.cod===c);
 const lote=c=>S.lotes.find(l=>l.cod===c);
+// DR-27: lista de tipos de mineral del lote (el de apertura y los agregados)
+const lMins=l=>l.mins&&l.mins.length?l.mins:[l.min];
+const lMinTxt=l=>lMins(l).map(minName).join(', ');
+// DR-18 y DR-20: fracciones exactas como [numerador, denominador]
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+function frac(t){t=String(t||'').trim().replace(',','.');let m;
+  if((m=/^(\d+)\s*\/\s*(\d+)$/.exec(t))){const n=+m[1],d=+m[2];if(!d)return null;const g=gcd(n,d)||1;return [n/g,d/g];}
+  if((m=/^(\d+(?:\.\d+)?)\s*%$/.exec(t))){const k=(m[1].split('.')[1]||'').length,d=100*Math.pow(10,k),n=Math.round(+m[1]*Math.pow(10,k));const g=gcd(n,d);return [n/g,d/g];}
+  if((m=/^(\d+(?:\.\d+)?)$/.exec(t))){const k=(m[1].split('.')[1]||'').length,d=Math.pow(10,k),n=Math.round(+m[1]*d);const g=gcd(n,d)||1;return [n/g,d/g];}
+  return null;}
+const fsum=fs=>fs.reduce((a,b)=>{const n=a[0]*b[1]+b[0]*a[1],d=a[1]*b[1],g=gcd(n,d)||1;return [n/g,d/g];},[0,1]);
+const ftxt=x=>x[1]===1?String(x[0]):x[0]+'/'+x[1];
+const fval=x=>x[0]/x[1];
 const avClass=u=>{const x=userBy(u);return 'avatar'+(x&&x.g>1?' g'+x.g:'');};
 function log(acc,ent,ref,det,antes,despues){S.seq.ev++;const u=me();S.audit.unshift({id:'EV-'+String(S.seq.ev).padStart(4,'0'),t:now().toISOString(),u:u?u.u:'sistema',acc,ent,ref,det:det||'',antes:antes||null,despues:despues||null});}
 
@@ -637,7 +654,7 @@ const PERM={'Administrador':'*',
   'Supervisor de planta':['inicio','ingresos','registrar','destare','vehiculo.alta','lotes','lotes.etapa','consulta']};
 const canRole=(rol,p)=>{const x=PERM[rol];return x==='*'||(x&&x.includes(p));};
 const can=p=>{const u=me();return !!u&&canRole(u.rol,p);};
-const FUNCS=[['registrar','Registrar un ingreso, con foto del ticket o sin ella'],['vehiculo.alta','Registrar un vehículo nuevo desde el registro de ingreso'],['destare','Registrar el destare de un vehículo'],['ingresos','Ver la lista y el detalle de ingresos'],['consulta','Consultar un ingreso por placa y fecha'],['corregir','Corregir un ingreso registrado'],['anular','Anular un ingreso'],['lotes.gestion','Abrir, asignar y cerrar lotes de proceso'],['lotes.etapa','Registrar el paso de un lote por una etapa'],['consolidacion','Consolidar la producción mensual'],['exportar','Exportar el total mensual'],['catalogos','Gestionar vehículos, minerales y transportistas'],['tara','Modificar la tara de un vehículo'],['alta','Dar de alta un lote para la venta'],['admin','Gestionar usuarios y consultar la auditoría']];
+const FUNCS=[['registrar','Registrar un ingreso, con foto del ticket o sin ella'],['vehiculo.alta','Registrar un vehículo nuevo desde el registro de ingreso'],['destare','Registrar el destare de un vehículo'],['ingresos','Ver la lista y el detalle de ingresos'],['consulta','Consultar un ingreso por placa y fecha'],['corregir','Corregir un ingreso registrado'],['anular','Anular un ingreso'],['lotes.gestion','Abrir lotes, agregar minerales, asignar ingresos, iniciar el recorrido y dividir'],['lotes.etapa','Registrar el paso de un lote por una etapa'],['consolidacion','Consolidar la producción mensual'],['exportar','Exportar el total mensual'],['catalogos','Gestionar vehículos, minerales y transportistas'],['tara','Modificar la tara de un vehículo'],['alta','Cerrar un lote con su destino: venta o traslado'],['admin','Gestionar usuarios y consultar la auditoría']];
 
 /* ================= Reglas de consistencia V1–V5 (HU-M05-01) ================= */
 const RULES=[['V1','Ticket no duplicado'],['V2','Tara menor que el peso bruto'],['V3','Formato de placa válido'],['V4','Peso neto dentro de la capacidad'],['V5','Fecha no posterior al registro']];
@@ -692,7 +709,7 @@ function compPartsFor(l,x,only){const r=[];(l.comp||[]).forEach(k=>(k.partes||[]
 const lineaTon=(l,x)=>+((x.ton==null?baseTon(l):x.ton)+compPartsFor(l,x,true).reduce((s,o)=>s+o.p.ton,0)).toFixed(2);
 const lineKeys=(l,x)=>[x.id].concat(compPartsFor(l,x,true).filter(o=>!o.p.unido).map(o=>o.k.id+'-'+o.p.lin));
 const loteCompleto=l=>l.estado==='cerrado'&&l.lineas.every(x=>lineDone(l,x))&&(l.comp||[]).every(compDone);
-function loteEstado(l){if(l.alta)return['Dado de alta','gray'];if(l.estado==='abierto')return['Abierto','blue'];if(loteCompleto(l))return['Listo para alta','green'];return['En recorrido','purple'];}
+function loteEstado(l){if(l.alta)return['Cerrado','gray'];if(l.estado==='abierto')return['Abierto','blue'];if(loteCompleto(l))return['Listo para cerrar','green'];return['En recorrido','purple'];}
 const loteTon=l=>+l.ing.reduce((a,c)=>{const i=ing(c);return a+(i&&i.estado==='reg'&&i.neto||0);},0).toFixed(2);
 const loteBB=l=>l.bb.reduce((a,b)=>a+b.cant,0);
 function loteAvance(l){let tot=1,done=Math.min(l.comunes.length,1);l.lineas.forEach(x=>{tot+=x.ruta?RUTAS[x.ruta].length:2;done+=x.etapas.length;});
@@ -708,7 +725,7 @@ const bbSum=(l,lin)=>bbSumKeys(l,[lin]);
 function ensSummary(l,keys,ton){const n=bbCntKeys(l,keys);if(!n)return '<span class="small muted">Sin bigbags registrados</span>';const tot=bbSumKeys(l,keys),d=+(tot-ton).toFixed(2);
   return '<span class="small row" style="gap:6px">'+ic('box',15)+'<span><b>'+n+' bigbags</b>, ≈ '+tn(tot)+' ensacadas · '+(Math.abs(d)<0.005?'<span class="tone-green">igual a lo registrado</span>':(d<0?'<span class="muted">'+num(d)+' t frente a '+tn(ton)+' registradas (merma)</span>':'<span style="color:var(--orange);font-weight:600">+'+num(d)+' t: supera lo registrado</span>'))+'</span></span>';}
 function stCard(name,rec,state,action,extra){const cls=rec?'ok':(state==='next'?'next':'');
-  const body=rec?pill('Completada','green')+'<p class="small muted">'+fDT(rec.f)+', '+userName(rec.u)+'</p>'+(extra||'')+(rec.obs?'<p class="xs faint">'+esc(rec.obs)+'</p>':''):(state==='next'?pill('Siguiente etapa','blue'):(state==='wait'?pill('Espera el cierre del lote','gray'):pill('Pendiente','gray')));
+  const body=rec?pill('Completada','green')+'<p class="small muted">'+fDT(rec.f)+', '+userName(rec.u)+'</p>'+(extra||'')+(rec.obs?'<p class="xs faint">'+esc(rec.obs)+'</p>':''):(state==='next'?pill('Siguiente etapa','blue'):(state==='wait'?pill('Espera el inicio del recorrido','gray'):pill('Pendiente','gray')));
   return '<div class="stage '+cls+'"><div class="row"><span class="s-n">'+(rec?ic('check',16):ic(name==='Ensacado'?'box':'clock',15))+'</span><h3>'+name+'</h3></div>'+body+(action||'')+'</div>';}
 const stCls=n=>['','one','two','three','four'][n]||'two';
 function trazView(l,edit){edit=edit&&!l.alta;const g=edit&&can('lotes.etapa');
@@ -716,14 +733,14 @@ function trazView(l,edit){edit=edit&&!l.alta;const g=edit&&can('lotes.etapa');
   let h='<div class="flow"><div><div class="flow-h"><h3>Etapa común</h3><span class="xs faint">Todo el lote se seca junto</span></div><div class="stages one">'+
     stCard('Secado',rec0,st0,!rec0&&st0==='next'&&g?B('Registrar secado','primary sm','lote-paso','data-c="'+l.cod+'" data-l=""'):'')+'</div></div>';
   const n=l.lineas.length,div=n>1;
-  h+='<div class="flow-split">'+(div?pill('Dividido en '+n+' lotes','purple'):'<span class="xs faint">Después del secado</span>')+'</div><div class="lines'+(n===2?' two':(n>2?' multi':''))+'">'+
+  h+='<div class="flow-split">'+(div?pill('Dividido en '+n+' partes','purple'):'<span class="xs faint">Después del secado</span>')+'</div><div class="lines'+(n===2?' two':(n>2?' multi':''))+'">'+
     l.lineas.map(x=>{const nx=nextStep(l,x);const ton=lineaTon(l,x);let cards;
       if(!x.ruta)cards='<div class="stages one"><div class="stage'+(nx==='elegir'?' next':'')+'"><h3>Ruta por definir</h3><p class="small muted">'+(nx==='elegir'?'Elija si este mineral se zarandea, se muele directo o pasa por ambos antes del ensacado.':'Se decide al terminar el secado.')+'</p>'+(nx==='elegir'&&g?B('Registrar siguiente paso','primary sm','lote-paso','data-c="'+l.cod+'" data-l="'+x.id+'"'):'')+'</div></div>';
       else{const steps=RUTAS[x.ruta];cards='<div class="stages '+stCls(steps.length)+'">'+steps.map((e,k)=>{const rec=x.etapas[k];const st=rec?'ok':(nx===e?'next':'pend');
         return stCard(e,rec,st,!rec&&nx===e&&g?B('Registrar '+e.toLowerCase(),'primary sm','lote-paso','data-c="'+l.cod+'" data-l="'+x.id+'"'):'',e==='Molienda'?rend(rec,x.ton==null?baseTon(l):x.ton):'');}).join('')+'</div>';}
       const cps=compPartsFor(l,x,false);
       const inc=cps.length?'<p class="xs muted">'+cps.map(o=>'Incluye '+o.k.ing+': +'+tn(o.p.ton)+(partUnif(o.p)?' (unificado)':' (en proceso)')).join(' · ')+'</p>':'';
-      return '<div class="card line"><div class="card-h"><div><h3>'+esc(x.nombre)+'</h3><p class="xs muted">'+(x.ruta?RUTA_TXT[x.ruta]:'Ruta por definir')+', '+tn(ton)+'</p></div>'+(lineDone(l,x)?pill('Ensacado','green',1):'')+'</div>'+inc+cards+
+      return '<div class="card line"><div class="card-h"><div><h3>'+esc(x.nombre)+'</h3><p class="xs muted">'+(x.ruta?RUTA_TXT[x.ruta]:'Ruta por definir')+(x.frac?', '+x.frac+' del lote, ≈ ':', ')+tn(ton)+'</p></div>'+(lineDone(l,x)?pill('Ensacado','green',1):'')+'</div>'+inc+cards+
         (ensacada(x)?'<div class="row between wrap">'+ensSummary(l,lineKeys(l,x),ton)+(g?B(ic('plus',14)+'Asociar bigbags','secondary sm','lote-bb','data-c="'+l.cod+'" data-l="'+x.id+'"'):'')+'</div>':'')+'</div>';}).join('')+'</div>';
   const CP=l.comp||[];
   if(CP.length)h+='<div class="flow-split">'+pill('Ingresos agregados después del secado','orange')+'</div><div class="stack">'+CP.map(k=>{const i=ing(k.ing),ton=compTon(k),sec=k.etapas[0];
@@ -740,14 +757,14 @@ function trazView(l,edit){edit=edit&&!l.alta;const g=edit&&can('lotes.etapa');
   return h+'</div>';}
 function trazMini(l){const row=(name,recs,steps)=>'<div class="mini"><b>'+esc(name)+'</b><div class="chips-st">'+steps.map((e,k)=>'<span class="st'+(recs[k]?' ok':'')+'">'+(recs[k]?ic('check',12):'')+e+'</span>').join('')+'</div></div>';
   let h=row('Etapa común',l.comunes,['Secado']);
-  l.lineas.forEach(x=>{const m=x.etapas.find(r=>r.e==='Molienda'&&r.horas);h+=row(x.nombre+' · '+tn(lineaTon(l,x))+(m?' · '+num((x.ton==null?baseTon(l):x.ton)/m.horas)+' t/h':''),x.etapas,x.ruta?RUTAS[x.ruta]:['Ruta por definir']);});
+  l.lineas.forEach(x=>{const m=x.etapas.find(r=>r.e==='Molienda'&&r.horas);h+=row(x.nombre+(x.frac?' · '+x.frac+' del lote':'')+' · ≈ '+tn(lineaTon(l,x))+(m?' · '+num((x.ton==null?baseTon(l):x.ton)/m.horas)+' t/h':''),x.etapas,x.ruta?RUTAS[x.ruta]:['Ruta por definir']);});
   (l.comp||[]).forEach(k=>{h+=row('Complemento '+k.ing+' · '+tn(compTon(k)),k.etapas,['Secado propio']);(k.partes||[]).filter(p=>!p.unido).forEach(p=>{const x=l.lineas.find(y=>y.id===p.lin)||{};h+=row('  '+k.ing+' → '+(x.nombre||'')+' · '+tn(p.ton),p.etapas,RUTAS[p.ruta]);});});
   return h;}
 function loteResumen(l,i){const e=loteEstado(l),av=loteAvance(l);
-  return '<div class="card"><div class="row wrap"><span class="tone-purple">'+ic('box',26)+'</span><div style="flex:1;min-width:200px"><h2><a href="#/lotes/'+l.cod+'">'+esc(l.nombre)+'</a></h2><p class="small muted">'+l.cod+', '+minName(l.min)+'</p></div>'+pill(e[0],e[1],1)+'</div>'+
-    '<div class="grid g3">'+kv('Ingresos del lote',l.ing.length)+kv('Toneladas netas',tn(loteTon(l)))+kv('Bigbags',loteBB(l)||'—')+kv('Apertura',fD(l.ap))+kv('Cierre',l.ci?fD(l.ci):'Aún abierto')+kv(l.alta?'Dado de alta':'Avance',l.alta?fD(l.alta.f):av[0]+' de '+av[1]+' etapas')+'</div>'+
+  return '<div class="card"><div class="row wrap"><span class="tone-purple">'+ic('box',26)+'</span><div style="flex:1;min-width:200px"><h2><a href="#/lotes/'+l.cod+'">'+esc(l.nombre)+'</a></h2><p class="small muted">'+l.cod+', '+lMinTxt(l)+'</p></div>'+pill(e[0],e[1],1)+'</div>'+
+    '<div class="grid g3">'+kv('Ingresos del lote',l.ing.length)+kv('Toneladas netas',tn(loteTon(l)))+kv('Bigbags',loteBB(l)||'—')+kv('Apertura',fD(l.ap))+kv('Inicio del recorrido',l.ci?fD(l.ci):'Aún abierto')+kv(l.alta?'Cerrado':'Avance',l.alta?fD(l.alta.f):av[0]+' de '+av[1]+' etapas')+'</div>'+
     (l.lineas.length>1?'<p class="small muted">Dividido en '+l.lineas.map(x=>esc(x.nombre)+' ('+tn(lineaTon(l,x))+')').join(', ')+'.</p>':'')+
-    (i&&l.tarde.includes(i.cod)?'<div>'+pill('Agregado después del cierre','orange')+'</div>':'')+(i&&i.estado==='anul'?bn('red','xCircle','Este ingreso está anulado: ya no suma en el lote.'):'')+'</div>';}
+    (i&&l.tarde.includes(i.cod)?'<div>'+pill('Ingreso tardío','orange')+'</div>':'')+(i&&i.estado==='anul'?bn('red','xCircle','Este ingreso está anulado: ya no suma en el lote.'):'')+'</div>';}
 
 /* Ticket de balanza: el papel real solo imprime placa, fecha y peso bruto */
 function ticketSVG(t,hl){
@@ -779,13 +796,13 @@ const NAV=[{sec:'General'},
   {k:'ingresos',t:'Ingresos',i:'tray',h:'#/ingresos',p:'ingresos',badge:()=>S.ingresos.filter(i=>i.estado==='proc').length},
   {k:'calendario',t:'Calendario',i:'cal',h:'#/calendario',p:'ingresos'},
   {k:'lotes',t:'Trazabilidad',i:'flow',h:'#/lotes',p:'lotes'},
-  {k:'altas',t:'Alta de lotes',i:'checkC',h:'#/altas',p:'alta'},
+  {k:'altas',t:'Cierre de lotes',i:'checkC',h:'#/altas',p:'alta'},
   {k:'consulta',t:'Consulta',i:'search',h:'#/consulta',p:'consulta'},
   {k:'consolidacion',t:'Consolidación',i:'chart',h:'#/consolidacion',p:'consolidacion'},
   {sec:'Gestión'},
   {k:'catalogos',t:'Catálogos',i:'doc',h:'#/catalogos/vehiculos',p:'catalogos'},
   {k:'admin',t:'Administración',i:'shield',h:'#/admin/usuarios',p:'admin'}];
-const TITLES={inicio:'Inicio',ingresos:'Ingresos',calendario:'Calendario',altas:'Alta de lotes',lotes:'Trazabilidad',consulta:'Consulta',consolidacion:'Consolidación',catalogos:'Catálogos',admin:'Administración'};
+const TITLES={inicio:'Inicio',ingresos:'Ingresos',calendario:'Calendario',altas:'Cierre de lotes',lotes:'Trazabilidad',consulta:'Consulta',consolidacion:'Consolidación',catalogos:'Catálogos',admin:'Administración'};
 function navHTML(active){let out='',pendSec=null;
   NAV.forEach(n=>{if(n.sec){pendSec=n.sec;return;}if(!can(n.p))return;if(pendSec){out+='<div class="nav-sec">'+pendSec+'</div>';pendSec=null;}
     const b=n.badge?n.badge():0;
@@ -880,7 +897,7 @@ function pIngresos(){if(!FI)resetFI();
 const DTABS=[['datos','Datos'],['ticket','Ticket'],['reconocimiento','Reconocimiento'],['validacion','Validación'],['trazabilidad','Trazabilidad'],['historial','Historial']];
 function pDetalle(cod,tab){const i=ing(cod);if(!i)return head('Ingreso no encontrado','',null,['Ingresos','#/ingresos'])+'<div class="card">'+empty('search','No existe el ingreso '+esc(cod),'Revise el código o búsquelo por placa y fecha en Consulta.',B('Ir a Consulta','secondary','go','data-h="#/consulta"'))+'</div>';
   const v=veh(i.placa)||{};const tr=v.transp?transp(v.transp):null;
-  let acts='';if(i.estado!=='anul'){if(can('corregir'))acts+=B(ic('edit',16)+'Corregir','secondary','corregir','data-c="'+i.cod+'"');if(can('anular'))acts+=B('Anular','danger-plain','anular','data-c="'+i.cod+'"');}
+  let acts='';if(i.estado!=='anul'){if(can('corregir'))acts+=B(ic('edit',16)+'Corregir','secondary','corregir','data-c="'+i.cod+'"');if(can('corregir')&&(i.hist||[]).length)acts+=B(ic('refresh',16)+'Revertir corrección','secondary','corr-revert','data-c="'+i.cod+'"');if(can('anular'))acts+=B('Anular','danger-plain','anular','data-c="'+i.cod+'"');}
   if(i.estado==='proc'&&can('destare'))acts+=B('Registrar destare','primary','go','data-h="#/destare"');
   let html=head(i.cod,fDT(i.fecha)+', '+i.placa+', '+minName(i.min),acts,['Ingresos','#/ingresos']);
   html+='<div class="row wrap">'+estPill(i)+(i.manual?pill(i.manual.tipo==='sinfoto'?'Sin foto del ticket':'Ingreso manual','gray'):'')+(i.just.V1?pill('Posible duplicado justificado','orange'):'')+(i.just.V4?pill('Advertencia V4 justificada','orange'):'')+'</div>';
@@ -890,7 +907,7 @@ function pDetalle(cod,tab){const i=ing(cod);if(!i)return head('Ingreso no encont
   if(tab==='datos'){
     html+='<div class="card pad-lg"><h2>Datos del ingreso</h2><div class="grid g4">'+kv('Placa',i.placa)+kv('Tipo de vehículo',v.tit||'—')+kv('Transportista',tr?esc(tr.razon):'No aplica')+kv('Capacidad del vehículo',tn(v.cap))+
       kv('Tipo de mineral',minName(i.min))+kv('Fecha y hora del ticket',fDT(i.fecha))+kv('Peso bruto',tn(i.bruto))+kv('Tara aplicada',i.tara==null?'Pendiente de destare':tn(i.tara))+
-      kv('Peso neto',tn(i.neto),'big')+kv('Lote de proceso',i.lote?'<a href="#/lotes/'+i.lote+'">'+i.lote+'</a>':'Sin asignar')+kv('Registrado por',userName(i.user))+kv('Estado',ST[i.estado][0])+kv('Número de ticket',i.ticket||'No consignado')+kv('Forma de registro',i.manual?(i.manual.tipo==='sinfoto'?'Manual, sin foto':'Manual, ticket ilegible'):'Lectura automática')+'</div></div>';
+      kv('Peso neto',tn(i.neto),'big')+kv('Lote de proceso',i.lote?'<a href="#/lotes/'+i.lote+'">'+i.lote+'</a>':'Sin asignar')+kv('Registrado por',userName(i.user))+kv('Estado',ST[i.estado][0])+kv('Forma de registro',i.manual?(i.manual.tipo==='sinfoto'?'Manual, sin foto':'Manual, ticket ilegible'):'Lectura automática')+'</div></div>';
     const dur=Math.round((D(i.fin)-D(i.ini))/1000);
     html+='<div class="grid g2"><div class="card"><h2>Marcas de tiempo del servidor</h2><div class="grid g3">'+kv('Inicio del registro',fDTS(i.ini))+kv('Fin del registro',fDTS(i.fin))+kv('Duración',Math.floor(dur/60)+' min '+pad(dur%60)+' s')+'</div><p class="small muted">Las asigna el servidor; sirven para medir la oportunidad del registro.</p></div>'+
       '<div class="card"><h2>Justificaciones</h2>'+(i.just.V1||i.just.V4?(i.just.V1?'<div class="kv"><span>Posible duplicado (V1)</span><b style="font-weight:400">'+esc(i.just.V1)+'</b></div>':'')+(i.just.V4?'<div class="kv"><span>Peso fuera de rango (V4)</span><b style="font-weight:400">'+esc(i.just.V4)+'</b></div>':''):'<p class="muted small">El ingreso cumplió todas las reglas; no requirió justificación.</p>')+'</div></div>';}
@@ -984,7 +1001,7 @@ function pRegistrar(){if(!REG)regNew();
       '<div class="stickybar"><span class="muted">'+ic('info',18)+'Ningún dato se ha guardado todavía</span>'+B('Descartar','secondary','reg-discard')+B('Confirmar registro','primary','reg-confirm')+'</div>';}
   if(REG.paso==='ok'){const i=ing(REG.cod);if(!i){regNew();return pRegistrar();}const pr=i.estado==='proc';const dur=Math.round((D(i.fin)-D(i.ini))/1000);
     return H+regSteps(3)+'<div class="card pad-lg" style="align-items:center;text-align:center;max-width:800px;width:100%;margin:0 auto;gap:16px"><div class="done-ic'+(pr?' orange':'')+'">'+ic(pr?'clock':'check',40)+'</div><h1>'+(pr?'Ingreso registrado En proceso':'Ingreso registrado')+'</h1><p class="muted">'+(pr?'Ingreso '+i.cod+' registrado en proceso: pendiente del destare del vehículo '+i.placa:'Ingreso registrado con el código '+i.cod)+'</p><div class="row wrap" style="justify-content:center">'+estPill(i)+(i.manual?pill(i.manual.tipo==='sinfoto'?'Sin foto del ticket':'Ingreso manual','gray'):'')+(i.just.V1?pill('Posible duplicado justificado','orange'):'')+(i.just.V4?pill('Advertencia V4 justificada','orange'):'')+'</div>'+
-      '<hr class="sep" style="width:100%"><div class="grid g4" style="width:100%;text-align:left">'+kv('Número de ticket','N.° '+i.ticket)+kv('Placa',i.placa)+kv('Pesaje',fDT(i.fecha))+kv('Peso bruto',tn(i.bruto))+kv('Peso neto',pr?'Tras el destare':tn(i.neto),'big')+kv('Tara aplicada',i.tara==null?'Pendiente':tn(i.tara))+kv('Duración del registro',Math.floor(dur/60)+' min '+pad(dur%60)+' s')+kv('Registrado por',userName(i.user))+'</div>'+
+      '<hr class="sep" style="width:100%"><div class="grid g4" style="width:100%;text-align:left">'+kv('Placa',i.placa)+kv('Pesaje',fDT(i.fecha))+kv('Peso bruto',tn(i.bruto))+kv('Peso neto',pr?'Tras el destare':tn(i.neto),'big')+kv('Tara aplicada',i.tara==null?'Pendiente':tn(i.tara))+kv('Duración del registro',Math.floor(dur/60)+' min '+pad(dur%60)+' s')+kv('Registrado por',userName(i.user))+'</div>'+
       (pr?bn('orange','info','Cuando el volquete se pese vacío, registre el destare para completar el peso neto.'):'')+
       '<div class="actions" style="justify-content:center">'+B('Ver detalle','secondary lg','go','data-h="#/ingresos/'+i.cod+'"')+(pr&&can('destare')?B('Registrar destare','secondary lg','go','data-h="#/destare"'):'')+B(ic('camera',16)+'Registrar otro ingreso','primary lg','reg-new')+'</div></div>';}
   return H;}
@@ -1035,30 +1052,36 @@ function pLotes(){const acts=can('lotes.gestion')?B(ic('plus',16)+'Abrir lote','
   const libres=S.ingresos.filter(i=>i.estado==='reg'&&!i.lote);
   let h=head('Lotes de proceso','Agrupe los ingresos que se procesan juntos y siga su recorrido: secado, zarandeo y, según el caso, molienda y ensacado',acts);
   if(libres.length&&can('lotes.gestion'))h+=bn('blue','info',libres.length+(libres.length===1?' ingreso registrado espera':' ingresos registrados esperan')+' en cancha sin lote: '+libres.map(i=>i.cod+' ('+minName(i.min).replace('Mineral ','')+')').join(', ')+'.');
-  h+=segBtns([['todos','Todos'],['abierto','Abiertos'],['curso','En recorrido'],['completo','Listos para alta'],['alta','Dados de alta']],FL,'lote-f');
+  h+=segBtns([['todos','Todos'],['abierto','Abiertos'],['curso','En recorrido'],['completo','Listos para cerrar'],['alta','Cerrados']],FL,'lote-f');
   if(!L.length)return h+'<div class="card">'+empty('box','No hay lotes en esta vista','Cambie el filtro o abra un lote nuevo.')+'</div>';
   return h+'<div class="card flush"><div class="table-scroll"><table class="tbl"><thead><tr><th>Lote</th><th>Tipo de mineral</th><th>Apertura</th><th class="r">Ingresos</th><th class="r">Toneladas</th><th>Avance</th><th class="r">Bigbags</th><th>Estado</th></tr></thead><tbody>'+
-    L.map(l=>{const e=loteEstado(l),av=loteAvance(l);return '<tr class="click" data-a="go" data-h="#/lotes/'+l.cod+'"><td class="main" data-l="">'+esc(l.nombre)+'<div class="xs faint" style="font-weight:400">'+l.cod+(l.lineas.length>1?', dividido en '+l.lineas.length:'')+'</div></td><td data-l="Mineral">'+minName(l.min)+'</td><td data-l="Apertura" class="num">'+fD(l.ap)+'</td><td class="r" data-l="Ingresos">'+l.ing.length+'</td><td class="r" data-l="Toneladas">'+num(loteTon(l))+'</td><td data-l="Avance"><div class="row" style="gap:8px;min-width:140px"><div class="bar '+(loteCompleto(l)?'green':'purple')+'" style="flex:1"><i style="width:'+Math.round(av[0]/av[1]*100)+'%"></i></div><span class="xs muted">'+av[0]+'/'+av[1]+'</span></div></td><td class="r" data-l="Bigbags">'+loteBB(l)+'</td><td data-l="Estado">'+pill(e[0],e[1],1)+'</td></tr>';}).join('')+'</tbody></table></div></div>';}
+    L.map(l=>{const e=loteEstado(l),av=loteAvance(l);return '<tr class="click" data-a="go" data-h="#/lotes/'+l.cod+'"><td class="main" data-l="">'+esc(l.nombre)+'<div class="xs faint" style="font-weight:400">'+l.cod+(l.lineas.length>1?', dividido en '+l.lineas.length:'')+'</div></td><td data-l="Mineral">'+lMinTxt(l)+'</td><td data-l="Apertura" class="num">'+fD(l.ap)+'</td><td class="r" data-l="Ingresos">'+l.ing.length+'</td><td class="r" data-l="Toneladas">'+num(loteTon(l))+'</td><td data-l="Avance"><div class="row" style="gap:8px;min-width:140px"><div class="bar '+(loteCompleto(l)?'green':'purple')+'" style="flex:1"><i style="width:'+Math.round(av[0]/av[1]*100)+'%"></i></div><span class="xs muted">'+av[0]+'/'+av[1]+'</span></div></td><td class="r" data-l="Bigbags">'+loteBB(l)+'</td><td data-l="Estado">'+pill(e[0],e[1],1)+'</td></tr>';}).join('')+'</tbody></table></div></div>';}
+function compLote(l,ab,g){
+  if(!l.ing.length&&lMins(l).length===1)return '<div class="card">'+empty('tray','El lote no tiene ingresos asignados','Agregue ingresos Registrados de '+lMinTxt(l)+' antes de iniciar su recorrido.',g?B('Agregar ingresos','primary','lote-asignar','data-c="'+l.cod+'"'):'')+'</div>';
+  const ed=ab&&g,cols=ed?5:4;let rows='';
+  lMins(l).forEach(m=>{const L=l.ing.filter(c=>ing(c).min===m),t=+L.reduce((a,c)=>{const i=ing(c);return a+(i.estado==='reg'&&i.neto||0);},0).toFixed(2);
+    rows+='<tr class="grp"><td colspan="3" data-l=""><b>'+esc(minName(m))+'</b> <span class="xs muted">'+L.length+(L.length===1?' ingreso':' ingresos')+'</span>'+(m===l.min?' '+pill('Mineral de apertura','gray'):'')+(ed&&!L.length&&lMins(l).length>1?' '+B('Quitar','danger-plain sm','lote-min-del','data-c="'+l.cod+'" data-m="'+m+'"'):'')+'</td><td class="r" data-l="Subtotal"><b>'+tn(t)+'</b></td>'+(ed?'<td></td>':'')+'</tr>';
+    if(!L.length)rows+='<tr><td colspan="'+cols+'" class="small muted" data-l="">Sin ingresos de este mineral todavía.</td></tr>';
+    rows+=L.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Tardío','orange'):'')+(i.estado==='anul'?' '+pill('Anulado','red'):'')+(i.estado==='proc'?' '+pill('En proceso','orange'):'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Fecha" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Peso neto">'+tn(i.neto)+'</td>'+(ed?'<td class="act">'+B('Retirar','danger-plain sm','lote-retirar','data-c="'+l.cod+'" data-i="'+c+'"')+'</td>':'')+'</tr>';}).join('');});
+  return '<div class="card flush"><table class="tbl"><thead><tr><th>Ingreso</th><th>Placa</th><th>Fecha del pesaje</th><th class="r">Peso neto</th>'+(ed?'<th></th>':'')+'</tr></thead><tbody>'+rows+
+    '</tbody><tfoot><tr><td colspan="3" data-l="">Total del lote</td><td class="r" data-l="Total">'+tn(loteTon(l))+'</td>'+(ed?'<td></td>':'')+'</tr></tfoot></table></div>';}
 function pLote(cod){const l=lote(cod);if(!l)return head('Lote no encontrado','',null,['Lotes de proceso','#/lotes'])+'<div class="card">'+empty('box','No existe el lote '+esc(cod),'')+'</div>';
   const g=can('lotes.gestion')&&!l.alta,ab=l.estado==='abierto',e=loteEstado(l),av=loteAvance(l),comp=loteCompleto(l);
   const canDiv=g&&l.lineas.length===1&&l.lineas[0].etapas.length===0&&!comp&&(l.comp||[]).every(k=>!(k.partes||[]).length);
-  const acts=(g&&!comp?B(ic('plus',16)+'Agregar ingresos','secondary','lote-asignar','data-c="'+l.cod+'"'):'')+(canDiv?B('Dividir lote','secondary','lote-dividir','data-c="'+l.cod+'"'):'')+(ab&&g?B('Cerrar e iniciar recorrido','primary','lote-cerrar','data-c="'+l.cod+'"'):'')+(comp&&!l.alta&&can('alta')?B(ic('checkC',16)+'Dar de alta','primary','go','data-h="#/altas/'+l.cod+'"'):'')+(l.alta?B('Ver resumen de alta','secondary','go','data-h="#/altas/'+l.cod+'"'):'');
-  let h=head(esc(l.nombre),l.cod+', '+minName(l.min)+', abierto el '+fD(l.ap),acts,['Lotes de proceso','#/lotes']);
-  h+='<div class="row wrap">'+pill(e[0],e[1],1)+pill(av[0]+' de '+av[1]+' etapas','purple')+(l.lineas.length>1?pill('Dividido en '+l.lineas.length+' lotes','gray'):'')+'</div>';
-  h+='<div class="card"><div class="grid g4">'+kv('Toneladas netas',tn(loteTon(l)),'big')+kv('Ingresos',l.ing.length+(l.tarde.length?' ('+l.tarde.length+' después del cierre)':''))+kv('Bigbags producidos',loteBB(l))+kv('Cierre',l.ci?fDT(l.ci):'Aún abierto')+'</div></div>';
-  if(l.alta)h+=bn('gray','checkC','Dado de alta para la venta el '+fDT(l.alta.f)+' por '+esc(userName(l.alta.u))+'. El lote está cerrado: no admite más ingresos ni etapas.');
-  else if(comp)h+=bn('green','checkC','Todo el mineral está ensacado. '+(can('alta')?'Puede darlo de alta para la venta.':'El Administrador puede darlo de alta para la venta.'));
-  if(ab)h+=bn('blue','info','Mientras el lote está abierto reúne ingresos. Al cerrarlo empieza el recorrido; aun así podrá agregar ingresos si llegan más volquetes.');
-  else if(!comp&&g)h+=bn('gray','info','El lote está en recorrido. Puede agregar ingresos que lleguen tarde'+(l.comunes.length?': cada uno tendrá su propio secado y luego se unirá a su parte o recorrerá sus etapas.':': se secarán junto con el resto del lote.'));
+  const acts=(g&&!comp?B(ic('plus',16)+'Agregar ingresos','secondary','lote-asignar','data-c="'+l.cod+'"'):'')+(g?B(ic('plus',16)+'Agregar otro mineral','secondary','lote-min','data-c="'+l.cod+'"'):'')+(canDiv?B('Dividir lote','secondary','lote-dividir','data-c="'+l.cod+'"'):'')+(ab&&g?B('Iniciar recorrido','primary','lote-cerrar','data-c="'+l.cod+'"'):'')+(comp&&!l.alta&&can('alta')?B(ic('checkC',16)+'Cerrar lote','primary','go','data-h="#/altas/'+l.cod+'"'):'')+(l.alta?B('Ver resumen de cierre','secondary','go','data-h="#/altas/'+l.cod+'"'):'');
+  let h=head(esc(l.nombre),l.cod+', '+lMinTxt(l)+', abierto el '+fD(l.ap),acts,['Lotes de proceso','#/lotes']);
+  h+='<div class="row wrap">'+pill(e[0],e[1],1)+pill(av[0]+' de '+av[1]+' etapas','purple')+(l.lineas.length>1?pill('Dividido en '+l.lineas.length+' partes','gray'):'')+'</div>';
+  h+='<div class="card"><div class="grid g4">'+kv('Toneladas netas',tn(loteTon(l)),'big')+kv('Ingresos',l.ing.length+(l.tarde.length?' ('+l.tarde.length+' tardíos)':''))+kv('Bigbags producidos',loteBB(l))+kv('Inicio del recorrido',l.ci?fDT(l.ci):'Aún abierto')+'</div></div>';
+  if(l.alta)h+=bn('gray','checkC','Cerrado con destino '+DEST[l.alta.dest||'venta'].toLowerCase()+' el '+fDT(l.alta.f)+' por '+esc(userName(l.alta.u))+'. El lote está cerrado: no admite más ingresos ni etapas.');
+  else if(comp)h+=bn('green','checkC','Todo el mineral está ensacado. '+(can('alta')?'Puede cerrarlo con su destino.':'Solo el Administrador puede cerrarlo con su destino.'));
+  if(ab)h+=bn('blue','info','Mientras el lote está abierto reúne ingresos. Al iniciar el recorrido empieza el secado; desde entonces el lote solo admite ingresos tardíos y ya no devuelve ingresos a cancha.');
+  else if(!comp&&g)h+=bn('gray','info','El lote está en recorrido. Puede agregar ingresos tardíos'+(l.comunes.length?': cada uno tendrá su propio secado y luego se unirá a su parte o recorrerá sus etapas.':': se secarán junto con el resto del lote.'));
   h+='<div class="row between"><h2>Recorrido del mineral</h2>'+(comp?pill('Todo el mineral ensacado','green'):'')+'</div>'+trazView(l,true);
   if(l.bb.length){const ln=id=>{const x=l.lineas.find(y=>y.id===id);if(x)return x.nombre;const m=/^(K\d+)-(\w+)$/.exec(id);if(m){const k=(l.comp||[]).find(y=>y.id===m[1]);const px=l.lineas.find(y=>y.id===m[2]);if(k&&px)return px.nombre+' (complemento '+k.ing+')';}return '—';};
     h+='<div class="row between"><h2>Bigbags</h2><span class="small muted">'+loteBB(l)+' en total</span></div><div class="card flush"><div class="table-scroll"><table class="tbl"><thead><tr><th>Códigos</th><th>Lote</th><th>Cálculo</th><th class="r">Cantidad</th><th class="r">Peso aprox. c/u</th><th class="r">Total aprox.</th><th>Registro</th></tr></thead><tbody>'+
       l.bb.map(b=>'<tr><td class="main" data-l="">'+bbRange(b)+'</td><td data-l="Lote">'+esc(ln(b.lin))+'</td><td data-l="Cálculo">'+(b.rec?pill('Recalculado','orange'):pill('Calculado por el sistema','gray'))+'</td><td class="r" data-l="Cantidad">'+b.cant+'</td><td class="r" data-l="Peso c/u">'+bbPeso(b)+'</td><td class="r" data-l="Total">'+bbTotal(b)+'</td><td data-l="Registro" class="num">'+fDT(b.f)+', '+userName(b.u)+'</td></tr>').join('')+'</tbody></table></div></div>';}
-  h+='<div class="row between"><h2>Composición del lote</h2><span class="small muted">'+l.ing.length+(l.ing.length===1?' ingreso':' ingresos')+'</span></div>';
-  if(!l.ing.length)h+='<div class="card">'+empty('tray','El lote no tiene ingresos asignados','Agregue ingresos Registrados de '+minName(l.min)+' antes de cerrarlo.',g?B('Agregar ingresos','primary','lote-asignar','data-c="'+l.cod+'"'):'')+'</div>';
-  else h+='<div class="card flush"><table class="tbl"><thead><tr><th>Ingreso</th><th>Placa</th><th>Fecha del pesaje</th><th class="r">Peso neto</th>'+(ab&&g?'<th></th>':'')+'</tr></thead><tbody>'+
-    l.ing.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Después del cierre','orange'):'')+(i.estado==='anul'?' '+pill('Anulado','red'):'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Fecha" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Peso neto">'+tn(i.neto)+'</td>'+(ab&&g?'<td class="act">'+B('Retirar','danger-plain sm','lote-retirar','data-c="'+l.cod+'" data-i="'+c+'"')+'</td>':'')+'</tr>';}).join('')+
-    '</tbody><tfoot><tr><td colspan="3" data-l="">Total</td><td class="r" data-l="Total">'+tn(loteTon(l))+'</td>'+(ab&&g?'<td></td>':'')+'</tr></tfoot></table></div>';
+  h+='<div class="row between"><h2>Composición del lote</h2><span class="small muted">'+l.ing.length+(l.ing.length===1?' ingreso':' ingresos')+(lMins(l).length>1?' de '+lMins(l).length+' tipos de mineral':'')+'</span></div>';
+  h+=compLote(l,ab,g);
   return h;}
 
 /* ================= Consulta por placa y fecha (HU-M07-01) ================= */
@@ -1080,7 +1103,7 @@ function pConsulta(){
   h+='<div class="split" style="grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)"><div class="card flush"><div class="card-h" style="padding:14px 20px 6px"><h2>'+CQ.res.length+(CQ.res.length===1?' resultado':' resultados')+'</h2></div><table class="tbl"><tbody>'+
     CQ.res.map(c=>{const x=ing(c);return '<tr class="click'+(c===i.cod?' sel':'')+(x.estado==='anul'?' dim':'')+'" data-a="cq-sel" data-c="'+c+'"><td class="main" data-l="" style="white-space:normal">'+c+'<div class="xs faint" style="font-weight:400">'+fDT(x.fecha)+', '+x.placa+', '+minName(x.min)+'</div>'+(x.estado==='anul'?'<div class="xs" style="color:var(--red);font-weight:500">Anulado: '+esc(x.anul.motivo)+'</div>':'')+'</td><td class="r" data-l="Pesos"><div class="small">'+tn(x.bruto)+' bruto</div><div class="small faint">'+(x.estado==='proc'?'Neto pendiente del destare':tn(x.neto)+' neto')+'</div></td><td data-l="Estado">'+pill(ST[x.estado][0],ST[x.estado][1],1)+'</td></tr>';}).join('')+'</tbody></table></div>'+
     '<div class="stack"><div class="viewer" style="min-height:340px'+(i.foto===false?'':';cursor:zoom-in')+'" data-a="zoom" data-c="'+i.cod+'">'+ticketFor(i)+(i.foto===false?'':'<span class="vtag">'+ic('search',14)+'Ampliar</span>')+'</div>'+
-    '<div class="card"><div class="card-h"><h2>'+i.cod+'</h2>'+estPill(i)+'</div><div class="grid g3">'+kv('Placa',i.placa)+kv('Pesaje',fDT(i.fecha))+kv('Tipo de mineral',minName(i.min))+kv('Peso bruto',tn(i.bruto))+kv('Tara',i.tara==null?'Pendiente':tn(i.tara))+kv('Peso neto',i.estado==='proc'?'Pendiente del destare':tn(i.neto),'big')+kv('Vehículo',v.tit||'—')+kv('Número de ticket',i.ticket||'No consignado')+kv('Registrado por',userName(i.user))+'</div>'+
+    '<div class="card"><div class="card-h"><h2>'+i.cod+'</h2>'+estPill(i)+'</div><div class="grid g3">'+kv('Placa',i.placa)+kv('Pesaje',fDT(i.fecha))+kv('Tipo de mineral',minName(i.min))+kv('Peso bruto',tn(i.bruto))+kv('Tara',i.tara==null?'Pendiente':tn(i.tara))+kv('Peso neto',i.estado==='proc'?'Pendiente del destare':tn(i.neto),'big')+kv('Vehículo',v.tit||'—')+kv('Registrado por',userName(i.user))+'</div>'+
     (can('ingresos')?'<div class="actions">'+B('Ver detalle completo','secondary','go','data-h="#/ingresos/'+i.cod+'"')+'</div>':'')+'</div>'+
     '<h2>Trazabilidad</h2>'+(l?loteResumen(l,i)+'<div class="card"><h3>Recorrido</h3>'+trazMini(l)+'</div>':bn('gray','info','Este ingreso aún no tiene lote: el mineral espera en cancha. Ninguna de las cuatro etapas se ha recorrido.'))+'</div></div>';
   return h;}
@@ -1107,7 +1130,7 @@ function pCalendario(){const n=now();if(!CAL)CAL={y:n.getFullYear(),m:n.getMonth
     '<div class="cal-wrap"><div class="card"><div class="cal-head"><h2>'+cap1(MES[CAL.m])+' de '+CAL.y+'</h2><div class="actions">'+B(ic('chevL',16),'secondary sm','cal-nav','data-k="-1" aria-label="Mes anterior"')+B('Hoy','secondary sm','cal-hoy')+B(ic('chevR',16),'secondary sm','cal-nav','data-k="1" aria-label="Mes siguiente"')+'</div></div>'+
     '<div class="cal">'+cells+'</div><div class="legend"><span><i style="background:color-mix(in srgb,var(--gold) 45%,var(--surface))"></i>Más toneladas, color más intenso</span><span><i style="background:var(--orange-b)"></i>Hay ingresos en proceso</span><span><i style="background:var(--red-b)"></i>Hay anulados</span></div></div>'+panel+'</div>';}
 
-/* ================= Alta de lotes (venta) ================= */
+/* ================= Cierre de lotes (venta) ================= */
 function durTxt(ms){if(!(ms>0))return '—';const h=Math.round(ms/3600000);const d=Math.floor(h/24),r=h%24;return (d?d+' d ':'')+r+' h';}
 function lotePend(l){const P=[];if(l.estado==='abierto'){P.push('el lote sigue abierto');return P;}if(!l.comunes.length)P.push('falta el secado del lote');
   l.lineas.forEach(x=>{const s=nextStep(l,x);if(s)P.push(x.nombre+': '+(s==='elegir'?'definir la ruta':'falta '+s.toLowerCase()));});
@@ -1117,25 +1140,25 @@ function loteRecs(l){const R=[];l.comunes.forEach(r=>R.push({r,sobre:'Todo el lo
   return R.sort((a,b)=>a.r.f.localeCompare(b.r.f));}
 function pAltas(){const L=S.lotes.slice().sort((a,b)=>b.cod.localeCompare(a.cod));
   const listos=L.filter(l=>!l.alta&&loteCompleto(l)),proc=L.filter(l=>!l.alta&&!loteCompleto(l)),hechos=L.filter(l=>l.alta);
-  const fila=(l,act)=>'<tr class="click" data-a="go" data-h="#/altas/'+l.cod+'"><td class="main" data-l="">'+esc(l.nombre)+'<div class="xs faint" style="font-weight:400">'+l.cod+', '+minName(l.min)+'</div></td><td class="r" data-l="Registrado">'+tn(loteTon(l))+'</td><td class="r" data-l="Bigbags">'+(loteBB(l)||'—')+'</td><td data-l="Estado" style="white-space:normal">'+act+'</td></tr>';
+  const fila=(l,act)=>'<tr class="click" data-a="go" data-h="#/altas/'+l.cod+'"><td class="main" data-l="">'+esc(l.nombre)+'<div class="xs faint" style="font-weight:400">'+l.cod+', '+lMinTxt(l)+'</div></td><td class="r" data-l="Registrado">'+tn(loteTon(l))+'</td><td class="r" data-l="Bigbags">'+(loteBB(l)||'—')+'</td><td data-l="Estado" style="white-space:normal">'+act+'</td></tr>';
   const tabla=(rows,emp)=>rows?'<div class="card flush"><div class="table-scroll"><table class="tbl"><thead><tr><th>Lote</th><th class="r">Toneladas registradas</th><th class="r">Bigbags</th><th>Estado</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':'<div class="card"><p class="small muted">'+emp+'</p></div>';
-  return head('Alta de lotes','Lotes terminados que se entregan para la venta, con el resumen de todo su proceso')+
-    '<h2>Listos para dar de alta</h2>'+tabla(listos.map(l=>fila(l,pill('Listo para alta','green',1))).join(''),'No hay lotes con todo su mineral ensacado.')+
+  return head('Cierre de lotes','Salida del mineral: los lotes terminados se cierran con su destino, venta o traslado, y el resumen de su proceso')+
+    '<h2>Listos para cerrar</h2>'+tabla(listos.map(l=>fila(l,pill('Listo para cerrar','green',1))).join(''),'No hay lotes con todo su mineral ensacado.')+
     '<h2>En proceso</h2>'+tabla(proc.map(l=>{const p=lotePend(l);return fila(l,'<span class="small muted">'+esc(cap1(p[0]||''))+(p.length>1?' y '+(p.length-1)+' más':'')+'</span>');}).join(''),'No hay lotes en proceso.')+
-    '<h2>Dados de alta</h2>'+tabla(hechos.map(l=>fila(l,pill('Dado de alta el '+fD(l.alta.f),'gray',1))).join(''),'Aún no se ha dado de alta ningún lote.');}
-function pAlta(cod){const l=lote(cod);if(!l)return head('Lote no encontrado','',null,['Alta de lotes','#/altas'])+'<div class="card">'+empty('box','No existe el lote '+esc(cod),'')+'</div>';
+    '<h2>Cerrados</h2>'+tabla(hechos.map(l=>fila(l,pill('Cerrado el '+fD(l.alta.f)+' · '+DEST[l.alta.dest||'venta'],'gray',1))).join(''),'Aún no se ha cerrado ningún lote.');}
+function pAlta(cod){const l=lote(cod);if(!l)return head('Lote no encontrado','',null,['Cierre de lotes','#/altas'])+'<div class="card">'+empty('box','No existe el lote '+esc(cod),'')+'</div>';
   const comp=loteCompleto(l),pend=lotePend(l),reg=loteTon(l);const ens=bbSumKeys(l,l.bb.map(b=>b.lin)),nbb=loteBB(l),dif=+(ens-reg).toFixed(2);
   const R=loteRecs(l);const ultEns=R.filter(o=>o.r.e==='Ensacado').map(o=>o.r.f).sort().pop();const sec=l.comunes[0];
-  let h=head('Resumen de '+esc(l.nombre),l.cod+', '+minName(l.min),(can('alta')&&comp&&!l.alta?B(ic('checkC',16)+'Dar de alta','primary','alta-open','data-c="'+l.cod+'"'):'')+B('Ver lote','secondary','go','data-h="#/lotes/'+l.cod+'"'),['Alta de lotes','#/altas']);
-  if(l.alta)h+=bn('green','checkC','Dado de alta para la venta el '+fDT(l.alta.f)+' por '+esc(userName(l.alta.u))+(l.alta.obs?'. Observación: '+esc(l.alta.obs):'')+'. El lote quedó cerrado: no admite más ingresos ni etapas.');
-  else if(!comp)h+=bn('orange','clock','Todavía no se puede dar de alta. Pendiente: '+pend.map(esc).join('; ')+'.');
-  else h+=bn('blue','info','Todo el mineral está ensacado. '+(can('alta')?'Revise el resumen y dé de alta el lote.':'Solo el Administrador puede darlo de alta.'));
+  let h=head('Resumen de '+esc(l.nombre),l.cod+', '+lMinTxt(l),(can('alta')&&comp&&!l.alta?B(ic('checkC',16)+'Cerrar lote','primary','alta-open','data-c="'+l.cod+'"'):'')+B('Ver lote','secondary','go','data-h="#/lotes/'+l.cod+'"'),['Cierre de lotes','#/altas']);
+  if(l.alta)h+=bn('green','checkC','Cerrado con destino '+DEST[l.alta.dest||'venta'].toLowerCase()+' el '+fDT(l.alta.f)+' por '+esc(userName(l.alta.u))+(l.alta.obs?'. Observación: '+esc(l.alta.obs):'')+'. El lote quedó cerrado: no admite más ingresos ni etapas.');
+  else if(!comp)h+=bn('orange','clock','Todavía no se puede cerrar el lote. Pendiente: '+pend.map(esc).join('; ')+'.');
+  else h+=bn('blue','info','Todo el mineral está ensacado. '+(can('alta')?'Revise el resumen y ciérrelo con su destino.':'Solo el Administrador puede cerrarlo con su destino.'));
   const K=[['Toneladas registradas',num(reg),'t','Suma de '+l.ing.filter(c=>ing(c)&&ing(c).estado==='reg').length+' ingresos','scale','blue'],
     ['Ensacado aproximado',nbb?num(ens):'—',nbb?'t':'',nbb+' bigbags','box','green'],
     ['Diferencia',nbb?(dif>0?'+':'')+num(dif):'—',nbb?'t':'',nbb?(dif<=0?'Merma de '+num(Math.abs(dif)/reg*100)+' %':'Supera lo registrado'):'Sin bigbags registrados','warn',dif>0?'orange':'gray'],
-    ['Duración del proceso',durTxt(ultEns&&l.ci?D(ultEns)-D(l.ci):0),'',l.ci?'Del cierre al último ensacado':'Lote abierto','clock','purple']];
+    ['Duración del proceso',durTxt(ultEns&&l.ci?D(ultEns)-D(l.ci):0),'',l.ci?'Del inicio del recorrido al último ensacado':'Lote abierto','clock','purple']];
   h+='<div class="grid g4">'+K.map(k=>'<div class="card kpi"><div class="k-top"><span>'+k[0]+'</span><span class="tone-'+k[5]+'">'+ic(k[4],18)+'</span></div><div class="k-val num">'+k[1]+'<small>'+k[2]+'</small></div><div class="k-sub">'+k[3]+'</div></div>').join('')+'</div>';
-  h+='<div class="card"><h2>Tiempos</h2><div class="grid g4">'+kv('Apertura',fDT(l.ap))+kv('Cierre',l.ci?fDT(l.ci):'—')+kv('Secado del lote',sec?fDT(sec.f):'—')+kv('Último ensacado',ultEns?fDT(ultEns):'—')+kv('De la apertura al último ensacado',durTxt(ultEns?D(ultEns)-D(l.ap):0))+kv('Del cierre al secado',durTxt(sec&&l.ci?D(sec.f)-D(l.ci):0))+kv('Dado de alta',l.alta?fDT(l.alta.f):'Pendiente')+kv('Responsable del alta',l.alta?esc(userName(l.alta.u)):'—')+'</div></div>';
+  h+='<div class="card"><h2>Tiempos</h2><div class="grid g4">'+kv('Apertura',fDT(l.ap))+kv('Inicio del recorrido',l.ci?fDT(l.ci):'—')+kv('Secado del lote',sec?fDT(sec.f):'—')+kv('Último ensacado',ultEns?fDT(ultEns):'—')+kv('De la apertura al último ensacado',durTxt(ultEns?D(ultEns)-D(l.ap):0))+kv('Del inicio del recorrido al secado',durTxt(sec&&l.ci?D(sec.f)-D(l.ci):0))+kv('Cierre del lote',l.alta?fDT(l.alta.f):'Pendiente')+kv('Destino',l.alta?DEST[l.alta.dest||'venta']:'—')+kv('Responsable del cierre',l.alta?esc(userName(l.alta.u)):'—')+'</div></div>';
   const filas=l.lineas.map(x=>{const keys=lineKeys(l,x),ton=lineaTon(l,x),e=bbSumKeys(l,keys),n=bbCntKeys(l,keys),d=+(e-ton).toFixed(2);
     const mol=x.etapas.filter(r=>r.e==='Molienda'&&r.horas).concat(...compPartsFor(l,x,true).map(o=>o.p.etapas.filter(r=>r.e==='Molienda'&&r.horas)));const hs=mol.reduce((s,r)=>s+r.horas,0);
     const rangos=l.bb.filter(b=>keys.includes(b.lin)).map(bbRange).join(', ');
@@ -1144,7 +1167,7 @@ function pAlta(cod){const l=lote(cod);if(!l)return head('Lote no encontrado','',
     '</tbody><tfoot><tr><td data-l="">Total del lote</td><td class="r" data-l="Registrado">'+tn(reg)+'</td><td class="r" data-l="Bigbags">'+(nbb||'—')+'</td><td data-l=""></td><td class="r" data-l="Ensacado">'+(nbb?'≈ '+tn(ens):'—')+'</td><td class="r" data-l="Diferencia">'+(nbb?(dif>0?'+':'')+num(dif)+' t':'—')+'</td><td data-l=""></td></tr></tfoot></table></div></div>';
   if((l.comp||[]).length)h+='<p class="small muted">Incluye '+l.comp.length+(l.comp.length===1?' ingreso agregado':' ingresos agregados')+' después del secado, con secado propio y repartidos entre las partes: '+l.comp.map(k=>k.ing+' ('+((k.partes||[]).map(p=>(l.lineas.find(y=>y.id===p.lin)||{}).nombre+' '+tn(p.ton)).join(', ')||'sin repartir')+')').join('; ')+'.</p>';
   h+='<h2>Recorrido del mineral</h2><div class="card">'+(R.length?'<div class="tl">'+R.map(o=>'<div class="tl-i"><span class="dot" style="background:'+(o.r.e==='Ensacado'?'#2E7D32':(o.r.e==='Molienda'?'#8A5C2B':'#C98A1B'))+'"></span><div class="t-b"><b>'+o.r.e+' · '+esc(o.sobre)+'</b><small>'+esc(userName(o.r.u))+(o.r.horas?' · '+num(o.r.horas).replace(',00','')+' h de molino':'')+(o.r.obs?' · '+esc(o.r.obs):'')+'</small></div><time>'+fDT(o.r.f)+'</time></div>').join('')+'</div>':'<p class="small muted">Aún no se registran etapas.</p>')+'</div>';
-  h+='<h2>Ingresos del lote</h2><div class="card flush"><table class="tbl"><thead><tr><th>Ingreso</th><th>Placa</th><th>Pesaje</th><th class="r">Peso neto</th></tr></thead><tbody>'+l.ing.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Después del cierre','orange'):'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Pesaje" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Neto">'+tn(i.neto)+'</td></tr>';}).join('')+'</tbody></table></div>';
+  h+='<h2>Ingresos del lote</h2><div class="card flush"><table class="tbl"><thead><tr><th>Ingreso</th><th>Placa</th><th>Pesaje</th><th class="r">Peso neto</th></tr></thead><tbody>'+l.ing.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Tardío','orange'):'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Pesaje" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Neto">'+tn(i.neto)+'</td></tr>';}).join('')+'</tbody></table></div>';
   return h;}
 
 /* ================= Consolidación (HU-M08-01/02) ================= */
@@ -1234,7 +1257,7 @@ function notifs(){const L=[];
   if(can('destare'))S.ingresos.filter(i=>i.estado==='proc').forEach(i=>L.push({ic:'clock',tone:'orange',t:i.cod+' espera el destare',s:'Vehículo '+i.placa+', peso bruto '+tn(i.bruto),h:'#/destare'}));
   S.ingresos.filter(i=>i.estado==='reg'&&i.just.V4&&isoD(i.fecha)===isoD(now())).forEach(i=>L.push({ic:'warn',tone:'orange',t:'Advertencia V4 justificada en '+i.cod,s:'Peso neto '+tn(i.neto)+' sobre la capacidad',h:'#/ingresos/'+i.cod+'/validacion'}));
   if(can('lotes'))S.lotes.filter(l=>l.estado==='cerrado'&&!loteCompleto(l)).forEach(l=>{const nx=(l.comunes.length<1?['Secado']:l.lineas.map(x=>{const s=nextStep(l,x);return s?x.nombre+': '+(s==='elegir'?'definir ruta':s.toLowerCase()):null;})).concat((l.comp||[]).flatMap(k=>{const a=[];if(compNext(l,k))a.push(k.ing+': secado');(k.partes||[]).forEach(p=>{const q=partNext(l,p);if(q)a.push(k.ing+': '+q.toLowerCase());});return a;})).filter(Boolean).join('; ');if(nx)L.push({ic:'box',tone:'purple',t:l.nombre,s:'Sigue: '+nx,h:'#/lotes/'+l.cod});});
-  if(can('alta'))S.lotes.filter(l=>!l.alta&&loteCompleto(l)).forEach(l=>L.push({ic:'checkC',tone:'green',t:l.nombre+' listo para dar de alta',s:tn(loteTon(l))+' registradas, '+loteBB(l)+' bigbags',h:'#/altas/'+l.cod}));
+  if(can('alta'))S.lotes.filter(l=>!l.alta&&loteCompleto(l)).forEach(l=>L.push({ic:'checkC',tone:'green',t:l.nombre+' listo para cerrar con su destino',s:tn(loteTon(l))+' registradas, '+loteBB(l)+' bigbags',h:'#/altas/'+l.cod}));
   if(can('lotes.gestion')){const lib=S.ingresos.filter(i=>i.estado==='reg'&&!i.lote);if(lib.length)L.push({ic:'tray',tone:'blue',t:lib.length+(lib.length===1?' ingreso sin lote':' ingresos sin lote'),s:lib.map(i=>i.cod).join(', '),h:'#/lotes'});}
   return L;}
 
@@ -1276,7 +1299,7 @@ A['pass-save']=()=>{const u=me();if(fv('p-a')!==u.pass)return formErr('La contra
 A['user-menu']=t=>{const u=me();let th='auto';try{th=localStorage.getItem(TKEY)||'auto';}catch(e){}
   pop('<div class="p-h"><b>'+esc(u.nombre)+'</b><small>'+esc(u.rol)+', usuario '+u.u+'</small></div>'+mi('key','Cambiar contraseña','pass-open')+'<div class="p-seg"><div class="xs faint" style="margin-bottom:6px">Apariencia</div>'+segBtns([['auto','Automática'],['light','Clara'],['dark','Oscura']],th,'theme')+'</div>'+mi('refresh','Restablecer datos de la demostración','reset-demo')+'<hr>'+mi('logout','Cerrar sesión','logout','','','red'),t,t.classList.contains('me')?'start':'end');};
 A.theme=t=>{setTheme(t.dataset.k);closePop();toast('Apariencia actualizada');};
-A['more-menu']=t=>{let h='';[['ingresos','Calendario','cal','#/calendario'],['lotes','Trazabilidad','flow','#/lotes'],['alta','Alta de lotes','checkC','#/altas'],['consolidacion','Consolidación','chart','#/consolidacion'],['catalogos','Catálogos','doc','#/catalogos/vehiculos'],['admin','Administración','shield','#/admin/usuarios']].forEach(x=>{if(can(x[0]))h+=mi(x[2],x[1],'go','data-h="'+x[3]+'"');});
+A['more-menu']=t=>{let h='';[['ingresos','Calendario','cal','#/calendario'],['lotes','Trazabilidad','flow','#/lotes'],['alta','Cierre de lotes','checkC','#/altas'],['consolidacion','Consolidación','chart','#/consolidacion'],['catalogos','Catálogos','doc','#/catalogos/vehiculos'],['admin','Administración','shield','#/admin/usuarios']].forEach(x=>{if(can(x[0]))h+=mi(x[2],x[1],'go','data-h="'+x[3]+'"');});
   if(can('destare'))h+=mi('scale','Registrar destare','go','data-h="#/destare"');const u=me();h+='<hr>'+mi('user',esc(u.nombre),'user-menu-m','',esc(u.rol));pop(h,t,'end');};
 A['user-menu-m']=()=>{closePop();setTimeout(()=>A['user-menu']($('.tb-avatar')),10);};
 A.notifs=t=>{const L=notifs();pop('<div style="width:330px;max-width:100%"><div class="p-h"><b>Notificaciones</b><small>'+(L.length?L.length+(L.length===1?' pendiente':' pendientes'):'Todo al día')+'</small></div>'+(L.length?L.map(n=>'<button type="button" class="mi" data-a="go" data-h="'+n.h+'"><span class="tone-'+n.tone+'">'+ic(n.ic,18)+'</span><div>'+esc(n.t)+'<small>'+esc(n.s)+'</small></div></button>').join(''):'<p class="small muted" style="padding:10px">No hay nada pendiente.</p>')+'</div>',t,'end');};
@@ -1293,6 +1316,7 @@ A['ing-export']=()=>exportCSV();
 A['row-menu']=t=>{const i=ing(t.dataset.c);let h='<div class="p-h"><b>'+i.cod+'</b><small>'+i.placa+', '+fDT(i.fecha)+'</small></div>'+mi('doc','Ver detalle','go','data-h="#/ingresos/'+i.cod+'"')+mi('photo','Ver ticket','go','data-h="#/ingresos/'+i.cod+'/ticket"');
   if(i.estado==='proc'&&can('destare'))h+=mi('scale','Registrar destare','go','data-h="#/destare"');
   if(i.estado!=='anul'&&can('corregir'))h+=mi('edit','Corregir','corregir','data-c="'+i.cod+'"');
+  if(i.estado!=='anul'&&can('corregir')&&(i.hist||[]).length)h+=mi('refresh','Revertir última corrección','corr-revert','data-c="'+i.cod+'"');
   if(i.estado!=='anul'&&can('anular'))h+='<hr>'+mi('xCircle','Anular','anular','data-c="'+i.cod+'"','','red');pop(h,t,'end');};
 A.corregir=t=>{const i=ing(t.dataset.c);if(!i)return;if(!can('corregir'))return toast('Acción no autorizada','red');if(i.estado==='anul')return toast('No se puede corregir un ingreso anulado','red');
   modal(sheet('Corregir '+i.cod,'Corrija el dato según el ticket. El historial conserva el valor anterior, el nuevo y el motivo.',
@@ -1308,15 +1332,25 @@ A['corr-save']=t=>{const i=ing(t.dataset.c);if(i.estado==='anul')return formErr(
   const e=evaluar(d,i.cod);const bl=RULES.map(r=>r[0]).find(c=>e.r[c]==='block');if(bl)return formErr(e.msg[bl]);
   const warns=['V1','V4'].filter(c=>e.r[c]==='warn');if(warns.length&&!just)return formErr('Debe corregir o justificar las inconsistencias señaladas ('+warns.join(' y ')+')');
   if(e.vehEstado==='nuevo')return formErr('La placa '+d.placa+' no está registrada en el catálogo de vehículos');if(e.vehEstado==='baja')return formErr('El vehículo '+d.placa+' está dado de baja');
-  if(i.lote&&d.min!==i.min)return formErr('El ingreso '+i.cod+' corresponde a otro tipo de mineral que el lote '+i.lote);
+  if(i.lote&&d.min!==i.min&&!lMins(lote(i.lote)).includes(d.min))return formErr(minName(d.min)+' no está en el lote '+lote(i.lote).nombre+'. Agregue ese mineral al lote para corregir el ingreso');
   const antes={},desp={};const ch=(k,a,b)=>{if(String(a)!==String(b)){antes[k]=a;desp[k]=b;}};
   ch('placa',i.placa,d.placa);ch('fecha',fDT(i.fecha),fDT(dtOf(d)));ch('peso_bruto',num(i.bruto),num(d.bruto));ch('tipo_de_mineral',minName(i.min),minName(d.min));
   if(!Object.keys(desp).length)return formErr('No hay cambios que guardar');
+  i.hist=i.hist||[];i.hist.push({t:now().toISOString(),u:me().u,mot,prev:{placa:i.placa,fecha:i.fecha,bruto:i.bruto,min:i.min,tara:i.tara,neto:i.neto,estado:i.estado,val:Object.assign({},i.val),just:Object.assign({},i.just)}});
   const v=e.v,oldNeto=i.neto;i.placa=d.placa;i.fecha=D(dtOf(d)).toISOString();i.bruto=d.bruto;i.min=d.min;i.tara=v.tara;
   if(v.tara==null){i.neto=null;i.estado='proc';}else{i.neto=e.neto;i.estado='reg';}
   if(oldNeto!==i.neto){antes.peso_neto=num(oldNeto);desp.peso_neto=num(i.neto);}
   i.val=Object.assign({},e.r);i.just={};warns.forEach(c=>{i.just[c]=just;});i.corr=true;
   log('Ingreso corregido','Ingreso',i.cod,'Motivo: '+mot,antes,desp);save();closeModal();route(true);toast('Corrección guardada');};
+A['corr-revert']=t=>{const i=ing(t.dataset.c);if(!can('corregir'))return toast('Acción no autorizada','red');const h=(i.hist||[]).slice(-1)[0];if(!h)return toast('El ingreso no tiene correcciones que revertir','orange');
+  modal(alertBox('refresh','blue','Revertir la última corrección de '+i.cod,'Se restauran los valores anteriores a la corrección del '+fDT(h.t)+' ('+esc(userName(h.u))+'): placa '+h.prev.placa+', '+fDT(h.prev.fecha)+', peso bruto '+tn(h.prev.bruto)+', '+esc(minName(h.prev.min))+'. El lote, el consolidado y la trazabilidad se actualizan en cadena.','<div class="field"><label for="rv-m">Motivo *</label><textarea class="input" id="rv-m" placeholder="Ej. la corrección se aplicó al ingreso equivocado"></textarea></div>',B('Cancelar','secondary','close')+B('Revertir corrección','primary','corr-revert-ok','data-c="'+i.cod+'"')),'alert');};
+A['corr-revert-ok']=t=>{const i=ing(t.dataset.c);const h=(i.hist||[]).slice(-1)[0];if(!h)return formErr('Solo puede revertirse la última corrección del ingreso');if(i.estado==='anul')return formErr('No se puede corregir un ingreso anulado');
+  const mot=fv('rv-m').trim();if(!mot)return formErr('Debe indicar el motivo de la reversión');const p=h.prev;
+  const d={placa:p.placa,fecha:isoD(p.fecha),hora:iso(p.fecha).slice(11,16),bruto:p.bruto,min:p.min};const e=evaluar(d,i.cod);const bl=RULES.map(r=>r[0]).find(c=>e.r[c]==='block');if(bl)return formErr(e.msg[bl]);
+  if(i.lote&&p.min!==i.min&&!lMins(lote(i.lote)).includes(p.min))return formErr(minName(p.min)+' no está en el lote '+lote(i.lote).nombre+'. Agregue ese mineral al lote para revertir');
+  const antes={placa:i.placa,fecha:fDT(i.fecha),peso_bruto:num(i.bruto),tipo_de_mineral:minName(i.min),peso_neto:num(i.neto)},desp={placa:p.placa,fecha:fDT(p.fecha),peso_bruto:num(p.bruto),tipo_de_mineral:minName(p.min),peso_neto:num(p.neto)};
+  Object.assign(i,{placa:p.placa,fecha:p.fecha,bruto:p.bruto,min:p.min,tara:p.tara,neto:p.neto,estado:p.estado,val:p.val,just:p.just});i.hist.pop();i.corr=i.hist.length>0;
+  log('Corrección revertida','Ingreso',i.cod,'Motivo: '+mot+'. Revierte la corrección del '+fDT(h.t)+' de '+userName(h.u),antes,desp);save();closeModal();route(true);toast('Corrección revertida en el ingreso '+i.cod);};
 A.anular=t=>{const i=ing(t.dataset.c);if(!can('anular'))return toast('Acción no autorizada','red');
   modal(alertBox('xCircle','red','Anular '+i.cod,'Dejará de contar en los totales, pero se conserva en el historial con el motivo y el responsable.','<div class="field"><label for="a-mot">Motivo de la anulación *</label><textarea class="input" id="a-mot" placeholder="Ej. ticket registrado dos veces"></textarea></div>',B('Cancelar','secondary','close')+B('Anular ingreso','danger','anul-save','data-c="'+i.cod+'"')),'alert');};
 A['anul-save']=t=>{const i=ing(t.dataset.c);if(i.estado==='anul')return formErr('El ingreso '+i.cod+' ya fue anulado');const m=fv('a-mot').trim();if(!m)return formErr('Debe indicar el motivo de la anulación');
@@ -1425,44 +1459,58 @@ A['lote-create']=()=>{const nom=fv('ln-n').trim(),m=fv('ln-m'),f=fv('ln-f');if(!
   S.lotes.push({cod,nombre:nom,min:m,ap,ci:null,estado:'abierto',ing:[],tarde:[],comunes:[],lineas:[{id:'A',nombre:nom,ruta:null,ton:null,etapas:[]}],bb:[],comp:[]});
   log('Lote abierto','Lote',cod,nom+', '+minName(m));save();closeModal();go('#/lotes/'+cod);toast('Lote '+nom+' abierto');};
 A['lote-asignar']=t=>{const l=lote(t.dataset.c);const after=l.estado==='cerrado',div=l.lineas.length>1;
-  const cand=S.ingresos.filter(i=>i.min===l.min&&i.estado!=='anul'&&!l.ing.includes(i.cod)&&(!i.lote||lote(i.lote).estado==='abierto')).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const otros=S.ingresos.filter(i=>!lMins(l).includes(i.min)&&i.estado==='reg'&&!i.lote).length;const cand=S.ingresos.filter(i=>lMins(l).includes(i.min)&&i.estado!=='anul'&&!l.ing.includes(i.cod)&&(!i.lote||lote(i.lote).estado==='abierto')).sort((a,b)=>b.fecha.localeCompare(a.fecha));
   const sec=l.comunes.length>=1;
-  const body=(after?bn('orange','info',sec?'El secado del lote ya se registró. Cada ingreso que agregue tendrá su propio secado; al registrarlo, sus toneladas se reparten entre las partes del lote y siguen sus etapas hasta unificarse.':'El lote ya está cerrado. Los ingresos que agregue se secarán junto con el resto del lote.'):'')+
+  const body=(after?bn('orange','info',sec?'El secado del lote ya se registró. Cada ingreso que agregue tendrá su propio secado; al registrarlo, sus toneladas se reparten entre las partes del lote y siguen sus etapas hasta unificarse.':'El lote ya inició su recorrido. Los ingresos tardíos que agregue se secarán junto con el resto del lote.'):'')+
     (after&&div&&!sec?'<div class="field"><label for="la-lin">Parte a la que se agregan *</label><select class="input" id="la-lin">'+l.lineas.map(x=>'<option value="'+x.id+'">'+esc(x.nombre)+' ('+(x.ruta?RUTA_TXT[x.ruta].toLowerCase():'ruta por definir')+')</option>').join('')+'</select></div>':'')+
-    (cand.length?'<div class="stack tight">'+cand.map(i=>{const dis=i.estado==='proc';return '<label class="check'+(dis?' disabled':'')+'" style="border:1px solid var(--sep)"><input type="checkbox" name="asig" value="'+i.cod+'"'+(dis?' disabled':'')+'><span style="flex:1;min-width:0"><b style="display:block;font-size:14px">'+i.cod+'</b><span class="small muted">'+(dis?'El ingreso '+i.cod+' está en proceso: falta el destare del vehículo':i.placa+', '+fDT(i.fecha)+(i.lote?', ahora en '+esc(lote(i.lote).nombre)+' (se trasladará)':''))+'</span></span><b class="num">'+(dis?'—':tn(i.neto))+'</b></label>';}).join('')+'</div>':empty('tray','No hay ingresos disponibles','Solo se agregan ingresos Registrados de '+minName(l.min)+' que no estén en un lote cerrado.'));
-  modal(sheet('Agregar ingresos a '+esc(l.nombre),minName(l.min)+'. Los anulados y los En proceso no se agregan.',body,cand.length?B('Cancelar','secondary','close')+B('Agregar','primary','lote-asig-save','data-c="'+l.cod+'"'):B('Cerrar','secondary','close')),'side');};
+    (cand.length?'<div class="stack tight">'+cand.map(i=>{const dis=i.estado==='proc';return '<label class="check'+(dis?' disabled':'')+'" style="border:1px solid var(--sep)"><input type="checkbox" name="asig" value="'+i.cod+'"'+(dis?' disabled':'')+'><span style="flex:1;min-width:0"><b style="display:block;font-size:14px">'+i.cod+'</b><span class="small muted">'+(dis?'El ingreso '+i.cod+' está en proceso: falta el destare del vehículo':i.placa+', '+fDT(i.fecha)+(i.lote?', ahora en '+esc(lote(i.lote).nombre)+' (se trasladará)':''))+'</span></span><b class="num">'+(dis?'—':tn(i.neto))+'</b></label>';}).join('')+'</div>':empty('tray','No hay ingresos disponibles','Solo se agregan ingresos Registrados de '+lMinTxt(l)+' que no estén en un lote en recorrido.'));
+  modal(sheet('Agregar ingresos a '+esc(l.nombre),lMinTxt(l)+'. Los anulados y los En proceso no se agregan.',(otros?bn('blue','info',otros+(otros===1?' ingreso de otro mineral espera':' ingresos de otros minerales esperan')+' sin lote. Para sumarlos a esta carga, use primero «Agregar otro mineral».'):'')+body,cand.length?B('Cancelar','secondary','close')+B('Agregar','primary','lote-asig-save','data-c="'+l.cod+'"'):B('Cerrar','secondary','close')),'side');};
 A['lote-asig-save']=t=>{const l=lote(t.dataset.c);const sel=$$('#modal-root input[name=asig]:checked').map(x=>x.value);if(!sel.length)return formErr('Seleccione al menos un ingreso');
   const after=l.estado==='cerrado',sec=l.comunes.length>=1;const lin=after&&!sec&&l.lineas.length>1?l.lineas.find(y=>y.id===fv('la-lin')):null;l.comp=l.comp||[];
   sel.forEach(c=>{const i=ing(c);if(i.lote&&i.lote!==l.cod){const o=lote(i.lote);o.ing=o.ing.filter(x=>x!==c);log('Ingreso retirado del lote','Lote',o.cod,c+' (trasladado a '+l.nombre+')');}
     l.ing.push(c);i.lote=l.cod;if(after){l.tarde.push(c);
       if(sec)l.comp.push({id:'K'+(l.comp.length+1),ing:c,etapas:[],partes:[]});
       else if(lin&&lin.ton!=null)lin.ton=+(lin.ton+(i.neto||0)).toFixed(2);}});
-  log(after?'Ingresos agregados después del cierre':'Ingresos asignados','Lote',l.cod,sel.join(', ')+(lin&&l.lineas.length>1?' para '+lin.nombre:'')+(after&&sec?', con secado propio':''));save();closeModal();route(true);toast(sel.length===1?'Ingreso agregado':sel.length+' ingresos agregados');};
+  log(after?'Ingresos tardíos agregados':'Ingresos asignados','Lote',l.cod,sel.join(', ')+(lin&&l.lineas.length>1?' para '+lin.nombre:'')+(after&&sec?', con secado propio':''));save();closeModal();route(true);toast(sel.length===1?'Ingreso agregado':sel.length+' ingresos agregados');};
 let DIVP=null;
 function divPartsHTML(){return DIVP.map((x,k)=>'<div class="card" style="box-shadow:none;background:var(--surface-2)"><div class="card-h"><h3>Parte '+(k+1)+'</h3>'+(k>1?B('Quitar','danger-plain sm','div-del','data-k="'+k+'"'):'')+'</div>'+
   '<div class="field"><label for="dv-n'+k+'">Nombre *</label><input class="input" id="dv-n'+k+'" value="'+esc(x.nombre)+'" placeholder="Ej. Lote Pique Pingüino '+(k+1)+'"></div>'+
   '<div class="field"><span class="lbl">Ruta *</span><div class="opts">'+Object.keys(RUTAS).map(r=>'<label class="opt"><input type="radio" name="dv-r'+k+'" value="'+r+'"'+(x.ruta===r?' checked':'')+'><span><b style="display:block;font-size:14px">'+RUTA_CORTO[r]+'</b><span class="xs muted">'+RUTAS[r].join(', ')+'</span></span></label>').join('')+'</div></div>'+
-  '<div class="field"><label for="dv-t'+k+'">Toneladas *</label><div class="input-wrap"><input class="input" id="dv-t'+k+'" inputmode="decimal" value="'+esc(x.ton)+'" placeholder="0,00"><span class="suffix">t</span></div></div></div>').join('')+
-  '<button type="button" class="btn secondary block" data-a="div-add">'+ic('plus',16)+'Agregar otro lote</button>';}
+  '<div class="field"><label for="dv-t'+k+'">Fracción del lote *</label><input class="input" id="dv-t'+k+'" value="'+esc(x.ton)+'" placeholder="Ej. 1/3, 2/3 o 50 %" data-in="div-sum"><span class="hint">El mineral en cancha no se pesa: se estima a la vista.</span></div></div>').join('')+
+  '<p class="small" id="dv-sum"></p><button type="button" class="btn secondary block" data-a="div-add">'+ic('plus',16)+'Agregar otra parte</button>';}
 function readDiv(){DIVP=DIVP.map((x,k)=>({nombre:fv('dv-n'+k),ruta:($('input[name=dv-r'+k+']:checked')||{}).value||'',ton:fv('dv-t'+k)}));}
-A['lote-dividir']=t=>{const l=lote(t.dataset.c);const tot=loteTon(l),a=+(tot/2).toFixed(2),b=+(tot-a).toFixed(2);
-  DIVP=[{nombre:l.nombre+' Molido',ruta:'molido',ton:num(a)},{nombre:l.nombre+' Zaranda',ruta:'zaranda',ton:num(b)}];
-  modal(sheet('Dividir '+esc(l.nombre),'Separe el lote en partes con rutas distintas. Total del lote: '+tn(tot)+'.','<div id="dv-parts" class="stack">'+divPartsHTML()+'</div><p class="small muted">El secado se registra para todo el lote. Después, cada parte sigue su ruta y se ensaca por separado.</p>',
-    B('Cancelar','secondary','close')+B('Dividir lote','primary','lote-div-save','data-c="'+l.cod+'"')),'side');};
+A['lote-min']=t=>{const l=lote(t.dataset.c);if(!can('lotes.gestion'))return toast('Acción no autorizada','red');if(l.alta)return toast('El lote '+l.cod+' ya fue cerrado','red');
+  const op=S.minerales.filter(m=>m.activo&&!lMins(l).includes(m.cod));
+  modal(sheet('Agregar otro mineral a '+esc(l.nombre),'La carga mezclará minerales. El lote mostrará sus ingresos y toneladas por tipo de mineral.',
+    op.length?'<div class="field"><label for="lm-m">Tipo de mineral *</label><select class="input" id="lm-m"><option value="">Seleccione</option>'+op.map(m=>'<option value="'+m.cod+'">'+esc(m.nombre)+'</option>').join('')+'</select></div><p class="small muted">Minerales actuales: '+esc(lMinTxt(l))+'.</p>':empty('box','No hay otros tipos de mineral activos','Todos los tipos del catálogo ya están en el lote.'),
+    op.length?B('Cancelar','secondary','close')+B('Agregar mineral','primary','lote-min-save','data-c="'+l.cod+'"'):B('Cerrar','secondary','close')));};
+A['lote-min-save']=t=>{const l=lote(t.dataset.c);const m=fv('lm-m');if(!m)return formErr('Debe completar los campos obligatorios');if(lMins(l).includes(m))return formErr('El mineral '+minName(m)+' ya está en el lote');
+  l.mins=lMins(l).concat(m);log('Mineral agregado al lote','Lote',l.cod,minName(m)+'; minerales: '+lMinTxt(l));save();closeModal();route(true);toast(minName(m)+' agregado al lote');};
+A['lote-min-del']=t=>{const l=lote(t.dataset.c),m=t.dataset.m;if(l.estado!=='abierto')return toast('Solo se quitan minerales mientras el lote está Abierto','red');
+  if(l.ing.some(c=>ing(c).min===m))return toast('No se puede quitar '+minName(m)+': tiene ingresos en el lote','red');if(lMins(l).length<2)return toast('El lote debe conservar al menos un tipo de mineral','red');
+  l.mins=lMins(l).filter(x=>x!==m);if(l.min===m)l.min=l.mins[0];log('Mineral quitado del lote','Lote',l.cod,minName(m));save();route(true);toast(minName(m)+' quitado del lote');};
+A['lote-dividir']=t=>{const l=lote(t.dataset.c);const tot=loteTon(l);
+  DIVP=[{nombre:l.nombre+' Molido',ruta:'molido',ton:'1/2'},{nombre:l.nombre+' Zaranda',ruta:'zaranda',ton:'1/2'}];
+  modal(sheet('Dividir '+esc(l.nombre),'Indique la fracción de cada parte y su ruta; las fracciones deben sumar la unidad. Total del lote: '+tn(tot)+'.','<div id="dv-parts" class="stack">'+divPartsHTML()+'</div><p class="small muted">El secado se registra para todo el lote. Después, cada parte sigue su ruta y se ensaca por separado. Las toneladas de cada parte son una estimación: fracción × total.</p>',
+    B('Cancelar','secondary','close')+B('Dividir lote','primary','lote-div-save','data-c="'+l.cod+'"')),'side');A['div-sum']();};
+A['div-sum']=()=>{const box=$('#dv-sum'),bt=$('[data-a=lote-div-save]');if(!box||!bt)return;const tot=loteTon(lote(bt.dataset.c));const fs=[];let bad=false;$$('#dv-parts input[id^=dv-t]').forEach(x=>{const q=frac(x.value);if(!q)bad=true;else fs.push(q);});
+  if(bad){box.innerHTML='<span style="color:var(--orange)">Escriba cada fracción como 1/3, 0,5 o 50 %.</span>';return;}const sm=fsum(fs),ok=sm[0]===sm[1];
+  box.innerHTML='Suma: <b>'+ftxt(sm)+'</b> de 1'+(ok?' <span class="tone-green">✓</span>':' <span style="color:var(--orange)">· '+(fval(sm)<1?'falta':'sobra')+' '+ftxt(fsum([sm,[-sm[1],sm[1]]]).map(Math.abs))+'</span>')+'<br><span class="xs muted">'+fs.map(q=>'≈ '+tn(tot*fval(q))).join(' · ')+'</span>';};
 A['div-add']=()=>{readDiv();if(DIVP.length>=6)return formErr('Puede dividir el lote en seis partes como máximo');DIVP.push({nombre:'',ruta:'',ton:''});$('#dv-parts').innerHTML=divPartsHTML();const f=$('#dv-n'+(DIVP.length-1));if(f)f.focus();};
 A['div-del']=t=>{readDiv();DIVP.splice(+t.dataset.k,1);$('#dv-parts').innerHTML=divPartsHTML();};
 A['lote-div-save']=t=>{const l=lote(t.dataset.c);if(l.lineas.length>1)return formErr('El lote ya fue dividido');if(l.lineas[0].etapas.length)return formErr('No se puede dividir: el lote ya avanzó por su ruta');
-  readDiv();const p=DIVP.map(x=>({nombre:x.nombre.trim(),ruta:x.ruta,ton:pnum(x.ton)}));
-  if(p.some(x=>!x.nombre||!x.ruta||!(x.ton>0)))return formErr('Debe completar los campos obligatorios de cada parte');
+  readDiv();const p=DIVP.map(x=>({nombre:x.nombre.trim(),ruta:x.ruta,q:frac(x.ton)}));
+  if(p.some(x=>!x.nombre||!x.ruta||!x.q||!(x.q[0]>0)))return formErr('Debe completar los campos obligatorios de cada parte');
   if(new Set(p.map(x=>x.nombre.toLowerCase())).size!==p.length)return formErr('Cada parte debe tener un nombre distinto');
-  const tot=loteTon(l),sum=p.reduce((s,x)=>s+x.ton,0);if(Math.abs(sum-tot)>0.01)return formErr('Las toneladas de las partes suman '+tn(sum)+' y deben sumar el total del lote ('+tn(tot)+')');
-  l.lineas=p.map((x,k)=>({id:'ABCDEF'[k],nombre:x.nombre,ruta:x.ruta,ton:x.ton,etapas:[]}));
-  log('Lote dividido','Lote',l.cod,p.map(x=>x.nombre+' ('+tn(x.ton)+', '+RUTA_TXT[x.ruta].toLowerCase()+')').join('; '));save();closeModal();route(true);toast('Lote dividido en '+p.length+' partes');};
-A['lote-cerrar']=t=>{const l=lote(t.dataset.c);modal(alertBox('lock','blue','Cerrar '+esc(l.nombre),l.ing.length?'Empezará el recorrido con el secado de '+tn(loteTon(l))+'. Si llegan más volquetes, aún podrá agregarlos.':'El lote todavía no tiene ingresos asignados.','',B('Cancelar','secondary','close')+B('Cerrar e iniciar','primary','lote-cerrar-ok','data-c="'+l.cod+'"')),'alert');};
-A['lote-cerrar-ok']=t=>{const l=lote(t.dataset.c);if(!l.ing.length)return formErr('El lote no tiene ingresos asignados');if(l.estado!=='abierto')return formErr('El lote ya fue cerrado');
-  l.estado='cerrado';l.ci=now().toISOString();log('Lote cerrado','Lote',l.cod,l.ing.length+' ingresos, '+tn(loteTon(l)));save();closeModal();route(true);toast('Lote '+l.nombre+' cerrado');};
+  const tot=loteTon(l),sm=fsum(p.map(x=>x.q));if(sm[0]!==sm[1])return formErr('Las fracciones suman '+ftxt(sm)+' y deben sumar la unidad');
+  let acc=0;p.forEach((x,k)=>{x.ton=k<p.length-1?+(tot*fval(x.q)).toFixed(2):+(tot-acc).toFixed(2);acc+=x.ton;});
+  l.lineas=p.map((x,k)=>({id:'ABCDEF'[k],nombre:x.nombre,ruta:x.ruta,frac:ftxt(x.q),ton:x.ton,etapas:[]}));
+  log('Lote dividido','Lote',l.cod,p.map(x=>x.nombre+' ('+ftxt(x.q)+', ≈ '+tn(x.ton)+', '+RUTA_TXT[x.ruta].toLowerCase()+')').join('; '));save();closeModal();route(true);toast('Lote dividido en '+p.length+' partes');};
+A['lote-cerrar']=t=>{const l=lote(t.dataset.c);modal(alertBox('lock','blue','Iniciar el recorrido de '+esc(l.nombre),l.ing.length?'Empezará el recorrido con el secado de '+tn(loteTon(l))+'. Si llegan más volquetes, aún podrá agregarlos.':'El lote todavía no tiene ingresos asignados.','',B('Cancelar','secondary','close')+B('Iniciar recorrido','primary','lote-cerrar-ok','data-c="'+l.cod+'"')),'alert');};
+A['lote-cerrar-ok']=t=>{const l=lote(t.dataset.c);if(!l.ing.length)return formErr('El lote no tiene ingresos asignados');if(l.estado!=='abierto')return formErr('El lote ya inició su recorrido');
+  l.estado='cerrado';l.ci=now().toISOString();log('Recorrido iniciado','Lote',l.cod,l.ing.length+' ingresos, '+tn(loteTon(l)));save();closeModal();route(true);toast(l.nombre+' en recorrido');};
 A['lote-retirar']=t=>{const l=lote(t.dataset.c),c=t.dataset.i;modal(alertBox('minus','orange','Retirar '+c,'El ingreso vuelve a cancha y podrá agregarse a otro lote.','',B('Cancelar','secondary','close')+B('Retirar','danger','lote-retirar-ok','data-c="'+l.cod+'" data-i="'+c+'"')),'alert');};
-A['lote-retirar-ok']=t=>{const l=lote(t.dataset.c),c=t.dataset.i;if(l.estado!=='abierto')return formErr('El lote ya fue cerrado');l.ing=l.ing.filter(x=>x!==c);ing(c).lote=null;log('Ingreso retirado del lote','Lote',l.cod,c);save();closeModal();route(true);toast('Ingreso retirado del lote');};
+A['lote-retirar-ok']=t=>{const l=lote(t.dataset.c),c=t.dataset.i;if(l.estado!=='abierto')return formErr('Solo se retiran ingresos mientras el lote está Abierto');l.ing=l.ing.filter(x=>x!==c);ing(c).lote=null;log('Ingreso retirado del lote','Lote',l.cod,c);save();closeModal();route(true);toast('Ingreso retirado del lote');};
 const prevRec=(l,x)=>x?(x.etapas.length?x.etapas[x.etapas.length-1]:l.comunes[0]):null;
 const horasField=(hide)=>'<div class="field'+(hide?' hide':'')+'" id="lp-hw"><label for="lp-h">Horas de molienda <span class="faint" style="font-weight:400">(opcional)</span></label><div class="input-wrap"><input class="input" id="lp-h" inputmode="decimal" placeholder="Ej. 4"><span class="suffix">h</span></div><span class="hint">Tiempo de uso del molino. Con él se calcula cuántas toneladas por hora se molieron.</span></div>';
 A['lote-paso']=t=>{const l=lote(t.dataset.c);const x=t.dataset.l?l.lineas.find(y=>y.id===t.dataset.l):null;const e=nextStep(l,x);if(!e)return;const prev=prevRec(l,x);const eleg=e==='elegir';
@@ -1476,10 +1524,10 @@ A['lote-paso']=t=>{const l=lote(t.dataset.c);const x=t.dataset.l?l.lineas.find(y
     B('Cancelar','secondary','close')+B('Registrar paso','primary','lote-paso-save','data-c="'+l.cod+'" data-l="'+(x?x.id:'')+'"')));};
 A['lp-r']=t=>{const w=$('#lp-hw');if(w)w.classList.toggle('hide',t.value!=='molido');};
 A['lote-paso-save']=t=>{const l=lote(t.dataset.c);const x=t.dataset.l?l.lineas.find(y=>y.id===t.dataset.l):null;let e=nextStep(l,x);
-  if(l.estado!=='cerrado')return formErr('El lote debe cerrarse antes de registrar etapas');if(!e)return formErr('No hay etapas pendientes para este lote');
+  if(l.estado!=='cerrado')return formErr('El lote debe iniciar su recorrido antes de registrar etapas');if(!e)return formErr('No hay etapas pendientes para este lote');
   const f=fv('lp-f');if(!f)return formErr('Debe completar los campos obligatorios');if(D(f)>now())return formErr('La fecha de la etapa no puede ser posterior a la fecha actual');
   const prev=prevRec(l,x);const mn=y=>Math.floor(D(y).getTime()/60000);if(prev&&mn(f)<mn(prev.f))return formErr('La fecha de la etapa no puede ser anterior a la de la etapa '+prev.e);
-  if(!prev&&l.ci&&mn(f)<mn(l.ci))return formErr('La fecha de la etapa no puede ser anterior al cierre del lote');
+  if(!prev&&l.ci&&mn(f)<mn(l.ci))return formErr('La fecha de la etapa no puede ser anterior al inicio del recorrido');
   let ruta=null;if(e==='elegir'){ruta=($('input[name=lp-r]:checked')||{}).value;if(!ruta)return formErr('Elija qué etapa sigue después del secado');e=RUTAS[ruta][0];}
   const hs=e==='Molienda'&&fv('lp-h').trim()?pnum(fv('lp-h')):null;if(hs!=null&&!(hs>0))return formErr('Las horas de molienda deben ser mayores que cero');
   const tonL=x?lineaTon(l,x):loteTon(l);let bbr={n:0};if(e==='Ensacado'){bbr=bbRead();if(bbr.err)return formErr(bbr.err);}
@@ -1518,28 +1566,29 @@ A['lote-bb-save']=t=>{const l=lote(t.dataset.c);const tg=bbTarget(l,t.dataset.l)
 // Complementos: ingresos agregados después del secado del lote
 A['comp-paso']=t=>{const l=lote(t.dataset.c),k=l.comp.find(y=>y.id===t.dataset.k);const ton=compTon(k);
   if(t.dataset.p===''){if(!compNext(l,k))return;const div=l.lineas.length>1;const tot=l.lineas.reduce((s,x)=>s+lineaTon(l,x),0)||1;
-    const sug=l.lineas.map(x=>+(ton*lineaTon(l,x)/tot).toFixed(2));if(div)sug[sug.length-1]=+(ton-sug.slice(0,-1).reduce((a,b)=>a+b,0)).toFixed(2);
+    const sug=l.lineas.map(x=>x.frac||ftxt(frac((lineaTon(l,x)/tot).toFixed(2))||[1,1]));
     const ini=x=>x.etapas.length>0&&!!x.ruta;
-    const fila=(x,k2)=>'<div class="field"><label for="cr-'+x.id+'">'+esc(x.nombre)+'</label><div class="input-wrap"><input class="input" id="cr-'+x.id+'" inputmode="decimal" value="'+num(sug[k2])+'" data-in="cr-sum"><span class="suffix">t</span></div><span class="hint">'+(ini(x)?'Ya avanzó por '+x.etapas[x.etapas.length-1].e.toLowerCase()+': esta porción recorrerá '+RUTAS[x.ruta].join(', ').toLowerCase()+' y luego se unifica.':'Aún no empezó su ruta: esta porción se une directamente.')+'</span></div>';
+    const fila=(x,k2)=>'<div class="field"><label for="cr-'+x.id+'">'+esc(x.nombre)+'</label><input class="input" id="cr-'+x.id+'" value="'+esc(sug[k2])+'" placeholder="Ej. 1/3 o 0" data-in="cr-sum"><span class="hint">'+(ini(x)?'Ya avanzó por '+x.etapas[x.etapas.length-1].e.toLowerCase()+': esta porción recorrerá '+RUTAS[x.ruta].join(', ').toLowerCase()+' y luego se unifica.':'Aún no empezó su ruta: esta porción se une directamente.')+'</span></div>';
     modal(sheet('Registrar secado de '+k.ing,tn(ton)+' de peso neto registrado. Secado propio, separado del resto del lote.',
       '<div class="field"><label for="lp-f">Fecha y hora en que terminó *</label><input class="input" type="datetime-local" id="lp-f" value="'+iso(now())+'"></div>'+
-      (div?'<div class="card" style="box-shadow:none;background:var(--surface-2)"><h3>Reparto entre las partes del lote</h3><p class="xs muted">Debe sumar las '+tn(ton)+' del ingreso. La merma del secado se verá al ensacar.</p>'+l.lineas.map(fila).join('')+'<p class="small" id="cr-txt">Suma: '+tn(sug.reduce((a,b)=>a+b,0))+' de '+tn(ton)+'</p></div>':
+      (div?'<div class="card" style="box-shadow:none;background:var(--surface-2)"><h3>Reparto entre las partes del lote</h3><p class="xs muted">El sistema propone las fracciones del lote; puede ajustarlas. Deben sumar la unidad (DR-20).</p>'+l.lineas.map(fila).join('')+'<p class="small" id="cr-txt"></p></div>':
         bn('blue','info',ini(l.lineas[0])?esc(l.lineas[0].nombre)+' ya avanzó: este ingreso recorrerá '+RUTAS[l.lineas[0].ruta].join(', ').toLowerCase()+' y luego se unifica.':'Al secarse, se une a '+esc(l.lineas[0].nombre)+'.'))+
       '<div class="field"><label for="lp-o">Observación</label><textarea class="input" id="lp-o" placeholder="Opcional"></textarea></div>',
-      B('Cancelar','secondary','close')+B('Registrar secado','primary','comp-paso-save','data-c="'+l.cod+'" data-k="'+k.id+'" data-p=""')),div?'side':'');return;}
+      B('Cancelar','secondary','close')+B('Registrar secado','primary','comp-paso-save','data-c="'+l.cod+'" data-k="'+k.id+'" data-p=""')),div?'side':'');if(div)A['cr-sum']();return;}
   const p=k.partes[+t.dataset.p];const e=partNext(l,p);if(!e)return;const x=l.lineas.find(y=>y.id===p.lin);const prev=p.etapas[p.etapas.length-1]||k.etapas[0];
   modal(sheet('Registrar '+e.toLowerCase(),k.ing+' → '+esc(x.nombre)+', '+tn(p.ton)+'. Etapa anterior: '+prev.e+', '+fDT(prev.f)+'.',
     '<div class="field"><label for="lp-f">Fecha y hora en que terminó *</label><input class="input" type="datetime-local" id="lp-f" value="'+iso(now())+'"></div>'+
     (e==='Molienda'?horasField(false):'')+(e==='Ensacado'?bbBlock(p.ton,bbPref(x.nombre),true):'')+
     '<div class="field"><label for="lp-o">Observación</label><textarea class="input" id="lp-o" placeholder="Opcional"></textarea></div>',
     B('Cancelar','secondary','close')+B('Registrar paso','primary','comp-paso-save','data-c="'+l.cod+'" data-k="'+k.id+'" data-p="'+t.dataset.p+'"')));};
-A['cr-sum']=()=>{const tx=$('#cr-txt'),bt=$('[data-a=comp-paso-save]');if(!tx||!bt)return;const l=lote(bt.dataset.c),k=l.comp.find(y=>y.id===bt.dataset.k);const sum=l.lineas.reduce((s,x)=>s+(pnum(fv('cr-'+x.id))||0),0),ton=compTon(k);
-  tx.innerHTML='Suma: <b>'+tn(sum)+'</b> de '+tn(ton)+(Math.abs(sum-ton)<0.01?' <span class="tone-green">✓</span>':' <span style="color:var(--orange)">· '+(sum<ton?'faltan '+tn(ton-sum):'sobran '+tn(sum-ton))+'</span>');};
+A['cr-sum']=()=>{const tx=$('#cr-txt'),bt=$('[data-a=comp-paso-save]');if(!tx||!bt)return;const l=lote(bt.dataset.c),k=l.comp.find(y=>y.id===bt.dataset.k),ton=compTon(k);const qs=l.lineas.map(x=>frac(fv('cr-'+x.id)));
+  if(qs.some(q=>!q)){tx.innerHTML='<span style="color:var(--orange)">Escriba cada fracción como 1/3, 0,5, 50 % o 0.</span>';return;}const sm=fsum(qs);
+  tx.innerHTML='Suma: <b>'+ftxt(sm)+'</b> de 1'+(sm[0]===sm[1]?' <span class="tone-green">✓</span>':' <span style="color:var(--orange)">· deben sumar la unidad</span>')+'<br><span class="xs muted">'+qs.map((q,k2)=>esc(l.lineas[k2].nombre)+' ≈ '+tn(ton*fval(q))).join(' · ')+'</span>';};
 A['comp-paso-save']=t=>{const l=lote(t.dataset.c),k=l.comp.find(y=>y.id===t.dataset.k);const ton=compTon(k);const mn=y=>Math.floor(D(y).getTime()/60000);
   const f=fv('lp-f');if(!f)return formErr('Debe completar los campos obligatorios');if(D(f)>now())return formErr('La fecha de la etapa no puede ser posterior a la fecha actual');const o=fv('lp-o').trim();
   if(t.dataset.p===''){if(!compNext(l,k))return formErr('El secado de este ingreso ya fue registrado');const i=ing(k.ing);if(i&&mn(f)<mn(i.fecha))return formErr('La fecha del secado no puede ser anterior al ingreso');
-    let rp=[];if(l.lineas.length>1){rp=l.lineas.map(x=>({x,t:pnum(fv('cr-'+x.id))}));if(rp.some(r=>r.t==null||isNaN(r.t)||r.t<0))return formErr('Indique las toneladas de cada parte (0 si no lleva)');
-      const sum=rp.reduce((s,r)=>s+r.t,0);if(Math.abs(sum-ton)>0.01)return formErr('El reparto suma '+tn(sum)+' y debe sumar las '+tn(ton)+' del ingreso');rp=rp.filter(r=>r.t>0);}
+    let rp=[];if(l.lineas.length>1){rp=l.lineas.map(x=>({x,q:frac(fv('cr-'+x.id))}));if(rp.some(r=>!r.q))return formErr('Indique la fracción de cada parte (0 si no lleva)');
+      const sm=fsum(rp.map(r=>r.q));if(sm[0]!==sm[1])return formErr('Las fracciones del reparto suman '+ftxt(sm)+' y deben sumar la unidad');let acc=0;rp=rp.filter(r=>r.q[0]>0);rp.forEach((r,k2)=>{r.t=k2<rp.length-1?+(ton*fval(r.q)).toFixed(2):+(ton-acc).toFixed(2);acc+=r.t;});}
     else rp=[{x:l.lineas[0],t:ton}];
     const rec={e:'Secado',f:D(f).toISOString(),u:me().u};if(o)rec.obs=o;k.etapas.push(rec);
     k.partes=rp.map(r=>{const ini=r.x.etapas.length>0&&!!r.x.ruta;return {lin:r.x.id,ton:+r.t.toFixed(2),ruta:ini?r.x.ruta:null,etapas:[],unido:ini?null:rec.f};});
@@ -1554,9 +1603,9 @@ A['comp-paso-save']=t=>{const l=lote(t.dataset.c),k=l.comp.find(y=>y.id===t.data
   if(bbr.n>0)bbSave(l,k.id+'-'+p.lin,'complemento '+k.ing+' ('+x.nombre+')',bbr,rec.f);
   save();closeModal();route(true);toast(partUnif(p)?k.ing+' unificado a '+x.nombre:'Etapa '+e+' registrada para '+k.ing);};
 A['alta-open']=t=>{const l=lote(t.dataset.c);if(!can('alta'))return toast('Acción no autorizada','red');if(!loteCompleto(l))return toast('El lote aún tiene etapas pendientes','orange');
-  modal(alertBox('checkC','green','Dar de alta '+esc(l.nombre),'Se entrega para la venta con '+tn(loteTon(l))+' registradas y '+loteBB(l)+' bigbags. Después no admitirá más ingresos ni etapas.','<div class="field"><label for="al-o">Observación</label><textarea class="input" id="al-o" placeholder="Opcional. Ej. despachado en dos camiones"></textarea></div>',B('Cancelar','secondary','close')+B('Dar de alta','primary','alta-save','data-c="'+l.cod+'"')),'alert');};
-A['alta-save']=t=>{const l=lote(t.dataset.c);if(!can('alta'))return formErr('Acción no autorizada');if(l.alta)return formErr('El lote ya fue dado de alta');if(!loteCompleto(l))return formErr('El lote aún tiene etapas pendientes');const o=fv('al-o').trim();
-  l.alta={f:now().toISOString(),u:me().u};if(o)l.alta.obs=o;log('Lote dado de alta','Lote',l.cod,l.nombre+': '+tn(loteTon(l))+' registradas, '+loteBB(l)+' bigbags, ≈ '+tn(bbSumKeys(l,l.bb.map(b=>b.lin)))+' ensacadas'+(o?'. '+o:''));save();closeModal();route(true);toast('Lote '+l.nombre+' dado de alta');};
+  modal(alertBox('checkC','green','Cerrar '+esc(l.nombre)+' con su destino','Cierre definitivo con '+tn(loteTon(l))+' registradas y '+loteBB(l)+' bigbags. Después no admitirá más ingresos, etapas ni bigbags.','<div class="field"><span class="lbl">Destino *</span><div class="stack tight">'+Object.keys(DEST).map(k=>'<label class="opt"><input type="radio" name="al-d" value="'+k+'"><span><b style="display:block;font-size:14px">'+DEST[k]+'</b><span class="xs muted">'+DEST_TXT[k]+'</span></span></label>').join('')+'</div></div><div class="field"><label for="al-o">Observación</label><textarea class="input" id="al-o" placeholder="Opcional. Ej. despachado en dos camiones"></textarea></div>',B('Cancelar','secondary','close')+B('Cerrar lote','primary','alta-save','data-c="'+l.cod+'"')),'alert');};
+A['alta-save']=t=>{const l=lote(t.dataset.c);if(!can('alta'))return formErr('Acción no autorizada');if(l.alta)return formErr('El lote ya fue cerrado');if(!loteCompleto(l))return formErr('Todavía no se puede cerrar el lote. Pendiente: '+lotePend(l).join('; '));const dest=($('input[name=al-d]:checked')||{}).value;if(!dest)return formErr('Debe indicar el destino del lote');const o=fv('al-o').trim();
+  l.alta={f:now().toISOString(),u:me().u,dest};if(o)l.alta.obs=o;log('Lote cerrado con destino','Lote',l.cod,l.nombre+', destino: '+DEST[dest]+': '+tn(loteTon(l))+' registradas, '+loteBB(l)+' bigbags, ≈ '+tn(bbSumKeys(l,l.bb.map(b=>b.lin)))+' ensacadas'+(o?'. '+o:''));save();closeModal();route(true);toast(l.nombre+' cerrado con destino '+DEST[dest].toLowerCase());};
 // Consulta
 A.cq=()=>{CQ.placa=fv('cq-p');CQ.desde=fv('cq-d');CQ.hasta=fv('cq-h');runConsulta();route(true);};
 A['cq-chip']=t=>{CQ={placa:t.dataset.p,desde:'',hasta:'',res:null,sel:null,err:null};runConsulta();route(true);};
