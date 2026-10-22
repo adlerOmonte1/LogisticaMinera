@@ -566,6 +566,7 @@ function seed(){
   i148.ocr={placa:['C9K-741',0.96],fecha:[i148.fecha,0.97],bruto:[28.1,0.71]};i148.val.V4='warn';i148.just={V4:'Carga con humedad por lluvia en la mina; se verificó el volquete en cancha antes de confirmar.'};
   I(149,12,3,9,15,'E4R-208','MOA',29.1,'jcondor',{ini:d(12,3,9,19,40),fin:d(12,3,9,22,8)});
   I(150,12,3,10,5,'V2K-841','MOA',27.3,'jcondor');
+  I(151,12,3,11,20,'F7T-615','MOA',30.4,'jcondor');
   i144.estado='anul';i144.anul={motivo:'Ticket registrado dos veces por error de digitación; el ingreso válido es ING-2027-00145.',u:'rpalomino',t:d(10,3,15,20)};
   const g=c=>ingresos.find(i=>i.cod===c);
   const C=n=>'ING-2027-00'+n;
@@ -582,7 +583,7 @@ function seed(){
       comunes:[{e:'Secado',f:d(12,3,9,10),u:'jcondor',obs:'Cancha 2, secado al sol'}],
       lineas:[{id:'A',nombre:'Lote Pique Pingüino Molido',ruta:'molido',frac:'5/8',ton:40.16,etapas:[]},{id:'B',nombre:'Lote Pique Pingüino Zaranda',ruta:'zaranda',frac:'3/8',ton:24.09,etapas:[{e:'Zarandeo',f:d(12,3,9,55),u:'jcondor'},{e:'Ensacado',f:d(12,3,10,20),u:'jcondor',obs:'Ensacado sin moler'}]}],
       bb:[{lin:'B',etapa:'Ensacado',cant:24,peso:1,rec:true,ref:24.09,pref:'PPZ',ini:1,f:d(12,3,10,20),u:'jcondor'}]},
-    {cod:'LOT-2027-019',nombre:'Lote Cancha 2 Óxido B',min:'MOB',mins:['MOB','MOA'],ap:d(11,3,17,0),ci:null,estado:'abierto',ing:[C(142),C(145)],tarde:[],comunes:[],lineas:[{id:'A',nombre:'Lote Cancha 2 Óxido B',ruta:null,ton:null,etapas:[]}],bb:[],comp:[]}];
+    {cod:'LOT-2027-019',nombre:'Lote Cancha 2 Óxido B',min:'MOB',ap:d(11,3,17,0),ci:null,estado:'abierto',ing:[C(142),C(145)],tarde:[],comunes:[],lineas:[{id:'A',nombre:'Lote Cancha 2 Óxido B',ruta:null,ton:null,etapas:[]}],bb:[],comp:[]}];
   lotes.forEach(l=>l.ing.forEach(c=>{g(c).lote=l.cod;}));
   // Auditoría
   const audit=[];let ev=0;
@@ -611,14 +612,14 @@ function seed(){
   L(d(12,3,9,38),'jcondor','Inicio de sesión','Usuario','jcondor','');
   L(d(12,3,9,52),'jcondor','Acceso rechazado','Usuario','jcondor','Intentó abrir Administración sin autorización');
   audit.sort((a,b)=>b.t.localeCompare(a.t));
-  return {v:6,users,transportistas,minerales,vehiculos,ingresos,lotes,audit,seq:{ing:150,lot:19,ev,tk:4819},session:null,lastNow:null};
+  return {v:7,users,transportistas,minerales,vehiculos,ingresos,lotes,audit,seq:{ing:151,lot:19,ev,tk:4819},session:null,lastNow:null};
 }
 function minName0(ms,c){const m=ms.find(x=>x.cod===c);return m?m.nombre:c;}
 
 /* ================= Estado y persistencia ================= */
-const KEY='consmin-sistema-demo-v6', TKEY='consmin-tema';
+const KEY='consmin-sistema-demo-v7', TKEY='consmin-tema';
 let S=null;const IMG={};
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x&&x.v===6)S=x;}}catch(e){}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x&&x.v===7)S=x;}}catch(e){}
   if(!S)S=seed();clockBase=Math.max(DEFAULT_NOW,S.lastNow?new Date(S.lastNow).getTime():0);T0=Date.now();}
 function save(){S.lastNow=now().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function applyTheme(){let t='auto';try{t=localStorage.getItem(TKEY)||'auto';}catch(e){}if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);return t;}
@@ -1062,7 +1063,7 @@ function compLote(l,ab,g){
   lMins(l).forEach(m=>{const L=l.ing.filter(c=>ing(c).min===m),t=+L.reduce((a,c)=>{const i=ing(c);return a+(i.estado==='reg'&&i.neto||0);},0).toFixed(2);
     rows+='<tr class="grp"><td colspan="3" data-l=""><b>'+esc(minName(m))+'</b> <span class="xs muted">'+L.length+(L.length===1?' ingreso':' ingresos')+'</span>'+(m===l.min?' '+pill('Mineral de apertura','gray'):'')+(ed&&!L.length&&lMins(l).length>1?' '+B('Quitar','danger-plain sm','lote-min-del','data-c="'+l.cod+'" data-m="'+m+'"'):'')+'</td><td class="r" data-l="Subtotal"><b>'+tn(t)+'</b></td>'+(ed?'<td></td>':'')+'</tr>';
     if(!L.length)rows+='<tr><td colspan="'+cols+'" class="small muted" data-l="">Sin ingresos de este mineral todavía.</td></tr>';
-    rows+=L.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Tardío','orange'):'')+(i.estado==='anul'?' '+pill('Anulado','red'):'')+(i.estado==='proc'?' '+pill('En proceso','orange'):'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Fecha" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Peso neto">'+tn(i.neto)+'</td>'+(ed?'<td class="act">'+B('Retirar','danger-plain sm','lote-retirar','data-c="'+l.cod+'" data-i="'+c+'"')+'</td>':'')+'</tr>';}).join('');});
+    rows+=L.map(c=>{const i=ing(c);return '<tr class="click'+(i.estado==='anul'?' dim':'')+'" data-a="go" data-h="#/ingresos/'+c+'"><td class="main" data-l="Ingreso">'+c+(l.tarde.includes(c)?' '+pill('Tardío','orange'):'')+((l.otros||{})[c]?' '+pill('Otro mineral','purple'):'')+(i.estado==='anul'?' '+pill('Anulado','red'):'')+(i.estado==='proc'?' '+pill('En proceso','orange'):'')+((l.otros||{})[c]?'<div class="xs muted" style="font-weight:400">Autorización: '+esc(l.otros[c].mot)+'</div>':'')+'</td><td data-l="Placa">'+i.placa+'</td><td data-l="Fecha" class="num">'+fDT(i.fecha)+'</td><td class="r" data-l="Peso neto">'+tn(i.neto)+'</td>'+(ed?'<td class="act">'+B('Retirar','danger-plain sm','lote-retirar','data-c="'+l.cod+'" data-i="'+c+'"')+'</td>':'')+'</tr>';}).join('');});
   return '<div class="card flush"><table class="tbl"><thead><tr><th>Ingreso</th><th>Placa</th><th>Fecha del pesaje</th><th class="r">Peso neto</th>'+(ed?'<th></th>':'')+'</tr></thead><tbody>'+rows+
     '</tbody><tfoot><tr><td colspan="3" data-l="">Total del lote</td><td class="r" data-l="Total">'+tn(loteTon(l))+'</td>'+(ed?'<td></td>':'')+'</tr></tfoot></table></div>';}
 function pLote(cod){const l=lote(cod);if(!l)return head('Lote no encontrado','',null,['Lotes de proceso','#/lotes'])+'<div class="card">'+empty('box','No existe el lote '+esc(cod),'')+'</div>';
@@ -1458,20 +1459,38 @@ A['lote-create']=()=>{const nom=fv('ln-n').trim(),m=fv('ln-m'),f=fv('ln-f');if(!
   S.seq.lot++;const cod='LOT-2027-'+String(S.seq.lot).padStart(3,'0');const ap=f===isoD(now())?now().toISOString():new Date(f+'T08:00').toISOString();
   S.lotes.push({cod,nombre:nom,min:m,ap,ci:null,estado:'abierto',ing:[],tarde:[],comunes:[],lineas:[{id:'A',nombre:nom,ruta:null,ton:null,etapas:[]}],bb:[],comp:[]});
   log('Lote abierto','Lote',cod,nom+', '+minName(m));save();closeModal();go('#/lotes/'+cod);toast('Lote '+nom+' abierto');};
+// Agregar ingresos: los del mineral del lote, y los de otro tipo con autorización (DR-27)
+function asigItem(i,otro){const dis=i.estado==='proc';return '<label class="check'+(dis?' disabled':'')+'" style="border:1px solid var(--sep)"><input type="checkbox" name="asig" value="'+i.cod+'"'+(otro?' data-otro="1"':'')+(dis?' disabled':'')+'><span style="flex:1;min-width:0"><b style="display:block;font-size:14px">'+i.cod+'</b><span class="small muted">'+(dis?'El ingreso '+i.cod+' está en proceso: falta el destare del vehículo':i.placa+', '+fDT(i.fecha)+(i.lote?', ahora en '+esc(lote(i.lote).nombre)+' (se trasladará)':''))+'</span></span><b class="num">'+(dis?'—':tn(i.neto))+'</b></label>';}
 A['lote-asignar']=t=>{const l=lote(t.dataset.c);const after=l.estado==='cerrado',div=l.lineas.length>1;
-  const otros=S.ingresos.filter(i=>!lMins(l).includes(i.min)&&i.estado==='reg'&&!i.lote).length;const cand=S.ingresos.filter(i=>lMins(l).includes(i.min)&&i.estado!=='anul'&&!l.ing.includes(i.cod)&&(!i.lote||lote(i.lote).estado==='abierto')).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const libre=i=>i.estado!=='anul'&&!l.ing.includes(i.cod)&&(!i.lote||lote(i.lote).estado==='abierto');
+  const cand=S.ingresos.filter(i=>lMins(l).includes(i.min)&&libre(i)).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const otros=S.ingresos.filter(i=>!lMins(l).includes(i.min)&&libre(i)).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const grupos=[...new Set(otros.map(i=>i.min))];
   const sec=l.comunes.length>=1;
   const body=(after?bn('orange','info',sec?'El secado del lote ya se registró. Cada ingreso que agregue tendrá su propio secado; al registrarlo, sus toneladas se reparten entre las partes del lote y siguen sus etapas hasta unificarse.':'El lote ya inició su recorrido. Los ingresos tardíos que agregue se secarán junto con el resto del lote.'):'')+
     (after&&div&&!sec?'<div class="field"><label for="la-lin">Parte a la que se agregan *</label><select class="input" id="la-lin">'+l.lineas.map(x=>'<option value="'+x.id+'">'+esc(x.nombre)+' ('+(x.ruta?RUTA_TXT[x.ruta].toLowerCase():'ruta por definir')+')</option>').join('')+'</select></div>':'')+
-    (cand.length?'<div class="stack tight">'+cand.map(i=>{const dis=i.estado==='proc';return '<label class="check'+(dis?' disabled':'')+'" style="border:1px solid var(--sep)"><input type="checkbox" name="asig" value="'+i.cod+'"'+(dis?' disabled':'')+'><span style="flex:1;min-width:0"><b style="display:block;font-size:14px">'+i.cod+'</b><span class="small muted">'+(dis?'El ingreso '+i.cod+' está en proceso: falta el destare del vehículo':i.placa+', '+fDT(i.fecha)+(i.lote?', ahora en '+esc(lote(i.lote).nombre)+' (se trasladará)':''))+'</span></span><b class="num">'+(dis?'—':tn(i.neto))+'</b></label>';}).join('')+'</div>':empty('tray','No hay ingresos disponibles','Solo se agregan ingresos Registrados de '+lMinTxt(l)+' que no estén en un lote en recorrido.'));
-  modal(sheet('Agregar ingresos a '+esc(l.nombre),lMinTxt(l)+'. Los anulados y los En proceso no se agregan.',(otros?bn('blue','info',otros+(otros===1?' ingreso de otro mineral espera':' ingresos de otros minerales esperan')+' sin lote. Para sumarlos a esta carga, use primero «Agregar otro mineral».'):'')+body,cand.length?B('Cancelar','secondary','close')+B('Agregar','primary','lote-asig-save','data-c="'+l.cod+'"'):B('Cerrar','secondary','close')),'side');};
-A['lote-asig-save']=t=>{const l=lote(t.dataset.c);const sel=$$('#modal-root input[name=asig]:checked').map(x=>x.value);if(!sel.length)return formErr('Seleccione al menos un ingreso');
+    '<h3>'+esc(lMinTxt(l))+'</h3>'+
+    (cand.length?'<div class="stack tight">'+cand.map(i=>asigItem(i,false)).join('')+'</div>':'<p class="small muted">No hay ingresos Registrados de '+esc(lMinTxt(l))+' disponibles.</p>')+
+    (grupos.length?'<button type="button" class="btn secondary block" data-a="la-otros" id="la-otros-btn">'+ic('plus',16)+'Agregar de otro tipo de mineral ('+otros.length+')</button>'+
+      '<div id="la-otros" class="stack hide">'+bn('orange','warn','Solo con autorización: el ingreso se unifica al lote aunque sea de otro tipo de mineral. El mineral se suma a la lista del lote y el ingreso queda marcado como «Otro mineral».')+
+      grupos.map(m=>{const L=otros.filter(i=>i.min===m);return '<div><div class="row between"><b>'+esc(minName(m))+'</b><span class="xs muted">'+L.length+(L.length===1?' ingreso':' ingresos')+'</span></div><div class="stack tight">'+L.map(i=>asigItem(i,true)).join('')+'</div></div>';}).join('')+
+      '<div class="field"><label for="la-mot">Autorización o motivo *</label><textarea class="input" id="la-mot" placeholder="Ej. autorizado por el gerente: óxido de ley similar, se procesa junto"></textarea><span class="hint">Obligatorio si elige ingresos de otro tipo de mineral.</span></div></div>':'');
+  const hay=cand.length||grupos.length;
+  modal(sheet('Agregar ingresos a '+esc(l.nombre),'Los anulados y los En proceso no se agregan.',hay?body:empty('tray','No hay ingresos disponibles','Todos los ingresos Registrados ya están en un lote en recorrido o cerrado.'),hay?B('Cancelar','secondary','close')+B('Agregar','primary','lote-asig-save','data-c="'+l.cod+'"'):B('Cerrar','secondary','close')),'side');};
+A['la-otros']=()=>{const box=$('#la-otros'),bt=$('#la-otros-btn');if(box)box.classList.remove('hide');if(bt)bt.remove();};
+A['lote-asig-save']=t=>{const l=lote(t.dataset.c);const ck=$$('#modal-root input[name=asig]:checked');const sel=ck.map(x=>x.value);if(!sel.length)return formErr('Seleccione al menos un ingreso');
+  const otr=ck.filter(x=>x.dataset.otro).map(x=>x.value);const mot=otr.length?fv('la-mot').trim():'';
+  if(otr.length&&!mot)return formErr('Indique quién autorizó o el motivo para unificar otro tipo de mineral');
   const after=l.estado==='cerrado',sec=l.comunes.length>=1;const lin=after&&!sec&&l.lineas.length>1?l.lineas.find(y=>y.id===fv('la-lin')):null;l.comp=l.comp||[];
+  if(otr.length){l.otros=l.otros||{};const nuevos=[...new Set(otr.map(c=>ing(c).min))].filter(m=>!lMins(l).includes(m));
+    l.mins=lMins(l).concat(nuevos);otr.forEach(c=>{l.otros[c]={mot,u:me().u,t:now().toISOString()};});
+    if(nuevos.length)log('Mineral agregado al lote','Lote',l.cod,nuevos.map(minName).join(', ')+'; autorización: '+mot);}
   sel.forEach(c=>{const i=ing(c);if(i.lote&&i.lote!==l.cod){const o=lote(i.lote);o.ing=o.ing.filter(x=>x!==c);log('Ingreso retirado del lote','Lote',o.cod,c+' (trasladado a '+l.nombre+')');}
     l.ing.push(c);i.lote=l.cod;if(after){l.tarde.push(c);
       if(sec)l.comp.push({id:'K'+(l.comp.length+1),ing:c,etapas:[],partes:[]});
       else if(lin&&lin.ton!=null)lin.ton=+(lin.ton+(i.neto||0)).toFixed(2);}});
-  log(after?'Ingresos tardíos agregados':'Ingresos asignados','Lote',l.cod,sel.join(', ')+(lin&&l.lineas.length>1?' para '+lin.nombre:'')+(after&&sec?', con secado propio':''));save();closeModal();route(true);toast(sel.length===1?'Ingreso agregado':sel.length+' ingresos agregados');};
+  log(after?'Ingresos tardíos agregados':'Ingresos asignados','Lote',l.cod,sel.join(', ')+(lin&&l.lineas.length>1?' para '+lin.nombre:'')+(after&&sec?', con secado propio':'')+(otr.length?'. De otro tipo de mineral: '+otr.map(c=>c+' ('+minName(ing(c).min)+')').join(', ')+'; autorización: '+mot:''));
+  save();closeModal();route(true);toast(sel.length===1?'Ingreso agregado':sel.length+' ingresos agregados');};
 let DIVP=null;
 function divPartsHTML(){return DIVP.map((x,k)=>'<div class="card" style="box-shadow:none;background:var(--surface-2)"><div class="card-h"><h3>Parte '+(k+1)+'</h3>'+(k>1?B('Quitar','danger-plain sm','div-del','data-k="'+k+'"'):'')+'</div>'+
   '<div class="field"><label for="dv-n'+k+'">Nombre *</label><input class="input" id="dv-n'+k+'" value="'+esc(x.nombre)+'" placeholder="Ej. Lote Pique Pingüino '+(k+1)+'"></div>'+
