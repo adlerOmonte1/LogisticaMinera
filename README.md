@@ -159,6 +159,17 @@ Detecta conceptos del alcance anterior (stock, kardex, captura sin conexión, in
 formato `RF-01`) que no deberían sobrevivir en `docs/` ni en `skills/`. Se ejecuta antes de cada
 commit de documentación.
 
+```bash
+python3 scripts/validar_docs.py
+```
+
+Comprueba las reglas de Mermaid, los enlaces, que toda referencia (HU, RN, RS, RU, RNF, D, DR)
+exista y que las historias coincidan entre cada `HU.md`, el índice y la matriz de trazabilidad.
+
+Ambas corren en el CI de GitHub Actions junto con el lint, las migraciones y las pruebas del
+backend sobre PostgreSQL. El pipeline completo está en
+[`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §6.6.
+
 ---
 
 ## Alcance

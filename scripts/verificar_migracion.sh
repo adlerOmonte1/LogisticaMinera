@@ -5,6 +5,10 @@
 # Este script es la fuente unica del patron de terminos retirados. Las skills y los
 # documentos lo invocan en lugar de transcribirlo, para no reintroducir esos terminos.
 
+# Los patrones llevan tildes ([oó]). Con un locale que no sea UTF-8, grep compara byte a byte y
+# esos patrones nunca coinciden: el script pasaria en local y fallaria en el CI. Se fija UTF-8.
+export LC_ALL=C.UTF-8
+
 patrones='Producci[oó]n y Existencias|RF-[0-9]{2}|\bstock\b|kardex|\bmerma\b|declaraci[oó]n semestral|Ley 32213|sin conexi[oó]n|IndexedDB|cobertura de registro|meses con consolidado|JMeter|m[oó]dulos implementados|\bhora_pesaje\b|\bhora_registro\b|Relaci[oó]n con el indicador|Indicador de tesis|M0[4-7]-(salidas|existencias|consolidados|sin-conexion)'
 
 # hora_pesaje y hora_registro se buscan como palabra completa: eran los campos sueltos del

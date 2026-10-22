@@ -260,6 +260,29 @@ regresión, que cubre como mínimo:
 9. Consolidado mensual de un mes con ingresos y de un mes sin ingresos, y su exportación.
 10. Acceso denegado a cada acción restringida, con un usuario de cada rol.
 
+### 6.6 Integración continua
+
+GitHub Actions ejecuta en cada pull request las comprobaciones que no dependen de una persona. Un
+PR con alguna etapa en rojo no se fusiona.
+
+| Etapa | Workflow | Cuándo corre | Qué verifica | Estado |
+|---|---|---|---|---|
+| 1. Documentación | `.github/workflows/docs.yml` | Cambios en `docs/` o `skills/` | `verificar_migracion.sh` y `validar_docs.py`: reglas de Mermaid, enlaces, referencias cruzadas e historias coherentes entre módulos, índice y matriz | Activa |
+| 2. Backend | `.github/workflows/backend.yml` | Cambios en `backend/` | `ruff`, `makemigrations --check` y `pytest` con cobertura sobre PostgreSQL 16 | Activa |
+| 3. Trazabilidad | `.github/workflows/backend.yml` | Cambios en `backend/` o `docs/modulos/` | `reporte_trazabilidad.py`: qué reglas y criterios tienen prueba, y qué pruebas citan códigos que la documentación no define | Activa, solo informa; pasa a `--estricto` tras la preparación del repositorio |
+| 4. PDF | Por definir | Al fusionar en la rama de documentación | Regenera los PDF de historias y de requerimientos | Pendiente |
+| 5. Preproducción | Por definir | Al fusionar en la rama de integración | Imágenes Docker, despliegue en preproducción y prueba de arranque | Pendiente: rama de integración y servidor por definir |
+| 6. Producción | Por definir | Al etiquetar `main`, con aprobación manual | Despliegue y registro automático en la bitácora de despliegues | Pendiente: servidor y D-14 por definir |
+| 7. Congelamiento (D-16) | Por definir | Todo PR durante la ventana de medición | Rechaza cambios en el motor de reconocimiento y en las reglas V1 a V5 sin justificación escrita | Pendiente |
+
+Las pruebas locales siguen usando SQLite en memoria salvo que se defina `TEST_DATABASE_URL`; el CI
+siempre la define. Antes de abrir un PR conviene correr lo mismo que el CI:
+
+```bash
+bash scripts/verificar_migracion.sh && python3 scripts/validar_docs.py
+cd backend && ruff check . && python manage.py makemigrations --check --dry-run && pytest
+```
+
 ---
 
 ## 7. Gestión de defectos
