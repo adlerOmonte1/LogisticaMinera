@@ -78,7 +78,7 @@ flowchart TD
     D5 -->|Si| E2[Rechazar: No se puede corregir un ingreso anulado]
     D5 -->|No| L2[Indicar motivo de la correccion]
     L2 --> D8{Cambia el tipo de mineral de un ingreso en lote?}
-    D8 -->|Si y difiere del lote| E4[Rechazar: El ingreso corresponde a otro tipo de mineral que el lote]
+    D8 -->|Si y no esta en la lista del lote| E4[Rechazar: el mineral no esta en el lote]
     E4 --> L2
     D8 -->|No| V1[Validar reglas V1 a V5 sobre los datos corregidos]
     V1 --> D6{Regla bloqueante incumplida?}
@@ -89,6 +89,9 @@ flowchart TD
     D9 -->|No| P3[Dejar el ingreso En proceso sin neto y auditar]
     P2 --> F3([Ingreso corregido con historial del cambio])
     P3 --> F3
+    F3 --> D10{Se revierte la ultima correccion?}
+    D10 -->|Si con motivo| V1
+    D10 -->|No| F4([Lote consolidado y trazabilidad reflejan el valor vigente])
 ```
 
 ## A-M03-03 · Conservación del borrador ante pérdida de conexión (RNF-M03-05)

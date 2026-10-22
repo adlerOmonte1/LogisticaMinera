@@ -198,3 +198,20 @@ Severidad: **B** bloquea implementar o medir · **A** alta · **M** media · **b
 4. **Propuestas que puedo redactar si las apruebas:** RNF de respaldo (Q-06), plazo o aviso de En
    proceso (Q-08), reporte de registros sin foto (Q-09), la decisión de salidas (Q-14), contratos con
    `import-linter` (Q-25).
+
+---
+
+## 7. Resoluciones del 22/10/2026
+
+| Punto | Resolución | Dónde queda |
+|---|---|---|
+| Q-01, Q-02 | Retiradas `apps/salidas`, `apps/sincronizacion` y `Cliente` (migración `0002_retira_cliente`). El resto del backend se modifica al cerrar la documentación | PLAN §8 |
+| Q-07, Q-08 | Cualquiera de los tres roles registra el destare; es obligatorio y sin plazo: puede hacerse días después, y el ingreso sigue En proceso mientras tanto | DR-25, HU-M03-04 |
+| Q-09 | Sin límite para el registro sin foto: a la empresa le conviene el respaldo de que el ingreso existió | DR-26 |
+| Q-10 | La agrupación del mineral se hace en el sistema, con los lotes y según los roles (DR-23) | M06 |
+| Q-11 | El lote admite varios tipos de mineral, agregados con «Agregar otro mineral» y presentados por grupo | DR-27, HU-M06-01 |
+| Q-13 | La corrección se propaga en cadena y la última corrección puede revertirse | DR-28, HU-M03-02 |
+| Q-14 | La salida es, por ahora, el cierre del lote con destino (opción A) | DR-24 |
+| Q-15 | Maqueta actualizada al proceso documentado de ingresos, lotes y salida | `Mockup/index.html` |
+
+Siguen abiertos: Q-03 a Q-06, Q-12, Q-16 a Q-26.

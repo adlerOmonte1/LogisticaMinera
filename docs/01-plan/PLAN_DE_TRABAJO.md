@@ -335,8 +335,8 @@ etapa.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | Apps eliminadas, con su migración de retiro cuando corresponda | `makemigrations --check` sin cambios pendientes |
-| Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
+| Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | **Hecho para `salidas` y `sincronizacion` (22/10/2026).** `existencias` se retira con el refactor de `apps/ingresos`, que hoy la usa para los movimientos de inventario | `makemigrations --check` sin cambios pendientes |
+| Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas — **hecho (22/10/2026), migración `0002_retira_cliente`** | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
 | Cambiar `Producto` por `TipoMineral` en `apps/catalogo` (DR-03), con sus referencias en `apps/ingresos` | Modelo `tipo_mineral.py` con código y nombre únicos; el campo `producto` de `Ingreso` renombrado en la misma migración, para no dejar el código en un estado mixto | `grep -rn producto backend/apps` sin resultados de dominio; `pytest` en verde |
 | Refactorizar `apps/ingresos` al modelo vigente de `INGRESO` | Tres marcas de tiempo, tara aplicada, peso neto calculado y estado En proceso, según `modelo_datos_entidad_relacion.md` | Revisión contra el modelo de datos |
 | Crear los esqueletos de `reconocimiento`, `validacion` y `trazabilidad`; renombrar `busqueda` a `consulta` y `reportes` a `consolidacion` | Apps con la estructura de capas de `catalogo` | Responsable técnico |

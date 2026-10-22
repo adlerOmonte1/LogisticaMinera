@@ -21,7 +21,8 @@ apps/trazabilidad/
 class LoteProceso(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     nombre = models.CharField(max_length=80, unique=True)
-    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
+    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)  # el de apertura
+    minerales = models.ManyToManyField(TipoMineral, through="LoteMineral", related_name="+")
     fecha_apertura = models.DateField()
     fecha_inicio_recorrido = models.DateTimeField(null=True, editable=False)
     ruta = models.CharField(max_length=10, choices=Ruta.choices, blank=True)  # sin dividir
@@ -31,6 +32,17 @@ class LoteProceso(models.Model):
     fecha_cierre = models.DateTimeField(null=True, editable=False)
     usuario_cierre = models.ForeignKey(Usuario, null=True, on_delete=models.PROTECT,
                                        editable=False, related_name="+")
+
+
+class LoteMineral(models.Model):          # lista de tipos admitidos (DR-27)
+    lote = models.ForeignKey(LoteProceso, on_delete=models.PROTECT, related_name="lista_minerales")
+    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
+    autorizacion = models.TextField(blank=True)  # obligatoria si entra al unificar otro mineral
+    fecha_hora = models.DateTimeField(editable=False)
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["lote", "tipo_mineral"], name="lote_mineral_unico")]
 
 
 class ParteLote(models.Model):
@@ -189,13 +201,13 @@ de implementar y verificar que el personal reconoce las cargas, sus partes y su 
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución de cada operación |
-| M02 | El tipo de mineral del lote |
+| M02 | Los tipos de mineral del lote |
 | M03 | Los ingresos que componen el lote, con su peso y su estado |
 | M09 | Registro de los eventos del lote |
 
 | Es requerido por | Para |
 |---|---|
-| M03 | El tipo de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
+| M03 | La lista de tipos de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
 | M07 | Mostrar el recorrido del proceso en el detalle de un ingreso |
 
 ## Pendientes que afectan a este módulo

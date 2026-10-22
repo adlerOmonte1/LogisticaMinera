@@ -5,7 +5,7 @@ Cada repositorio ofrece dos vistas del mismo dato:
 - `todos()`     -> incluye desactivados, para las consultas históricas.
 """
 
-from apps.catalogo.models import Cliente, Producto, Transportista, Vehiculo
+from apps.catalogo.models import Producto, Transportista, Vehiculo
 
 
 class _RepositorioCatalogo:
@@ -41,10 +41,6 @@ class TransportistaRepository(_RepositorioCatalogo):
     @staticmethod
     def tiene_vehiculos(transportista):
         return transportista.vehiculos.exists()
-
-
-class ClienteRepository(_RepositorioCatalogo):
-    modelo = Cliente
 
 
 class VehiculoRepository(_RepositorioCatalogo):

@@ -29,6 +29,8 @@ erDiagram
     INGRESO ||--o{ RESULTADO_VALIDACION : evalua
 
     LOTE_PROCESO ||--o{ INGRESO : agrupa
+    LOTE_PROCESO ||--o{ LOTE_MINERAL : admite
+    TIPO_MINERAL ||--o{ LOTE_MINERAL : clasifica
     LOTE_PROCESO ||--o{ PARTE_LOTE : divide
     PARTE_LOTE ||--o{ REPARTO_INGRESO : recibe
     INGRESO ||--o{ REPARTO_INGRESO : reparte
@@ -243,7 +245,7 @@ etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
 | id_lote | PK | |
 | codigo | varchar(20) | único, asignado por el servidor |
 | nombre | varchar(80) | único; lo indica el usuario |
-| id_tipo_mineral | FK → TIPO_MINERAL | un lote reúne un solo tipo de mineral |
+| id_tipo_mineral | FK → TIPO_MINERAL | tipo con que se abre el lote; los demás están en `LOTE_MINERAL` (DR-27) |
 | fecha_apertura | date | |
 | fecha_inicio_recorrido | datetime | nula mientras el lote esté Abierto; `editable=False` (DR-19) |
 | ruta | enum | ZARANDEO / MOLIENDA / AMBAS; vacía hasta decidirla tras el secado, y vacía si el lote se divide |
@@ -261,6 +263,22 @@ que hace realista la trazabilidad.
 `EN_RECORRIDO`: desde el inicio del recorrido, que empieza por el secado; admite ingresos tardíos,
 pero no los devuelve a cancha. `CERRADO`: cierre definitivo con destino, solo con todo el mineral
 ensacado; no admite ningún cambio.
+
+### LOTE_MINERAL (M06)
+
+Lista de tipos de mineral que admite un lote (DR-27): el de apertura y los agregados después con
+«Agregar otro mineral». Un ingreso solo se asigna si su tipo está en la lista.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id_lote | FK → LOTE_PROCESO | único junto con `id_tipo_mineral` |
+| id_tipo_mineral | FK → TIPO_MINERAL | |
+| autorizacion | text | obligatoria cuando el tipo entra al unificar un ingreso de otro mineral; quién lo autorizó o el motivo |
+| fecha_hora | datetime | `editable=False` |
+| id_usuario_registro | FK → USUARIO | `editable=False` |
+
+Cada ingreso unificado de otro mineral guarda además su autorización en el evento de auditoría de
+la asignación y se presenta marcado «Otro mineral». Un tipo se quita solo si no tiene ingresos en el lote y el lote está Abierto.
 
 ### PARTE_LOTE (M06)
 

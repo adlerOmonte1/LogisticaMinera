@@ -31,9 +31,17 @@ seguir su avance por las etapas sin tener que anotar cada volquete por separado.
 
 **Descripción**
 
-Un lote reúne los ingresos de un mismo tipo de mineral que se procesarán como una sola carga. Se
-abre con un nombre, el tipo de mineral y la fecha de apertura, y recibe ingresos mientras está
-Abierto. Mientras tanto la agrupación es una decisión revisable: un ingreso puede retirarse del lote
+Un lote reúne los ingresos que se procesarán como una sola carga. Se abre con un nombre, un tipo de
+mineral y la fecha de apertura, y recibe ingresos mientras está Abierto. Si la carga mezcla
+minerales, el usuario lo declara con la acción **Agregar otro mineral**: el tipo se suma a la lista
+del lote y desde entonces admite sus ingresos (DR-27). El lote muestra sus ingresos y sus toneladas
+agrupados por tipo de mineral, de modo que la mezcla siempre es visible y nunca accidental.
+
+También se puede unificar un ingreso de otro tipo de mineral directamente al agregar ingresos: la
+opción **Agregar de otro tipo de mineral** muestra esos ingresos agrupados por mineral. Elegir uno
+exige indicar la autorización o el motivo —por ejemplo, que el gerente aprobó procesarlo junto—; su
+mineral se suma a la lista del lote y el ingreso queda marcado «Otro mineral», con esa autorización
+visible en la composición. Mientras tanto la agrupación es una decisión revisable: un ingreso puede retirarse del lote
 o trasladarse a otro lote Abierto.
 
 Cuando la carga está reunida, el usuario **inicia el recorrido**: el lote pasa a En recorrido y su
@@ -50,7 +58,9 @@ historia aparte (HU-M06-05).
 **Detalles**
 - Código del lote: asignado por el servidor, único.
 - Nombre: obligatorio, único entre los lotes.
-- Tipo de mineral: obligatorio, del catálogo; todos los ingresos del lote comparten el mismo.
+- Tipos de mineral: uno obligatorio al abrir, del catálogo; otros se agregan con «Agregar otro
+  mineral». Un tipo sin ingresos puede quitarse mientras el lote está Abierto.
+- Composición: ingresos y toneladas agrupados por tipo de mineral.
 - Fecha de apertura: obligatoria, no posterior a la fecha actual.
 - Fecha de inicio del recorrido: se asigna al iniciarlo.
 - Estado: Abierto, En recorrido o Cerrado.
@@ -73,13 +83,13 @@ historia aparte (HU-M06-05).
 > crear el lote, entonces el sistema rechaza la operación mostrando "La fecha de apertura no puede
 > ser posterior a hoy".
 
-> **CA04.** Dado que un lote está Abierto, cuando el usuario le asigna ingresos Registrados del mismo
-> tipo de mineral, entonces el sistema los incorpora y muestra el total de ingresos y de toneladas
-> del lote.
+> **CA04.** Dado que un lote está Abierto, cuando el usuario le asigna ingresos Registrados de un
+> tipo de mineral que está en la lista del lote, entonces el sistema los incorpora y muestra el total
+> de ingresos y de toneladas del lote, y el de cada tipo de mineral.
 
-> **CA05.** Dado que un ingreso es de un tipo de mineral distinto al del lote, cuando el usuario
-> intenta asignarlo, entonces el sistema rechaza la operación mostrando "El ingreso {codigo}
-> corresponde a otro tipo de mineral".
+> **CA05.** Dado que un ingreso es de un tipo de mineral que no está en la lista del lote, cuando el
+> usuario abre la asignación, entonces el sistema no lo ofrece entre los ingresos del lote, sino en
+> «Agregar de otro tipo de mineral», agrupado por su tipo de mineral.
 
 > **CA06.** Dado que un ingreso está anulado, cuando el usuario intenta asignarlo a un lote,
 > entonces el sistema rechaza la operación mostrando "No se puede asignar un ingreso anulado".
@@ -119,6 +129,26 @@ historia aparte (HU-M06-05).
 > **CA16.** Dado que el usuario consulta un lote, cuando el sistema lo muestra, entonces presenta su
 > estado y su composición —los ingresos con su código, su fecha y su peso neto, con los tardíos
 > señalados— y el total de toneladas.
+
+> **CA17.** Dado que el lote no está Cerrado, cuando el usuario elige «Agregar otro mineral» e indica
+> un tipo de mineral del catálogo, entonces el sistema lo suma a la lista del lote, muestra su grupo
+> sin ingresos y registra el cambio en auditoría.
+
+> **CA18.** Dado que un tipo de mineral ya está en el lote, cuando el usuario intenta agregarlo de
+> nuevo, entonces el sistema rechaza la operación mostrando "El mineral {mineral} ya está en el
+> lote".
+
+> **CA19.** Dado que un tipo de mineral del lote tiene ingresos asignados, cuando el usuario intenta
+> quitarlo, entonces el sistema rechaza la operación mostrando "No se puede quitar {mineral}: tiene
+> ingresos en el lote".
+
+> **CA20.** Dado que el usuario eligió ingresos de otro tipo de mineral, cuando intenta agregarlos sin
+> indicar la autorización o el motivo, entonces el sistema rechaza la operación mostrando "Indique
+> quién autorizó o el motivo para unificar otro tipo de mineral".
+
+> **CA21.** Dado que el usuario agrega un ingreso de otro tipo de mineral con su autorización, cuando
+> el sistema lo incorpora, entonces suma ese mineral a la lista del lote, muestra el ingreso en su
+> grupo marcado «Otro mineral» con la autorización, y registra ambos actos en auditoría.
 
 ---
 
