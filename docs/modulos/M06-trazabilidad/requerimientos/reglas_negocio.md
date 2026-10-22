@@ -7,7 +7,7 @@
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
 | RN-M06-01 | Un ingreso pertenece a un lote como máximo | Las mismas toneladas se contarían en dos cargas distintas |
-| RN-M06-02 | Un ingreso solo se asigna a un lote cuya lista de tipos de mineral incluye el suyo; un tipo nuevo se agrega al lote de forma explícita y queda registrado (DR-27) | La mezcla de minerales en una carga ocurriría sin que nadie la decidiera, y el lote no explicaría qué contiene |
+| RN-M06-02 | Un ingreso solo se asigna a un lote cuya lista de tipos de mineral incluye el suyo, o se unifica desde «Agregar de otro tipo de mineral» con autorización obligatoria, que suma su mineral a la lista y marca el ingreso como «Otro mineral» (DR-27) | La mezcla de minerales en una carga ocurriría sin que nadie la decidiera ni quedara constancia de quién la autorizó |
 | RN-M06-03 | Un ingreso anulado no se asigna a ningún lote. Si se anula estando asignado, se retira del lote Abierto; en un lote En recorrido o Cerrado permanece vinculado y deja de contar en sus totales | Un ingreso retirado del histórico seguiría aportando toneladas a una carga |
 | RN-M06-04 | Desde el inicio del recorrido no se retiran ni se trasladan ingresos del lote: solo se admiten ingresos tardíos (DR-22) | El recorrido ya registrado dejaría de corresponder al mineral que efectivamente lo hizo |
 | RN-M06-05 | Solo un lote En recorrido registra etapas | Se anotaría el secado de una carga que aún se está reuniendo, o un paso en una carga ya cerrada |

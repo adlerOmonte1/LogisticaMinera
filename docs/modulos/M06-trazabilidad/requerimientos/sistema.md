@@ -4,7 +4,7 @@
 |---|---|---|
 | RS-M06-01 | El sistema registra lotes de proceso con `codigo` asignado por el servidor, `nombre` único, `id_tipo_mineral`, `fecha_apertura` no posterior a la fecha actual y `estado` con dominio cerrado {ABIERTO, EN_RECORRIDO, CERRADO} | RU-M06-01 |
 | RS-M06-02 | El sistema asigna ingresos a un lote mediante `id_lote` en el ingreso, admitiendo como máximo un lote por ingreso | RU-M06-01 |
-| RS-M06-03 | El sistema mantiene la lista de tipos de mineral de cada lote, con el tipo de apertura y los agregados después, y exige que el tipo del ingreso esté en ella para permitir la asignación | RU-M06-01, RU-M06-11 |
+| RS-M06-03 | El sistema mantiene la lista de tipos de mineral de cada lote; ofrece aparte, agrupados por mineral, los ingresos de otros tipos, y al unificarlos exige la autorización, suma su mineral a la lista y marca el ingreso como «Otro mineral» | RU-M06-01, RU-M06-11 |
 | RS-M06-04 | El sistema admite asignar a un lote solo ingresos en estado `REGISTRADO`, e impide asignar los anulados y los que están En proceso | — (integridad con M03) |
 | RS-M06-05 | El sistema permite retirar un ingreso de un lote, o trasladarlo a otro, solo mientras ambos están en estado `ABIERTO` | RU-M06-01 |
 | RS-M06-06 | El sistema admite ingresos tardíos en un lote `EN_RECORRIDO`, los marca como tales y rechaza agregar ingresos a un lote `CERRADO` | RU-M06-08 |

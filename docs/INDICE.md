@@ -1,20 +1,20 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**131 archivos · 18050 líneas de texto.**
+**131 archivos · 18086 líneas de texto.**
 
 ## `Mockup/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [index.html](../Mockup/index.html) | — | 1731 | 374 |
+| [index.html](../Mockup/index.html) | — | 1750 | 377 |
 
 ## `docs/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [HistoriasUsuario.md](HistoriasUsuario.md) | Historias de usuario — índice | 116 | 4 |
-| [Historias_de_Usuario.pdf](Historias_de_Usuario.pdf) | — | — | 1002 |
+| [Historias_de_Usuario.pdf](Historias_de_Usuario.pdf) | — | — | 1007 |
 | [REVISION_TECNICA_V2.md](REVISION_TECNICA_V2.md) | Revisión técnica de la versión 2 — arquitectura, estructura y puntos abiertos | 217 | 16 |
 | [REVISION_TECNICA_V2.pdf](REVISION_TECNICA_V2.pdf) | — | — | 275 |
 | [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6175 |
@@ -27,7 +27,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 911 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
 | [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 288 | 16 |
-| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 430 | 22 |
+| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 432 | 22 |
 
 ## `docs/00-tesis/`
 
@@ -191,8 +191,8 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [HU.md](modulos/M06-trazabilidad/HU.md) | Historias de usuario — M06 Trazabilidad del proceso | 460 | 24 |
-| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 217 | 11 |
+| [HU.md](modulos/M06-trazabilidad/HU.md) | Historias de usuario — M06 Trazabilidad del proceso | 474 | 25 |
+| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 218 | 11 |
 
 ## `docs/modulos/M06-trazabilidad/diagramas/`
 

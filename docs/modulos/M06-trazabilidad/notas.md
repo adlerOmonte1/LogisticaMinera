@@ -37,6 +37,7 @@ class LoteProceso(models.Model):
 class LoteMineral(models.Model):          # lista de tipos admitidos (DR-27)
     lote = models.ForeignKey(LoteProceso, on_delete=models.PROTECT, related_name="lista_minerales")
     tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
+    autorizacion = models.TextField(blank=True)  # obligatoria si entra al unificar otro mineral
     fecha_hora = models.DateTimeField(editable=False)
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
 

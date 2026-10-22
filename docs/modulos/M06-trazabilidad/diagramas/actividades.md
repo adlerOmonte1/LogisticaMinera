@@ -10,10 +10,10 @@ flowchart TD
     E0 --> A1
     V0 -->|No| L1[Seleccionar ingresos para la carga]
     L1 --> V1{Mineral del ingreso en la lista del lote?}
-    V1 -->|No| D0{Agregar ese mineral al lote?}
-    D0 -->|No| E1[Rechazar: el mineral no esta en el lote]
+    V1 -->|No| D0{Unificar desde Agregar de otro tipo con autorizacion?}
+    D0 -->|No| E1[No se asigna: el mineral no esta en el lote]
     E1 --> L1
-    D0 -->|Si| M1[Agregar otro mineral al lote]
+    D0 -->|Si| M1[Registrar la autorizacion sumar el mineral y marcar Otro mineral]
     M1 --> V2
     V1 -->|Si| V2{Ingreso anulado o En proceso?}
     V2 -->|Si| E2[Rechazar con el mensaje de la regla]

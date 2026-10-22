@@ -273,10 +273,12 @@ Lista de tipos de mineral que admite un lote (DR-27): el de apertura y los agreg
 |---|---|---|
 | id_lote | FK → LOTE_PROCESO | único junto con `id_tipo_mineral` |
 | id_tipo_mineral | FK → TIPO_MINERAL | |
+| autorizacion | text | obligatoria cuando el tipo entra al unificar un ingreso de otro mineral; quién lo autorizó o el motivo |
 | fecha_hora | datetime | `editable=False` |
 | id_usuario_registro | FK → USUARIO | `editable=False` |
 
-Un tipo se quita solo si no tiene ingresos en el lote y el lote está Abierto.
+Cada ingreso unificado de otro mineral guarda además su autorización en el evento de auditoría de
+la asignación y se presenta marcado «Otro mineral». Un tipo se quita solo si no tiene ingresos en el lote y el lote está Abierto.
 
 ### PARTE_LOTE (M06)
 
