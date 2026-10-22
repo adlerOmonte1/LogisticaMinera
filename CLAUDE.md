@@ -78,7 +78,9 @@ commits de código.
 
 ```bash
 bash scripts/verificar_migracion.sh
+python3 scripts/validar_docs.py
 ```
 
-Detecta conceptos del sistema anterior en `docs/` y `skills/`. Debe pasar sin hallazgos antes de
-cada commit de documentación.
+El primero detecta conceptos del sistema anterior en `docs/` y `skills/`; el segundo, problemas de
+coherencia interna (Mermaid, enlaces, referencias, historias). Ambos deben pasar sin hallazgos antes
+de cada commit de documentación, y el CI los repite en cada PR (`PLAN_DE_TRABAJO.md` §6.6).

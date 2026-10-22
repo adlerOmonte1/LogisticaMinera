@@ -30,7 +30,7 @@ el texto impreso en papel térmico, por eso la verificación compara la lectura 
 
 ## Nota sobre RNF-M03-05
 
-Sustituye a la operación sin conexión que contemplaba el alcance anterior. No se trata de registrar
+Sustituye a la operación sin conexión que contemplaba el alcance anterior. No se trata de registrar <!-- migracion:ok -->
 sin red, sino de no perder el trabajo ya hecho: la fotografía tomada y los campos corregidos siguen
 disponibles cuando la señal vuelve. El ingreso se confirma siempre contra el servidor, porque el
 código único y la validación viven allí (D-02, D-08).

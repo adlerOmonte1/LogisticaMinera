@@ -3,8 +3,9 @@
 ## Backend (Django)
 
 **App:** `apps/accounts/` — implementada y con pruebas (`models/`, `services/`, `serializers/`,
-`views/`, `permissions.py`, `tests/`). Sin cambios de fondo en esta reformulación: el módulo ya
-respondía a RF10 con el diseño anterior.
+`views/`, `permissions.py`, `tests/`). El modelo y la autenticación no cambian; sí cambia la matriz
+de permisos, que debe ampliarse al alcance del Supervisor de planta (DR-17) y reservar el cierre del
+lote al Administrador (DR-14).
 
 ### Modelo
 
@@ -23,6 +24,26 @@ cambio de contraseña.
 `apps/accounts/permissions.py` define las clases de permiso que reutilizan los demás módulos. Cada
 app declara qué clase de permiso exige cada `ViewSet`; ninguna app reimplementa la lógica de rol por
 su cuenta.
+
+Hoy el archivo solo contiene `PuedeGestionarUsuarios`. Con la matriz de la versión 2 hacen falta, al
+menos, permisos por acción para:
+
+| Permiso | Roles | Módulo que lo usa |
+|---|---|---|
+| Registrar ingreso, con foto o sin ella | Los tres | M03 |
+| Corregir ingreso | Administrador, Administrativo | M03 |
+| Anular ingreso | Administrador | M03 |
+| Dar de alta un vehículo desde el registro y registrar su destare | Los tres | M02, M03 |
+| Gestionar catálogos | Administrador, Administrativo | M02 |
+| Modificar una tara ya registrada | Administrador | M02 |
+| Componer lotes: abrir, asignar, retirar, iniciar el recorrido y dividir | Administrador, Administrativo | M06 |
+| Registrar el paso por etapa, el secado de un ingreso tardío y los bigbags | Los tres | M06 |
+| Cerrar el lote con su destino | Administrador | M06 |
+| Consolidar y exportar | Administrador, Administrativo | M08 |
+| Consultar la auditoría del sistema | Administrador | M09 |
+
+Los nombres de las clases se fijan al implementar cada módulo; lo que no cambia es que se definen
+aquí y no en la app que las usa (RN-M01-09).
 
 ## Frontend (Angular)
 

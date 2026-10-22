@@ -1,6 +1,6 @@
 # Historias de usuario — índice
 
-**Versión:** 2.1 · **Total: 22 historias en 9 módulos**
+**Versión:** 3.0 · **Total: 26 historias en 9 módulos** · versión 2 del sistema
 
 Este archivo es un **índice**. El detalle de cada historia —descripción, campos y criterios de
 aceptación— vive únicamente en el `HU.md` de su módulo; aquí solo constan el identificador, el
@@ -41,7 +41,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
-| HU-M03-01 | Registro de un ingreso a partir del ticket de balanza | Supervisor de planta | Crítica |
+| HU-M03-01 | Registro de un ingreso a partir del ticket de balanza, con la excepción del registro sin foto | Supervisor de planta | Crítica |
 | HU-M03-02 | Corrección de un ingreso registrado | Administrativo | Alta |
 | HU-M03-03 | Anulación de un ingreso | Administrador | Alta |
 | HU-M03-04 | Registro del destare de un vehículo en su primer viaje | Supervisor de planta | Crítica |
@@ -70,8 +70,10 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
 | HU-M06-01 | Gestión de lotes de proceso | Administrativo | Alta |
-| HU-M06-02 | Registro del paso de un lote por una etapa | Supervisor de planta | Crítica |
+| HU-M06-02 | Registro del paso de un lote por una etapa de su ruta | Supervisor de planta | Crítica |
 | HU-M06-03 | Consulta de la trazabilidad de un ingreso | Administrativo | Media |
+| HU-M06-04 | División de un lote por fracciones | Administrativo | Alta |
+| HU-M06-05 | Cierre del lote con su destino | Administrador | Alta |
 
 ## M07 — Consulta de ingresos y respaldo
 
@@ -81,6 +83,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 |---|---|---|---|
 | HU-M07-01 | Consulta de un ingreso por placa y fecha con su respaldo | Administrativo | Crítica |
 | HU-M07-02 | Listado y detalle de ingresos | Administrativo | Alta |
+| HU-M07-03 | Calendario de llegadas | Administrativo | Media |
 
 ## M08 — Consolidación de la producción
 
@@ -98,7 +101,8 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 | HU | Título | Rol | Prioridad |
 |---|---|---|---|
 | HU-M09-01 | Registro de eventos del sistema | Administrador | Alta |
-| HU-M09-02 | Consulta del historial de un registro | Administrador | Media |
+| HU-M09-02 | Historial de un ingreso | Supervisor de planta | Media |
+| HU-M09-03 | Consulta de la auditoría del sistema | Administrador | Media |
 
 ---
 

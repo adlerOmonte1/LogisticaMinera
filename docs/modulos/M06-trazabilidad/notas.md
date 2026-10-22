@@ -202,6 +202,5 @@ de implementar y verificar que el personal reconoce las cargas, sus partes y su 
 
 | Pendiente | Efecto |
 |---|---|
-| Modelo de datos sin actualizar a la versión 2 (`mapa_limpieza_v2.md` §3) | `modelo_datos_entidad_relacion.md` solo tiene el lote con estado ABIERTO/CERRADO. El modelo de esta nota prevalece hasta que se actualice |
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede abrirse ningún lote |
 | Ajuste del mockup (plan, pendiente 3) | El mockup divide en toneladas y solo ofrece la venta como destino; esta documentación sigue DR-18 y DR-14 |

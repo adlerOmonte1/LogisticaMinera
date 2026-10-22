@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     Start([Solicitud de inicio de sesion]) --> V1{Campos completos?}
-    V1 -->|No| E1[Mostrar: Complete los campos obligatorios]
+    V1 -->|No| E1[Mostrar: Debe completar los campos obligatorios]
     E1 --> Fin([Fin])
     V1 -->|Si| B1[Buscar usuario por nombre de usuario]
     B1 --> V2{Usuario existe?}

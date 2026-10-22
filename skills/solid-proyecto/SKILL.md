@@ -104,8 +104,9 @@ class PuedeAnularIngreso(BasePermission): ...              # solo Administrador
 class PuedeConsultarConsolidacion(BasePermission): ...
 ```
 
-El rol **Supervisor de planta** obtiene únicamente registro y consulta. No se le inyecta la interfaz
-de gestión de usuarios ni la de consolidación. Esto no es elegancia: una solicitud directa a un
+El rol **Supervisor de planta** obtiene el registro de ingresos, el alta del vehículo nuevo desde el
+registro, el destare, el paso del lote por las etapas y la consulta (DR-17). No se le inyecta la
+interfaz de gestión de usuarios, ni la de consolidación, ni la de composición o cierre de lotes. Esto no es elegancia: una solicitud directa a un
 módulo fuera de su rol debe ser rechazada **en el servidor** y quedar registrada en auditoría.
 Ocultar un botón no es control de acceso.
 

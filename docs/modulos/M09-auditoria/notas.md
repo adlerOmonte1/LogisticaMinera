@@ -152,4 +152,3 @@ operativa, nunca eliminar.
 | Pendiente | Efecto |
 |---|---|
 | Volumen esperado de eventos durante la ventana de operación | Condiciona si conviene una política de archivado antes de que RNF-M09-04 se vuelva difícil de sostener |
-| Modelo de datos sin actualizar a la versión 2 (`mapa_limpieza_v2.md` §3) | `EVENTO_AUDITORIA` no tiene aún la columna de ingresos relacionados; el modelo de esta nota prevalece hasta que se actualice |

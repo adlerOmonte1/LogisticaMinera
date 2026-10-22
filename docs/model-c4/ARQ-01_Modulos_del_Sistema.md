@@ -1,8 +1,8 @@
 # ARQ-01 — Definición de módulos del sistema
 
 **Documento:** ARQ-01
-**Versión:** 2.0
-**Estado:** Aprobado
+**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
+**Estado:** En revisión
 **Alcance:** la lista cerrada de módulos del sistema web inteligente, con la justificación de cada uno
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../00-tesis/decisiones_reformulacion.md`
 
@@ -43,13 +43,13 @@ dentro de otro.
 |---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 |
 | M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) |
-| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 |
+| M03 | Registro de ingresos | Registrar el ingreso desde la imagen del ticket —o sin ella, con motivo—, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 |
 | M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza | RF02 |
 | M05 | Validación automática de consistencia | Aplicar las reglas V1 a V5 y registrar su resultado | RF03 |
-| M06 | Trazabilidad del proceso | Asignar ingresos a lotes y registrar su paso por cada etapa | RF07 |
+| M06 | Trazabilidad del proceso | Agrupar ingresos en lotes, decidir la ruta de cada lote o parte, registrar su paso por las etapas y cerrar el lote con su destino | RF07 |
 | M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |
 | M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 |
-| M09 | Auditoría | Registrar quién hizo qué y cuándo sobre cada entidad | — (transversal) |
+| M09 | Auditoría | Registrar quién hizo qué y cuándo, incluidos reconocimiento y corrección | — (transversal) |
 
 **Total: 9 módulos y 10 RF.** Cada RF tiene un módulo principal responsable; ningún RF queda sin
 dueño y ninguno está repartido entre dos módulos sin que uno decida.
@@ -70,7 +70,9 @@ V4). Un catálogo escrito a mano en cada ingreso haría las tres cosas imposible
 mineral a planta, y aquí se materializa: recibe la imagen, orquesta el reconocimiento y la
 validación, recoge la confirmación del usuario, calcula el peso neto con la tara del vehículo y
 persiste el ingreso con su código único y sus tres marcas de tiempo. Cuando el vehículo viaja por
-primera vez, el ingreso queda En proceso hasta que se registre su destare. M03 no lee la imagen ni
+primera vez, el ingreso queda En proceso hasta que se registre su destare. Si el ticket se extravió
+o no puede fotografiarse, registra el ingreso sin foto, con motivo y marcado «sin respaldo
+fotográfico» (DR-13); no es un RF nuevo, sino una excepción de RF01. M03 no lee la imagen ni
 aplica las reglas: las delega y decide con su resultado.
 
 **M04 — Reconocimiento automático del ticket.** Existe como módulo propio, y no como una función
@@ -86,19 +88,26 @@ en el servidor (D-08). Cubre RF03.
 
 **M06 — Trazabilidad del proceso.** El mineral de varios volquetes se mezcla en cancha, de modo que
 el vínculo directo entre un ingreso y una etapa no es realista: el ingreso se asigna a un lote de
-proceso y es el lote el que registra su paso por secado, zarandeo, molienda y ensacado (DR-04). Esa
-indirección es la responsabilidad del módulo. Cubre RF07.
+proceso y es el lote el que registra su paso por las etapas (DR-04). El secado es común; después la
+planta decide la **ruta** de cada lote —zarandeo, molienda o ambos, y ensacado—, y un lote puede
+dividirse por fracciones en partes con rutas distintas (DR-16, DR-18). El ciclo del lote es Abierto,
+En recorrido y Cerrado; el cierre lo hace el Administrador con el destino del mineral, venta o
+traslado (DR-14, DR-19). Los bigbags y las horas de molienda son datos descriptivos (DR-15). Esa
+indirección y ese ciclo son la responsabilidad del módulo. Cubre RF07.
 
 **M07 — Consulta de ingresos y respaldo.** Recuperar un ingreso concreto por placa y fecha, con la
-imagen de su ticket, es una lectura con sus propios índices y su propio contrato. No tiene entidad
-propia: lee sobre M03 (D-10). Cubre RF08.
+imagen de su ticket, es una lectura con sus propios índices y su propio contrato. Presenta además
+el calendario de llegadas del mes y señala los ingresos sin respaldo fotográfico. No tiene entidad
+propia: lee sobre M03 y M06 (D-10). Cubre RF08.
 
-**M08 — Consolidación de la producción.** Agrega los ingresos no anulados del mes por tipo de
+**M08 — Consolidación de la producción.** Agrega los ingresos Registrados del mes por tipo de
 mineral y entrega el total, con su exportación (DR-06). Tampoco tiene entidad propia. Cubre RF09.
 
 **M09 — Auditoría.** Transversal y sin RF propio. Registra creación, corrección y anulación, y
 también el reconocimiento y las correcciones sobre los datos propuestos. No mejora ninguna función
 del negocio: sostiene que el histórico pueda demostrarse íntegro, que es condición de todo lo demás.
+El historial de un ingreso lo consultan los tres roles; la auditoría completa del sistema, solo el
+Administrador.
 
 ## 5. Fuera de alcance
 
@@ -142,8 +151,10 @@ registro.
 |---|---|---|
 | Precisión insuficiente del motor de reconocimiento | El usuario corrige tantos campos que el registro tarda más que la transcripción manual | Piloto con 20 a 30 tickets reales antes de fijar D-12; la interfaz `ReconocedorTicket` permite cambiar de motor sin tocar M03 |
 | Calidad de las fotografías en planta | Tickets ilegibles por luz, sombra, papel térmico desvaído o encuadre | Camino manual siempre disponible (HU-M04-01 CA03 y CA04); guía de captura al usuario; validación de tamaño y formato |
-| Mezcla de mineral en cancha | El vínculo ingreso–etapa no refleja la operación real y la trazabilidad queda inservible | Lote de proceso como indirección (DR-04); confirmar con la empresa cómo se agrupa realmente el mineral antes de implementar M06 |
-| Placa reconocida que no está en el catálogo | El registro se bloquea en planta, donde no hay quien dé de alta el vehículo | DR-05: el Administrativo puede darlo de alta en el momento; medir cuántas veces ocurre durante el piloto |
+| Mezcla de mineral en cancha | El vínculo ingreso–etapa no refleja la operación real y la trazabilidad queda inservible | Lote de proceso como indirección (DR-04) y ruta por lote o parte (DR-16); confirmar con la empresa cómo se agrupa realmente el mineral antes de implementar M06 |
+| Placa reconocida que no está en el catálogo | El registro se bloquea en planta, donde no hay quien dé de alta el vehículo | DR-05 y DR-17: cualquiera de los tres roles, incluido el Supervisor de planta, lo da de alta en la misma pantalla del registro; medir cuántas veces ocurre durante el piloto |
+| Ticket extraviado o imposible de fotografiar | El ingreso no puede registrarse y vuelve al papel | DR-13: registro sin foto con motivo y marca visible en toda consulta |
+| Alcance de los roles todavía no validado con los usuarios | Una matriz de permisos que no corresponde al trabajo real obliga a rehacer M01 | DR-23: validar la matriz con la empresa antes de implementar M01 |
 | El catálogo de tipo de mineral no está definido | M02 y M08 se construyen sobre un supuesto | Definir sus valores con la empresa antes de implementar M02 (DR-03) |
 | Motor o reglas modificados durante la medición | Los ingresos del periodo dejan de ser comparables entre sí | D-16: motor, versión y reglas congelados; la versión se registra en cada reconocimiento |
 | Nueve módulos en el cronograma previsto | Sobrecarga | M09 puede reducirse a registro de eventos sin interfaz de consulta si el tiempo aprieta |

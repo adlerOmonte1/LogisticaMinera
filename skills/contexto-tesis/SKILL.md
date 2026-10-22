@@ -134,7 +134,7 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 | Rol | Código | Alcance |
 |---|---|---|
 | Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos, anulaciones y el cierre del lote con su destino |
-| Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación |
+| Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes (DR-23) |
 | Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta (DR-17) |
 
 ## Requerimientos funcionales
@@ -242,7 +242,7 @@ registro sin foto con motivo · DR-14 cierre del lote con destino, venta o trasl
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
 del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
 cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
-DR-22 retiro de ingresos solo con el lote Abierto. Queda pendiente P-03.
+DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

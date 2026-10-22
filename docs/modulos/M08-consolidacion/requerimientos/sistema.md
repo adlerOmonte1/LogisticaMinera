@@ -14,3 +14,5 @@
 | RS-M08-10 | El sistema registra en auditoría cada exportación, con el periodo y el usuario responsable | — (integridad con M09) |
 | RS-M08-11 | El sistema no persiste ninguna entidad propia: toda su información se deriva de `INGRESO` en el momento de la consulta | — (D-10) |
 | RS-M08-12 | El sistema informa el número de ingresos del periodo en estado `EN_PROCESO` junto al resultado | RU-M08-01 |
+| RS-M08-13 | El sistema informa junto al resultado los códigos de los ingresos En proceso, el número de anulados excluidos y la participación de cada tipo de mineral en el total | RU-M08-01 |
+| RS-M08-14 | El sistema agrupa los ingresos por el mes de `fecha_hora_pesaje` y no filtra por respaldo fotográfico ni por lote | RU-M08-01 |
