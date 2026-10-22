@@ -7,7 +7,7 @@
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
 | RN-M06-01 | Un ingreso pertenece a un lote como máximo | Las mismas toneladas se contarían en dos cargas distintas |
-| RN-M06-02 | Todos los ingresos de un lote comparten el tipo de mineral del lote | Una carga mezclaría minerales que se procesan distinto, y el recorrido por etapas no describiría a todos sus ingresos |
+| RN-M06-02 | Un ingreso solo se asigna a un lote cuya lista de tipos de mineral incluye el suyo; un tipo nuevo se agrega al lote de forma explícita y queda registrado (DR-27) | La mezcla de minerales en una carga ocurriría sin que nadie la decidiera, y el lote no explicaría qué contiene |
 | RN-M06-03 | Un ingreso anulado no se asigna a ningún lote. Si se anula estando asignado, se retira del lote Abierto; en un lote En recorrido o Cerrado permanece vinculado y deja de contar en sus totales | Un ingreso retirado del histórico seguiría aportando toneladas a una carga |
 | RN-M06-04 | Desde el inicio del recorrido no se retiran ni se trasladan ingresos del lote: solo se admiten ingresos tardíos (DR-22) | El recorrido ya registrado dejaría de corresponder al mineral que efectivamente lo hizo |
 | RN-M06-05 | Solo un lote En recorrido registra etapas | Se anotaría el secado de una carga que aún se está reuniendo, o un paso en una carga ya cerrada |
@@ -28,6 +28,8 @@
 | RN-M06-20 | Solo el Administrador cierra un lote, solo cuando todo su mineral está ensacado y con destino obligatorio: venta o traslado (DR-14) | Se cerraría una carga con etapas pendientes o sin saber a dónde fue el mineral |
 | RN-M06-21 | Un lote Cerrado no admite ingresos, etapas ni bigbags | El resumen del cierre dejaría de corresponder al lote |
 | RN-M06-22 | La trazabilidad de un ingreso se expresa sobre las etapas de su ruta; en un lote dividido, sobre la unión de las rutas de sus partes; sin ruta decidida no se calcula la proporción (DR-16, DR-21) | Una carga que siguió el camino correcto aparecería incompleta, o se calcularía una proporción sobre una ruta inexistente |
+| RN-M06-23 | Un tipo de mineral solo se quita de un lote si no tiene ingresos en él y el lote está Abierto | Ingresos del lote quedarían sin el tipo que justificó su asignación |
+| RN-M06-24 | Toda cifra del lote —toneladas por tipo de mineral, estimación de las partes y de los bigbags— se calcula sobre los ingresos al consultarse, de modo que una corrección o su reversión en M03 se refleja sin acción adicional (DR-28) | Las cifras del lote quedarían desactualizadas tras corregir un ingreso |
 
 ## Nota sobre RN-M06-01 y RN-M06-11
 

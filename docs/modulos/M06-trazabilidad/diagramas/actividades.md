@@ -9,9 +9,12 @@ flowchart TD
     V0 -->|Si| E0[Rechazar con el mensaje correspondiente]
     E0 --> A1
     V0 -->|No| L1[Seleccionar ingresos para la carga]
-    L1 --> V1{Mismo tipo de mineral?}
-    V1 -->|No| E1[Rechazar: El ingreso corresponde a otro tipo de mineral]
+    L1 --> V1{Mineral del ingreso en la lista del lote?}
+    V1 -->|No| D0{Agregar ese mineral al lote?}
+    D0 -->|No| E1[Rechazar: el mineral no esta en el lote]
     E1 --> L1
+    D0 -->|Si| M1[Agregar otro mineral al lote]
+    M1 --> V2
     V1 -->|Si| V2{Ingreso anulado o En proceso?}
     V2 -->|Si| E2[Rechazar con el mensaje de la regla]
     E2 --> L1

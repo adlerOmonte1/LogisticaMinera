@@ -33,9 +33,9 @@ sequenceDiagram
     SRV->>ING: Leer tipo de mineral y estado de cada ingreso
     ING-->>SRV: Datos de los ingresos
 
-    alt Tipo de mineral distinto
+    alt Mineral fuera de la lista del lote
         SRV-->>API: Rechazo RN-M06-02
-        API-->>NG: 400 El ingreso corresponde a otro tipo de mineral
+        API-->>NG: 400 El mineral no esta en el lote
     else Ingreso anulado o En proceso
         SRV-->>API: Rechazo RN-M06-03 o RN-M06-13
         API-->>NG: 400 con el mensaje de la regla

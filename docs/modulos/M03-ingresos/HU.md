@@ -190,8 +190,15 @@ Toda corrección exige un motivo y vuelve a someter los datos a las reglas de va
 corregido cumple exactamente las mismas condiciones que uno nuevo. El sistema conserva los valores
 anteriores, de modo que siempre puede reconstruirse qué decía el registro antes del cambio.
 
-Si el ingreso ya pertenece a un lote de proceso, su tipo de mineral no puede cambiarse por otro
-distinto del que tiene el lote: el lote reúne un solo tipo de mineral (M06).
+Si el ingreso ya pertenece a un lote de proceso, su nuevo tipo de mineral debe estar en la lista del
+lote; si no lo está, primero se agrega ese mineral al lote (DR-27).
+
+La corrección **se propaga en cadena**: los totales y las estimaciones del lote, el consolidado del
+mes, el calendario y la trazabilidad se calculan sobre el ingreso, así que reflejan el valor
+corregido sin acción adicional. Por eso la corrección es **reversible**: la última corrección vigente
+de un ingreso puede revertirse, con motivo, y el sistema restaura los valores anteriores, los
+revalida y deja ambos actos en auditoría (DR-28). Revertir no borra la corrección: la anula con otro
+cambio igual de atribuible.
 
 **Detalles**
 - Campos corregibles: placa, fecha y hora del pesaje, peso bruto, tipo de mineral y justificación.
@@ -200,6 +207,8 @@ distinto del que tiene el lote: el lote reúne un solo tipo de mineral (M06).
 - Campos no corregibles: código, hora de inicio y fin del registro, imagen del ticket, usuario que
   registró.
 - Motivo de la corrección: obligatorio, texto libre.
+- Reversión: solo de la última corrección vigente; con motivo; revalidada como una corrección. Se
+  puede repetir hacia atrás, una corrección por vez.
 - Roles autorizados: Administrativo y Administrador.
 
 **Criterios de aceptación**
@@ -234,11 +243,27 @@ distinto del que tiene el lote: el lote reúne un solo tipo de mineral (M06).
 > proceso hasta el destare de ese vehículo.
 
 > **CA09.** Dado que el ingreso pertenece a un lote y el usuario cambia su tipo de mineral por otro
-> distinto del lote, cuando intenta guardar, entonces el sistema rechaza la operación mostrando "El
-> ingreso {codigo} corresponde a otro tipo de mineral que el lote {lote}".
+> que no está en la lista del lote, cuando intenta guardar, entonces el sistema rechaza la operación
+> mostrando "{mineral} no está en el lote {lote}. Agregue ese mineral al lote para corregir el
+> ingreso".
 
 > **CA10.** Dado que el usuario no modificó ningún campo, cuando intenta guardar la corrección,
 > entonces el sistema rechaza la operación mostrando "No hay cambios que guardar".
+
+> **CA11.** Dado que un ingreso asignado a un lote se corrige, cuando el usuario consulta el lote, el
+> consolidado del mes o la trazabilidad, entonces las cifras reflejan el valor corregido.
+
+> **CA12.** Dado que un ingreso tiene una corrección vigente, cuando el usuario elige revertirla desde
+> el historial del ingreso e indica el motivo, entonces el sistema restaura los valores anteriores a
+> esa corrección, recalcula el peso neto y muestra "Corrección revertida en el ingreso {codigo}".
+
+> **CA13.** Dado que el usuario intenta revertir una corrección que no es la última vigente del
+> ingreso, cuando lo solicita, entonces el sistema rechaza la operación mostrando "Solo puede
+> revertirse la última corrección del ingreso".
+
+> **CA14.** Dado que los valores que restauraría la reversión incumplen una regla vigente —una regla
+> de validación o la lista de minerales del lote—, cuando el usuario intenta revertir, entonces el
+> sistema rechaza la operación con el mensaje literal de la regla.
 
 ---
 
@@ -341,6 +366,8 @@ mantiene por decisión de la Gerencia: solo el Administrador puede modificarla, 
 - Tara: obligatoria, digitada, en toneladas, decimal positivo, menor que el peso bruto de cada
   ingreso En proceso del vehículo.
 - Fecha y hora del destare: propuestas con la hora actual y editables; no posteriores al registro.
+- Obligatorio y sin plazo: puede registrarse días después del ingreso, que mientras tanto sigue En
+  proceso y figura como pendiente (DR-25).
 - Se registra una sola vez por vehículo.
 - Efecto sobre el vehículo: queda con tara, fecha del destare y usuario que la registró.
 - Efecto sobre cada ingreso En proceso del vehículo: tara aplicada, peso neto calculado y estado

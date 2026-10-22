@@ -89,6 +89,11 @@ mismo vehículo a la vez con taras distintas.
 no persiste valores reconocidos —no los hay— y aplica la misma validación. No existe un servicio
 aparte para ese caso; separarlo duplicaría las reglas del registro y tarde o temprano divergirían.
 
+`revertir_correccion()` toma el último evento `MODIFICAR` vigente del ingreso en M09, restaura sus
+`valores_anteriores` por el mismo camino que `corregir_ingreso()` —con la misma validación— y
+registra un evento nuevo que referencia al revertido (RN-M03-28, RN-M03-29). No hay tabla de
+versiones: la auditoría ya es el historial.
+
 `corregir_ingreso()` vuelve a leer la tara del vehículo corregido: si no la tiene, deja el ingreso En
 proceso (RN-M03-26). Antes de cambiar el tipo de mineral consulta el lote del ingreso a través del
 repositorio de M06 (RN-M03-25). `anular_ingreso()` pide al servicio de M06 que retire el ingreso de

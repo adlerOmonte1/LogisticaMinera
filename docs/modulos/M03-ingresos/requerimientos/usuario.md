@@ -12,6 +12,7 @@
 | RU-M03-08 | Si un ingreso no debió registrarse, quiero sacarlo de las cuentas pero que no desaparezca |
 | RU-M03-09 | Como el ticket no dice la hora, quiero que el sistema me la proponga y poder ajustarla a la hora real del pesaje |
 | RU-M03-10 | Si llega un carro nuevo, quiero agregarlo ahí mismo, sin cambiar de pantalla |
+| RU-M03-11 | Si corrijo un ingreso por error, quiero poder deshacer esa corrección sin tener que corregirlo a mano otra vez |
 | RU-M03-11 | Cuando un carro viene por primera vez, quiero anotar su tara al destararlo, y que después el sistema saque el neto solo |
 | RU-M03-12 | Si el ticket se pierde o no lo puedo fotografiar, quiero registrar igual el ingreso, explicando por qué no tiene foto |
 | RU-M03-13 | Si llega un mineral que no está en la lista, quiero que alguien de la oficina pueda agregarlo sin que yo pierda el registro |

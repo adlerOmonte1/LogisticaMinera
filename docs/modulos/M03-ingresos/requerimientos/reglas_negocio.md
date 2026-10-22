@@ -30,9 +30,11 @@
 | RN-M03-22 | El ingreso sin foto no pasa por el reconocimiento, pero sí por las mismas reglas de validación que un ingreso con foto | Un registro sin imagen se convertiría en la vía para eludir las reglas V1 a V5 |
 | RN-M03-23 | La fecha y hora del destare no pueden ser posteriores al momento del registro | La tara quedaría fechada en el futuro y el orden entre el primer viaje y su destare dejaría de ser reconstruible |
 | RN-M03-24 | Desde el registro, solo el Administrativo y el Administrador dan de alta un tipo de mineral, con las mismas reglas que el alta desde el catálogo | El catálogo crecería con denominaciones distintas para un mismo mineral y la consolidación dejaría de agrupar |
-| RN-M03-25 | La corrección no cambia el tipo de mineral de un ingreso asignado a un lote por otro distinto del lote | Un lote reuniría minerales distintos y su recorrido dejaría de describir a todos sus ingresos |
+| RN-M03-25 | La corrección no cambia el tipo de mineral de un ingreso asignado a un lote por otro que no está en la lista del lote (DR-27) | El lote reuniría un mineral que nadie decidió agregar y su composición dejaría de explicar lo que contiene |
 | RN-M03-26 | Si la corrección asocia el ingreso a un vehículo sin tara, el ingreso vuelve a En proceso, sin tara aplicada ni peso neto | Quedaría un peso neto calculado con la tara de otro vehículo |
 | RN-M03-27 | La anulación retira el ingreso del lote que todavía reúne ingresos; si el lote ya inició su recorrido, el ingreso permanece vinculado y deja de contar en sus totales | Un lote en formación arrastraría un ingreso que ya no debía existir |
+| RN-M03-28 | Solo se revierte la última corrección vigente de un ingreso, con motivo, y los valores restaurados se revalidan como en una corrección (DR-28) | Revertir una corrección intermedia dejaría el ingreso en un estado que nunca existió, o reintroduciría un dato que las reglas ya rechazan |
+| RN-M03-29 | La reversión es un cambio nuevo, atribuido y auditado; la corrección revertida permanece en el historial | Se perdería la evidencia de que el dato estuvo mal y de quién lo corrigió |
 
 ## Nota sobre RN-M03-04
 

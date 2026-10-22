@@ -84,7 +84,7 @@ sistema.
 **Etapas del proceso y ruta (DR-16):** secado, zarandeo, molienda y ensacado. Cada lote o parte del
 lote sigue una **ruta decidida** —secado común; zarandeo, molienda o ambos; ensacado—, y el
 denominador de I6 son las etapas de esa ruta; en un lote dividido, la unión de las etapas de las
-rutas de sus partes (DR-21). Un lote se divide por **fracciones**, no por toneladas (DR-18). Su ciclo
+rutas de sus partes (DR-21). Un lote se divide por **fracciones**, no por toneladas (DR-18), y admite varios tipos de mineral agregados de forma explícita (DR-27). Su ciclo
 es Abierto → En recorrido → Cerrado: «inicio del recorrido» y «cierre del lote» son acciones
 distintas (DR-19). Un ingreso puede registrarse **sin foto**, con motivo, como excepción de RF01 (DR-13).
 
@@ -242,7 +242,7 @@ registro sin foto con motivo · DR-14 cierre del lote con destino, venta o trasl
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
 del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
 cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
-DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad. Queda pendiente P-03.
+DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

@@ -25,5 +25,7 @@
 | RS-M03-21 | El sistema permite iniciar el registro sin imagen, sin invocar a `ReconocedorTicket`, con un motivo obligatorio elegido de una lista cerrada; persiste el ingreso con `sin_respaldo_fotografico` y el motivo, y lo somete a las mismas reglas de validación | RU-M03-12 |
 | RS-M03-22 | El sistema presenta el ingreso sin respaldo fotográfico señalado como tal, con su motivo, en toda lista y en el detalle | RU-M03-12 |
 | RS-M03-23 | El sistema permite al Administrativo y al Administrador dar de alta un tipo de mineral desde el registro, a través del servicio de M02, y lo deja elegido para el ingreso sin descartar los datos capturados | RU-M03-13 |
-| RS-M03-24 | El sistema rechaza la corrección del tipo de mineral de un ingreso asignado a un lote cuando el nuevo tipo difiere del lote | — (integridad con M06) |
+| RS-M03-24 | El sistema rechaza la corrección del tipo de mineral de un ingreso asignado a un lote cuando el nuevo tipo no está en la lista de minerales del lote | — (integridad con M06) |
 | RS-M03-25 | El sistema retira de su lote el ingreso que se anula mientras el lote todavía reúne ingresos | — (integridad con M06) |
+| RS-M03-26 | El sistema permite al Administrativo y al Administrador revertir la última corrección vigente de un ingreso, con motivo, restaurando los valores anteriores registrados en auditoría y revalidándolos | RU-M03-11 |
+| RS-M03-27 | El sistema no almacena cifras derivadas del ingreso fuera de él: lotes, consolidado y calendario las calculan al consultarse, de modo que una corrección o su reversión se propagan sin proceso adicional | RU-M03-11 |

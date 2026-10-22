@@ -15,6 +15,7 @@ registro sin foto es una excepción de RF01 (DR-13), no un RF adicional.
 | Listar ingresos | Consulta paginada con filtros por fecha, vehículo, tipo de mineral, estado y respaldo fotográfico | HU-M03-01 | `GET /api/v1/ingresos/` |
 | Consultar un ingreso | Detalle con la imagen del ticket —o el motivo de su ausencia— y las tres marcas de tiempo | HU-M03-01 | `GET /api/v1/ingresos/{id}/` |
 | Corregir ingreso | Modifica los campos corregibles, con motivo y revalidación; recalcula tara, neto y estado | HU-M03-02 | `PATCH /api/v1/ingresos/{id}/` |
+| Revertir la última corrección | Restaura los valores anteriores a la última corrección vigente, con motivo y revalidación | HU-M03-02 | `POST /api/v1/ingresos/{id}/revertir-correccion/` |
 | Anular ingreso | Baja lógica con motivo y responsable; retira el ingreso del lote que todavía reúne ingresos | HU-M03-03 | `PATCH /api/v1/ingresos/{id}/anular/` |
 | Listar ingresos pendientes de destare | Ingresos En proceso con su placa, fecha y peso bruto | HU-M03-04 | `GET /api/v1/ingresos/?estado=EN_PROCESO` |
 | Registrar destare | Recibe el vehículo, la tara digitada y la fecha y hora del destare; guarda la tara en el vehículo y completa todos sus ingresos En proceso | HU-M03-04 | `POST /api/v1/ingresos/destares/` |
@@ -59,6 +60,7 @@ que referencia al ingreso desde su propio lado.
 | Registrar ingreso sin foto | Sí | Sí | Sí |
 | Listar y consultar | Sí | Sí | Sí |
 | Corregir ingreso | Sí | Sí | No |
+| Revertir la última corrección | Sí | Sí | No |
 | Anular ingreso | Sí | No | No |
 | Alta rápida de vehículo desde el registro | Sí | Sí | Sí |
 | Alta rápida de tipo de mineral desde el registro | Sí | Sí | No |

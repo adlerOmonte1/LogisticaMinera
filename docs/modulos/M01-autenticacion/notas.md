@@ -31,12 +31,12 @@ menos, permisos por acción para:
 | Permiso | Roles | Módulo que lo usa |
 |---|---|---|
 | Registrar ingreso, con foto o sin ella | Los tres | M03 |
-| Corregir ingreso | Administrador, Administrativo | M03 |
+| Corregir ingreso y revertir su última corrección | Administrador, Administrativo | M03 |
 | Anular ingreso | Administrador | M03 |
 | Dar de alta un vehículo desde el registro y registrar su destare | Los tres | M02, M03 |
 | Gestionar catálogos | Administrador, Administrativo | M02 |
 | Modificar una tara ya registrada | Administrador | M02 |
-| Componer lotes: abrir, asignar, retirar, iniciar el recorrido y dividir | Administrador, Administrativo | M06 |
+| Componer lotes: abrir, agregar o quitar minerales, asignar, retirar, iniciar el recorrido y dividir | Administrador, Administrativo | M06 |
 | Registrar el paso por etapa, el secado de un ingreso tardío y los bigbags | Los tres | M06 |
 | Cerrar el lote con su destino | Administrador | M06 |
 | Consolidar y exportar | Administrador, Administrativo | M08 |
