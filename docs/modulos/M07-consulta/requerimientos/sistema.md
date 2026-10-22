@@ -1,0 +1,26 @@
+# Requerimientos de sistema — M07 Consulta de ingresos y respaldo
+
+| Código | Requerimiento | Deriva de |
+|---|---|---|
+| RS-M07-01 | El sistema busca ingresos por placa y por fecha o rango de fechas del ticket | RU-M07-01 |
+| RS-M07-02 | El sistema admite búsqueda parcial de placa, sin distinguir mayúsculas ni guiones | RU-M07-02 |
+| RS-M07-03 | El sistema exige al menos uno de los dos criterios para ejecutar la búsqueda | — (evita recorrer la tabla completa) |
+| RS-M07-04 | El sistema devuelve los resultados ordenados por `fecha_hora_pesaje` descendente | RU-M07-01 |
+| RS-M07-05 | El sistema entrega, en el detalle de un ingreso, la imagen del ticket asociada o, si el ingreso se registró sin foto, la indicación de que no tiene respaldo fotográfico y su motivo | RU-M07-03 |
+| RS-M07-06 | El sistema sirve la imagen solo a usuarios autenticados con permiso sobre el ingreso | — (integridad con M03) |
+| RS-M07-07 | El sistema informa cuando el respaldo no está disponible, en lugar de presentar el detalle sin indicarlo | RU-M07-03 |
+| RS-M07-08 | El sistema incluye los ingresos anulados en los resultados, señalados como tales y con su motivo | RU-M07-05 |
+| RS-M07-09 | El sistema ofrece un listado con filtros combinables por rango de fechas, tipo de mineral, vehículo, titularidad y estado, y búsqueda por placa o código; sin fechas indicadas, presenta el mes en curso hasta la fecha actual | RU-M07-04 |
+| RS-M07-10 | El sistema pagina los resultados del listado | RU-M07-04 |
+| RS-M07-11 | El sistema calcula el número de ingresos y la suma de pesos netos del conjunto filtrado considerando solo los ingresos en estado `REGISTRADO` | RU-M07-04 |
+| RS-M07-12 | El sistema rechaza un rango de fechas cuyo inicio sea posterior a su fin | RU-M07-04 |
+| RS-M07-13 | El sistema compone el detalle de un ingreso con sus validaciones, su reconocimiento, su trazabilidad y su historial | — (integridad con M04, M05, M06, M09) |
+| RS-M07-14 | El sistema indica la ausencia de cada uno de esos elementos en lugar de omitir su bloque | RU-M07-03 |
+| RS-M07-15 | El sistema no escribe ningún dato: todas sus operaciones son de lectura | — (D-10) |
+| RS-M07-16 | El sistema incluye los ingresos En proceso en los resultados, señalados como tales y con el peso neto indicado como pendiente del destare | RU-M07-04 |
+| RS-M07-17 | El sistema presenta, junto al resultado de la búsqueda por placa y fecha, el lote del ingreso, su estado y su recorrido por las etapas de la ruta, o indica que el ingreso aún no tiene lote | RU-M07-06 |
+| RS-M07-18 | El sistema señala en el listado los ingresos sin respaldo fotográfico | RU-M07-03 |
+| RS-M07-19 | El sistema calcula, para un mes, por cada día según la fecha del pesaje, el número de ingresos no anulados, las toneladas netas de los Registrados y si hay ingresos En proceso o anulados | RU-M07-07 |
+| RS-M07-20 | El sistema calcula el resumen del mes: ingresos no anulados, toneladas netas de los Registrados, días con llegadas e ingresos En proceso | RU-M07-07 |
+| RS-M07-21 | El sistema lista los ingresos de un día con su hora del pesaje, placa, código, tipo de mineral, peso neto y estado | RU-M07-07 |
+| RS-M07-22 | El sistema presenta el historial de un ingreso que provee M09, sin componerlo por su cuenta | RU-M07-08 |

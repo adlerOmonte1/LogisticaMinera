@@ -1,194 +1,288 @@
 # Decisiones de diseño fijadas
 
-**Estado:** cerradas. Reabrir cualquiera exige justificación escrita, porque todas condicionan un indicador operativo o la integridad del dominio.
+**Estado:** cerradas salvo las marcadas como pendientes. Reabrir cualquiera exige justificación
+escrita, porque todas condicionan la integridad del dominio o la comparabilidad de los registros
+durante el periodo de medición.
+
+Cada decisión declara: enunciado, módulos afectados, razón, qué protege y qué ocurre si se revierte.
 
 ---
 
-## D-01. La hora de pesaje y la hora de registro son dos campos independientes
-
-**Módulos afectados:** M03, M07
-**Indicador en juego:** I1 (latencia entre pesaje y disponibilidad del dato)
-
-La hora de pesaje la ingresa el usuario copiándola del ticket de balanza. La hora de registro la asigna el servidor automáticamente al persistir. La diferencia entre ambas **es** el indicador I1.
-
-Si se colapsan en un solo campo, el indicador desaparece y la dimensión D1 de resultado queda sin medición. En el código, `hora_registro` es `editable=False` y la asigna **el servicio**, no el ORM. `auto_now_add` sería incorrecto: fija la hora de inserción en la base, y para un ingreso capturado sin conexión el valor correcto es la hora de captura local que envía el cliente (ver D-03). Ningún rol puede modificarla.
-
-## D-02. El correlativo lo asigna el servidor, nunca el dispositivo
+## D-01. El ingreso guarda tres marcas de tiempo independientes
 
 **Módulos afectados:** M03, M07
 
-Un ingreso capturado sin conexión recibe un identificador local temporal (UUID generado en el cliente) y obtiene su correlativo definitivo al sincronizar. Si el dispositivo asignara el correlativo, dos supervisores trabajando sin conexión de forma simultánea generarían el mismo número, y la unidad de registro del sistema dejaría de ser identificable de forma única.
+El ingreso registra tres momentos distintos, y ninguno se deriva de otro:
 
-Implementación: transacción con bloqueo sobre la tabla de correlativos, o secuencia de PostgreSQL. Nunca `MAX(correlativo) + 1` fuera de transacción.
+| Marca | Origen | Editable |
+|---|---|---|
+| Fecha y hora del pesaje | La fecha se reconoce del ticket —en el registro sin foto la digita el usuario—; la hora la indica el usuario sobre una propuesta del sistema con la hora actual, porque el ticket no la imprime (DR-09, DR-11) | Sí, antes de confirmar |
+| Inicio del registro | Asignada por el servidor al recibir la imagen o, en el registro sin foto, cuando el usuario elige esa opción (DR-13) | No |
+| Fin del registro | Asignada por el servidor cuando el usuario confirma el ingreso | No |
 
-## D-03. La hora de registro de un ingreso offline es la hora de captura local, no la de sincronización
+La propuesta de hora la calcula el servidor con su reloj al abrir la revisión, no el navegador.
+Proponer la hora actual no colapsa la primera marca con las otras dos: el usuario la ajusta a la del
+pesaje real, y el sistema conserva las tres como valores distintos. Ejemplo de DR-11: pesaje a las
+16:00, inicio del registro a las 16:05 y fin a las 16:06.
 
-**Módulo afectado:** M07
-**Indicadores en juego:** I1, I2
+La primera dice cuándo se pesó el volquete; la segunda, cuándo alguien empezó a registrarlo; la
+tercera, cuándo el dato quedó disponible. Son tres hechos distintos del proceso y responden
+preguntas distintas.
 
-Si se tomara la hora de sincronización, la latencia mediría el tiempo transcurrido hasta que hubo señal de red, no el tiempo hasta que se capturó el dato. Eso invalidaría el indicador justamente en el módulo diseñado para mejorarlo.
+El fin del registro se asigna al confirmar, **también cuando el ingreso queda En proceso** por estar
+pendiente el destare del vehículo (D-17). El destare ocurre después, cuando el volquete ya descargó,
+y no mueve ninguna de las tres marcas: si lo hiciera, el tiempo de registro de un primer viaje
+incluiría el tiempo de descarga, que no es trabajo de registro.
 
-Implementación: el cliente envía `hora_captura_local` junto con el registro; el servidor la persiste como `hora_registro` y guarda además `hora_sincronizacion` como campo auxiliar de auditoría. El sistema no acepta una `hora_captura_local` posterior a la hora del servidor.
+**Implementación.** Las dos marcas del servidor son `editable=False` y las asigna **el servicio**,
+no el ORM: `auto_now_add` fijaría la hora de inserción y no la del inicio real de la operación.
+Ningún rol las modifica, y la API rechaza cualquier intento de enviarlas.
 
-## D-04. La captura sin conexión se decide en la semana 1, no se añade al final
+**Si se revierte.** Con una sola marca de tiempo no se distingue un ingreso registrado al momento de
+otro transcrito tres días después, y el histórico deja de poder explicar cómo se trabajó.
 
-**Módulo afectado:** M07
+## D-02. El código único lo asigna el servidor, dentro de una transacción con bloqueo
 
-La aplicación web progresiva, el almacenamiento local y la cola de sincronización son decisiones de arquitectura, no una funcionalidad agregable. Si M03 se construye asumiendo conexión permanente, incorporar M07 obliga a reescribirlo.
+**Módulos afectados:** M03
 
-Por eso M07 figura en la semana 4 del cronograma y no en la 8, y por eso el esqueleto PWA aparece como entregable de la semana 1.
+El código identifica al ingreso como unidad de registro. Lo asigna el servidor al confirmar,
+mediante bloqueo sobre la tabla de contadores o secuencia de PostgreSQL. Nunca
+`MAX(codigo) + 1` fuera de transacción, y nunca el dispositivo.
 
-## D-05. M09-Búsqueda existe porque el indicador I5 lo exige
+**Si se revierte.** Dos registros simultáneos recibirían el mismo código y dejarían de ser
+identificables de forma única.
 
-**Módulo afectado:** M09
+## D-06. La titularidad del vehículo es un atributo del catálogo, no texto libre
 
-I5 mide el tiempo de recuperación del dato de un ingreso concreto (por padrón, fecha, placa o producto). Ninguno de los diez requerimientos originales cubría búsqueda por criterios. Sin ella, I5 no mejora en la medición posterior y la dimensión D3 queda sin efecto medible. Se incorporó como RF-11.
+**Módulos afectados:** M02, M03, M05
 
-## D-06. El tipo de vehículo (propio / externo) es un atributo del catálogo, no texto libre
+El vehículo se elige del catálogo, y de él se derivan tres datos que el usuario no digita en cada
+ingreso: el tipo de vehículo —propio o externo—, la capacidad de carga, que la regla V4 contrasta
+contra el peso neto, y la tara, con la que se calcula ese peso neto (D-17).
 
-**Módulos afectados:** M02, M03
-**Indicador en juego:** I2 (cobertura de registro por tipo de vehículo)
-
-El hallazgo central del diagnóstico es que los volquetes propios se registran peor que los externos, porque a los externos se les paga por viaje y eso obliga a fotografiar el ticket. Demostrarlo con datos requiere que la titularidad del vehículo sea un campo clasificado y obligatorio en el catálogo, no una anotación libre.
+**Si se revierte.** Con la titularidad escrita a mano, el tipo de vehículo dejaría de ser un valor
+clasificable y V4 no tendría contra qué comparar el peso neto.
 
 ## D-07. El sistema no borra ingresos: los anula
 
-**Módulos afectados:** M03, M08
+**Módulos afectados:** M03, M06, M09
 
-Un ingreso registrado no se elimina físicamente. Se marca como anulado, con motivo y responsable, y permanece en el histórico. La razón es de trazabilidad: si durante el periodo de medición un registro pudiera desaparecer, no se podría demostrar ante la gerencia que la cobertura del histórico no fue depurada retroactivamente.
+Un ingreso registrado no se elimina físicamente. Se marca como anulado, con motivo y responsable, y
+permanece en el histórico. Los totales lo excluyen; el detalle lo conserva.
 
-## D-08. Las reglas de negocio no se replican en el cliente como fuente de verdad
+El mismo criterio alcanza al lote de proceso, a sus partes, a sus pasos por etapa y a sus bigbags
+(M06): todas sus claves foráneas son `PROTECT`, y un lote Cerrado no admite cambios.
 
-**Módulos afectados:** todos
+**Si se revierte.** No se podría demostrar que el histórico no fue depurado retroactivamente, y
+cualquier total sería indefendible.
 
-Angular puede validar en el formulario para mejorar la experiencia, pero la validación autoritativa está en el backend. Un registro que llega por la cola de sincronización de M07 no pasa por el formulario y debe someterse a las mismas reglas.
+## D-08. Las reglas de negocio viven en el servidor; el cliente solo muestra el resultado
+
+**Módulos afectados:** todos, con particular fuerza en M05
+
+Angular puede validar en el formulario para mejorar la experiencia, pero la validación autoritativa
+está en el backend. Esto vale sin excepción para las reglas V1 a V5: se aplican sobre los datos
+propuestos por el reconocimiento y otra vez sobre los confirmados por el usuario.
+
+**Si se revierte.** Una petición que no pase por el formulario entraría sin validar, y el histórico
+contendría datos que el sistema declara imposibles.
 
 ## D-09. `repositories/` es el lado de lectura, no una abstracción sobre el ORM
 
 **Módulos afectados:** todos
-**Indicadores en juego:** I3, I5
 
-Cada app separa la lectura (`repositories/`) de la escritura (`services/`). La razón es de rendimiento
-con consecuencia sobre la medición: I3 mide el tiempo de determinación del stock e I5 el de recuperación de
-un ingreso. Ambas son consultas que habrá que optimizar —`select_related`, índices, agregados— y esa
-optimización no debe obligar a tocar la lógica de escritura ni a rehacer sus pruebas.
+Cada app separa la lectura (`repositories/`) de la escritura (`services/`). La razón es de
+rendimiento: las consultas de M07 y M08 habrá que optimizarlas —`select_related`, índices,
+agregados— y esa optimización no debe obligar a tocar la lógica de escritura ni a rehacer sus
+pruebas.
 
 Lo que **no** es: el patrón Repository clásico, pensado para aislar un ORM que se quiere poder
 sustituir. Django ORM ya es la capa de acceso a datos, y envolverlo en una interfaz con una sola
-implementación es ceremonia que en la revisión técnica se defiende peor que su ausencia. En consecuencia:
+implementación es ceremonia que en la revisión técnica se defiende peor que su ausencia. En
+consecuencia:
 
 - Una clase concreta por entidad (`RepositorioIngreso`), sin `Protocol` ni clase base abstracta.
 - No escribe: ni `save()`, ni `create()`, ni `update()`, ni `delete()`.
 - Devuelve entidades o `QuerySet`, nunca diccionarios listos para la respuesta HTTP: eso es trabajo
   del serializer.
 - La abstracción se crea solo cuando exista una segunda implementación real o una prueba que exija
-  sustituirla — el generador de correlativo (D-02), el reloj y los exportadores de M06 la exigen; un
-  repositorio de productos, no.
+  sustituirla. El reconocedor (D-12), el generador de código (D-02), el reloj y los exportadores de
+  M08 la exigen; un repositorio de vehículos, no.
 
-Pregunta previsible en la revisión técnica: «¿por qué repositorios sobre un ORM que ya abstrae la base?».
-La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
+Pregunta previsible en la revisión técnica: «¿por qué repositorios sobre un ORM que ya abstrae la
+base?». La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
 
-## D-10. M06 y M09 son apps de lectura: no tienen `models/` ni `migrations/`
+## D-10. M07 y M08 son apps de lectura: no tienen `models/` ni `migrations/`
 
-**Módulos afectados:** M06, M09
-**Indicadores en juego:** I5, I6
+**Módulos afectados:** M07, M08
 
-Ni Consolidados-Reportes ni Búsqueda poseen entidad propia. M06 agrega sobre `INGRESO`, `SALIDA` y
-`MOVIMIENTO_STOCK`; M09 consulta `INGRESO` por padrón, fecha, placa o producto. Ninguno de los dos
-aparece como entidad en el modelo entidad-relación, y ese documento es la fuente única.
+Ni Consulta ni Consolidación poseen entidad propia. M07 lee `INGRESO` por placa y fecha; M08 agrega
+sobre `INGRESO` por mes y tipo de mineral. Ninguno aparece como entidad en el modelo
+entidad-relación, y ese documento es la fuente única.
 
-En consecuencia, su estructura es:
+Su estructura es:
 
 ```
-apps/reportes/          M06            apps/busqueda/        M09
-  repositories/   lectura sobre M03/M04/M05    repositories/  lectura sobre M03
-  exportadores/   una clase por formato (OCP)  services/
-  services/                                    serializers/
-  serializers/                                 views/
-  views/                                       permissions.py  filters.py  urls.py  tests/
-  permissions.py  filters.py  urls.py  tests/
+apps/consulta/         M07              apps/consolidacion/    M08
+  repositories/   lectura sobre M03       repositories/   lectura sobre M03
+  services/                               exportadores/   una clase por formato
+  serializers/                            services/
+  views/                                  serializers/
+  permissions.py  filters.py              views/
+  urls.py  tests/                         permissions.py  filters.py  urls.py  tests/
 ```
 
 Sin `models/` y sin `migrations/`. Crear paquetes vacíos «por simetría» es peor que no crearlos: un
 `models/` vacío invita a que alguien agregue ahí una entidad que debía discutirse primero en el
-modelo ER, y un `migrations/` vacío hace creer que el módulo tiene esquema propio cuando no lo tiene.
+modelo entidad-relación.
 
-**La regla que esto fija, y que vale para los nueve módulos:** una app solo tiene `models/` si aporta
-una entidad al modelo entidad-relación. Si un módulo necesita persistir algo nuevo, la entidad se
-añade primero al ERD y después al código, nunca al revés. Aplica a M07: si la cola de sincronización
-llegara a necesitar un registro de lote, ese registro se discute en el ERD antes de existir en
-`apps/sincronizacion/models/`.
+**La regla que esto fija, y que vale para los nueve módulos:** una app solo tiene `models/` si
+aporta una entidad al modelo entidad-relación. Si un módulo necesita persistir algo nuevo, la
+entidad se añade primero al modelo y después al código, nunca al revés.
 
-`exportadores/` en M06 es la aplicación literal del principio abierto/cerrado: `ExportadorExcel` y
-`ExportadorPDF` hoy, y el formato de declaración semestral —pendiente hasta la semana 7— como clase
-nueva, sin tocar lo existente. Es el único caso del backend donde la abstracción está justificada de
-antemano, porque la segunda implementación ya existe.
+`exportadores/` en M08 es la aplicación literal del principio abierto/cerrado: `ExportadorExcel` y
+`ExportadorPDF` como clases separadas, y cualquier formato futuro como clase nueva, sin tocar lo
+existente.
 
 ## D-11. El frontend vive en un repositorio separado, con capas dentro de cada feature
 
 **Módulos afectados:** todos los del cliente
-**Indicador en juego:** ninguno de forma directa; protege el periodo de medición
 
 Dos decisiones en una, porque se tomaron juntas.
 
 **Repositorio aparte.** El frontend se despliega como archivos estáticos y el backend como servicio
-con base de datos: dos ciclos de vida distintos. Con un solo repositorio, un cambio de estilos obliga
-a reconstruir y volver a desplegar la API, y todo despliegue en producción durante la ventana de
-observación es un cambio no controlado en las condiciones de medición (`ARQ-02` §7). El costo es que el contrato de la API
-deja de estar garantizado por el compilador; se compensa con el esquema OpenAPI en `/api/v1/docs/`
-como contrato, la misma convención de commits en ambos historiales y una etiqueta `M{nn}-cerrado`
-puesta el mismo día en los dos repositorios.
+con base de datos: dos ciclos de vida distintos. Con un solo repositorio, un cambio de estilos
+obliga a reconstruir y volver a desplegar la API, y todo despliegue en producción durante la ventana
+de observación es un cambio no controlado en las condiciones de trabajo. El costo es que el contrato
+de la API deja de estar garantizado por el compilador; se compensa con el esquema OpenAPI en
+`/api/v1/docs/` como contrato, la misma convención de commits en ambos historiales y una etiqueta
+`M{nn}-cerrado` puesta el mismo día en los dos repositorios.
 
 **Capas dentro del feature.** Cada `features/<modulo>/` se divide en `data-access/` (única puerta a
-`HttpClient`), `pages/` (componentes ruteados, con estado) y `ui/` (presentacionales, sin estado). Es
-la misma separación por motivo de cambio que ya se aplica en el servidor. La consecuencia verificable
-es que un componente de `ui/` se prueba con entradas y salidas, sin `HttpTestingController`: eso es
-lo que sostiene la característica *capacidad de ser probado* de ISO/IEC 25010 que declara este sistema.
+`HttpClient`), `pages/` (componentes ruteados, con estado) y `ui/` (presentacionales, sin estado).
+Es la misma separación por motivo de cambio que se aplica en el servidor. La consecuencia
+verificable es que un componente de `ui/` se prueba con entradas y salidas, sin
+`HttpTestingController`.
 
 Se descartó un monorepo Nx: aporta límites de dependencia y build incremental, que rinden con varios
-equipos y varias aplicaciones. Aquí hay una aplicación, un desarrollador y ocho semanas.
+equipos y varias aplicaciones. Aquí hay una aplicación y un equipo reducido.
 
-M07 no tiene carpeta en `features/`: la captura sin conexión es transversal y vive en `core/` como
-interceptor más cola. Si fuera una pantalla, M03 tendría que saber si hay red — la dependencia que
-D-04 prohíbe.
-
-## D-12. El kardex es de solo-anexado: una corrección genera un movimiento, no muta el anterior
-
-**Módulos afectados:** M03, M04, M05
-**Indicadores en juego:** I3, I4
-
-HU-M03-06 CA03 decía que editar un ingreso «recalcula el movimiento de stock asociado», mientras que
-RN-M05-01, RN-M05-02 y RN-M05-09 fijan que el saldo es siempre la suma algebraica de los movimientos,
-que **no se escribe directamente por ninguna vía** y que una corrección genera un movimiento nuevo
-conservando el original en el kardex. Eran dos modelos incompatibles: uno mutable y otro de asiento.
-
-Manda el kardex. Un asiento no se reescribe: si un ingreso se corrige, se anexa el movimiento que
-compensa la diferencia. La razón es auditable, no estética — si los movimientos pudieran mutar, el
-kardex dejaría de poder explicar cómo se llegó al saldo actual, que es justamente la evidencia sobre
-la que se interpretan I3 e I4.
-
-En consecuencia: HU-M03-06 CA03, el diagrama S-M03-04 y A-M03-02 quedaron redactados en esos
-términos, y el puerto `common/stock.py` expone `ajustar_por_edicion(ingreso, valores_anteriores)`, no
-un `recalcular_movimiento`.
-
-## D-13. Cada serie de correlativos tiene su propia tabla de contadores
+## D-12. El motor de reconocimiento queda detrás de la interfaz `ReconocedorTicket` — *pendiente de elegir el motor*
 
 **Módulos afectados:** M03, M04
 
-RN-M04-10 exige que la serie de salidas sea independiente de la de ingresos. La independencia se
-consigue por construcción y no por convención: cada módulo mantiene su propia tabla de contadores
-(`contador_correlativo_ingreso`, y la que corresponda en M04) y le pasa su prefijo al generador
-compartido de `common/correlativo.py`. No existe una tabla común donde dos series pudieran solaparse
-en la misma fila del año.
+El código de negocio no conoce el motor concreto. M03 recibe por inyección un `ReconocedorTicket`
+con una operación —dada una imagen, devolver tres campos (placa, fecha y peso bruto) con su confianza, más el identificador y la
+versión del motor— y no sabe si detrás hay OCR local, un servicio en la nube o un modelo multimodal
+por API.
 
-La mecánica —bloqueo con `select_for_update()`, incremento, formato `{PREFIJO}-{año}-{cinco
-dígitos}`— vive una sola vez; la tabla es infraestructura de cada módulo y por eso no aparece en el
-modelo entidad-relación (D-10).
+**Qué está cerrado:** la interfaz, la inyección y el registro del motor y su versión en cada
+reconocimiento.
+**Qué está pendiente:** cuál motor. Se decide tras un piloto con 20 a 30 tickets reales de dos o
+tres alternativas, comparando exactitud de lectura, costo y dependencia de conexión (DR-02).
+
+**Si se revierte.** Con el motor invocado directamente desde el servicio de registro, cambiarlo
+—algo previsible, porque aún no está elegido— obligaría a reescribir M03 y sus pruebas.
+
+## D-13. El dato reconocido no se persiste sin confirmación del usuario
+
+**Módulos afectados:** M03, M04, M05
+
+El resultado del reconocimiento es una **propuesta**. El sistema la presenta, resalta los campos con
+confianza inferior al umbral y señala las inconsistencias, pero no guarda nada como dato del ingreso
+hasta que el usuario revisa y confirma. Al persistir, se conservan **por separado** el valor
+reconocido y el valor confirmado de cada campo, junto con la confianza, el motor y su versión.
+
+**Registro sin foto (DR-13).** Cuando el ticket se extravió o no puede fotografiarse, no hay
+reconocimiento: el usuario digita los datos, el ingreso no tiene `RECONOCIMIENTO_TICKET` y queda
+marcado «sin respaldo fotográfico» con su motivo. Las reglas V1 a V5 se aplican igual (D-08). D-13
+no se relaja: no hay propuesta que persistir sin confirmar.
+
+**Si se revierte.** Un error de lectura se convertiría en dato oficial sin que nadie lo revisara, y
+después sería imposible distinguir qué leyó el motor de qué escribió la persona.
+
+## D-17. El peso neto lo calcula el sistema con la tara del vehículo
+
+**Módulos afectados:** M02, M03, M05, M06, M08
+
+El ticket de balanza imprime un solo peso, el bruto (DR-09). La tara es un atributo del vehículo: se
+obtiene en el destare de su primer viaje, la digita el usuario y se mantiene por decisión de la
+Gerencia (DR-10). El peso neto lo calcula el servidor al confirmar el ingreso, como peso bruto menos
+la tara vigente del vehículo, y no es editable.
+
+El ingreso **conserva la tara que se aplicó** como dato propio, no como referencia al catálogo. Si la
+Gerencia decide después actualizar la tara de un vehículo, los ingresos ya registrados mantienen el
+neto con el que se registraron; solo los siguientes usan la tara nueva.
+
+Mientras el vehículo no tiene tara —primer viaje, antes del destare—, el ingreso se confirma en
+estado **En proceso**: tiene código, peso bruto y marcas de tiempo, pero no peso neto. No cuenta en
+la consolidación ni puede asignarse a un lote. Al registrarse la tara, el sistema calcula el neto y
+el ingreso pasa a Registrado.
+
+**Si se revierte.** Con un neto digitado en cada ingreso, dos registros del mismo vehículo podrían
+aplicar taras distintas sin que nada lo advirtiera. Con la tara como referencia viva al catálogo, un
+cambio de tara reescribiría en silencio el histórico de toneladas.
+
+## D-14. Almacenamiento de las imágenes del ticket — *pendiente*
+
+**Módulos afectados:** M03, M07
+
+La imagen es el respaldo del ingreso y debe conservarse íntegra mientras el ingreso exista. Solo
+falta en el ingreso registrado sin foto, que lleva su marca y su motivo (DR-13). Está
+pendiente decidir el medio —volumen del servidor o almacenamiento de objetos—, la compresión
+admisible sin perder legibilidad, la política de retención y el respaldo.
+
+**Criterio de cierre:** se fija junto con el despliegue, antes de implementar M03.
+
+## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
+
+**Módulos afectados:** M04
+
+El reconocimiento se ejecuta de forma síncrona dentro de la petición, sin broker de tareas. El
+usuario está de pie junto al volquete esperando el resultado: una cola asíncrona añadiría
+complejidad de infraestructura y una espera que igualmente habría que mostrar.
+
+**Criterio de cierre:** si el piloto de D-12 muestra tiempos de más de unos pocos segundos por
+ticket, se revisa esta decisión y con ella la tabla de contenedores de ARQ-03.
+
+## D-16. El motor, su versión y las reglas no cambian durante la ventana de medición
+
+**Módulos afectados:** M04, M05
+
+Entre el inicio y el fin del periodo de medición no se actualiza el motor de reconocimiento, su
+versión ni los parámetros de las reglas V1 a V5. Si una corrección resulta inevitable, se documenta
+con fecha y se reporta.
+
+**Si se revierte.** Dos ingresos del mismo periodo habrían sido procesados por sistemas distintos, y
+dejarían de ser comparables entre sí.
+
+---
+
+## Decisiones retiradas
+
+Se conservan sus códigos para que el historial siga siendo legible. **Ningún código retirado vuelve
+a usarse con otro significado**, salvo los dos casos señalados, que se reasignaron antes de que
+llegaran a `main`.
+
+| Código | Decisión original | Motivo del retiro |
+|---|---|---|
+| D-03 | La hora de registro de un ingreso capturado sin señal es la de captura local | Se retira con el módulo de captura local (DR-01). Con ella desaparece la contradicción que mantenía con D-01 |
+| D-04 | La captura sin conexión se decide en la semana 1 | Se retira con el mismo módulo. Queda un RNF de conservación del borrador | <!-- migracion:ok -->
+| D-05 | El módulo de búsqueda existe porque un indicador lo exige | Se reformula: M07 existe por RF08 y por su responsabilidad de recuperar un ingreso con su respaldo |
+| D-12 *(anterior)* | El kardex es de solo-anexado | Se retira con el inventario de producto terminado, fuera de alcance. El código **D-12 se reasignó** al motor de reconocimiento | <!-- migracion:ok -->
+| D-13 *(anterior)* | Cada serie de correlativos tiene su propia tabla de contadores | Existía porque había dos series, ingresos y salidas. Con una sola serie la decisión pierde objeto. El código **D-13 se reasignó** a la confirmación del dato reconocido |
+
+Las decisiones D-12 y D-13 anteriores solo existieron en la rama `feature/M03-ingresos` y nunca
+llegaron a `main`; las únicas referencias a ellas están en `apps/salidas`, que se retira en la
+preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8).
 
 ## Pendientes que bloquean decisiones
 
-| Pendiente | Bloquea | Fecha límite |
+| Pendiente | Bloquea | Momento |
 |---|---|---|
-| Criterio de estimación de merma por humedad | M04, indicador I4 | Antes de la semana 5 |
-| Formato oficial de declaración semestral | M06 | Antes de la semana 7 |
-| Definición del volumen mínimo de registros para evaluar D3 | Seguimiento de indicadores | Antes de cerrar el periodo de medición |
+| Piloto de motores de reconocimiento | D-12, implementación de M04 | Antes de implementar M04 |
+| Medio de almacenamiento y política de retención de imágenes | D-14, implementación de M03 | Junto con el despliegue |
+| Valores del catálogo de tipo de mineral, a definir con la empresa | M02, M08 | Antes de implementar M02 |
+| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10) | M03, D-17 | Antes de implementar M03 |
+| Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte | M06, alcance de DR-04 y DR-16 | Antes de implementar M06 |
+| Validación con los usuarios del uso de los tres roles y su matriz de permisos (DR-23) | M01 | Antes de implementar M01 |

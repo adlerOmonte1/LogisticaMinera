@@ -4,33 +4,43 @@
 flowchart LR
     ADM(("Administrador"))
     ADV(("Administrativo"))
-    SUP(("Supervisor"))
+    SUP(("Supervisor de planta"))
 
-    UC1["Gestionar productos"]
-    UC2["Gestionar vehiculos"]
+    UC1["Gestionar vehiculos"]
+    UC2["Gestionar tipos de mineral"]
     UC3["Gestionar transportistas"]
-    UC4["Gestionar clientes"]
-    UC5["Consultar catalogos"]
+    UC4["Consultar catalogos"]
+    UC5["Modificar tara de un vehiculo"]
+    UC6["Dar de alta vehiculo desde el registro"]
+    UC7["Dar de alta tipo de mineral desde el registro"]
 
     ADM --> UC1
     ADM --> UC2
     ADM --> UC3
-    ADM --> UC4
     ADV --> UC1
     ADV --> UC2
     ADV --> UC3
+    ADM --> UC4
     ADV --> UC4
-    SUP --> UC5
+    ADM --> UC5
+    SUP --> UC4
+    ADM --> UC6
+    ADV --> UC6
+    SUP --> UC6
+    ADM --> UC7
+    ADV --> UC7
 ```
 
 ## Casos de uso
 
 | Caso | HU | Actores | Nota |
 |---|---|---|---|
-| Gestionar productos | HU-M02-01 | Administrador, Administrativo | Incluye alta, edición y baja lógica |
-| Gestionar vehículos | HU-M02-02 | Administrador, Administrativo | La titularidad es obligatoria |
-| Gestionar transportistas | HU-M02-03 | Administrador, Administrativo | |
-| Gestionar clientes | HU-M02-04 | Administrador, Administrativo | |
-| Consultar catálogos | HU-M02-01 a 04 | Los tres roles | El Supervisor solo consulta, para poder seleccionar en el formulario de ingreso |
+| Gestionar vehículos | HU-M02-01 | Administrador, Administrativo | La titularidad y la capacidad son obligatorias; el vehículo nace sin tara |
+| Modificar tara de un vehículo | HU-M02-01 | Administrador | Con motivo obligatorio; los ingresos ya registrados conservan su tara |
+| Dar de alta vehículo desde el registro | HU-M02-01, HU-M03-01 | Los tres roles | Mismas reglas que el alta desde el catálogo; es el primer viaje del vehículo |
+| Gestionar tipos de mineral | HU-M02-02 | Administrador, Administrativo | Catálogo único, usado al registrar y al consolidar |
+| Dar de alta tipo de mineral desde el registro | HU-M02-02, HU-M03-01 | Administrador, Administrativo | Mismas reglas que el alta desde el catálogo; el código puede generarlo el sistema |
+| Gestionar transportistas | HU-M02-03 | Administrador, Administrativo | Del que depende un vehículo con titularidad externa |
+| Consultar catálogos | HU-M02-01 a 03 | Los tres roles | El Supervisor de planta consulta para seleccionar en el registro de ingresos; además da de alta vehículos desde el registro |
 
 Los actores se definen en `../../M01-autenticacion/diagramas/caso_uso.md` y no se redefinen aquí.

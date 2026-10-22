@@ -1,19 +1,48 @@
 # Reglas de negocio — M02 Catálogo maestro
 
-> Ubicación en el código: `apps/catalogo/models/` y validadores asociados.
+> Ubicación en el código: `apps/catalogo/models/` (invariantes de las entidades) y
+> `apps/catalogo/services/` (baja lógica y validaciones cruzadas). Ninguna de estas reglas vive en
+> `views/` ni en un componente Angular (D-08).
 
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
-| RN-M02-01 | El código de producto es único | Los consolidados por producto (I6) se duplicarían |
-| RN-M02-02 | La placa de vehículo es única | Un mismo volquete tendría dos identidades y la cobertura por titularidad (I2) sería incorrecta |
-| RN-M02-03 | La titularidad del vehículo es obligatoria y pertenece al dominio cerrado {PROPIO, EXTERNO} | El indicador I2 quedaría sin clasificación posible |
-| RN-M02-04 | Un vehículo EXTERNO debe tener transportista asociado | No se podría analizar cobertura por proveedor |
-| RN-M02-05 | Un vehículo PROPIO no tiene transportista asociado | Se introduciría ambigüedad en la clasificación de titularidad |
-| RN-M02-06 | El RUC tiene exactamente once dígitos numéricos | Registros inválidos en documentos formales |
-| RN-M02-07 | Ninguna entidad de catálogo con registros dependientes se elimina físicamente | Se romperían las claves foráneas del histórico y se perderían ingresos del periodo de observación |
-| RN-M02-08 | Una entidad desactivada no se ofrece en formularios operativos, pero sí aparece en consultas históricas | Los registros antiguos quedarían sin etiqueta legible |
-| RN-M02-09 | La unidad de medida de todo producto es la tonelada | Los cálculos de stock mezclarían unidades incompatibles |
+| RN-M02-01 | La placa de vehículo es única | Un mismo volquete tendría dos identidades en el catálogo |
+| RN-M02-02 | La titularidad del vehículo es obligatoria y pertenece al dominio cerrado {PROPIO, EXTERNO} | El tipo de vehículo del ingreso quedaría sin clasificación posible (D-06) |
+| RN-M02-03 | Un vehículo EXTERNO debe tener transportista asociado | No se podría atribuir el vehículo a ningún proveedor |
+| RN-M02-04 | Un vehículo PROPIO no tiene transportista asociado | Se introduciría ambigüedad en la clasificación de titularidad |
+| RN-M02-05 | La capacidad de carga de un vehículo es un decimal positivo | La regla V4 no tendría un límite válido contra el cual contrastar el peso neto |
+| RN-M02-06 | El código de tipo de mineral es único | Un ingreso podría clasificarse en dos categorías a la vez |
+| RN-M02-07 | El RUC de un transportista tiene exactamente once dígitos numéricos | Se registrarían identificadores que ningún documento formal reconoce |
+| RN-M02-08 | Ninguna entidad de catálogo con registros dependientes se elimina físicamente | Se romperían las referencias del histórico de ingresos |
+| RN-M02-09 | Una entidad desactivada no se ofrece en el formulario de registro, pero sí aparece en consultas históricas | Los ingresos antiguos quedarían sin una etiqueta legible para su vehículo o su tipo de mineral |
+| RN-M02-10 | La unidad de medida de todo tipo de mineral es la tonelada | Los totales de la consolidación mezclarían unidades incompatibles |
+| RN-M02-11 | Un vehículo se da de alta sin tara; la primera tara se registra en el destare de su primer viaje, como decimal positivo en toneladas, con su fecha y el usuario que la registró | Se aceptaría una tara estimada o copiada de otro vehículo, y el peso neto de todos sus ingresos quedaría falseado |
+| RN-M02-12 | Una tara ya registrada solo la modifica el Administrador, con motivo obligatorio, y el cambio se registra en auditoría con el valor anterior y el nuevo | La tara, de la que depende el peso neto, cambiaría sin que nadie pudiera explicar por qué |
+| RN-M02-13 | El cambio de tara no altera los ingresos ya registrados: solo se aplica a los siguientes | Un cambio de tara reescribiría en silencio las toneladas ya consolidadas (D-17) |
+| RN-M02-14 | El alta de un vehículo desde el registro de un ingreso aplica las mismas reglas RN-M02-01 a RN-M02-05 que el alta desde el catálogo | El registro se convertiría en una puerta trasera para crear vehículos incompletos o duplicados |
+| RN-M02-15 | El nombre de un tipo de mineral es único, sin distinguir mayúsculas | El mismo mineral figuraría dos veces con códigos distintos y su total mensual se repartiría entre ambos |
+| RN-M02-16 | El código de un tipo de mineral tiene de dos a seis letras o números y no se modifica después del alta | Un cambio de código desconectaría la clasificación de los ingresos ya consolidados de su etiqueta |
+| RN-M02-17 | El alta de un tipo de mineral desde el registro de un ingreso la hacen solo el Administrativo y el Administrador, con las reglas RN-M02-06, RN-M02-15 y RN-M02-16; si no se indica el código, el sistema genera uno que no se repite | El catálogo crecería con denominaciones creadas en planta sin control administrativo |
+| RN-M02-18 | El RUC de un transportista es único | Dos registros del mismo proveedor dividirían sus vehículos entre ambos |
 
-## Nota sobre RN-M02-09
+## Nota sobre RN-M02-05
 
-La unidad única simplifica el alcance del proyecto y es coherente con la operación real: la balanza reporta en toneladas y todos los productos en alcance (Saranda, Molido) se manejan en esa unidad. Si en el futuro se incorporara un producto en otra unidad, esta regla debe revisarse antes de que el sistema acepte el registro.
+Es la regla que conecta este módulo con la validación de M05. La capacidad no se usa dentro de M02
+más que como un dato del vehículo; su propósito completo solo se entiende en la regla V4, que la
+lee para decidir si un peso neto es razonable. Un vehículo con capacidad cero o negativa haría que
+esa regla fallara o se volviera inservible para ese vehículo.
+
+## Nota sobre RN-M02-10
+
+La unidad única simplifica el alcance del sistema y es coherente con la operación real: el ticket de
+balanza reporta en toneladas. Si en el futuro se incorporara un tipo de mineral medido en otra
+unidad, esta regla debe revisarse antes de que el sistema acepte el registro.
+
+## Nota sobre RN-M02-11 a RN-M02-13
+
+La tara es el dato del catálogo con más efecto sobre las toneladas: el ticket de balanza solo imprime
+el peso bruto, y el peso neto de cada ingreso es ese bruto menos la tara del vehículo. Por eso se
+registra una sola vez, a partir de un pesaje real del vehículo vacío, y su cambio posterior es una
+decisión de la Gerencia que ejecuta el Administrador y queda explicada por su motivo. Que el cambio
+no alcance a los ingresos anteriores es lo que permite que un total mensual ya consolidado siga
+siendo el mismo al consultarlo después.

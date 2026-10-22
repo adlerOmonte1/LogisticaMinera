@@ -1,0 +1,45 @@
+# Etapa 1 del pipeline: coherencia de la documentación.
+# Corre en todo PR y en todo push a las ramas largas que toquen docs/ o skills/.
+name: Documentacion
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "skills/**"
+      - "scripts/verificar_migracion.sh"
+      - "scripts/validar_docs.py"
+      - ".github/workflows/docs.yml"
+  push:
+    branches: [main, staging, "docs/version-2"]
+    paths:
+      - "docs/**"
+      - "skills/**"
+      - "scripts/verificar_migracion.sh"
+      - "scripts/validar_docs.py"
+      - ".github/workflows/docs.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coherencia:
+    name: Coherencia de la documentacion
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Conceptos del sistema anterior
+        run: bash scripts/verificar_migracion.sh
+
+      - name: Mermaid, enlaces, referencias e historias
+        run: python3 scripts/validar_docs.py

@@ -2,48 +2,69 @@
 
 ```mermaid
 flowchart LR
-    SUP(("Supervisor"))
+    SUP(("Supervisor de planta"))
     ADV(("Administrativo"))
     ADM(("Administrador"))
-    BAL[["Balanza<br/>(fuente externa<br/>no integrada)"]]
+    REC[["ReconocedorTicket M04"]]
+    VAL[["ValidadorConsistencia M05"]]
 
-    UC1["Registrar ingreso"]
-    UC2["Consultar listado"]
-    UC3["Ver detalle de ingreso"]
-    UC4["Editar ingreso"]
+    UC1["Registrar ingreso desde el ticket"]
+    UC2["Revisar y corregir datos propuestos"]
+    UC3["Consultar ingresos"]
+    UC4["Corregir ingreso registrado"]
     UC5["Anular ingreso"]
+    UC6["Dar de alta vehiculo nuevo"]
+    UC7["Registrar destare del vehiculo"]
+    UC8["Registrar ingreso sin foto"]
+    UC9["Dar de alta tipo de mineral"]
 
     SUP --> UC1
     SUP --> UC2
     SUP --> UC3
-
+    SUP --> UC6
+    SUP --> UC7
+    SUP --> UC8
     ADV --> UC1
     ADV --> UC2
     ADV --> UC3
     ADV --> UC4
-    ADV --> UC5
-
+    ADV --> UC6
+    ADV --> UC7
+    ADV --> UC8
+    ADV --> UC9
     ADM --> UC1
     ADM --> UC2
     ADM --> UC3
     ADM --> UC4
     ADM --> UC5
+    ADM --> UC6
+    ADM --> UC7
+    ADM --> UC8
+    ADM --> UC9
 
-    BAL -.provee ticket.-> UC1
+    REC -.-> UC1
+    VAL -.-> UC1
+    VAL -.-> UC4
+    VAL -.-> UC7
+    VAL -.-> UC8
 ```
-
-## Nota sobre la balanza
-
-La balanza **no está integrada** al sistema. Es una fuente externa que produce un ticket en papel; el usuario transcribe sus datos. La integración automática está fuera de alcance (ver `../../00-arquitectura/ARQ-01_Modulos_del_Sistema.md` §5).
-
-Esta decisión tiene consecuencia sobre la medición: la latencia I1 incluye el tiempo de transcripción manual. Si la balanza estuviera integrada, la latencia tendería a cero y el indicador perdería variabilidad. La transcripción manual es parte del proceso real que se mide.
 
 ## Casos de uso
 
-| Caso | HU | Actores | Precondición |
+| Caso | HU | Actores | Nota |
 |---|---|---|---|
-| Registrar ingreso | HU-M03-01, 02, 03 | Los tres roles | Sesión activa; catálogos cargados |
-| Consultar listado | HU-M03-04 | Los tres roles | Sesión activa |
-| Ver detalle | HU-M03-05 | Los tres roles | Ingreso existente |
-| Editar ingreso | HU-M03-06 | Administrativo, Administrador | Ingreso no anulado |
-| Anular ingreso | HU-M03-07 | Administrativo, Administrador | Ingreso en estado REGISTRADO |
+| Registrar ingreso desde el ticket | HU-M03-01 | Los tres roles | Empieza con la captura de la imagen; la hora del pesaje se propone y el usuario la ajusta; el código, la hora de fin y el peso neto los asigna el servidor |
+| Revisar y corregir datos propuestos | HU-M03-01 | Los tres roles | Ocurre antes de confirmar; la placa leída puede corregirse; nada se persiste hasta entonces |
+| Consultar ingresos | HU-M03-01 | Los tres roles | Listado y detalle del propio recurso. La búsqueda por placa y fecha es de M07 |
+| Corregir ingreso registrado | HU-M03-02 | Administrativo, Administrador | Exige motivo y vuelve a validar. El Supervisor de planta no corrige |
+| Anular ingreso | HU-M03-03 | Administrador | Exige motivo. No elimina: excluye de los totales y conserva el registro |
+| Dar de alta vehículo nuevo | HU-M03-01 | Los tres roles | En la misma pantalla del registro, sin perder lo capturado. Es el primer viaje: el ingreso queda En proceso |
+| Registrar destare del vehículo | HU-M03-04 | Los tres roles | Se elige el vehículo; la tara se digita, no se reconoce. Completa el peso neto de todos sus ingresos En proceso |
+| Registrar ingreso sin foto | HU-M03-01 | Los tres roles | Excepción con motivo obligatorio: sin imagen ni reconocimiento, con validación. El ingreso queda marcado sin respaldo fotográfico |
+| Dar de alta tipo de mineral | HU-M03-01 | Administrativo, Administrador | En la misma pantalla del registro, con las reglas del catálogo de M02. El Supervisor de planta no lo ofrece |
+
+`ReconocedorTicket` y `ValidadorConsistencia` son interfaces que M03 invoca, no actores humanos: se
+dibujan con línea discontinua para mostrar que el caso de uso depende de ellas. El registro sin foto
+depende del validador, pero no del reconocedor.
+
+Los actores se definen en `../../M01-autenticacion/diagramas/caso_uso.md` y no se redefinen aquí.

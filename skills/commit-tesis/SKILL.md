@@ -59,7 +59,7 @@ Para entregas parciales, describe lo que efectivamente entra, con el mismo estil
 
 ```
 docs(ingresos): Correccion de los criterios de aceptacion de HU-M03-02
-docs(existencias): Diagramas de secuencia del kardex
+docs(validacion): Diagramas de secuencia de las reglas V1 a V5
 ```
 
 ## Ramas
