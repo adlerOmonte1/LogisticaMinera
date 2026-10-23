@@ -74,8 +74,9 @@ class ReglaV4Capacidad:
 
 Añadir una regla nueva —por ejemplo, una placa que no está en el catálogo— debe ser **una clase
 nueva registrada en la colección**, no un `elif` en una función existente ni una modificación de V1
-a V5. El mismo criterio aplica a los exportadores de M08 (`ExportadorExcel` hoy, otros formatos
-después) y a los adaptadores del motor de reconocimiento de M04.
+a V5. El mismo criterio aplica a los exportadores de M07 (`ExportadorCSVListado`) y de M08
+(`ExportadorExcel` hoy, otros formatos después) y a los adaptadores del motor de reconocimiento de
+M04.
 
 ## L — Sustitución de Liskov
 

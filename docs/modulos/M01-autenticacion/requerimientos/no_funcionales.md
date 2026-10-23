@@ -6,8 +6,9 @@
 | RNF-M01-02 | Seguridad — autenticidad | Todo endpoint distinto de login y refresh exige token válido | Prueba automatizada: solicitud sin token devuelve 401 |
 | RNF-M01-03 | Seguridad — integridad | El token se firma con clave secreta del servidor y su alteración lo invalida | Prueba automatizada: token modificado devuelve 401 |
 | RNF-M01-04 | Eficiencia de desempeño — comportamiento temporal | El inicio de sesión responde en menos de 2 segundos con 20 usuarios concurrentes | Prueba de carga con datos sintéticos |
-| RNF-M01-05 | Usabilidad — accesibilidad | El formulario de inicio de sesión es operable desde un teléfono en campo, con campos de al menos 44 px de alto | Inspección en dispositivo real |
+| RNF-M01-05 | Capacidad de interacción — inclusividad | El formulario de inicio de sesión es operable desde un teléfono en campo, con campos de al menos 44 px de alto | Inspección en dispositivo real |
 | RNF-M01-06 | Fiabilidad — tolerancia a fallos | La expiración de sesión no provoca pérdida de datos no guardados en un formulario a medio llenar | Prueba manual: expirar sesión con el formulario de registro a medio llenar |
+| RNF-M01-07 | Seguridad — confidencialidad | La contraseña temporal se genera con un generador criptográficamente seguro, tiene al menos ocho caracteres, se muestra una sola vez y no se registra en auditoría ni en los registros del servidor | Prueba automatizada sobre el servicio de restablecimiento e inspección de los registros del servidor |
 
 ## Nota sobre RNF-M01-04
 

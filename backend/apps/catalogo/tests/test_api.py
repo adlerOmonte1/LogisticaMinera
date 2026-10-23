@@ -106,9 +106,6 @@ def test_no_existe_borrado_fisico(api_como, administrador):
     assert Producto.objects.filter(pk=p.pk).exists()
 
 
-CLIENTES = "/api/v1/catalogo/clientes/"
-
-
 def test_hu_m02_01_editar_nombre_de_producto(api_como, administrativo):
     p = ProductoFactory(codigo="ED", nombre="Viejo")
     r = api_como(administrativo).patch(f"{PRODUCTOS}{p.pk}/", {"nombre": "Nuevo"})
@@ -140,22 +137,3 @@ def test_hu_m02_03_ca02_ruc_invalido(api_como, administrativo):
     r = api_como(administrativo).post(TRANSPORTISTAS, {"razon_social": "X", "ruc": "123"})
     assert r.status_code == 400
     assert r.data["mensaje"] == "El RUC debe tener once dígitos"
-
-
-def test_hu_m02_04_ca01_crear_cliente(api_como, administrativo):
-    r = api_como(administrativo).post(
-        CLIENTES, {"razon_social": "Minera Sur SAC", "ruc": "20999888777"}
-    )
-    assert r.status_code == 201
-
-
-def test_hu_m02_04_ca02_desactivar_cliente_es_baja_logica(api_como, administrador):
-    from apps.catalogo.models import Cliente
-
-    from .factories import ClienteFactory
-
-    c = ClienteFactory()
-    r = api_como(administrador).patch(f"{CLIENTES}{c.pk}/desactivar/")
-    assert r.status_code == 200
-    c.refresh_from_db()
-    assert c.activo is False and Cliente.objects.filter(pk=c.pk).exists()

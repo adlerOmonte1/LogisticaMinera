@@ -113,7 +113,8 @@ campo y no en el motor en conjunto.
 - Se consulta desde el detalle del ingreso.
 - Campos visibles: nombre, valor reconocido, valor confirmado, confianza, si fue corregido.
 - Cabecera: motor, versión, fecha de proceso y umbral vigente al procesar.
-- Roles autorizados: Administrativo y Administrador.
+- Roles autorizados: los tres. El Supervisor de planta la consulta porque responde por lo que
+  registró (DR-31); la consulta no ofrece ninguna operación de corrección.
 
 **Criterios de aceptación**
 
@@ -128,8 +129,11 @@ campo y no en el motor en conjunto.
 > registró sin foto, cuando el usuario consulta su detalle, entonces el sistema indica que no hubo
 > reconocimiento y muestra el motivo.
 
-> **CA04.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta consultar la
-> comparación, entonces el sistema rechaza la operación mostrando "Acción no autorizada".
+> **CA04.** Dado que el usuario tiene rol de Supervisor de planta, cuando consulta la comparación,
+> entonces el sistema la presenta en modo de solo lectura, sin ofrecer la corrección del ingreso.
 
 > **CA05.** Dado que se consulta un reconocimiento, cuando el sistema lo presenta, entonces muestra
 > el motor y la versión que lo produjeron.
+
+> **CA06.** Dado que una solicitud de consulta llega sin sesión válida, cuando el servidor la recibe,
+> entonces la rechaza con código 401 sin devolver ningún dato del reconocimiento.

@@ -84,7 +84,7 @@ sistema.
 **Etapas del proceso y ruta (DR-16):** secado, zarandeo, molienda y ensacado. Cada lote o parte del
 lote sigue una **ruta decidida** —secado común; zarandeo, molienda o ambos; ensacado—, y el
 denominador de I6 son las etapas de esa ruta; en un lote dividido, la unión de las etapas de las
-rutas de sus partes (DR-21). Un lote se divide por **fracciones**, no por toneladas (DR-18). Su ciclo
+rutas de sus partes (DR-21). Un lote se divide por **fracciones**, no por toneladas (DR-18), y admite varios tipos de mineral agregados de forma explícita (DR-27). Su ciclo
 es Abierto → En recorrido → Cerrado: «inicio del recorrido» y «cierre del lote» son acciones
 distintas (DR-19). Un ingreso puede registrarse **sin foto**, con motivo, como excepción de RF01 (DR-13).
 
@@ -133,9 +133,9 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 
 | Rol | Código | Alcance |
 |---|---|---|
-| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos, anulaciones y el cierre del lote con su destino |
+| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios y restablecimiento de contraseñas, catálogos, anulaciones y el cierre del lote con su destino |
 | Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes (DR-23) |
-| Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta (DR-17) |
+| Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta, incluidos el reconocimiento y la validación de cada ingreso (DR-17, DR-31) |
 
 ## Requerimientos funcionales
 
@@ -168,7 +168,7 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 | M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Sin código |
 | M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado, detrás de la interfaz `ValidadorConsistencia` | RF03 | Sin código |
 | M06 | Trazabilidad del proceso | Asignar ingresos a lotes de proceso y registrar su paso por cada etapa | RF07 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
+| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket; listado con exportación, calendario e inicio con avisos de pendientes | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
 | M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 | Sin código (`apps/reportes` es un esqueleto) |
 | M09 | Auditoría | Registrar quién hizo qué y cuándo sobre cada entidad, incluidos reconocimiento y corrección | — (transversal) | Sin código (`apps/auditoria` es un esqueleto) |
 
@@ -211,13 +211,19 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-13 | El dato reconocido no se guarda sin confirmación del usuario |
 | D-16 | Motor, versión y reglas no cambian entre el inicio y el fin de la medición |
 | D-17 | El peso neto lo calcula el servidor con la tara del vehículo; el ingreso conserva la tara aplicada |
+| D-18 | El almacén de imágenes se usa por la API de almacenamiento de Django, sin interfaz propia; el medio lo fija D-14 |
+| D-19 | El listado de ingresos pertenece solo a M07; M03 expone su recurso y los pendientes de destare |
+| D-20 | Respaldo mínimo ejecutable desde la semana 1 (volcado de la base y copia del volumen `media`, con restauración de prueba); servicio y política definitivos con el alojamiento de la presentación |
+| D-21 | Códigos de ruta: `ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO`, `ZARANDEO_MOLIENDA_ENSACADO` |
+| D-22 | Ninguna operación de la API usa `DELETE`: el retiro de un ingreso y el de un mineral del lote son acciones `POST`, y el mineral quitado queda con baja lógica |
+| D-23 | Códigos HTTP: 400 regla o dato, 401 autenticación, 403 permiso o contraseña temporal, 404 inexistente, 409 conflicto de estado, 423 cuenta bloqueada |
 
 **Pendientes de cierre**
 
 | ID | Decisión | Criterio de cierre |
 |---|---|---|
-| D-12 | Motor de reconocimiento (OCR local, servicio en la nube o modelo multimodal por API) | Piloto con 20 a 30 tickets reales de dos o tres motores; se compara exactitud, costo y dependencia de conexión. La documentación usa `ReconocedorTicket` y no depende del motor |
-| D-14 | Almacenamiento de imágenes (volumen del servidor u objetos, compresión, retención, respaldo) | Se fija con el despliegue |
+| D-12 | Motor de reconocimiento (OCR local, servicio en la nube o modelo multimodal por API) | Piloto con 20 a 30 tickets reales de dos o tres motores, con el sistema funcional y antes del congelamiento de la semana 8. **Provisional:** adaptador local dentro del mismo backend |
+| D-14 | Almacenamiento de imágenes (volumen del servidor u objetos, compresión, retención, respaldo) | Con el servicio de alojamiento de la presentación. **Provisional:** volumen `media` del backend, por la API de Django (D-18) |
 | D-15 | Procesamiento síncrono o asíncrono del reconocimiento | Síncrono, salvo que el piloto de D-12 muestre tiempos de más de unos segundos por ticket |
 
 **Retiradas**
@@ -242,7 +248,7 @@ registro sin foto con motivo · DR-14 cierre del lote con destino, venta o trasl
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
 del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
 cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
-DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad. Queda pendiente P-03.
+DR-22 retiro de ingresos solo con el lote Abierto (ampliada por DR-29) · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección · DR-29 retiro de ingresos del lote hasta el zarandeo o la molienda · DR-30 elementos de la maqueta 2.1 incorporados: inicio con avisos, exportación del listado, gestión de cuentas y bajas, búsqueda desde la cabecera · DR-31 el Supervisor consulta el reconocimiento y la validación. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

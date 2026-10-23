@@ -10,6 +10,9 @@
 | RU-M07-06 | Cuando busco un volquete, quiero ver también en qué carga está su mineral y por dónde va |
 | RU-M07-07 | Quiero ver en un calendario cuántos carros llegaron cada día y cuántas toneladas trajeron |
 | RU-M07-08 | Quiero ver todo lo que le pasó a un ingreso: quién lo registró, quién lo corrigió y por qué |
+| RU-M07-09 | Al entrar quiero ver de un vistazo lo que llegó hoy y lo que está pendiente de mí |
+| RU-M07-10 | Quiero llevarme a una hoja de cálculo la lista de ingresos que filtré |
+| RU-M07-11 | Si tengo el código de un ingreso, quiero abrirlo directamente, sin pasar por filtros |
 
 ## Contexto del diagnóstico
 
@@ -22,3 +25,6 @@
 | RU-M07-06 | Saber dónde está el mineral de un volquete obliga hoy a cruzar el ticket con lo que se anotó en planta, si se anotó |
 | RU-M07-07 | El ritmo de llegadas se conoce solo de memoria; no hay forma rápida de ver qué días llegó más mineral |
 | RU-M07-08 | Cuando un dato cambia, hoy no queda rastro de quién lo cambió ni de qué decía antes |
+| RU-M07-09 | Lo pendiente —un destare, una etapa por registrar, un lote por cerrar— depende hoy de que alguien lo recuerde |
+| RU-M07-10 | Los reportes de trabajo se arman copiando a mano los datos del cuaderno a una hoja de cálculo |
+| RU-M07-11 | El código del ingreso es el único identificador del registro (DR-12): quien lo tiene no debería tener que buscarlo por fecha |

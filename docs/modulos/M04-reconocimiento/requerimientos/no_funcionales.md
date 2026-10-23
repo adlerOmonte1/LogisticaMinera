@@ -7,10 +7,10 @@
 | RNF-M04-03 | Fiabilidad — disponibilidad | La indisponibilidad del motor no impide registrar ingresos | Prueba automatizada con el motor desactivado |
 | RNF-M04-04 | Adecuación funcional — corrección | El sistema reconoce los tres campos sobre tickets de la balanza en uso, incluidos los impresos en papel térmico con desgaste | Contraste del resultado con la lectura humana sobre el conjunto de tickets de prueba |
 | RNF-M04-05 | Mantenibilidad — modularidad | Sustituir el motor exige escribir un adaptador nuevo y no modificar ningún otro módulo | Inspección de código: solo `motores/` importa la librería del proveedor |
-| RNF-M04-06 | Mantenibilidad — capacidad de ser probado | Las pruebas del registro y de la validación se ejecutan sin invocar al motor real | Inspección de código: el motor se inyecta y se sustituye por un doble en las pruebas |
+| RNF-M04-06 | Mantenibilidad — capacidad de prueba | Las pruebas del registro y de la validación se ejecutan sin invocar al motor real | Inspección de código: el motor se inyecta y se sustituye por un doble en las pruebas |
 | RNF-M04-07 | Seguridad — confidencialidad | Si el motor es un servicio externo, la imagen se transmite cifrada y sus credenciales viven en variables de entorno | Inspección de configuración |
 | RNF-M04-08 | Seguridad — integridad | El motor y su versión quedan registrados en cada reconocimiento y no son modificables desde la API | Prueba automatizada que intenta alterarlos |
-| RNF-M04-09 | Usabilidad — protección contra errores del usuario | Los campos con confianza bajo el umbral se distinguen visualmente de los demás sin depender solo del color | Inspección en dispositivo real |
+| RNF-M04-09 | Capacidad de interacción — protección contra errores del usuario | Los campos con confianza bajo el umbral se distinguen visualmente de los demás sin depender solo del color | Inspección en dispositivo real |
 
 ## Nota sobre RNF-M04-01 y RNF-M04-02
 

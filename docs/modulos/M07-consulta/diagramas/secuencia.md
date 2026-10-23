@@ -136,3 +136,76 @@ sequenceDiagram
     NG-->>A: Ingresos del dia o No llegaron volquetes este dia
 ```
 
+## S-M07-05 · Exportación del listado de ingresos (HU-M07-02)
+
+```mermaid
+sequenceDiagram
+    actor A as Administrativo
+    participant NG as Angular
+    participant API as Django REST
+    participant SRV as ServicioConsulta
+    participant REP as RepositorioConsulta
+    participant EXP as ExportadorCSVListado
+    participant DB as PostgreSQL
+    participant AUD as ServicioAuditoria M09
+
+    A->>NG: Elige exportar el listado filtrado
+    NG->>API: GET /api/v1/consulta/ingresos/exportar/ con los filtros
+    alt Rol Supervisor de planta
+        API-->>NG: 403 Accion no autorizada
+    else Rol autorizado
+        API->>SRV: exportar_listado(filtros, usuario)
+        SRV->>REP: listar(filtros) sin paginar
+        REP->>DB: Consulta con los mismos filtros del listado
+        DB-->>REP: Conjunto filtrado completo
+        REP-->>SRV: Ingresos
+        alt Conjunto vacio
+            SRV-->>API: Sin ingresos
+            API-->>NG: 400 No hay ingresos para exportar
+        else Con ingresos
+            SRV->>EXP: escribir(ingresos)
+            EXP-->>SRV: Archivo CSV en UTF-8
+            SRV->>AUD: Registrar evento EXPORTAR con filtros y numero de ingresos
+            SRV-->>API: Archivo
+            API-->>NG: 200 Archivo CSV en UTF-8
+            NG-->>A: Descarga del archivo
+        end
+    end
+```
+
+## S-M07-06 · Resumen del día y avisos de pendientes (HU-M07-04)
+
+```mermaid
+sequenceDiagram
+    actor U as Usuario
+    participant NG as Angular
+    participant API as Django REST
+    participant SRV as ServicioInicio
+    participant REP as Repositorios de lectura
+    participant DB as PostgreSQL
+
+    U->>NG: Inicia sesion o abre el inicio
+    NG->>API: GET /api/v1/consulta/inicio/
+    API->>SRV: resumen_del_dia(usuario)
+    SRV->>REP: Cifras del dia y toneladas de siete dias
+    REP->>DB: Consultas agregadas por fecha del pesaje
+    Note over REP,DB: Cuenta los no anulados y suma solo los Registrados
+    DB-->>REP: Cifras
+    REP-->>SRV: Resumen
+    SRV-->>API: Resumen con enlaces segun el rol
+    API-->>NG: 200 con el resumen
+    U->>NG: Abre los avisos
+    NG->>API: GET /api/v1/consulta/avisos/
+    API->>SRV: avisos(usuario)
+    SRV->>REP: Destares pendientes, V4 del dia, lotes con paso pendiente
+    opt Rol que compone lotes
+        SRV->>REP: Ingresos Registrados sin lote
+    end
+    opt Rol Administrador
+        SRV->>REP: Lotes listos para cerrar
+    end
+    REP-->>SRV: Pendientes calculados al consultar
+    SRV-->>API: Avisos del rol
+    API-->>NG: 200 con los avisos o lista vacia
+    NG-->>U: Avisos o No hay nada pendiente
+```

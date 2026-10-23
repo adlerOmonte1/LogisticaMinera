@@ -46,10 +46,8 @@ LOCAL_APPS = [
     "apps.accounts",        # M01
     "apps.catalogo",        # M02
     "apps.ingresos",        # M03
-    "apps.salidas",         # M04
     "apps.existencias",     # M05
     "apps.reportes",        # M06  — app de lectura, sin modelos (D-10)
-    "apps.sincronizacion",  # M07
     "apps.auditoria",       # M08
     "apps.busqueda",        # M09  — app de lectura, sin modelos (D-10)
 ]

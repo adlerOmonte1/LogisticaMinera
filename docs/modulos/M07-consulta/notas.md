@@ -8,8 +8,9 @@
 
 ```
 apps/consulta/
-├── repositories/    buscar_por_placa_fecha, listar_con_filtros, obtener_detalle, calendario
-├── services/        composicion del detalle a partir de los repositorios de M03 a M06 y M09
+├── repositories/    buscar_por_placa_fecha, listar_con_filtros, obtener_detalle, calendario, resumen_del_dia
+├── services/        composicion del detalle, inicio y avisos, a partir de los repositorios de M03 a M06 y M09
+├── exportadores/    csv_listado
 ├── serializers/  views/  permissions.py  filters.py  urls.py  tests/
 ```
 
@@ -120,12 +121,41 @@ las tres consultas tomen el filtro de Registrados del mismo método del gestor d
 `TruncDate` debe aplicarse en la zona horaria de la planta. Si se trunca en UTC, un ingreso pesado a
 las 20:00 de un día aparece en el día siguiente (RN-M07-11).
 
+### Inicio y avisos
+
+`ServicioInicio` compone el resumen del día con consultas agregadas sobre `INGRESO` y `LOTE_PROCESO`
+—un número fijo, como exige RNF-M07-13— y reutiliza el filtro de Registrados del gestor de `Ingreso`,
+el mismo del listado, del calendario y de M08 (RN-M07-14). El día se toma en la zona horaria de la
+planta, igual que en el calendario.
+
+Los avisos no tienen tabla: `avisos(usuario)` ejecuta las consultas de pendientes que corresponden al
+rol y devuelve una lista calculada (RN-M07-15). El siguiente paso de un lote lo pide al servicio de
+M06, que es quien sabe qué etapa sigue; M07 no lo deduce. Un aviso nuevo es una consulta más en el
+servicio, no un cambio en el modelo de datos.
+
+### Exportación del listado
+
+`ExportadorCSVListado`, en `exportadores/csv_listado.py`, recibe el mismo `QuerySet` filtrado del listado, sin paginar, y lo
+escribe en CSV con `csv.writer`, separador punto y coma y codificación `utf-8-sig`, para que la hoja de
+cálculo de la planta reconozca las tildes (RNF-M07-15). La respuesta se entrega como
+`StreamingHttpResponse` para no cargar el archivo completo en memoria. La exportación la orquesta
+`ServicioConsulta.exportar_listado()`, no la vista: obtiene el conjunto del repositorio, lo entrega al
+exportador y registra el evento `EXPORTAR` con los filtros y el número de ingresos mediante
+`ServicioAuditoria` de M09, inyectado como en los demás servicios (RN-M07-17). Es el mismo esquema de
+la exportación del consolidado en M08. M07 no escribe datos del dominio, pero toda salida de datos
+queda atribuida.
+
 ## Frontend (Angular)
 
 **Feature:** `features/consulta/`
 
-- La búsqueda por placa y fecha está en la pantalla inicial tras iniciar sesión (RNF-M07-07), no
-  detrás de un menú: es la operación más frecuente del módulo.
+- La pantalla de inicio (HU-M07-04) ofrece el acceso a la consulta por placa, y la búsqueda de la
+  cabecera está en todas las pantallas (RNF-M07-07): la operación más frecuente del módulo no queda
+  detrás de un menú.
+- Los avisos se muestran en la cabecera con su número y se vuelven a pedir al navegar; el cliente no
+  los guarda ni los marca como leídos (RN-M07-15).
+- El botón de exportar solo se muestra al Administrativo y al Administrador, pero el control real
+  está en el servidor (RN-M07-17).
 - La miniatura de la lista usa una versión reducida de la imagen; la resolución original se pide
   solo al ampliar (RNF-M07-04), con una petición separada a `.../ticket/`.
 - Los estados anulado y En proceso se distinguen en la lista con una marca visible, sin depender de
@@ -167,9 +197,9 @@ histórico completo sin límite.
 | M02 | La placa y la titularidad del vehículo, usadas como criterios |
 | M03 | Los ingresos y sus imágenes |
 | M04 | La comparación entre lo reconocido y lo confirmado |
-| M05 | El resultado de las validaciones |
-| M06 | El lote y el recorrido del proceso |
-| M09 | El historial del ingreso |
+| M05 | El resultado de las validaciones y las advertencias V4 justificadas, para los avisos |
+| M06 | El lote y el recorrido del proceso, y el siguiente paso de cada lote, para los avisos |
+| M09 | El historial del ingreso y el registro del evento de exportación |
 
 | Es requerido por | Para |
 |---|---|
@@ -181,4 +211,3 @@ histórico completo sin límite.
 |---|---|
 | Medio de almacenamiento de las imágenes (D-14) | Define cómo `ServicioConsulta` accede al respaldo y qué errores debe capturar |
 | Volumen esperado de ingresos en producción | Condiciona si la estrategia de paginación e índices de RNF-M07-01 y RNF-M07-03 es suficiente |
-| Exportación del listado de ingresos que muestra el mockup | No está en ninguna decisión ni RF; no se documenta hasta que se decida |

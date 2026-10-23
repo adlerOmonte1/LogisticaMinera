@@ -12,15 +12,17 @@ registro sin foto es una excepción de RF01 (DR-13), no un RF adicional.
 | Registrar ingreso | Revalida, calcula el peso neto y persiste los datos confirmados, con código y hora de fin; En proceso si el vehículo no tiene tara | HU-M03-01 | `POST /api/v1/ingresos/` |
 | Alta rápida de vehículo | Da de alta un vehículo nuevo desde la pantalla de registro, sin salir de ella | HU-M03-01 | `POST /api/v1/catalogo/vehiculos/` (servicio de M02) |
 | Alta rápida de tipo de mineral | Da de alta un tipo de mineral desde la pantalla de registro y lo deja elegido | HU-M03-01 | `POST /api/v1/catalogo/tipos-mineral/` (servicio de M02) |
-| Listar ingresos | Consulta paginada con filtros por fecha, vehículo, tipo de mineral, estado y respaldo fotográfico | HU-M03-01 | `GET /api/v1/ingresos/` |
-| Consultar un ingreso | Detalle con la imagen del ticket —o el motivo de su ausencia— y las tres marcas de tiempo | HU-M03-01 | `GET /api/v1/ingresos/{id}/` |
+| Consultar un ingreso | Recurso del ingreso con la imagen del ticket —o el motivo de su ausencia— y las tres marcas de tiempo, que usan la corrección, la reversión y la anulación | HU-M03-01, HU-M03-02, HU-M03-03 | `GET /api/v1/ingresos/{id}/` |
 | Corregir ingreso | Modifica los campos corregibles, con motivo y revalidación; recalcula tara, neto y estado | HU-M03-02 | `PATCH /api/v1/ingresos/{id}/` |
+| Revertir la última corrección | Restaura los valores anteriores a la última corrección vigente, con motivo y revalidación | HU-M03-02 | `POST /api/v1/ingresos/{id}/revertir-correccion/` |
 | Anular ingreso | Baja lógica con motivo y responsable; retira el ingreso del lote que todavía reúne ingresos | HU-M03-03 | `PATCH /api/v1/ingresos/{id}/anular/` |
 | Listar ingresos pendientes de destare | Ingresos En proceso con su placa, fecha y peso bruto | HU-M03-04 | `GET /api/v1/ingresos/?estado=EN_PROCESO` |
 | Registrar destare | Recibe el vehículo, la tara digitada y la fecha y hora del destare; guarda la tara en el vehículo y completa todos sus ingresos En proceso | HU-M03-04 | `POST /api/v1/ingresos/destares/` |
 
-El listado y el detalle que expone M03 son los de su propio recurso. La consulta por placa y fecha
-con presentación del respaldo es responsabilidad de M07, que lee sobre esta misma entidad.
+M03 no expone un listado general de ingresos (D-19): el listado con filtros, totales y exportación,
+la consulta por placa y fecha y el detalle completo son de M07, que lee sobre esta misma entidad. M03
+expone el recurso de un ingreso, que su flujo de escritura necesita, y la lista de pendientes de
+destare de HU-M03-04.
 
 ## Responsabilidad y límites
 
@@ -38,7 +40,7 @@ persiste el ingreso con sus valores reconocidos y confirmados.
 | M04 Reconocimiento | `ReconocedorTicket` | La placa, la fecha y el peso bruto del ticket, con su nivel de confianza |
 | M05 Validación | `ValidadorConsistencia` | La lista de inconsistencias de las reglas V1 a V5 |
 | M02 Catálogo | Servicio del catálogo | El vehículo vigente con su titularidad, capacidad y tara; el tipo de mineral; el alta rápida de un vehículo nuevo o de un tipo de mineral, y el registro de la tara en el destare |
-| M06 Trazabilidad | Lectura del lote del ingreso | El tipo de mineral del lote, para la corrección, y si el lote todavía reúne ingresos, para la anulación |
+| M06 Trazabilidad | Lectura del lote del ingreso | La lista de tipos de mineral del lote, para la corrección y su reversión, y si el lote todavía reúne ingresos, para la anulación |
 | M09 Auditoría | Servicio de eventos | El registro de la creación, la corrección, la anulación y el destare |
 
 M03 no sabe qué motor lee la imagen ni cómo se evalúa cada regla: recibe resultados y decide con
@@ -57,8 +59,9 @@ que referencia al ingreso desde su propio lado.
 | Iniciar registro | Sí | Sí | Sí |
 | Registrar ingreso | Sí | Sí | Sí |
 | Registrar ingreso sin foto | Sí | Sí | Sí |
-| Listar y consultar | Sí | Sí | Sí |
+| Consultar un ingreso y listar los pendientes de destare | Sí | Sí | Sí |
 | Corregir ingreso | Sí | Sí | No |
+| Revertir la última corrección | Sí | Sí | No |
 | Anular ingreso | Sí | No | No |
 | Alta rápida de vehículo desde el registro | Sí | Sí | Sí |
 | Alta rápida de tipo de mineral desde el registro | Sí | Sí | No |
@@ -74,7 +77,7 @@ auditoría.
 |---|---|
 | M01 | Autenticación y atribución de cada operación a un usuario |
 | M02 | Vehículo vigente con su titularidad, capacidad y tara; alta rápida de vehículos y de tipos de mineral; catálogo de tipos de mineral |
-| M06 | Tipo de mineral del lote del ingreso y retirada del ingreso anulado de un lote que todavía reúne ingresos |
+| M06 | Lista de tipos de mineral del lote del ingreso y retirada del ingreso anulado de un lote que todavía reúne ingresos |
 | M04 | Propuesta de la placa, la fecha y el peso bruto del ticket |
 | M05 | Evaluación de las reglas V1 a V5 |
 | M09 | Registro de los eventos de creación, corrección, anulación y destare |

@@ -10,8 +10,11 @@
 | Listar usuarios | Consultar usuarios registrados | HU-M01-02 | `GET /api/v1/usuarios/` |
 | Crear usuario | Alta de usuario con rol | HU-M01-02 | `POST /api/v1/usuarios/` |
 | Editar usuario | Modificar datos y rol | HU-M01-02 | `PATCH /api/v1/usuarios/{id}/` |
-| Desactivar usuario | Baja lógica | HU-M01-02 | `PATCH /api/v1/usuarios/{id}/desactivar/` |
-| Cambiar contraseña propia | El usuario cambia su propia clave | HU-M01-02 | `POST /api/v1/usuarios/cambiar-clave/` |
+| Desactivar usuario | Baja lógica; rechaza la propia cuenta | HU-M01-02 | `PATCH /api/v1/usuarios/{id}/desactivar/` |
+| Reactivar usuario | Devuelve el acceso a un usuario inactivo, con su mismo rol | HU-M01-02 | `PATCH /api/v1/usuarios/{id}/reactivar/` |
+| Restablecer contraseña | Genera una contraseña temporal de cambio obligatorio | HU-M01-02 | `POST /api/v1/usuarios/{id}/restablecer-clave/` |
+| Cambiar contraseña propia | El usuario cambia su propia clave, también la temporal | HU-M01-01, HU-M01-02 | `POST /api/v1/usuarios/cambiar-clave/` |
+| Controlar el acceso por rol | Concede o niega cada operación de los demás módulos según el rol, en el servidor, y registra el rechazo | HU-M01-03 | (transversal: clases de `apps/accounts/permissions.py`) |
 
 ## Responsabilidad y límites
 
@@ -24,7 +27,8 @@ módulo con esa autorización: solo la concede o la niega.
 | Función | Administrador | Administrativo | Supervisor de planta |
 |---|:---:|:---:|:---:|
 | Iniciar y cerrar sesión | Sí | Sí | Sí |
-| Gestionar usuarios | Sí | No | No |
+| Gestionar usuarios: alta, edición, desactivación y reactivación | Sí | No | No |
+| Restablecer la contraseña de otro usuario | Sí | No | No |
 | Cambiar contraseña propia | Sí | Sí | Sí |
 
 ## Permisos generales por módulo
@@ -36,15 +40,16 @@ uno.
 |---|:---:|:---:|:---:|
 | M02 Catálogo maestro | Sí | Sí, salvo modificar una tara ya registrada | Consulta; alta del vehículo desde el registro y primera tara |
 | M03 Registro de ingresos | Sí | Sí, salvo anular | Registro con foto o sin ella, destare y consulta; no corrige ni anula |
-| M04 Reconocimiento | Sí | Sí | Solo dentro del registro |
-| M05 Validación | Sí | Sí | Solo dentro del registro, con justificación de V1 y V4 |
+| M04 Reconocimiento | Sí | Sí | Dentro del registro, y consulta en el detalle del ingreso (DR-31) |
+| M05 Validación | Sí | Sí | Dentro del registro, con justificación de V1 y V4, y consulta en el detalle del ingreso (DR-31) |
 | M06 Trazabilidad | Sí | Sí, salvo cerrar el lote con su destino | Paso por etapa, secado de un ingreso tardío, bigbags y consulta |
-| M07 Consulta | Sí | Sí | Sí |
+| M07 Consulta | Sí | Sí | Sí, salvo exportar el listado de ingresos |
 | M08 Consolidación | Sí | Sí | No |
 | M09 Auditoría | Sí | Historial de un ingreso | Historial de un ingreso |
 
 El alcance del Supervisor de planta sigue DR-17: registra en planta lo que ocurre en planta
-(ingresos, vehículos nuevos, destares y etapas) y consulta. El cierre del lote con su destino es
+(ingresos, vehículos nuevos, destares y etapas) y consulta, incluidos el reconocimiento y la
+validación de cada ingreso (DR-31). El cierre del lote con su destino es
 exclusivo del Administrador (DR-14). Si esta tabla y la sección «Permisos» de un módulo difieren,
 prevalece la del módulo y la diferencia se reporta.
 

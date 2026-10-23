@@ -14,15 +14,11 @@ from rest_framework.response import Response
 from apps.catalogo.filters import ProductoFilter, VehiculoFilter
 from apps.catalogo.permissions import PuedeGestionarCatalogo
 from apps.catalogo.repositories import (
-    ClienteRepository,
     ProductoRepository,
     TransportistaRepository,
     VehiculoRepository,
 )
 from apps.catalogo.serializers import (
-    ClienteCreateSerializer,
-    ClienteSerializer,
-    ClienteUpdateSerializer,
     ProductoCreateSerializer,
     ProductoSerializer,
     ProductoUpdateSerializer,
@@ -33,7 +29,7 @@ from apps.catalogo.serializers import (
     VehiculoSerializer,
     VehiculoUpdateSerializer,
 )
-from apps.catalogo.services import clientes, productos, transportistas, vehiculos
+from apps.catalogo.services import productos, transportistas, vehiculos
 
 _VERDADERO = {"1", "true", "True", "si", "sí"}
 
@@ -128,14 +124,4 @@ class TransportistaViewSet(CatalogoViewSet):
     fn_desactivar = staticmethod(transportistas.desactivar_transportista)
 
 
-class ClienteViewSet(CatalogoViewSet):
-    repositorio = ClienteRepository
-    serializer_salida = ClienteSerializer
-    serializer_alta = ClienteCreateSerializer
-    serializer_edicion = ClienteUpdateSerializer
-    fn_crear = staticmethod(clientes.crear_cliente)
-    fn_actualizar = staticmethod(clientes.actualizar_cliente)
-    fn_desactivar = staticmethod(clientes.desactivar_cliente)
-
-
-__all__ = ["ProductoViewSet", "VehiculoViewSet", "TransportistaViewSet", "ClienteViewSet"]
+__all__ = ["ProductoViewSet", "VehiculoViewSet", "TransportistaViewSet"]

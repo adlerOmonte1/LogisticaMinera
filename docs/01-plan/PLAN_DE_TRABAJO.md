@@ -1,8 +1,10 @@
 # PLAN-01 — Plan de trabajo, pruebas y entrega
 
 **Documento:** PLAN-01
-**Versión:** 2.1
-**Estado:** Vigente
+**Versión:** 2.3
+**Estado:** Vigente. Fase documental cerrada el 23/10/2026 con la línea base 2.1
+(`ACTA_CIERRE_FASE_DOCUMENTAL.md`); sigue la fase de implementación, cuya ejecución paso a paso y
+validación en Postman detalla `PLAN_IMPLEMENTACION.md` (PLAN-02)
 **Alcance:** Sistema web inteligente de control de inventarios de ingreso de mineral (M01 a M09,
 ver `../model-c4/ARQ-01_Modulos_del_Sistema.md`)
 
@@ -233,6 +235,13 @@ inconsistencias V1 a V5, ingresos registrados sin foto, lotes Abiertos, En recor
 con rutas distintas, al menos un lote dividido por fracciones con un ingreso tardío, y un mes sin
 ingresos, porque la consolidación de un mes vacío es un caso de prueba obligatorio (HU-M08-01 CA03).
 
+La versión 2.1 añade al juego: un lote con dos tipos de mineral, uno de ellos unificado con
+autorización (DR-27); un lote En recorrido con el secado registrado y sin zarandeo ni molienda, para
+el retiro de un ingreso, y otro ya zarandeado, para su rechazo (DR-29); un ingreso con dos
+correcciones, para revertir la última (DR-28); un vehículo, un tipo de mineral, un transportista y un
+usuario dados de baja, para su reactivación; un usuario con contraseña temporal (DR-30); e ingresos
+del día actual, para el resumen del día y los avisos de cada rol (HU-M07-04).
+
 El conjunto de tickets reales para medir ERA y TDI se guarda aparte, con las inconsistencias
 sembradas documentadas en `../03-pruebas/plan_de_pruebas.md` §4 (DR-08): no se genera
 sintéticamente, porque la exactitud del reconocimiento solo es significativa sobre fotografías
@@ -259,6 +268,16 @@ regresión, que cubre como mínimo:
    por el Administrador.
 9. Consolidado mensual de un mes con ingresos y de un mes sin ingresos, y su exportación.
 10. Acceso denegado a cada acción restringida, con un usuario de cada rol.
+11. Reversión de la última corrección de un ingreso, con motivo, y su reflejo en el lote y en el
+    consolidado (DR-28).
+12. Retiro de un ingreso de un lote En recorrido antes del zarandeo o la molienda, y su rechazo
+    después (DR-29).
+13. Exportación del listado filtrado por el Administrativo y su rechazo al Supervisor de planta.
+14. Pantalla de inicio y avisos con una cuenta de cada rol, y desaparición del aviso de destare al
+    registrarlo (HU-M07-04).
+15. Restablecimiento de una contraseña, con su cambio obligatorio al iniciar sesión, y reactivación de
+    un usuario y de un vehículo (DR-30).
+16. Restauración del último respaldo en un entorno limpio, con los ingresos y sus imágenes (D-20).
 
 ### 6.6 Integración continua
 
@@ -335,13 +354,14 @@ etapa.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | Apps eliminadas, con su migración de retiro cuando corresponda | `makemigrations --check` sin cambios pendientes |
-| Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
+| Retirar `apps/salidas`, `apps/existencias` y `apps/sincronizacion` | **Hecho para `salidas` y `sincronizacion` (22/10/2026).** `existencias` se retira con el refactor de `apps/ingresos`, que hoy la usa para los movimientos de inventario | `makemigrations --check` sin cambios pendientes |
+| Retirar `Cliente` de `apps/catalogo`, **después** de retirar salidas — **hecho (22/10/2026), migración `0002_retira_cliente`** | Modelo, serializer, servicio, vista, rutas, factory y pruebas retirados con una migración nueva, sin editar `0001_initial` | `pytest` en verde |
 | Cambiar `Producto` por `TipoMineral` en `apps/catalogo` (DR-03), con sus referencias en `apps/ingresos` | Modelo `tipo_mineral.py` con código y nombre únicos; el campo `producto` de `Ingreso` renombrado en la misma migración, para no dejar el código en un estado mixto | `grep -rn producto backend/apps` sin resultados de dominio; `pytest` en verde |
 | Refactorizar `apps/ingresos` al modelo vigente de `INGRESO` | Tres marcas de tiempo, tara aplicada, peso neto calculado y estado En proceso, según `modelo_datos_entidad_relacion.md` | Revisión contra el modelo de datos |
 | Crear los esqueletos de `reconocimiento`, `validacion` y `trazabilidad`; renombrar `busqueda` a `consulta` y `reportes` a `consolidacion` | Apps con la estructura de capas de `catalogo` | Responsable técnico |
-| Ajustes del proyecto | `LOCAL_APPS` actualizado, `MEDIA_ROOT`, límite de carga de imágenes y Pillow en `requirements/base.txt` | `pytest` en verde |
-| Auditoría final de la documentación y fusión | `verificar_migracion.sh` sin hallazgos; rama de reformulación fusionada en `main` | Revisión humana del PR |
+| Ajustes del proyecto | `LOCAL_APPS` con la numeración vigente de módulos (M01 a M09), almacenamiento de archivos de Django sobre el volumen `media` del backend (D-14 provisional, D-18), límite de carga de imágenes de 10 MB y Pillow en `requirements/base.txt` | `pytest` en verde |
+| Auditoría final de la documentación — **hecha (23/10/2026)** | Línea base 2.1 validada y fase documental cerrada (`ACTA_CIERRE_FASE_DOCUMENTAL.md`) | `verificar_migracion.sh` y `validar_docs.py` sin hallazgos |
+| Fusión de la documentación en la rama principal | Rama de documentación fusionada; la rama de integración del código la fija el responsable del repositorio | Revisión humana del PR |
 
 ```bash
 cd backend && python manage.py makemigrations --check --dry-run && pytest -q
@@ -351,30 +371,38 @@ cd backend && python manage.py makemigrations --check --dry-run && pytest -q
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Esqueleto backend, PostgreSQL, ajustes por entorno | Proyecto que arranca con `runserver` y `pytest` en verde | Responsable técnico |
-| Esqueleto Angular | Aplicación que carga y navega entre pantallas | Responsable técnico |
-| M01 completo | Inicio y cierre de sesión, expiración, bloqueo por intentos, menú por rol | Tester: casos de HU-M01-01 a HU-M01-03 |
-| Decisiones de arquitectura firmadas | `decisiones_diseno.md` sin decisiones abiertas que bloqueen M03 | Responsable técnico |
+| Esqueleto backend, PostgreSQL, ajustes por entorno | Proyecto que arranca con `runserver` y `pytest` en verde; Docker Compose de desarrollo con los volúmenes `db` y `media` | Responsable técnico |
+| Esqueleto Angular | Repositorio del frontend creado (D-11); aplicación que carga, inicia sesión y navega entre pantallas | Responsable técnico |
+| Validación de los roles con la empresa (DR-23) | Matriz de permisos de M01, con DR-30 y DR-31, revisada con los usuarios al inicio de la semana | Jefatura de operaciones |
+| M01: sesión | Inicio y cierre de sesión, expiración por inactividad, bloqueo tras cinco intentos, «¿Olvidó su contraseña?» y cambio obligatorio de la contraseña temporal | Tester: HU-M01-01 |
+| M01: usuarios | Alta, edición, desactivación y reactivación; restablecimiento de contraseña con una temporal; rechazo a desactivar la propia cuenta; cambio de la propia contraseña | Tester: HU-M01-02 |
+| M01: permisos por rol | Una clase de permiso por operación para M01 a M09, en `apps/accounts/permissions.py`; menú por rol con el inicio; acceso rechazado registrado en auditoría | Tester: HU-M01-03 y CP10 |
+| Registrador de auditoría | `EVENTO_AUDITORIA` y `ServicioAuditoria`, que M01 ya necesita (HU-M01-01 CA07) y M03 usa dentro de su transacción | Prueba automatizada por evento de M01 |
+| Respaldo y restauración ejecutables (D-20) | Procedimiento de volcado de la base y copia del volumen `media`, con su restauración | Restauración de prueba en un entorno limpio |
+| Decisiones de arquitectura — **hecho (23/10/2026)** | Sin decisiones abiertas que bloqueen M03: D-12 y D-14 con solución provisional, D-18 a D-21 cerradas | Responsable técnico |
 
-Riesgo de la semana: si D-12 (motor de reconocimiento) no tiene al menos un candidato para el
-piloto, M04 no puede arrancar en la semana 3.
+Riesgo de la semana: que la validación de los roles con la empresa cambie la matriz de permisos
+después de cerrar M01. Por eso se valida al inicio de la semana, antes de escribir las clases de
+permiso; un cambio posterior entra como decisión nueva.
 
 ### Semana 2 — M02 y piloto de motores de reconocimiento
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| M02 catálogo maestro | Alta, edición y baja lógica de vehículos, tipos de mineral y transportistas | Tester: HU-M02-01 a HU-M02-03 |
+| M02 catálogo maestro | Alta, edición, baja lógica y reactivación de vehículos, tipos de mineral y transportistas; rechazo por rol al Supervisor de planta | Tester: HU-M02-01 a HU-M02-03 |
 | Capacidad de carga y tara del vehículo | Capacidad disponible para V4; tara que nace vacía, se registra en el destare y solo modifica el Administrador con motivo | Prueba de contrato automatizada; Tester: HU-M02-01 |
-| Piloto de D-12 | Comparación de 20 a 30 tickets reales entre dos o tres motores; motor elegido y documentado | Responsable técnico |
+| Alta desde el registro | Vehículo dado de alta por cualquier rol y tipo de mineral solo por Administrativo y Administrador, con las mismas reglas del catálogo | Tester: HU-M02-01 CA12, HU-M02-02 CA07 |
+| Carga inicial del catálogo (DR-03) | Tipos de mineral acordados con la empresa y vehículos que ya operan, con su tara y su capacidad | Jefatura de operaciones |
+| Conjunto de tickets reales | Tickets fotografiados para el piloto de D-12 y los 50 del conjunto de prueba, guardados aparte del código (DR-08) | Responsable técnico |
 
 ### Semana 3 — M03 con M04 y M05 inyectados
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Captura de imagen y propuesta de reconocimiento | Foto del ticket que devuelve la placa, la fecha y el peso bruto con su confianza | Tester: HU-M04-01 |
+| Captura de imagen y propuesta de reconocimiento | Foto del ticket que devuelve la placa, la fecha y el peso bruto con su confianza, con el adaptador local provisional dentro del backend (D-12) | Tester: HU-M04-01 |
 | Pantalla de confirmación con validación | Inconsistencias señaladas junto al campo, con mensaje literal de V1 a V5 | Tester: HU-M05-01 |
 | Registro del ingreso | Ingreso persistido con código único y tres marcas de tiempo distintas | Tester: HU-M03-01 |
-| Corrección y anulación | Corrección con motivo y revalidación; anulación excluida de totales | Tester: HU-M03-02, HU-M03-03 |
+| Corrección, reversión y anulación | Corrección con motivo y revalidación; reversión de la última corrección; anulación excluida de totales | Tester: HU-M03-02, HU-M03-03 |
 | Primer viaje y destare | Alta del vehículo en la misma pantalla, ingreso En proceso y registro del destare con cálculo del peso neto | Tester: HU-M03-04 |
 
 Hito de la semana: a partir de aquí el sistema produce el dato completo que la ficha de observación
@@ -384,7 +412,7 @@ de la investigación contrasta en el postest.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Registro de eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección | Prueba automatizada por acción |
+| Verificación de los eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección, registrado desde la semana 1 | Prueba automatizada por acción y consulta en Postman |
 | Registro de acceso rechazado | Evento por cada intento sin permiso | Tester |
 | Historial de un ingreso | Historial cronológico con valores anteriores y nuevos, visible para los tres roles | Tester: HU-M09-02 |
 | Consulta de la auditoría del sistema | Eventos filtrables por usuario, entidad, acción y periodo, solo para el Administrador | Tester: HU-M09-03 |
@@ -393,15 +421,15 @@ de la investigación contrasta en el postest.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Gestión de lotes de proceso | Apertura con nombre, asignación y retiro de ingresos con el lote Abierto, inicio del recorrido e ingresos tardíos | Tester: HU-M06-01 |
+| Gestión de lotes de proceso | Apertura con nombre, asignación de ingresos, inicio del recorrido, ingresos tardíos y retiro de ingresos hasta el zarandeo o la molienda | Tester: HU-M06-01 |
 | Registro del paso por etapa | Secado común, elección de la ruta y etapas de esa ruta en orden; horas de molienda y bigbags como datos descriptivos | Tester: HU-M06-02 |
 | División de un lote | Partes por fracciones que suman la unidad, cada una con su ruta; reparto de un ingreso tardío | Tester: HU-M06-04 |
 | Consulta de trazabilidad de un ingreso | Etapas recorridas sobre las etapas de la ruta del lote o de la unión de las rutas de sus partes | Tester: HU-M06-03 |
 | Cierre del lote con su destino | Cierre por el Administrador con venta o traslado, solo con todo el mineral ensacado | Tester: HU-M06-05, CP12 |
 
-Precondición: la forma real de agrupar el mineral en cancha y de decidir la ruta debe verificarse con
-la jefatura de operaciones antes de esta semana (DR-04, DR-16). Si el vínculo directo es más fiel
-que el lote, este módulo se ajusta antes de implementarse.
+Precondición resuelta el 22/10/2026 (`../REVISION_TECNICA_V2.md` §7, Q-10): la agrupación del
+mineral se hace en el sistema, con los lotes de M06 y según los roles (DR-23); el lote admite varios
+tipos de mineral (DR-27) y la ruta de cada lote o parte se registra según DR-16.
 
 ### Semana 6 — M07 Consulta
 
@@ -411,6 +439,8 @@ que el lote, este módulo se ajusta antes de implementarse.
 | Listado con filtros combinables | Fecha, tipo de mineral, vehículo, titularidad y estado | Tester |
 | Detalle completo del ingreso | Datos, imagen o marca de sin respaldo fotográfico, reconocimiento, validaciones y trazabilidad en una vista | Tester: HU-M07-01, HU-M07-02 |
 | Calendario de llegadas | Número de volquetes y toneladas por día del mes, con acceso a los ingresos del día | Tester: HU-M07-03 |
+| Exportación del listado y búsqueda desde la cabecera | CSV del conjunto filtrado, solo Administrativo y Administrador, auditado; un código abre el ingreso | Tester: HU-M07-02 |
+| Pantalla de inicio y avisos | Resumen del día y avisos de pendientes calculados según el rol | Tester: HU-M07-04, con una cuenta de cada rol |
 
 ### Semana 7 — M08 Consolidación
 
@@ -419,6 +449,7 @@ que el lote, este módulo se ajusta antes de implementarse.
 | Total acumulado mensual por tipo de mineral | Reporte generado a demanda, sin acumulado almacenado | Jefatura de operaciones |
 | Mes sin ingresos | Consolidado que informa ausencia de producción, sin error | Caso de prueba obligatorio |
 | Exportación a hoja de cálculo | Archivo con el mismo total que la consulta en pantalla | Tester |
+| Piloto de D-12 y elección del motor | Comparación de 20 a 30 tickets reales entre dos o tres motores sobre el sistema funcional; motor elegido, adaptador configurado y D-12 cerrada antes del congelamiento de la semana 8 | Responsable técnico |
 
 ### Semana 8 — Estabilización e instrumentos de la variable independiente
 
@@ -497,6 +528,11 @@ Toda solicitud de funcionalidad no prevista se evalúa contra la lista cerrada d
 avance antes de comprometerse. Si se rechaza, se anota en el apartado de fuera de alcance con la
 razón. Ningún cambio entra por conversación informal.
 
+Desde el cierre de la fase documental (23/10/2026), un cambio que afecte a la línea base 2.1 se
+registra antes de programarlo: como decisión de reformulación (DR) si cambia el alcance o una regla
+del dominio, o como decisión de diseño (D) si cambia la forma de construirlo, con la revisión de los
+documentos que dependen de ella (`ACTA_CIERRE_FASE_DOCUMENTAL.md` §5).
+
 ---
 
 ## 11. Artefactos del plan
@@ -508,6 +544,10 @@ razón. Ningún cambio entra por conversación informal.
 | Registro de defectos | `../03-pruebas/registro_defectos.md` | Tester |
 | Actas de aceptación por módulo | `../03-pruebas/actas/` | Jefatura de operaciones |
 | Registro de despliegues | `../04-despliegue/registro_despliegues.md` | Responsable técnico |
+| Acta de cierre de la fase documental | `ACTA_CIERRE_FASE_DOCUMENTAL.md` | Responsable técnico |
+| Plan de implementación por fases | `PLAN_IMPLEMENTACION.md` (PLAN-02) | Responsable técnico |
+| Colección y entornos de Postman | `../../postman/` | Responsable técnico |
+| Bitácora de puertas de fase | `../03-pruebas/bitacora_puertas.md` | Supervisor |
 
 ---
 

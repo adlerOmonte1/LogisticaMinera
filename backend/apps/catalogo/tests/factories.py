@@ -1,6 +1,6 @@
 import factory
 
-from apps.catalogo.models import Cliente, Producto, Transportista, Vehiculo
+from apps.catalogo.models import Producto, Transportista, Vehiculo
 
 
 class ProductoFactory(factory.django.DjangoModelFactory):
@@ -18,14 +18,6 @@ class TransportistaFactory(factory.django.DjangoModelFactory):
         model = Transportista
 
     razon_social = factory.Sequence(lambda n: f"Transportes {n} SAC")
-    ruc = factory.Sequence(lambda n: f"20{n:09d}")
-
-
-class ClienteFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Cliente
-
-    razon_social = factory.Sequence(lambda n: f"Cliente {n} SAC")
     ruc = factory.Sequence(lambda n: f"20{n:09d}")
 
 

@@ -107,7 +107,8 @@ consecuencia:
   del serializer.
 - La abstracción se crea solo cuando exista una segunda implementación real o una prueba que exija
   sustituirla. El reconocedor (D-12), el generador de código (D-02), el reloj y los exportadores de
-  M08 la exigen; un repositorio de vehículos, no.
+  M07 y M08 la exigen; un repositorio de vehículos, no. Tampoco el almacén de imágenes: Django ya
+  ofrece esa abstracción (D-18).
 
 Pregunta previsible en la revisión técnica: «¿por qué repositorios sobre un ORM que ya abstrae la
 base?». La respuesta es la de arriba: aquí no abstraen la base, separan lectura de escritura.
@@ -126,6 +127,7 @@ Su estructura es:
 apps/consulta/         M07              apps/consolidacion/    M08
   repositories/   lectura sobre M03       repositories/   lectura sobre M03
   services/                               exportadores/   una clase por formato
+  exportadores/   CSV del listado
   serializers/                            services/
   views/                                  serializers/
   permissions.py  filters.py              views/
@@ -140,9 +142,9 @@ modelo entidad-relación.
 aporta una entidad al modelo entidad-relación. Si un módulo necesita persistir algo nuevo, la
 entidad se añade primero al modelo y después al código, nunca al revés.
 
-`exportadores/` en M08 es la aplicación literal del principio abierto/cerrado: `ExportadorExcel` y
-`ExportadorPDF` como clases separadas, y cualquier formato futuro como clase nueva, sin tocar lo
-existente.
+`exportadores/` es la aplicación literal del principio abierto/cerrado: en M08, `ExportadorExcel`,
+el único formato de la primera versión; en M07, `ExportadorCSVListado` (DR-30). Cualquier formato
+futuro —un PDF del consolidado, por ejemplo— es una clase nueva, sin tocar las existentes.
 
 ## D-11. El frontend vive en un repositorio separado, con capas dentro de cada feature
 
@@ -167,7 +169,7 @@ verificable es que un componente de `ui/` se prueba con entradas y salidas, sin
 Se descartó un monorepo Nx: aporta límites de dependencia y build incremental, que rinden con varios
 equipos y varias aplicaciones. Aquí hay una aplicación y un equipo reducido.
 
-## D-12. El motor de reconocimiento queda detrás de la interfaz `ReconocedorTicket` — *pendiente de elegir el motor*
+## D-12. El motor de reconocimiento queda detrás de la interfaz `ReconocedorTicket` — *motor pendiente; adaptador local provisional*
 
 **Módulos afectados:** M03, M04
 
@@ -180,6 +182,13 @@ por API.
 reconocimiento.
 **Qué está pendiente:** cuál motor. Se decide tras un piloto con 20 a 30 tickets reales de dos o
 tres alternativas, comparando exactitud de lectura, costo y dependencia de conexión (DR-02).
+
+**Solución provisional (23/10/2026).** El motor se elige cuando el sistema sea funcional, con el
+piloto ejecutado sobre el registro completo y, a más tardar, antes del congelamiento de la semana 8
+(D-16). Mientras tanto, el primer adaptador de `ReconocedorTicket` se ejecuta **dentro del mismo
+backend**, con procesamiento local, sin servicio externo ni credenciales. Las pruebas automatizadas
+usan un adaptador determinista. Cambiar al motor elegido es añadir su adaptador y configurarlo: M03
+no cambia.
 
 **Si se revierte.** Con el motor invocado directamente desde el servicio de registro, cambiarlo
 —algo previsible, porque aún no está elegido— obligaría a reescribir M03 y sus pruebas.
@@ -223,7 +232,7 @@ el ingreso pasa a Registrado.
 aplicar taras distintas sin que nada lo advirtiera. Con la tara como referencia viva al catálogo, un
 cambio de tara reescribiría en silencio el histórico de toneladas.
 
-## D-14. Almacenamiento de las imágenes del ticket — *pendiente*
+## D-14. Almacenamiento de las imágenes del ticket — *provisional en el backend; medio definitivo pendiente*
 
 **Módulos afectados:** M03, M07
 
@@ -232,7 +241,146 @@ falta en el ingreso registrado sin foto, que lleva su marca y su motivo (DR-13).
 pendiente decidir el medio —volumen del servidor o almacenamiento de objetos—, la compresión
 admisible sin perder legibilidad, la política de retención y el respaldo.
 
-**Criterio de cierre:** se fija junto con el despliegue, antes de implementar M03.
+**Criterio de cierre:** se fija junto con el servicio de alojamiento que se defina para la
+presentación del sistema. Lo que ya no está pendiente es **cómo accede el código** al almacén: por la
+API de almacenamiento de Django (D-18), de modo que cerrar D-14 cambia la configuración y no el código.
+
+**Solución provisional (23/10/2026).** Hasta entonces, las imágenes se guardan en el **mismo
+backend**: el almacenamiento de archivos de Django sobre el volumen con nombre `media`, montado en el
+contenedor del backend, en desarrollo, en preproducción y en la primera puesta en marcha. La
+compresión no se aplica todavía; la retención es la del propio ingreso, que nunca se borra (D-07), y
+el respaldo es el mínimo de D-20.
+
+## D-18. El almacén de imágenes se usa a través de la API de almacenamiento de Django
+
+**Módulos afectados:** M03, M07 · **Fecha:** 23/10/2026
+
+`ServicioIngreso` guarda la imagen del ticket por el campo `ImageField` del ingreso, que delega en el
+almacenamiento de Django (`Storage`) configurado para cada entorno: el sistema de archivos local en
+desarrollo y, en producción, el medio que fije D-14 —un volumen del servidor o un servicio de objetos
+mediante `django-storages`—. M07 sirve la imagen leyendo del mismo almacenamiento, siempre detrás de
+la vista que comprueba la sesión (RN-M07-06).
+
+No se define una interfaz propia `AlmacenImagenes` ni se inyecta en el servicio. Django ya ofrece
+esa abstracción, con implementaciones intercambiables por configuración y un almacenamiento en
+memoria para las pruebas. Envolverla en otra interfaz con una sola implementación es la ceremonia
+que D-09 descarta. `ServicioIngreso` conserva así cuatro dependencias inyectadas: reconocedor,
+validador, generador de código y reloj.
+
+**Qué protege.** Que cerrar D-14 sea un cambio de configuración y no de código, y que el caso de uso
+del registro no dependa del medio físico donde termina la fotografía.
+
+**Si se revierte.** Una interfaz propia obligaría a mantener dos abstracciones del mismo almacén y a
+decidir en cada módulo cuál usar; la imagen podría guardarse por una y servirse por la otra.
+
+## D-19. El listado de ingresos pertenece solo a M07
+
+**Módulos afectados:** M03, M07 · **Fecha:** 23/10/2026
+
+El listado de ingresos con filtros, totales del conjunto y exportación es de M07 (HU-M07-02), el lado
+de lectura del sistema (D-10). M03 no expone un listado general: conserva solo lo que su flujo de
+escritura necesita, que es el recurso de un ingreso —para corregirlo, revertir su última corrección
+o anularlo— y la lista de ingresos pendientes de destare de HU-M03-04.
+
+**Qué protege.** Que haya un solo listado y un solo cálculo del total del conjunto. Con dos listados
+sobre la misma entidad, cada uno con sus filtros, el total de la pantalla podría diferir del de la
+consulta o del consolidado sin que ninguna prueba de módulo lo advirtiera.
+
+**Si se revierte.** Dos endpoints con el mismo propósito terminan divergiendo en filtros, orden y
+criterio de suma, y la interfaz no sabría cuál consumir.
+
+## D-20. Respaldo mínimo ejecutable ahora; servicio y política definitivos para la presentación
+
+**Módulos afectados:** todos · **Fecha:** 23/10/2026
+
+Desde la semana 1 el sistema incluye un procedimiento de respaldo y restauración que se puede
+ejecutar a demanda en cualquier entorno: un volcado de la base con `pg_dump` y una copia comprimida
+del volumen `media` con las imágenes, tomados en el mismo momento y fechados juntos, y el
+procedimiento inverso para restaurarlos. Su verificación es una restauración de prueba en un entorno
+limpio, que debe devolver los mismos ingresos con sus imágenes.
+
+El **servicio de alojamiento** que se usará en la presentación del sistema y su **política de
+respaldo** —frecuencia, retención, ubicación fuera del servidor y responsable— se definen junto con
+ese servicio, porque dependen de lo que ofrezca. Antes de que el sistema entre en operación real
+deben estar definidos y con una restauración probada (skill `despliegue-docker`).
+
+**Qué protege.** El histórico que el sistema existe para conservar: ingresos que no se borran (D-07)
+y sus fotografías, que son su respaldo. Sin un procedimiento probado, una falla del servidor los
+perdería juntos.
+
+**Si se revierte.** Dejar el respaldo para el final convierte la primera falla en una pérdida
+irrecuperable, y una copia que nunca se restauró no garantiza que sirva.
+
+## D-21. Códigos de las rutas del lote
+
+**Módulos afectados:** M06 · **Fecha:** 23/10/2026
+
+Las tres rutas de DR-16 se codifican con la secuencia de etapas que recorren después del secado:
+
+| Código | Etapas después del secado | Nombre en pantalla |
+|---|---|---|
+| `ZARANDEO_ENSACADO` | Zarandeo y ensacado | Zaranda |
+| `MOLIENDA_ENSACADO` | Molienda y ensacado | Molido |
+| `ZARANDEO_MOLIENDA_ENSACADO` | Zarandeo, molienda y ensacado | Zarandeado y molido |
+
+Se descartan los códigos propuestos antes, `ZARANDEO`, `MOLIENDA` y `AMBAS`: los dos primeros
+coinciden con los códigos de etapa de `ETAPA_PROCESO`, de modo que `ZARANDEO` significaría a la vez
+una etapa y una ruta, y `AMBAS` no dice cuáles. Con la secuencia completa, el código se lee igual en
+la base, en la API y en los registros de auditoría, y no admite dos interpretaciones. Los nombres en
+pantalla son los de la maqueta.
+
+**Si se revierte.** Un código que coincide con el de una etapa invita a comparar una ruta con una
+etapa en el código —por ejemplo, al calcular cuántas etapas faltan— y a contar mal el recorrido.
+
+## D-22. Ninguna operación de la API usa `DELETE`
+
+**Módulos afectados:** M06 y todos · **Fecha:** 23/10/2026
+
+La regla «nada se elimina» (D-07) se aplica sin excepciones también a los vínculos. Las dos
+operaciones de M06 que antes se expresaban como `DELETE` pasan a acciones explícitas:
+
+| Operación | Endpoint | Efecto en la base |
+|---|---|---|
+| Retirar un ingreso del lote o trasladarlo (DR-29) | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/retirar/` | `INGRESO.id_lote` pasa a nulo; el evento de auditoría conserva el lote del que salió |
+| Quitar un tipo de mineral de la lista del lote (DR-27) | `POST /api/v1/lotes/{id}/minerales/{id_tipo}/quitar/` | La fila de `LOTE_MINERAL` no se borra: recibe la fecha y el usuario de su retiro (baja lógica) |
+
+`ViewSetBase` no expone `destroy` en ningún módulo, y la revisión rechaza cualquier `DELETE` escrito a
+mano.
+
+**Qué protege.** Que la regla no tenga excepciones que haya que recordar, y que la lista de minerales
+de un lote pueda reconstruirse tal como estaba en cualquier momento.
+
+**Si se revierte.** Un `DELETE` admitido «solo para vínculos» abre la puerta a otros, y la fila
+borrada de `LOTE_MINERAL` deja una autorización de otro mineral sin rastro en la base.
+
+## D-23. Convención de códigos HTTP de la API
+
+**Módulos afectados:** todos · **Fecha:** 23/10/2026
+
+Toda respuesta de error lleva el cuerpo uniforme `{"codigo", "mensaje", "detalles"}` de ARQ-02 §6, y
+`mensaje` coincide literalmente con el criterio de aceptación. El código HTTP sigue esta tabla, que
+recoge la que ya usan los diagramas de secuencia de los módulos y el manejador de errores del backend:
+
+| Código | Cuándo | Ejemplo |
+|---|---|---|
+| 200 | Consulta u operación completada | Corrección guardada; consolidado del mes |
+| 201 | Alta de un recurso | Ingreso registrado; lote abierto |
+| 400 | Datos inválidos o regla de negocio incumplida por lo que se envía | Campos obligatorios; V2, V3 o V5; fracciones que no suman la unidad |
+| 401 | Falta de autenticación: credenciales inválidas, cuenta inactiva, sesión expirada o token inválido | «Usuario o contraseña incorrectos» |
+| 403 | El rol no autoriza la operación, o la cuenta debe cambiar su contraseña temporal | «Acción no autorizada» |
+| 404 | El recurso no existe | Ingreso o lote inexistente |
+| 409 | La operación choca con el estado actual del recurso | Ingreso ya anulado; lote cerrado; vehículo con tara; mineral ya zarandeado |
+| 423 | Cuenta bloqueada temporalmente por intentos fallidos | «Cuenta bloqueada temporalmente…» |
+
+En el dominio, las excepciones de `common/excepciones.py` se traducen así en el manejador uniforme:
+`ErrorDeValidacionDeDominio` a 400, `AccionNoAutorizada` a 403 y `ConflictoDeConcurrencia` —el
+conflicto de estado— a 409.
+
+**Qué protege.** Que la interfaz y las pruebas de Postman sepan qué esperar de cada rechazo sin leer
+el código, y que un mismo tipo de error responda igual en los nueve módulos.
+
+**Si se revierte.** Cada módulo elegiría su código, el interceptor del frontend tendría que distinguir
+casos que deberían ser uno y las pruebas de contrato dejarían de ser comparables.
 
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
@@ -280,9 +428,10 @@ preparación del repositorio (`../01-plan/PLAN_DE_TRABAJO.md` §8).
 
 | Pendiente | Bloquea | Momento |
 |---|---|---|
-| Piloto de motores de reconocimiento | D-12, implementación de M04 | Antes de implementar M04 |
-| Medio de almacenamiento y política de retención de imágenes | D-14, implementación de M03 | Junto con el despliegue |
+| Piloto de motores de reconocimiento | D-12. M04 se implementa con el adaptador local provisional | Con el sistema funcional, antes del congelamiento de la semana 8 |
+| Medio de almacenamiento definitivo, retención y respaldo de imágenes | D-14 y D-20. M03 se implementa con el almacenamiento provisional en el backend | Con el servicio de alojamiento de la presentación |
+| Servicio de alojamiento y política de respaldo de la base | D-20 | Con la presentación del sistema, antes de la operación real |
 | Valores del catálogo de tipo de mineral, a definir con la empresa | M02, M08 | Antes de implementar M02 |
-| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10) | M03, D-17 | Antes de implementar M03 |
-| Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte | M06, alcance de DR-04 y DR-16 | Antes de implementar M06 |
+| ~~Quién registra el destare en planta y cómo se avisa de un vehículo pendiente de destarar (DR-10)~~ — **resuelto por DR-25**: cualquiera de los tres roles, sin plazo; la lista de pendientes de destare (HU-M03-04) es el aviso | — | — |
+| ~~Forma real de agrupar el mineral en cancha y de decidir la ruta de cada lote o parte~~ — **resuelto el 22/10/2026** (`../REVISION_TECNICA_V2.md` §7, Q-10): la agrupación se hace en el sistema, con los lotes de M06 y según los roles (DR-23) | — | — |
 | Validación con los usuarios del uso de los tres roles y su matriz de permisos (DR-23) | M01 | Antes de implementar M01 |

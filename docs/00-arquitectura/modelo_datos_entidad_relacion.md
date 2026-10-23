@@ -1,6 +1,6 @@
 # Modelo de datos — Entidad-Relación
 
-**Versión:** 3.0 · **Estado:** En revisión · **Cambio:** versión 2 del sistema (DR-11 a DR-23)
+**Versión:** 3.1 · **Estado:** Validado · **Cambio:** versión 2.1 del sistema (DR-11 a DR-31)
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../00-tesis/decisiones_reformulacion.md`
 
 **Fuente única.** Todas las entidades del sistema se modelan aquí, sin importar cuántos módulos las
@@ -29,6 +29,8 @@ erDiagram
     INGRESO ||--o{ RESULTADO_VALIDACION : evalua
 
     LOTE_PROCESO ||--o{ INGRESO : agrupa
+    LOTE_PROCESO ||--o{ LOTE_MINERAL : admite
+    TIPO_MINERAL ||--o{ LOTE_MINERAL : clasifica
     LOTE_PROCESO ||--o{ PARTE_LOTE : divide
     PARTE_LOTE ||--o{ REPARTO_INGRESO : recibe
     INGRESO ||--o{ REPARTO_INGRESO : reparte
@@ -58,6 +60,7 @@ alcance que la reformulación dejó fuera.
 | activo | boolean | la baja es lógica |
 | intentos_fallidos | int | soporta el bloqueo temporal |
 | ultimo_acceso | datetime | |
+| debe_cambiar_clave | boolean | verdadero tras un restablecimiento; obliga a cambiar la contraseña temporal al iniciar sesión (DR-30) |
 
 **Para qué existe.** Atribuir cada operación a una persona. Sin ella, ningún registro es imputable.
 **Quién la usa.** La escribe M01; la referencian todos los módulos que persisten algo.
@@ -123,7 +126,7 @@ Administrador puede modificarla, con motivo, y el cambio queda en auditoría (D-
 |---|---|---|
 | id_ingreso | PK | |
 | codigo | varchar(20) | único, asignado por el servidor (D-02), `editable=False` |
-| imagen_ticket | varchar(255) | ruta del respaldo (D-14 fija el medio); nula **solo** si el ingreso se registró sin foto |
+| imagen_ticket | varchar(255) | ubicación del archivo en el almacenamiento de Django (D-18); provisionalmente en el volumen `media` del backend (D-14); nula **solo** si el ingreso se registró sin foto |
 | sin_respaldo_fotografico | boolean | verdadero en el registro sin foto (DR-13); `editable=False` |
 | motivo_sin_respaldo | varchar(60) | obligatorio si `sin_respaldo_fotografico`; lista cerrada de motivos; `editable=False` |
 | fecha_hora_pesaje | datetime | fecha reconocida del ticket —o digitada en el registro sin foto— y hora indicada por el usuario sobre la propuesta del sistema con la hora actual (DR-11); corregible antes de confirmar |
@@ -232,9 +235,9 @@ datos y no se administra.
 | orden | smallint | posición relativa: ordena las etapas dentro de cualquier ruta |
 
 **Rutas (DR-16).** El secado es común a todo el lote. Después la planta decide una de tres rutas: zarandeo
-y ensacado; molienda y ensacado; o zarandeo, molienda y ensacado. Los códigos `ZARANDEO`, `MOLIENDA`
-y `AMBAS` son una propuesta de nombres para el código. La ruta no es una tabla: es un dominio cerrado en el código que asocia a cada valor sus
-etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
+y ensacado; molienda y ensacado; o zarandeo, molienda y ensacado, con los códigos `ZARANDEO_ENSACADO`,
+`MOLIENDA_ENSACADO` y `ZARANDEO_MOLIENDA_ENSACADO` (D-21). La ruta no es una tabla: es un dominio
+cerrado en el código que asocia a cada valor sus etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
 
 ### LOTE_PROCESO (M06)
 
@@ -243,10 +246,10 @@ etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
 | id_lote | PK | |
 | codigo | varchar(20) | único, asignado por el servidor |
 | nombre | varchar(80) | único; lo indica el usuario |
-| id_tipo_mineral | FK → TIPO_MINERAL | un lote reúne un solo tipo de mineral |
+| id_tipo_mineral | FK → TIPO_MINERAL | tipo con que se abre el lote; los demás están en `LOTE_MINERAL` (DR-27) |
 | fecha_apertura | date | |
 | fecha_inicio_recorrido | datetime | nula mientras el lote esté Abierto; `editable=False` (DR-19) |
-| ruta | enum | ZARANDEO / MOLIENDA / AMBAS; vacía hasta decidirla tras el secado, y vacía si el lote se divide |
+| ruta | enum | ZARANDEO_ENSACADO / MOLIENDA_ENSACADO / ZARANDEO_MOLIENDA_ENSACADO (D-21); vacía hasta decidirla tras el secado, y vacía si el lote se divide |
 | estado | enum | ABIERTO / EN_RECORRIDO / CERRADO (DR-19) |
 | destino | enum | VENTA / TRASLADO; obligatorio al cerrar (DR-14) |
 | observacion_cierre | text | opcional |
@@ -257,10 +260,31 @@ etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
 recorre las etapas por sí solo: lo hace el lote al que pertenece (DR-04). El lote es la indirección
 que hace realista la trazabilidad.
 
-**Ciclo de vida (DR-19, DR-22).** `ABIERTO`: reúne ingresos; se pueden asignar, retirar o trasladar.
-`EN_RECORRIDO`: desde el inicio del recorrido, que empieza por el secado; admite ingresos tardíos,
-pero no los devuelve a cancha. `CERRADO`: cierre definitivo con destino, solo con todo el mineral
+**Ciclo de vida (DR-19, DR-29).** `ABIERTO`: reúne ingresos; se pueden asignar, retirar o trasladar.
+`EN_RECORRIDO`: desde el inicio del recorrido, que empieza por el secado; admite ingresos tardíos, y
+devuelve a cancha un ingreso agregado por error solo mientras su mineral no haya pasado por zarandeo
+ni molienda y el lote conserve al menos un ingreso. `CERRADO`: cierre definitivo con destino, solo con todo el mineral
 ensacado; no admite ningún cambio.
+
+### LOTE_MINERAL (M06)
+
+Lista de tipos de mineral que admite un lote (DR-27): el de apertura y los agregados después con
+«Agregar otro mineral». Un ingreso solo se asigna si su tipo está en la lista.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id_lote | FK → LOTE_PROCESO | único junto con `id_tipo_mineral` entre las filas vigentes, sin fecha de retiro |
+| id_tipo_mineral | FK → TIPO_MINERAL | |
+| autorizacion | text | obligatoria cuando el tipo entra al unificar un ingreso de otro mineral; quién lo autorizó o el motivo |
+| fecha_hora | datetime | `editable=False` |
+| id_usuario_registro | FK → USUARIO | `editable=False` |
+| fecha_retiro | datetime | nula mientras el tipo está en la lista; se asigna al quitarlo (D-22) |
+| id_usuario_retiro | FK → USUARIO | nulo mientras el tipo está en la lista |
+
+Cada ingreso unificado de otro mineral guarda además su autorización en el evento de auditoría de
+la asignación y se presenta marcado «Otro mineral». Un tipo se quita solo si no tiene ingresos en el
+lote y el lote está Abierto, y quitarlo no borra su fila: le asigna la fecha y el usuario del retiro
+(D-22). La lista vigente del lote son las filas sin fecha de retiro.
 
 ### PARTE_LOTE (M06)
 
@@ -273,7 +297,7 @@ Una fila por parte de un lote dividido (DR-18). Un lote se divide una sola vez, 
 | nombre | varchar(80) | |
 | numerador | smallint | fracción de la parte |
 | denominador | smallint | las fracciones de un lote suman exactamente la unidad |
-| ruta | enum | ZARANDEO / MOLIENDA / AMBAS |
+| ruta | enum | ZARANDEO_ENSACADO / MOLIENDA_ENSACADO / ZARANDEO_MOLIENDA_ENSACADO (D-21) |
 
 **Por qué numerador y denominador.** Con decimales, tres tercios suman 0,999999 y una división
 correcta se rechazaría. Las toneladas aproximadas de cada parte no se almacenan: se calculan como
@@ -339,7 +363,7 @@ partes (DR-21). Un ingreso sin lote no ha recorrido ninguna.
 | id_entidad | int | identificador del registro afectado |
 | valores_anteriores | jsonb | nulo en creación |
 | valores_nuevos | jsonb | nulo en anulación |
-| motivo | text | explicación escrita por el usuario; obligatoria en la corrección de un ingreso y en el cambio de tara de un vehículo |
+| motivo | text | explicación o autorización escrita por el usuario; obligatoria en la corrección de un ingreso y su reversión, la anulación, el cambio de tara de un vehículo y la unificación de un ingreso de otro tipo de mineral a un lote |
 | fecha_hora | datetime | |
 | direccion_ip | varchar(45) | |
 | ingresos_relacionados | int[] | identificadores de los ingresos que afecta un evento de lote; índice GIN. Vacío en los demás eventos |
@@ -403,8 +427,7 @@ conservarse por el filtro del catálogo.
 |---|---|
 | Valores del catálogo `TIPO_MINERAL`, a definir con la empresa (DR-03) | Implementación de M02 y forma del total mensual de M08 |
 | Medio de almacenamiento y retención de `imagen_ticket` (D-14) | Implementación de M03 |
-| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente (DR-10) | Flujo de ingresos En proceso de M03 |
-| Forma real de agrupar el mineral en cancha y de decidir la ruta, a confirmar con la jefatura de operaciones | Alcance de `LOTE_PROCESO`; si la planta procesara volquete por volquete, el lote podría simplificarse a un vínculo directo |
+
 
 ## 6. Referencias
 

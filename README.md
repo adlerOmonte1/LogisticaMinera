@@ -12,33 +12,38 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 
 ## Estado del proyecto
 
-La documentación del sistema está en su **versión 2**: nueve módulos, 26 historias de usuario, sus
+La documentación del sistema está en su **versión 2.1**: nueve módulos, 27 historias de usuario, sus
 requerimientos y diagramas, reformulados a partir de la revisión del prototipo navegable
-([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-22. La versión 1 queda en
+([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-31. El informe de
+validación de esta versión está en [`docs/REVISION_V2_1.md`](docs/REVISION_V2_1.md). **La fase documental
+quedó cerrada el 23/10/2026** con la línea base 2.1
+([`docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`](docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md)); lo que sigue
+es la implementación, fase por fase y con validación en Postman, según
+[`docs/01-plan/PLAN_IMPLEMENTACION.md`](docs/01-plan/PLAN_IMPLEMENTACION.md). La versión 1 queda en
 la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
 preparación del repositorio, antes de construir los módulos
 ([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).
 
 | Rama | Contenido |
 |---|---|
-| `main` | Última versión estable: backend con M01 y M02 implementados, bajo el diseño anterior |
-| `docs/version-2` | Documentación de la versión 2, reformulada con las decisiones DR-11 a DR-23; el backend todavía no se tocó |
+| `main` | Documentación de la versión 2 hasta DR-23; backend con M01 y M02 implementados, bajo el diseño anterior |
+| `docs/version-2` | Documentación de la versión 2.1, validada con las decisiones DR-11 a DR-31; preparación del backend en curso |
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|
-| M01 | Autenticación y roles | Versión 2 | Implementado; falta ampliar la matriz de permisos al alcance del Supervisor de planta |
-| M02 | Catálogo maestro | Versión 2 | Implementado; pendiente retirar `Cliente` y renombrar `Producto` a `TipoMineral` |
-| M03 | Registro de ingresos | Versión 2 | Implementado con el diseño anterior; pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Versión 2 | Sin código |
-| M05 | Validación automática de consistencia | Versión 2 | Sin código |
-| M06 | Trazabilidad del proceso | Versión 2 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Versión 2 | Sin código |
-| M08 | Consolidación de la producción | Versión 2 | Sin código |
-| M09 | Auditoría | Versión 2 | Esqueleto, sin lógica |
+| M01 | Autenticación y roles | Versión 2.1 | Implementado; falta la matriz completa de permisos, el restablecimiento de contraseñas y la reactivación (DR-30, DR-31) |
+| M02 | Catálogo maestro | Versión 2.1 | Implementado; `Cliente` retirado, pendiente renombrar `Producto` a `TipoMineral` |
+| M03 | Registro de ingresos | Versión 2.1 | Implementado con el diseño anterior; pendiente de refactor |
+| M04 | Reconocimiento automático del ticket | Versión 2.1 | Sin código |
+| M05 | Validación automática de consistencia | Versión 2.1 | Sin código |
+| M06 | Trazabilidad del proceso | Versión 2.1 | Sin código |
+| M07 | Consulta de ingresos y respaldo | Versión 2.1 | Sin código |
+| M08 | Consolidación de la producción | Versión 2.1 | Sin código |
+| M09 | Auditoría | Versión 2.1 | Esqueleto, sin lógica |
 
-La limpieza del backend (retirar `apps/salidas`, `apps/existencias`, `apps/sincronizacion`, refactorizar
-`apps/ingresos`, crear las apps nuevas) es la preparación del repositorio de
-`PLAN_DE_TRABAJO.md` §8 y todavía no se ejecutó.
+La limpieza del backend es la preparación del repositorio de `PLAN_DE_TRABAJO.md` §8 y está en
+curso. El 22/10/2026 se retiraron `apps/salidas`, `apps/sincronizacion` y `Cliente`; falta retirar
+`apps/existencias`, refactorizar `apps/ingresos` y crear las apps nuevas.
 
 ---
 
@@ -47,7 +52,7 @@ La limpieza del backend (retirar `apps/salidas`, `apps/existencias`, `apps/sincr
 ```
 LogisticaMinera/
 ├── backend/          Django 5 + Django REST Framework, una app por módulo
-├── Mockup/           Prototipo navegable de la interfaz, fuente de las decisiones DR-11 a DR-22
+├── Mockup/           Prototipo navegable de la interfaz, alineado con las decisiones hasta DR-31
 ├── docs/             Documentación completa del sistema y de la tesis
 │   ├── 00-tesis/            Marco de tesis, decisiones de reformulación, plantillas
 │   ├── 00-arquitectura/     Decisiones de diseño, modelo de datos, guías, convenciones
@@ -57,7 +62,8 @@ LogisticaMinera/
 │   ├── 01-plan/             Cronograma
 │   └── 03-pruebas/          Guías de prueba
 ├── skills/           Skills del repositorio; contexto-tesis es la fuente para el agente
-├── scripts/          verificar_migracion.sh, generar_pdf_hu.py, generar_pdf_requerimientos.py
+├── scripts/          verificar_migracion.sh, validar_docs.py, reporte_trazabilidad.py,
+│                     indexar_docs.py, generar_pdf_hu.py, generar_pdf_requerimientos.py, md_a_pdf.py
 └── CLAUDE.md         Instrucciones para trabajar con un agente de IA en este repositorio
 ```
 
