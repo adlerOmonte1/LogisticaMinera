@@ -242,7 +242,7 @@ registro sin foto con motivo · DR-14 cierre del lote con destino, venta o trasl
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
 del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
 cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
-DR-22 retiro de ingresos solo con el lote Abierto · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección. Queda pendiente P-03.
+DR-22 retiro de ingresos solo con el lote Abierto (ampliada por DR-29) · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección · DR-29 retiro de ingresos del lote hasta el zarandeo o la molienda. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

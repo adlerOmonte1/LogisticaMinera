@@ -393,7 +393,7 @@ de la investigación contrasta en el postest.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Gestión de lotes de proceso | Apertura con nombre, asignación y retiro de ingresos con el lote Abierto, inicio del recorrido e ingresos tardíos | Tester: HU-M06-01 |
+| Gestión de lotes de proceso | Apertura con nombre, asignación de ingresos, inicio del recorrido, ingresos tardíos y retiro de ingresos hasta el zarandeo o la molienda | Tester: HU-M06-01 |
 | Registro del paso por etapa | Secado común, elección de la ruta y etapas de esa ruta en orden; horas de molienda y bigbags como datos descriptivos | Tester: HU-M06-02 |
 | División de un lote | Partes por fracciones que suman la unidad, cada una con su ruta; reparto de un ingreso tardío | Tester: HU-M06-04 |
 | Consulta de trazabilidad de un ingreso | Etapas recorridas sobre las etapas de la ruta del lote o de la unión de las rutas de sus partes | Tester: HU-M06-03 |

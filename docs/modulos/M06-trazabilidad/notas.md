@@ -132,12 +132,22 @@ El secado de un ingreso tardío en un lote dividido crea a la vez el `PasoEtapa`
 sus `RepartoIngreso`. El serializer recibe las fracciones propuestas por la interfaz, que parte de
 las del lote (DR-20), y el servicio repite la comprobación de suma.
 
+### Retiro de ingresos
+
+`retirar_ingreso()` comprueba que ninguna parte del lote tenga registrado zarandeo o molienda —o, si
+el ingreso tiene secado propio, que ninguna de sus partes haya empezado su ruta— y que un lote
+`EN_RECORRIDO` conserve al menos un ingreso (RN-M06-04). Pone en nulo el `id_lote` del ingreso y no
+borra ningún paso: el secado del lote, y el secado propio del ingreso tardío con su reparto, quedan
+como hecho registrado y el retiro en auditoría (D-07). Las estimaciones de las partes no requieren
+ajuste, porque se calculan sobre los ingresos que pertenecen al lote al consultarse (RN-M06-24). El
+traslado a otro lote es el mismo retiro seguido de una asignación, dentro de una transacción.
+
 ### Composición, trazabilidad y resumen
 
 El detalle del lote necesita el número de ingresos y la suma de sus pesos netos. Se resuelve con una
 consulta agregada sobre `INGRESO`, no recorriendo los ingresos en Python (RNF-M06-02). La suma
-excluye los ingresos anulados (RN-M06-03): un ingreso retirado del histórico no aporta toneladas,
-aunque su vínculo con el lote se conserve si ya inició el recorrido.
+excluye los ingresos anulados (RN-M06-03): un ingreso anulado no aporta toneladas, aunque su vínculo
+con el lote se conserve si ya inició el recorrido.
 
 La asignación filtra por `estado="REGISTRADO"` y no por «distinto de anulado» (RN-M06-13). Con el
 segundo criterio, un ingreso En proceso —sin peso neto— entraría al lote y su suma trataría el nulo

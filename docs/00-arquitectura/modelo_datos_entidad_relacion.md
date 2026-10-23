@@ -259,9 +259,10 @@ etapas en orden. Un lote no recorre necesariamente las cuatro etapas.
 recorre las etapas por sí solo: lo hace el lote al que pertenece (DR-04). El lote es la indirección
 que hace realista la trazabilidad.
 
-**Ciclo de vida (DR-19, DR-22).** `ABIERTO`: reúne ingresos; se pueden asignar, retirar o trasladar.
-`EN_RECORRIDO`: desde el inicio del recorrido, que empieza por el secado; admite ingresos tardíos,
-pero no los devuelve a cancha. `CERRADO`: cierre definitivo con destino, solo con todo el mineral
+**Ciclo de vida (DR-19, DR-29).** `ABIERTO`: reúne ingresos; se pueden asignar, retirar o trasladar.
+`EN_RECORRIDO`: desde el inicio del recorrido, que empieza por el secado; admite ingresos tardíos, y
+devuelve a cancha un ingreso agregado por error solo mientras su mineral no haya pasado por zarandeo
+ni molienda y el lote conserve al menos un ingreso. `CERRADO`: cierre definitivo con destino, solo con todo el mineral
 ensacado; no admite ningún cambio.
 
 ### LOTE_MINERAL (M06)

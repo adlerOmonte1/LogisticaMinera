@@ -41,12 +41,15 @@ También se puede unificar un ingreso de otro tipo de mineral directamente al ag
 opción **Agregar de otro tipo de mineral** muestra esos ingresos agrupados por mineral. Elegir uno
 exige indicar la autorización o el motivo —por ejemplo, que el gerente aprobó procesarlo junto—; su
 mineral se suma a la lista del lote y el ingreso queda marcado «Otro mineral», con esa autorización
-visible en la composición. Mientras tanto la agrupación es una decisión revisable: un ingreso puede retirarse del lote
-o trasladarse a otro lote Abierto.
+visible en la composición. Mientras el lote está Abierto, la agrupación es una decisión revisable: un ingreso puede
+retirarse del lote o trasladarse a otro.
 
 Cuando la carga está reunida, el usuario **inicia el recorrido**: el lote pasa a En recorrido y su
-siguiente paso es el secado. Desde entonces ningún ingreso vuelve a cancha, pero el lote todavía
-admite **ingresos tardíos**, porque pueden llegar volquetes que se suman a una carga ya en marcha.
+siguiente paso es el secado. El lote todavía admite **ingresos tardíos**, porque pueden llegar
+volquetes que se suman a una carga ya en marcha. Y como agregar un ingreso al lote equivocado es un
+error posible del usuario, el ingreso puede retirarse —y volver a cancha— hasta que su mineral pase
+por zarandeo o molienda: después de esas etapas el mineral ya se transformó junto con el resto y el
+retiro dejaría de describir lo ocurrido (DR-29). El secado ya registrado del lote se conserva.
 Un ingreso tardío que llega antes del secado del lote se seca junto con el resto; uno que llega
 después tiene su propio secado. Si el lote está dividido, el ingreso tardío se reparte entre las
 partes (HU-M06-04).
@@ -66,7 +69,8 @@ historia aparte (HU-M06-05).
 - Estado: Abierto, En recorrido o Cerrado.
 - Solo se asignan ingresos en estado Registrado: ni los anulados ni los que siguen En proceso,
   pendientes del destare, porque aún no tienen peso neto.
-- Retiro y traslado de ingresos: solo mientras el lote está Abierto.
+- Retiro y traslado de ingresos: mientras el mineral del ingreso no haya pasado por zarandeo ni
+  molienda; un lote En recorrido conserva al menos un ingreso (DR-29).
 - Ingresos tardíos: admitidos mientras el lote está En recorrido, señalados como tales.
 - Roles autorizados: Administrativo y Administrador.
 
@@ -98,12 +102,14 @@ historia aparte (HU-M06-05).
 > entonces el sistema rechaza la operación mostrando "El ingreso {codigo} está en proceso: falta el
 > destare del vehículo".
 
-> **CA08.** Dado que un ingreso pertenece a otro lote Abierto, cuando el usuario lo asigna a este,
-> entonces el sistema lo traslada y deja constancia del cambio en ambos lotes.
+> **CA08.** Dado que un ingreso pertenece a otro lote cuyo mineral aún no pasó por zarandeo ni
+> molienda, cuando el usuario lo asigna a este, entonces el sistema lo traslada y deja constancia del
+> cambio en ambos lotes.
 
-> **CA09.** Dado que el lote ya inició su recorrido, cuando el usuario intenta retirar un ingreso o
-> trasladarlo a otro lote, entonces el sistema rechaza la operación mostrando "El lote {codigo} ya
-> inició su recorrido".
+> **CA09.** Dado que el mineral del ingreso ya pasó por zarandeo o molienda —en alguna parte del lote
+> o, si es un ingreso tardío con secado propio, en alguna de sus partes—, cuando el usuario intenta
+> retirarlo o trasladarlo a otro lote, entonces el sistema rechaza la operación mostrando "El mineral
+> del ingreso {codigo} ya pasó por zarandeo o molienda".
 
 > **CA10.** Dado que un lote Abierto tiene al menos un ingreso, cuando el usuario inicia el
 > recorrido, entonces el sistema registra la fecha de inicio, pasa el lote a En recorrido y muestra
@@ -149,6 +155,15 @@ historia aparte (HU-M06-05).
 > **CA21.** Dado que el usuario agrega un ingreso de otro tipo de mineral con su autorización, cuando
 > el sistema lo incorpora, entonces suma ese mineral a la lista del lote, muestra el ingreso en su
 > grupo marcado «Otro mineral» con la autorización, y registra ambos actos en auditoría.
+
+> **CA22.** Dado que el lote está En recorrido y ninguna de sus partes registró zarandeo ni molienda,
+> cuando el usuario retira un ingreso agregado por error, entonces el sistema lo devuelve a cancha sin
+> lote, recalcula los totales del lote, conserva el secado ya registrado y registra el retiro en
+> auditoría.
+
+> **CA23.** Dado que el lote está En recorrido y tiene un solo ingreso, cuando el usuario intenta
+> retirarlo o trasladarlo, entonces el sistema rechaza la operación mostrando "El lote {codigo} en
+> recorrido debe conservar al menos un ingreso".
 
 ---
 

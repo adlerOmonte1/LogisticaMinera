@@ -1,18 +1,19 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**131 archivos · 18086 líneas de texto.**
+**133 archivos · 18138 líneas de texto.**
 
 ## `Mockup/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [index.html](../Mockup/index.html) | — | 1750 | 377 |
+| [index.html](../Mockup/index.html) | — | 1764 | 379 |
 
 ## `docs/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
+| [.DS_Store](.DS_Store) | — | — | 8 |
 | [HistoriasUsuario.md](HistoriasUsuario.md) | Historias de usuario — índice | 116 | 4 |
 | [Historias_de_Usuario.pdf](Historias_de_Usuario.pdf) | — | — | 1007 |
 | [REVISION_TECNICA_V2.md](REVISION_TECNICA_V2.md) | Revisión técnica de la versión 2 — arquitectura, estructura y puntos abiertos | 217 | 16 |
@@ -27,13 +28,13 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 911 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
 | [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 288 | 16 |
-| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 432 | 22 |
+| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 433 | 22 |
 
 ## `docs/00-tesis/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [decisiones_reformulacion.md](00-tesis/decisiones_reformulacion.md) | Decisiones de reformulación | 101 | 14 |
+| [decisiones_reformulacion.md](00-tesis/decisiones_reformulacion.md) | Decisiones de reformulación | 102 | 15 |
 | [marco_tesis.md](00-tesis/marco_tesis.md) | Marco de tesis — fuente de verdad | 187 | 11 |
 
 ## `docs/01-plan/`
@@ -61,6 +62,12 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [ARQ-01_Modulos_del_Sistema.md](model-c4/ARQ-01_Modulos_del_Sistema.md) | ARQ-01 — Definición de módulos del sistema | 177 | 11 |
 | [ARQ-02_Arquitectura_Tecnica.md](model-c4/ARQ-02_Arquitectura_Tecnica.md) | ARQ-02 — Arquitectura técnica (Django + Angular) | 265 | 13 |
 | [ARQ-03_Modelo_C4.md](model-c4/ARQ-03_Modelo_C4.md) | ARQ-03 — Modelo C4 del sistema | 399 | 19 |
+
+## `docs/modulos/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [.DS_Store](modulos/.DS_Store) | — | — | 8 |
 
 ## `docs/modulos/M01-autenticacion/`
 
@@ -191,14 +198,14 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [HU.md](modulos/M06-trazabilidad/HU.md) | Historias de usuario — M06 Trazabilidad del proceso | 474 | 25 |
-| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 218 | 11 |
+| [HU.md](modulos/M06-trazabilidad/HU.md) | Historias de usuario — M06 Trazabilidad del proceso | 489 | 26 |
+| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 228 | 12 |
 
 ## `docs/modulos/M06-trazabilidad/diagramas/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [actividades.md](modulos/M06-trazabilidad/diagramas/actividades.md) | Diagramas de actividades — M06 Trazabilidad del proceso | 142 | 5 |
+| [actividades.md](modulos/M06-trazabilidad/diagramas/actividades.md) | Diagramas de actividades — M06 Trazabilidad del proceso | 150 | 6 |
 | [caso_uso.md](modulos/M06-trazabilidad/diagramas/caso_uso.md) | Diagrama de casos de uso — M06 Trazabilidad del proceso | 55 | 2 |
 | [secuencia.md](modulos/M06-trazabilidad/diagramas/secuencia.md) | Diagramas de secuencia — M06 Trazabilidad del proceso | 232 | 8 |
 
@@ -208,7 +215,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 |---|---|---:|---:|
 | [funcionales.md](modulos/M06-trazabilidad/requerimientos/funcionales.md) | Requerimientos funcionales — M06 Trazabilidad del proceso | 80 | 5 |
 | [no_funcionales.md](modulos/M06-trazabilidad/requerimientos/no_funcionales.md) | Requerimientos no funcionales — M06 Trazabilidad del proceso | 37 | 3 |
-| [reglas_negocio.md](modulos/M06-trazabilidad/requerimientos/reglas_negocio.md) | Reglas de negocio — M06 Trazabilidad del proceso | 70 | 7 |
+| [reglas_negocio.md](modulos/M06-trazabilidad/requerimientos/reglas_negocio.md) | Reglas de negocio — M06 Trazabilidad del proceso | 73 | 8 |
 | [sistema.md](modulos/M06-trazabilidad/requerimientos/sistema.md) | Requerimientos de sistema — M06 Trazabilidad del proceso | 34 | 5 |
 | [usuario.md](modulos/M06-trazabilidad/requerimientos/usuario.md) | Requerimientos de usuario — M06 Trazabilidad del proceso | 28 | 2 |
 

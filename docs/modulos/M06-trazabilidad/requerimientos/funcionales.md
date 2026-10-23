@@ -11,7 +11,7 @@ ensacado. El cierre del lote con su destino forma parte de RF07 (DR-14), no es u
 | Quitar un mineral | Retira de la lista un tipo sin ingresos, con el lote Abierto | HU-M06-01 | `DELETE /api/v1/lotes/{id}/minerales/{id_tipo}/` |
 | Consultar lote | Detalle con su estado, su composición, sus partes y su recorrido | HU-M06-01 | `GET /api/v1/lotes/{id}/` |
 | Asignar ingresos al lote | Incorpora uno o varios ingresos; en un lote En recorrido, como ingresos tardíos | HU-M06-01 | `POST /api/v1/lotes/{id}/ingresos/` |
-| Retirar un ingreso del lote | Quita el ingreso de un lote Abierto | HU-M06-01 | `DELETE /api/v1/lotes/{id}/ingresos/{id_ingreso}/` |
+| Retirar un ingreso del lote | Devuelve a cancha un ingreso cuyo mineral aún no pasó por zarandeo ni molienda | HU-M06-01 | `DELETE /api/v1/lotes/{id}/ingresos/{id_ingreso}/` |
 | Iniciar el recorrido | Pasa el lote a En recorrido y registra la fecha de inicio | HU-M06-01 | `PATCH /api/v1/lotes/{id}/iniciar-recorrido/` |
 | Registrar paso por etapa | Anota el paso del lote o de una parte por una etapa, con la ruta cuando corresponde, y las horas de molienda o los bigbags si aplica | HU-M06-02 | `POST /api/v1/lotes/{id}/etapas/` |
 | Registrar secado de un ingreso tardío | Anota el secado propio del ingreso que llegó después del secado del lote y, si el lote está dividido, su reparto entre las partes | HU-M06-02, HU-M06-04 | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/secado/` |

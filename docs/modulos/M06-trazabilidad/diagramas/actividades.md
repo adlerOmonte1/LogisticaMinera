@@ -25,7 +25,13 @@ flowchart TD
     V3 -->|No| E3[Rechazar: El lote no tiene ingresos asignados]
     E3 --> L1
     V3 -->|Si| P2[Iniciar el recorrido y pasar a En recorrido]
-    P2 --> D2{Llega un volquete tardio?}
+    P2 --> D4{Ingreso agregado por error?}
+    D4 -->|Si| V4{Su mineral paso por zarandeo o molienda?}
+    V4 -->|Si| E4[Rechazar: el mineral ya paso por zarandeo o molienda]
+    V4 -->|No| P5[Retirar el ingreso y devolverlo a cancha]
+    E4 --> D2
+    P5 --> D2
+    D4 -->|No| D2{Llega un volquete tardio?}
     D2 -->|Si| D3{Secado del lote registrado?}
     D3 -->|No| P3[Agregarlo para secarse con el lote]
     D3 -->|Si| P4[Agregarlo con secado propio]
@@ -34,8 +40,10 @@ flowchart TD
     D2 -->|No| F([Lote recorriendo su ruta hasta el cierre])
 ```
 
-Mientras el lote está Abierto, un ingreso puede retirarse o trasladarse a otro lote Abierto. Desde
-el inicio del recorrido ningún ingreso vuelve a cancha: solo se suman ingresos tardíos (RN-M06-04).
+Mientras el lote está Abierto, un ingreso puede retirarse o trasladarse a otro lote. Desde el inicio
+del recorrido se suman ingresos tardíos, y un ingreso agregado por error todavía puede retirarse
+hasta que su mineral pase por zarandeo o molienda, siempre que el lote conserve al menos un ingreso.
+El secado ya registrado se conserva (RN-M06-04).
 
 ## A-M06-02 · Recorrido del lote por su ruta (RN-M06-05 a RN-M06-08, RN-M06-15, RN-M06-19)
 
