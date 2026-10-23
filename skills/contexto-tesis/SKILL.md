@@ -216,6 +216,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-20 | Respaldo mínimo ejecutable desde la semana 1 (volcado de la base y copia del volumen `media`, con restauración de prueba); servicio y política definitivos con el alojamiento de la presentación |
 | D-21 | Códigos de ruta: `ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO`, `ZARANDEO_MOLIENDA_ENSACADO` |
 | D-22 | Ninguna operación de la API usa `DELETE`: el retiro de un ingreso y el de un mineral del lote son acciones `POST`, y el mineral quitado queda con baja lógica |
+| D-23 | Códigos HTTP: 400 regla o dato, 401 autenticación, 403 permiso o contraseña temporal, 404 inexistente, 409 conflicto de estado, 423 cuenta bloqueada |
 
 **Pendientes de cierre**
 

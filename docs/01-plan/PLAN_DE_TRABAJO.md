@@ -1,9 +1,10 @@
 # PLAN-01 — Plan de trabajo, pruebas y entrega
 
 **Documento:** PLAN-01
-**Versión:** 2.2
+**Versión:** 2.3
 **Estado:** Vigente. Fase documental cerrada el 23/10/2026 con la línea base 2.1
-(`ACTA_CIERRE_FASE_DOCUMENTAL.md`); sigue la fase de implementación
+(`ACTA_CIERRE_FASE_DOCUMENTAL.md`); sigue la fase de implementación, cuya ejecución paso a paso y
+validación en Postman detalla `PLAN_IMPLEMENTACION.md` (PLAN-02)
 **Alcance:** Sistema web inteligente de control de inventarios de ingreso de mineral (M01 a M09,
 ver `../model-c4/ARQ-01_Modulos_del_Sistema.md`)
 
@@ -376,6 +377,7 @@ cd backend && python manage.py makemigrations --check --dry-run && pytest -q
 | M01: sesión | Inicio y cierre de sesión, expiración por inactividad, bloqueo tras cinco intentos, «¿Olvidó su contraseña?» y cambio obligatorio de la contraseña temporal | Tester: HU-M01-01 |
 | M01: usuarios | Alta, edición, desactivación y reactivación; restablecimiento de contraseña con una temporal; rechazo a desactivar la propia cuenta; cambio de la propia contraseña | Tester: HU-M01-02 |
 | M01: permisos por rol | Una clase de permiso por operación para M01 a M09, en `apps/accounts/permissions.py`; menú por rol con el inicio; acceso rechazado registrado en auditoría | Tester: HU-M01-03 y CP10 |
+| Registrador de auditoría | `EVENTO_AUDITORIA` y `ServicioAuditoria`, que M01 ya necesita (HU-M01-01 CA07) y M03 usa dentro de su transacción | Prueba automatizada por evento de M01 |
 | Respaldo y restauración ejecutables (D-20) | Procedimiento de volcado de la base y copia del volumen `media`, con su restauración | Restauración de prueba en un entorno limpio |
 | Decisiones de arquitectura — **hecho (23/10/2026)** | Sin decisiones abiertas que bloqueen M03: D-12 y D-14 con solución provisional, D-18 a D-21 cerradas | Responsable técnico |
 
@@ -410,7 +412,7 @@ de la investigación contrasta en el postest.
 
 | Actividad | Entregable | Verificación |
 |---|---|---|
-| Registro de eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección | Prueba automatizada por acción |
+| Verificación de los eventos de M01 a M05 | Evento por cada creación, modificación, anulación, reconocimiento y corrección, registrado desde la semana 1 | Prueba automatizada por acción y consulta en Postman |
 | Registro de acceso rechazado | Evento por cada intento sin permiso | Tester |
 | Historial de un ingreso | Historial cronológico con valores anteriores y nuevos, visible para los tres roles | Tester: HU-M09-02 |
 | Consulta de la auditoría del sistema | Eventos filtrables por usuario, entidad, acción y periodo, solo para el Administrador | Tester: HU-M09-03 |
@@ -543,6 +545,9 @@ documentos que dependen de ella (`ACTA_CIERRE_FASE_DOCUMENTAL.md` §5).
 | Actas de aceptación por módulo | `../03-pruebas/actas/` | Jefatura de operaciones |
 | Registro de despliegues | `../04-despliegue/registro_despliegues.md` | Responsable técnico |
 | Acta de cierre de la fase documental | `ACTA_CIERRE_FASE_DOCUMENTAL.md` | Responsable técnico |
+| Plan de implementación por fases | `PLAN_IMPLEMENTACION.md` (PLAN-02) | Responsable técnico |
+| Colección y entornos de Postman | `../../postman/` | Responsable técnico |
+| Bitácora de puertas de fase | `../03-pruebas/bitacora_puertas.md` | Supervisor |
 
 ---
 

@@ -68,7 +68,8 @@ token de inmediato; la sesión también expira por inactividad tras el tiempo co
 > restablecerla con una contraseña temporal, sin revelar si el nombre de usuario existe.
 
 > **CA09.** Dado que un usuario inicia sesión con una contraseña temporal, cuando el sistema
-> establece la sesión, entonces le exige cambiarla antes de permitirle cualquier otra operación.
+> establece la sesión, entonces le exige cambiarla antes de permitirle cualquier otra operación, y
+> rechaza las demás mostrando "Debe cambiar la contraseña temporal antes de continuar".
 
 ---
 

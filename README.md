@@ -18,7 +18,8 @@ requerimientos y diagramas, reformulados a partir de la revisión del prototipo 
 validación de esta versión está en [`docs/REVISION_V2_1.md`](docs/REVISION_V2_1.md). **La fase documental
 quedó cerrada el 23/10/2026** con la línea base 2.1
 ([`docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`](docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md)); lo que sigue
-es la implementación. La versión 1 queda en
+es la implementación, fase por fase y con validación en Postman, según
+[`docs/01-plan/PLAN_IMPLEMENTACION.md`](docs/01-plan/PLAN_IMPLEMENTACION.md). La versión 1 queda en
 la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
 preparación del repositorio, antes de construir los módulos
 ([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).

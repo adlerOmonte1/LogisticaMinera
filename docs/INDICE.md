@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**137 archivos · 19390 líneas de texto.**
+**139 archivos · 20552 líneas de texto.**
 
 ## `Mockup/`
 
@@ -19,8 +19,8 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [REVISION_TECNICA_V2.md](REVISION_TECNICA_V2.md) | Revisión técnica de la versión 2 — arquitectura, estructura y puntos abiertos | 218 | 17 |
 | [REVISION_TECNICA_V2.pdf](REVISION_TECNICA_V2.pdf) | — | — | 275 |
 | [REVISION_V2_1.md](REVISION_V2_1.md) | Revisión y validación de la versión 2.1 de la documentación | 211 | 17 |
-| [REVISION_V2_1.pdf](REVISION_V2_1.pdf) | — | — | 351 |
-| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6328 |
+| [REVISION_V2_1.pdf](REVISION_V2_1.pdf) | — | — | 353 |
+| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6333 |
 
 ## `docs/00-arquitectura/`
 
@@ -29,7 +29,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [GUIA_FRONTEND_ANGULAR.md](00-arquitectura/GUIA_FRONTEND_ANGULAR.md) | Guía del frontend — Angular en repositorio separado | 344 | 13 |
 | [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 912 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
-| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 408 | 24 |
+| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 437 | 25 |
 | [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 437 | 23 |
 
 ## `docs/00-tesis/`
@@ -44,7 +44,9 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [ACTA_CIERRE_FASE_DOCUMENTAL.md](01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md) | Acta de cierre de la fase documental | 146 | 9 |
-| [PLAN_DE_TRABAJO.md](01-plan/PLAN_DE_TRABAJO.md) | PLAN-01 — Plan de trabajo, pruebas y entrega | 604 | 36 |
+| [ACTA_CIERRE_FASE_DOCUMENTAL.pdf](01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.pdf) | — | — | 265 |
+| [PLAN_DE_TRABAJO.md](01-plan/PLAN_DE_TRABAJO.md) | PLAN-01 — Plan de trabajo, pruebas y entrega | 609 | 36 |
+| [PLAN_IMPLEMENTACION.md](01-plan/PLAN_IMPLEMENTACION.md) | PLAN-02 — Plan de implementación por fases, con validación en Postman | 1124 | 96 |
 
 ## `docs/02-trazabilidad/`
 
@@ -65,7 +67,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [ARQ-01_Modulos_del_Sistema.md](model-c4/ARQ-01_Modulos_del_Sistema.md) | ARQ-01 — Definición de módulos del sistema | 179 | 11 |
 | [ARQ-02_Arquitectura_Tecnica.md](model-c4/ARQ-02_Arquitectura_Tecnica.md) | ARQ-02 — Arquitectura técnica (Django + Angular) | 284 | 14 |
 | [ARQ-03_Modelo_C4.md](model-c4/ARQ-03_Modelo_C4.md) | ARQ-03 — Modelo C4 del sistema | 591 | 32 |
-| [ARQ-03_Modelo_C4.pdf](model-c4/ARQ-03_Modelo_C4.pdf) | — | — | 599 |
+| [ARQ-03_Modelo_C4.pdf](model-c4/ARQ-03_Modelo_C4.pdf) | — | — | 603 |
 
 ## `docs/modulos/`
 
@@ -77,7 +79,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [HU.md](modulos/M01-autenticacion/HU.md) | Historias de usuario — M01 Autenticación y roles | 215 | 10 |
+| [HU.md](modulos/M01-autenticacion/HU.md) | Historias de usuario — M01 Autenticación y roles | 216 | 10 |
 | [notas.md](modulos/M01-autenticacion/notas.md) | Notas de implementación — M01 Autenticación y roles | 81 | 4 |
 
 ## `docs/modulos/M01-autenticacion/diagramas/`
@@ -320,7 +322,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/backend-django/SKILL.md) | Skill `backend-django` | 198 | 9 |
+| [SKILL.md](../skills/backend-django/SKILL.md) | Skill `backend-django` | 200 | 9 |
 
 ## `skills/base-datos-postgresql/`
 
@@ -338,7 +340,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 321 | 22 |
+| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 322 | 22 |
 
 ## `skills/despliegue-docker/`
 

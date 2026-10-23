@@ -525,7 +525,7 @@ def manejador_uniforme(exc, context):
     if isinstance(exc, ReglaDeNegocioError):
         return Response(
             {"codigo": exc.codigo, "mensaje": str(exc), "detalles": exc.detalles},
-            status=422,
+            status=400,  # D-23: 400 regla, 403 permiso, 409 conflicto de estado
         )
     respuesta = exception_handler(exc, context)
     if respuesta is not None:

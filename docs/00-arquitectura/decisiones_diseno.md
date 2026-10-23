@@ -353,6 +353,35 @@ de un lote pueda reconstruirse tal como estaba en cualquier momento.
 **Si se revierte.** Un `DELETE` admitido «solo para vínculos» abre la puerta a otros, y la fila
 borrada de `LOTE_MINERAL` deja una autorización de otro mineral sin rastro en la base.
 
+## D-23. Convención de códigos HTTP de la API
+
+**Módulos afectados:** todos · **Fecha:** 23/10/2026
+
+Toda respuesta de error lleva el cuerpo uniforme `{"codigo", "mensaje", "detalles"}` de ARQ-02 §6, y
+`mensaje` coincide literalmente con el criterio de aceptación. El código HTTP sigue esta tabla, que
+recoge la que ya usan los diagramas de secuencia de los módulos y el manejador de errores del backend:
+
+| Código | Cuándo | Ejemplo |
+|---|---|---|
+| 200 | Consulta u operación completada | Corrección guardada; consolidado del mes |
+| 201 | Alta de un recurso | Ingreso registrado; lote abierto |
+| 400 | Datos inválidos o regla de negocio incumplida por lo que se envía | Campos obligatorios; V2, V3 o V5; fracciones que no suman la unidad |
+| 401 | Falta de autenticación: credenciales inválidas, cuenta inactiva, sesión expirada o token inválido | «Usuario o contraseña incorrectos» |
+| 403 | El rol no autoriza la operación, o la cuenta debe cambiar su contraseña temporal | «Acción no autorizada» |
+| 404 | El recurso no existe | Ingreso o lote inexistente |
+| 409 | La operación choca con el estado actual del recurso | Ingreso ya anulado; lote cerrado; vehículo con tara; mineral ya zarandeado |
+| 423 | Cuenta bloqueada temporalmente por intentos fallidos | «Cuenta bloqueada temporalmente…» |
+
+En el dominio, las excepciones de `common/excepciones.py` se traducen así en el manejador uniforme:
+`ErrorDeValidacionDeDominio` a 400, `AccionNoAutorizada` a 403 y `ConflictoDeConcurrencia` —el
+conflicto de estado— a 409.
+
+**Qué protege.** Que la interfaz y las pruebas de Postman sepan qué esperar de cada rechazo sin leer
+el código, y que un mismo tipo de error responda igual en los nueve módulos.
+
+**Si se revierte.** Cada módulo elegiría su código, el interceptor del frontend tendría que distinguir
+casos que deberían ser uno y las pruebas de contrato dejarían de ser comparables.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04
