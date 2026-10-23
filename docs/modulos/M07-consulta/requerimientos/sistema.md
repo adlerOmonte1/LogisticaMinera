@@ -16,7 +16,7 @@
 | RS-M07-12 | El sistema rechaza un rango de fechas cuyo inicio sea posterior a su fin | RU-M07-04 |
 | RS-M07-13 | El sistema compone el detalle de un ingreso con sus validaciones, su reconocimiento, su trazabilidad y su historial | — (integridad con M04, M05, M06, M09) |
 | RS-M07-14 | El sistema indica la ausencia de cada uno de esos elementos en lugar de omitir su bloque | RU-M07-03 |
-| RS-M07-15 | El sistema no escribe ningún dato del dominio: todas sus operaciones son de lectura, y el evento de una exportación lo registra el registrador común de M09 | — (D-10) |
+| RS-M07-15 | El sistema no escribe ningún dato del dominio: todas sus operaciones son de lectura, y el evento de una exportación lo registra `ServicioAuditoria` de M09 | — (D-10) |
 | RS-M07-16 | El sistema incluye los ingresos En proceso en los resultados, señalados como tales y con el peso neto indicado como pendiente del destare | RU-M07-04 |
 | RS-M07-17 | El sistema presenta, junto al resultado de la búsqueda por placa y fecha, el lote del ingreso, su estado y su recorrido por las etapas de la ruta, o indica que el ingreso aún no tiene lote | RU-M07-06 |
 | RS-M07-18 | El sistema señala en el listado los ingresos sin respaldo fotográfico | RU-M07-03 |

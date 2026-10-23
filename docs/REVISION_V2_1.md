@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Fecha | 23/10/2026 |
-| Alcance | Todo `docs/`, `skills/contexto-tesis`, `skills/requisitos-modulo`, `scripts/generar_pdf_requerimientos.py` y `Mockup/index.html` |
+| Alcance | Todo `docs/`, `skills/contexto-tesis`, `skills/requisitos-modulo`, `skills/solid-proyecto`, `scripts/generar_pdf_requerimientos.py` y `Mockup/index.html`; el cierre del modelo C4 se registra en la sección 8 |
 | Propósito | Cerrar la versión 2.1 de la documentación del sistema: contrastarla con la maqueta validada por el autor, resolver las divergencias y dejarla lista como base de la documentación requerida por la tesis y de la implementación |
 | Resultado | **Documentación revisada y validada.** Sin hallazgos en las comprobaciones automáticas ni divergencias abiertas entre la documentación y la maqueta |
 | Antecedente | [`REVISION_TECNICA_V2.md`](REVISION_TECNICA_V2.md), revisión técnica del 21/10/2026 y sus resoluciones del 22/10/2026 |
@@ -22,6 +22,7 @@
 | Cobertura de cada historia en `funcionales.md`, diagramas, matriz e índice | 27 de 27 | Comprobación 2 de la skill `revision-coherencia` |
 | Numeración de historias y cabeceras de `HU.md` | Sin saltos ni duplicados; cada cabecera coincide con sus historias | Comprobación 3 de la skill `revision-coherencia` |
 | Tildes, eñes y signos de apertura dentro de Mermaid | Ninguno | Comprobación 4 de la skill `revision-coherencia` |
+| Diagramas Mermaid que renderizan | 88 de 88, incluidos los diez de ARQ-03 | Render de cada bloque con Mermaid 11 en Chrome sin interfaz |
 | Operaciones restringidas por rol con criterio de rechazo | Todas | Revisión de las 27 historias |
 | RNF con característica ISO/IEC 25010:2023 y método de verificación | 87 de 87, con la nomenclatura de la edición 2023 | Revisión de los nueve `no_funcionales.md` |
 | Mensajes literales de los criterios frente a la maqueta | Coinciden, salvo los que solo produce el servidor: bloqueo de cuenta, expiración de sesión, ticket ilegible o motor no disponible, y los rechazos que la interfaz ya evita al no ofrecer la acción (confirmar sin imagen, asignar un anulado, registrar una etapa fuera de orden o repetida) | Contraste automático de los 277 criterios con `Mockup/index.html` |
@@ -42,12 +43,13 @@ empresa.
 | Criterios de aceptación | 277 |
 | Requerimientos de usuario | 71 |
 | Requerimientos de sistema | 170 |
-| Funciones expuestas | 75 |
+| Funciones expuestas | 74 |
 | Requerimientos no funcionales | 87 |
 | Reglas de negocio | 143 |
 | Casos de uso | 50 |
 | Diagramas | 76 |
 | Decisiones de reformulación | 31 (DR-01 a DR-31) |
+| Decisiones de diseño | 16 (D-01, D-02 y D-06 a D-19), de las cuales D-12, D-14 y D-15 siguen pendientes de cierre; D-03 a D-05 están retiradas |
 
 ## 3. Decisiones incorporadas en esta versión
 
@@ -104,28 +106,29 @@ Ninguna de las tres crea un RF: el denominador de la lista de control sigue sien
 | [`02-trazabilidad/matriz_HU_RF_indicador.md`](02-trazabilidad/matriz_HU_RF_indicador.md) | Única relación entre el sistema y los indicadores de la tesis |
 | [`03-pruebas/plan_de_pruebas.md`](03-pruebas/plan_de_pruebas.md) | Lista de control CP01 a CP10, conjunto de la capacidad inteligente y tareas de usabilidad |
 | [`00-arquitectura/modelo_datos_entidad_relacion.md`](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos 3.1 |
-| [`model-c4/`](model-c4/) | ARQ-01 a ARQ-03, versión 3.1 |
+| [`model-c4/`](model-c4/) y `model-c4/ARQ-03_Modelo_C4.pdf` | ARQ-01 a ARQ-03, versión 3.1; ARQ-03 validado con sus cuatro niveles y la vista de despliegue, y su PDF con los diagramas renderizados |
 | Este informe y su PDF | Constancia de la revisión |
 
 ## 6. Puntos abiertos
 
 Ninguno bloquea la documentación del sistema; varios bloquean la implementación o la medición. Se
-conserva la numeración de la revisión anterior.
+conserva la numeración de la revisión anterior. Estado actualizado al cierre de la fase documental
+(`01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`).
 
 | ID | Sev. | Punto | Estado | Quién decide | Antes de |
 |---|---|---|---|---|---|
-| Q-17 | B | Anexos 02, 03 y 04 del documento de tesis desactualizados (DR-06, DR-09, DR-16, DR-21) | Abierto | Autor | **El juicio de expertos** |
-| Q-18 | A | P-03: tratamiento del ingreso sin foto en la ficha de observación | Abierto; marcado `[PENDIENTE]` en la matriz | Autor | Anexo 02 |
-| Q-19 | A | La hora del pesaje propuesta puede sesgar la medición del tiempo de espera | Abierto; la ficha debe registrar la hora real por observación directa | Autor | Anexo 02 |
-| Q-03 | B | Valores del catálogo de tipos de mineral (DR-03) | Abierto | Empresa | Implementar M02 |
-| Q-12 | M | Validar los tres roles y su matriz de permisos con los usuarios (DR-23), ahora con DR-30 y DR-31 | Abierto | Usuarios | Implementar M01 |
-| Q-04 | B | Piloto del motor de reconocimiento (D-12) | Abierto | Autor | Implementar M04 |
-| Q-05 | A | Almacenamiento, retención y respaldo de las imágenes (D-14) | Abierto | Autor | Implementar M03 |
-| Q-06 | A | No existe un requisito de respaldo de la base de datos | Abierto; se propone un RNF transversal | Autor | El despliegue |
+| Q-17 | B | Anexos 02, 03 y 04 del documento de tesis desactualizados (DR-06, DR-09, DR-16, DR-21) | Fuera de esta fase: lo atiende el proceso de la tesis | Autor | **El juicio de expertos** |
+| Q-18 | A | P-03: tratamiento del ingreso sin foto en la ficha de observación | Fuera de esta fase; sigue marcado `[PENDIENTE]` en la matriz | Autor | Anexo 02 |
+| Q-19 | A | La hora del pesaje propuesta puede sesgar la medición del tiempo de espera | Fuera de esta fase; la ficha debe registrar la hora real por observación directa | Autor | Anexo 02 |
+| Q-03 | B | Valores del catálogo de tipos de mineral (DR-03) | Programado en la semana 2 del plan | Empresa | Implementar M02 |
+| Q-12 | M | Validar los tres roles y su matriz de permisos con los usuarios (DR-23), ahora con DR-30 y DR-31 | Programado al inicio de la semana 1 | Usuarios | Implementar M01 |
+| Q-04 | B | Piloto del motor de reconocimiento (D-12) | Provisional: adaptador local en el backend; piloto en la semana 7, con el sistema funcional | Autor | El congelamiento de la semana 8 |
+| Q-05 | A | Almacenamiento, retención y respaldo de las imágenes (D-14) | Provisional: volumen `media` del backend (D-14, D-18) | Autor | El servicio de alojamiento de la presentación |
+| Q-06 | A | No existe un requisito de respaldo de la base de datos | Resuelto por D-20: respaldo mínimo ejecutable desde la semana 1; política definitiva con el alojamiento | Autor | La operación real |
 | Q-02 | A | Ocho pruebas del backend citan criterios de historias de M03 retiradas en la reformulación, con la numeración anterior a la versión 2 | Abierto; se resuelve con el refactor de `apps/ingresos` | Autor | Implementar M03 |
-| Q-16 | b | Códigos de ruta propuestos y no decididos | Abierto | Autor | Implementar M06 |
+| Q-16 | b | Códigos de ruta propuestos y no decididos | Resuelto por D-21 | Autor | — |
 | Q-20, Q-21 | A, M | Denominador de la trazabilidad y congelamiento de motor y reglas durante la medición | Abiertos; el sistema ya exige la ruta antes de las etapas siguientes al secado | Autor | La medición |
-| Q-22 a Q-26 | M, b | Rama de integración, repositorio del frontend, servidores, contratos entre módulos y tratamiento de datos personales | Abiertos | Autor | La semana 1 de implementación |
+| Q-22 a Q-26 | M, b | Rama de integración, repositorio del frontend, servidores, contratos entre módulos y tratamiento de datos personales | La rama la fija el responsable del repositorio; el repositorio del frontend se crea en la semana 1; los servidores, con el alojamiento de la presentación; Q-25 y Q-26 siguen abiertos | Autor | La semana 1 de implementación |
 
 ## 7. Siguiente fase
 
@@ -141,3 +144,68 @@ Orden recomendado para la documentación requerida por la tesis:
 2. **Validación con la empresa** (Q-03, Q-12): valores del catálogo de tipos de mineral y matriz de
    roles, con la maqueta 2.1 como soporte.
 3. **Decisiones técnicas previas a la implementación** (Q-04, Q-05, Q-06, Q-22).
+
+## 8. Cierre del modelo C4 (23/10/2026)
+
+### 8.1 Hallazgos
+
+La revisión de `model-c4/ARQ-03_Modelo_C4.md` encontró que el documento tenía los cuatro niveles,
+pero no estaba cerrado:
+
+| ID | Tipo | Hallazgo |
+|---|---|---|
+| C4-01 | Incompleto | El nivel 3 no dibujaba M06, el módulo con más reglas después de M03, ni M07, el lado de lectura |
+| C4-02 | Incompleto | No había vista de despliegue; ARQ-02 describía los entornos solo en texto |
+| C4-03 | Desactualizado | El modelo `Ingreso` citaba «RN-M03-01 a RN-M03-27»; M03 llega a RN-M03-29 |
+| C4-04 | Desactualizado | `ServicioIngreso` no tenía `revertir_correccion` (DR-28) en los niveles 3 y 4 |
+| C4-05 | Incoherente | El nivel 3 inyectaba `AlmacenImagenes`; el nivel 4, las notas de M03 y D-09 solo admitían cuatro interfaces |
+| C4-06 | Incoherente | `SelectorIngresos` atribuía a M03 un listado con totales, que HU-M07-02 asigna a M07; M03 y M07 exponían dos listados de la misma entidad |
+| C4-07 | Incoherente | Las notas de M09 inyectan `ServicioAuditoria` en todo servicio de escritura, pero el constructor de `ServicioIngreso` en M03, ARQ-02 y el nivel 4 no lo incluían |
+| C4-08 | Error | El diagrama de componentes de M04 usaba sintaxis de diagrama de clases dentro de un `flowchart` y no se renderizaba |
+| C4-09 | Desactualizado | La tabla de contenedores que no existen solo mencionaba la exportación del consolidado, y no explicaba por qué no hay servicio de notificaciones |
+| C4-10 | Desactualizado | La trazabilidad del modelo no cubría DR-27 a DR-31 |
+| C4-11 | Incoherente | D-10 citaba un `ExportadorPDF` que M08 no tiene: su primera versión solo exporta XLSX |
+| C4-12 | Incoherente | Las notas de M07 registraban la exportación desde la vista, y no desde el servicio como hace M08 |
+| C4-13 | Menor | M03 llamaba `RepositorioLote` al repositorio de M06 que el resto de la documentación llama `RepositorioTrazabilidad` |
+
+### 8.2 Consultas al autor y decisiones registradas
+
+C4-05 y C4-06 exigían una decisión de diseño. Se consultaron al autor el 23/10/2026:
+
+| Consulta | Opciones | Respuesta | Registro |
+|---|---|---|---|
+| ¿Cómo accede `ServicioIngreso` al almacén de imágenes? | API de almacenamiento de Django · interfaz propia inyectada | API de almacenamiento de Django | **D-18** |
+| ¿Qué módulo es dueño del listado de ingresos? | Solo M07 · mantener ambos | Solo M07 | **D-19** |
+
+Las demás se resolvieron con la fuente de mayor orden, sin decisión nueva: C4-07 con las notas de M09,
+que ya fijaban la inyección; C4-11 con HU-M08-02, que fija XLSX como único formato inicial; C4-12 con
+el patrón de M08 y la regla de que las vistas solo traducen HTTP (ARQ-02 §5).
+
+### 8.3 Correcciones
+
+| Hallazgo | Corrección | Archivos |
+|---|---|---|
+| C4-01 | Secciones 4.5 (M06) y 4.6 (M07), con su diagrama y la justificación de cada componente | ARQ-03 |
+| C4-02 | Sección 6, vista de despliegue: Compose por entorno, volúmenes con nombre, motor según D-12, respaldo como pendiente Q-06 | ARQ-03 |
+| C4-03, C4-04 | Nivel 3 de M03 rehecho; `revertir_correccion` en el nivel 4 | ARQ-03 |
+| C4-05 | D-18: la imagen se guarda por el `ImageField`, que delega en el almacenamiento de Django; sin interfaz propia | `decisiones_diseno.md`, ARQ-02, ARQ-03, notas de M03, `GUIA_MARCO_DE_TRABAJO.md` |
+| C4-06 | D-19: M03 retira su listado general y conserva el recurso del ingreso y los pendientes de destare | `decisiones_diseno.md`, funcionales y caso de uso de M03, reglas de M07, ARQ-02, ARQ-03 |
+| C4-07 | `ServicioAuditoria` en el constructor de `ServicioIngreso` y en los niveles 3 y 4 | Notas de M03, ARQ-02, ARQ-03 |
+| C4-08 | Relación de implementación expresada con flechas de `flowchart` | ARQ-03 |
+| C4-09, C4-10 | Tabla de contenedores y trazabilidad ampliadas | ARQ-03 |
+| C4-11 | D-10 y D-09 nombran los exportadores reales de M07 y M08 | `decisiones_diseno.md`, ARQ-02, skill `solid-proyecto` |
+| C4-12 | `ServicioConsulta.exportar_listado()` orquesta la exportación y registra el evento | Notas, secuencia y sistema de M07 |
+| C4-13 | Nombre unificado | Secuencia de M03 |
+
+ARQ-03 pasa a la versión 3.1 con estado **Validado** y una tabla de control de versiones.
+
+### 8.4 Validación
+
+| Comprobación | Resultado |
+|---|---|
+| `scripts/verificar_migracion.sh` | Sin hallazgos |
+| `scripts/validar_docs.py` | Sin hallazgos |
+| Render de los 88 diagramas Mermaid del repositorio | 88 de 88 |
+| PDF de requerimientos y diagramas | Regenerado con el cambio de M03 |
+| PDF de ARQ-03 | Generado con sus diez diagramas renderizados; `scripts/md_a_pdf.py` ahora renderiza los bloques Mermaid |
+

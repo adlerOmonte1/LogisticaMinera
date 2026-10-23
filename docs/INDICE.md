@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**135 archivos · 18734 líneas de texto.**
+**137 archivos · 19390 líneas de texto.**
 
 ## `Mockup/`
 
@@ -18,19 +18,19 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [Historias_de_Usuario.pdf](Historias_de_Usuario.pdf) | — | — | 892 |
 | [REVISION_TECNICA_V2.md](REVISION_TECNICA_V2.md) | Revisión técnica de la versión 2 — arquitectura, estructura y puntos abiertos | 218 | 17 |
 | [REVISION_TECNICA_V2.pdf](REVISION_TECNICA_V2.pdf) | — | — | 275 |
-| [REVISION_V2_1.md](REVISION_V2_1.md) | Revisión y validación de la versión 2.1 de la documentación | 143 | 12 |
-| [REVISION_V2_1.pdf](REVISION_V2_1.pdf) | — | — | 282 |
-| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6308 |
+| [REVISION_V2_1.md](REVISION_V2_1.md) | Revisión y validación de la versión 2.1 de la documentación | 211 | 17 |
+| [REVISION_V2_1.pdf](REVISION_V2_1.pdf) | — | — | 351 |
+| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6328 |
 
 ## `docs/00-arquitectura/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [GUIA_FRONTEND_ANGULAR.md](00-arquitectura/GUIA_FRONTEND_ANGULAR.md) | Guía del frontend — Angular en repositorio separado | 344 | 13 |
-| [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 911 | 34 |
+| [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 912 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
-| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 288 | 16 |
-| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 433 | 22 |
+| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 408 | 24 |
+| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 437 | 23 |
 
 ## `docs/00-tesis/`
 
@@ -43,7 +43,8 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [PLAN_DE_TRABAJO.md](01-plan/PLAN_DE_TRABAJO.md) | PLAN-01 — Plan de trabajo, pruebas y entrega | 571 | 32 |
+| [ACTA_CIERRE_FASE_DOCUMENTAL.md](01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md) | Acta de cierre de la fase documental | 146 | 9 |
+| [PLAN_DE_TRABAJO.md](01-plan/PLAN_DE_TRABAJO.md) | PLAN-01 — Plan de trabajo, pruebas y entrega | 604 | 36 |
 
 ## `docs/02-trazabilidad/`
 
@@ -62,8 +63,9 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [ARQ-01_Modulos_del_Sistema.md](model-c4/ARQ-01_Modulos_del_Sistema.md) | ARQ-01 — Definición de módulos del sistema | 179 | 11 |
-| [ARQ-02_Arquitectura_Tecnica.md](model-c4/ARQ-02_Arquitectura_Tecnica.md) | ARQ-02 — Arquitectura técnica (Django + Angular) | 270 | 13 |
-| [ARQ-03_Modelo_C4.md](model-c4/ARQ-03_Modelo_C4.md) | ARQ-03 — Modelo C4 del sistema | 399 | 19 |
+| [ARQ-02_Arquitectura_Tecnica.md](model-c4/ARQ-02_Arquitectura_Tecnica.md) | ARQ-02 — Arquitectura técnica (Django + Angular) | 284 | 14 |
+| [ARQ-03_Modelo_C4.md](model-c4/ARQ-03_Modelo_C4.md) | ARQ-03 — Modelo C4 del sistema | 591 | 32 |
+| [ARQ-03_Modelo_C4.pdf](model-c4/ARQ-03_Modelo_C4.pdf) | — | — | 599 |
 
 ## `docs/modulos/`
 
@@ -126,7 +128,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [HU.md](modulos/M03-ingresos/HU.md) | Historias de usuario — M03 Registro de ingresos | 415 | 23 |
-| [notas.md](modulos/M03-ingresos/notas.md) | Notas de implementación — M03 Registro de ingresos | 185 | 11 |
+| [notas.md](modulos/M03-ingresos/notas.md) | Notas de implementación — M03 Registro de ingresos | 190 | 11 |
 
 ## `docs/modulos/M03-ingresos/diagramas/`
 
@@ -140,7 +142,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [funcionales.md](modulos/M03-ingresos/requerimientos/funcionales.md) | Requerimientos funcionales — M03 Registro de ingresos | 88 | 6 |
+| [funcionales.md](modulos/M03-ingresos/requerimientos/funcionales.md) | Requerimientos funcionales — M03 Registro de ingresos | 89 | 6 |
 | [no_funcionales.md](modulos/M03-ingresos/requerimientos/no_funcionales.md) | Requerimientos no funcionales — M03 Registro de ingresos | 48 | 5 |
 | [reglas_negocio.md](modulos/M03-ingresos/requerimientos/reglas_negocio.md) | Reglas de negocio — M03 Registro de ingresos | 77 | 8 |
 | [sistema.md](modulos/M03-ingresos/requerimientos/sistema.md) | Requerimientos de sistema — M03 Registro de ingresos | 31 | 5 |
@@ -201,7 +203,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [HU.md](modulos/M06-trazabilidad/HU.md) | Historias de usuario — M06 Trazabilidad del proceso | 490 | 26 |
-| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 227 | 12 |
+| [notas.md](modulos/M06-trazabilidad/notas.md) | Notas de implementación — M06 Trazabilidad del proceso | 233 | 13 |
 
 ## `docs/modulos/M06-trazabilidad/diagramas/`
 
@@ -226,7 +228,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
 | [HU.md](modulos/M07-consulta/HU.md) | Historias de usuario — M07 Consulta de ingresos y respaldo | 367 | 19 |
-| [notas.md](modulos/M07-consulta/notas.md) | Notas de implementación — M07 Consulta de ingresos y respaldo | 210 | 10 |
+| [notas.md](modulos/M07-consulta/notas.md) | Notas de implementación — M07 Consulta de ingresos y respaldo | 213 | 10 |
 
 ## `docs/modulos/M07-consulta/diagramas/`
 
@@ -234,7 +236,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 |---|---|---:|---:|
 | [actividades.md](modulos/M07-consulta/diagramas/actividades.md) | Diagramas de actividades — M07 Consulta de ingresos y respaldo | 123 | 5 |
 | [caso_uso.md](modulos/M07-consulta/diagramas/caso_uso.md) | Diagrama de casos de uso — M07 Consulta de ingresos y respaldo | 64 | 2 |
-| [secuencia.md](modulos/M07-consulta/diagramas/secuencia.md) | Diagramas de secuencia — M07 Consulta de ingresos y respaldo | 203 | 7 |
+| [secuencia.md](modulos/M07-consulta/diagramas/secuencia.md) | Diagramas de secuencia — M07 Consulta de ingresos y respaldo | 211 | 7 |
 
 ## `docs/modulos/M07-consulta/requerimientos/`
 
@@ -242,7 +244,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 |---|---|---:|---:|
 | [funcionales.md](modulos/M07-consulta/requerimientos/funcionales.md) | Requerimientos funcionales — M07 Consulta de ingresos y respaldo | 78 | 4 |
 | [no_funcionales.md](modulos/M07-consulta/requerimientos/no_funcionales.md) | Requerimientos no funcionales — M07 Consulta de ingresos y respaldo | 35 | 4 |
-| [reglas_negocio.md](modulos/M07-consulta/requerimientos/reglas_negocio.md) | Reglas de negocio — M07 Consulta de ingresos y respaldo | 75 | 6 |
+| [reglas_negocio.md](modulos/M07-consulta/requerimientos/reglas_negocio.md) | Reglas de negocio — M07 Consulta de ingresos y respaldo | 76 | 6 |
 | [sistema.md](modulos/M07-consulta/requerimientos/sistema.md) | Requerimientos de sistema — M07 Consulta de ingresos y respaldo | 33 | 5 |
 | [usuario.md](modulos/M07-consulta/requerimientos/usuario.md) | Requerimientos de usuario — M07 Consulta de ingresos y respaldo | 30 | 2 |
 
@@ -303,7 +305,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [generar_pdf_hu.py](../scripts/generar_pdf_hu.py) | — | 508 | 23 |
 | [generar_pdf_requerimientos.py](../scripts/generar_pdf_requerimientos.py) | — | 827 | 39 |
 | [indexar_docs.py](../scripts/indexar_docs.py) | — | 66 | 2 |
-| [md_a_pdf.py](../scripts/md_a_pdf.py) | — | 82 | 3 |
+| [md_a_pdf.py](../scripts/md_a_pdf.py) | — | 101 | 4 |
 | [reporte_trazabilidad.py](../scripts/reporte_trazabilidad.py) | — | 121 | 5 |
 | [validar_docs.py](../scripts/validar_docs.py) | — | 172 | 6 |
 | [verificar_migracion.sh](../scripts/verificar_migracion.sh) | — | 36 | 1 |
@@ -312,7 +314,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/backend-auth-permisos/SKILL.md) | Skill `backend-auth-permisos` | 98 | 5 |
+| [SKILL.md](../skills/backend-auth-permisos/SKILL.md) | Skill `backend-auth-permisos` | 116 | 7 |
 
 ## `skills/backend-django/`
 
@@ -336,13 +338,13 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 316 | 21 |
+| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 321 | 22 |
 
 ## `skills/despliegue-docker/`
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/despliegue-docker/SKILL.md) | Skill `despliegue-docker` | 102 | 5 |
+| [SKILL.md](../skills/despliegue-docker/SKILL.md) | Skill `despliegue-docker` | 111 | 6 |
 
 ## `skills/diagramas-uml/`
 
@@ -378,7 +380,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/reconocimiento-validacion/SKILL.md) | Skill `reconocimiento-validacion` | 185 | 9 |
+| [SKILL.md](../skills/reconocimiento-validacion/SKILL.md) | Skill `reconocimiento-validacion` | 187 | 9 |
 
 ## `skills/requisitos-modulo/`
 
@@ -396,4 +398,4 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/solid-proyecto/SKILL.md) | Skill `solid-proyecto` | 162 | 8 |
+| [SKILL.md](../skills/solid-proyecto/SKILL.md) | Skill `solid-proyecto` | 163 | 8 |

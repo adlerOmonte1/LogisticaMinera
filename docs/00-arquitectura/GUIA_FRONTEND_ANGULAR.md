@@ -97,7 +97,7 @@ logistica-minera-frontend/
         catalogo/            M02
         ingresos/             M03 (incluye reconocimiento y validacion, M04 y M05, registro sin foto y destare)
         trazabilidad/         M06 (lotes, ruta, division por fracciones, etapas, bigbags y cierre)
-        consulta/             M07 (busqueda, listado, detalle y calendario de llegadas)
+        consulta/             M07 (inicio y avisos, busqueda, listado y exportacion, detalle y calendario)
         consolidacion/        M08
         auditoria/            M09 (historial de un ingreso y auditoria del sistema)
       app.config.ts   app.routes.ts   app.component.ts

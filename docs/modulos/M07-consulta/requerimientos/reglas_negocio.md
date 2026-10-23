@@ -40,9 +40,10 @@ suma porque su peso neto todavía no existe.
 
 ## Nota sobre RN-M07-03
 
-Es la regla que distingue este módulo de un listado más. Recuperar el dato ya lo hace el listado de
-M03; lo que M07 aporta es poder **verificar** el dato contra su respaldo. Un detalle que mostrara
-solo los números dejaría al módulo sin propósito propio.
+Es la regla que distingue la consulta de un listado más. Recuperar el dato es lo mínimo de cualquier
+listado —y en este sistema el listado también es de M07 (D-19)—; lo que la consulta aporta es poder
+**verificar** el dato contra su respaldo. Un detalle que mostrara solo los números dejaría a la
+consulta sin propósito propio.
 
 ## Nota sobre RN-M07-05
 

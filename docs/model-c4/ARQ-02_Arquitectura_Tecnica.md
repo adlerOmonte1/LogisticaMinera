@@ -193,7 +193,8 @@ de M03.
 
 **O — Abierto/cerrado.** Las reglas de validación (M05) se implementan como una clase por regla que
 se registra en una colección; añadir V6 no obliga a modificar V1 a V5 ni el servicio que las
-compone. Lo mismo aplica a los exportadores de M08 (`ExportadorExcel` hoy, otros formatos después).
+compone. Lo mismo aplica a los exportadores de M07 (`ExportadorCSVListado`) y de M08
+(`ExportadorExcel` hoy, otros formatos después).
 
 **L — Sustitución de Liskov.** Los motores de reconocimiento, los exportadores y los repositorios
 de lectura son intercambiables sin romper a quien los consume. Cualquier implementación de
@@ -208,9 +209,11 @@ composición o el cierre de lotes ni la consolidación. Los permisos se definen 
 `docs/modulos/M01-autenticacion/notas.md`.
 
 **D — Inversión de dependencias.** Los servicios dependen de abstracciones, no de implementaciones
-concretas. `ServicioIngreso` recibe `ReconocedorTicket`, `ValidadorConsistencia` y un generador de
-código por inyección; en pruebas se sustituyen por dobles deterministas sin tocar la lógica del caso
-de uso.
+concretas. `ServicioIngreso` recibe por inyección cuatro interfaces —`ReconocedorTicket`,
+`ValidadorConsistencia`, `GeneradorCodigo` y `Reloj`— y el servicio concreto `ServicioAuditoria` de
+M09; en pruebas las cuatro se sustituyen por dobles deterministas sin tocar la lógica del caso de
+uso. La imagen del ticket no requiere una interfaz propia: se guarda por la API de almacenamiento de
+Django, configurable por entorno (D-18).
 
 ## 6. Contrato de la API
 
@@ -227,13 +230,15 @@ GET    /api/v1/catalogo/tipos-mineral/                 M02
 POST   /api/v1/catalogo/tipos-mineral/                 M02  tambien desde el registro
 POST   /api/v1/ingresos/borradores/                    M03
 POST   /api/v1/ingresos/                               M03  con imagen o sin foto con motivo
-GET    /api/v1/ingresos/{id}/                          M03
+GET    /api/v1/ingresos/{id}/                          M03  recurso del ingreso; el listado es de M07 (D-19)
+POST   /api/v1/ingresos/{id}/revertir-correccion/      M03
 PATCH  /api/v1/ingresos/{id}/anular/                   M03
 POST   /api/v1/ingresos/destares/                      M03
 GET    /api/v1/reconocimientos/{id}/                   M04
 GET    /api/v1/ingresos/{id}/validaciones/             M05
 POST   /api/v1/lotes/                                  M06
 POST   /api/v1/lotes/{id}/ingresos/                    M06
+POST   /api/v1/lotes/{id}/ingresos/{id_ingreso}/retirar/ M06  hasta zarandeo o molienda; sin DELETE (D-22)
 PATCH  /api/v1/lotes/{id}/iniciar-recorrido/           M06
 POST   /api/v1/lotes/{id}/division/                    M06
 POST   /api/v1/lotes/{id}/etapas/                      M06
@@ -264,6 +269,15 @@ los criterios de aceptación de las historias.
 | Desarrollo | Local, base de datos con datos de prueba |
 | Preproducción | Servidor de pruebas donde se ejecutan las pruebas funcionales y de rendimiento previas a la estabilización |
 | Producción | Servidor en planta/administración; la medición del pretest y del postest se recolecta con el proceso manual y, tras la validación, con el sistema en este entorno |
+
+Hasta que se defina el servicio de alojamiento de la presentación, el backend aloja también las
+imágenes del ticket, en el volumen `media` (D-14), y el primer adaptador del reconocimiento (D-12).
+
+**Respaldo (D-20).** Desde la semana 1 existe un procedimiento ejecutable a demanda en cualquier
+entorno: `pg_dump` de la base y copia comprimida del volumen `media`, tomados en el mismo momento y
+fechados juntos, con su procedimiento de restauración. Se verifica restaurando en un entorno limpio.
+La frecuencia, la retención y la ubicación definitivas se fijan con el servicio de alojamiento, antes
+de la operación real.
 
 El sistema no se usa en planta hasta que el pretest de la investigación termine (ver
 `docs/00-tesis/marco_tesis.md` §11). Cualquier despliegue posterior al inicio de esa medición debe

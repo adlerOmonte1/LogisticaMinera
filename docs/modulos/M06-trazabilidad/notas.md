@@ -25,7 +25,7 @@ class LoteProceso(models.Model):
     minerales = models.ManyToManyField(TipoMineral, through="LoteMineral", related_name="+")
     fecha_apertura = models.DateField()
     fecha_inicio_recorrido = models.DateTimeField(null=True, editable=False)
-    ruta = models.CharField(max_length=10, choices=Ruta.choices, blank=True)  # sin dividir
+    ruta = models.CharField(max_length=30, choices=Ruta.choices, blank=True)  # sin dividir
     estado = models.CharField(max_length=12, choices=ESTADOS)  # ABIERTO, EN_RECORRIDO, CERRADO
     destino = models.CharField(max_length=10, choices=DESTINOS, blank=True)  # VENTA, TRASLADO
     observacion_cierre = models.TextField(blank=True)
@@ -40,9 +40,14 @@ class LoteMineral(models.Model):          # lista de tipos admitidos (DR-27)
     autorizacion = models.TextField(blank=True)  # obligatoria si entra al unificar otro mineral
     fecha_hora = models.DateTimeField(editable=False)
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
+    fecha_retiro = models.DateTimeField(null=True, editable=False)  # baja logica al quitarlo (D-22)
+    usuario_retiro = models.ForeignKey(Usuario, null=True, on_delete=models.PROTECT,
+                                       editable=False, related_name="+")
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["lote", "tipo_mineral"], name="lote_mineral_unico")]
+        constraints = [models.UniqueConstraint(fields=["lote", "tipo_mineral"],
+                                               condition=models.Q(fecha_retiro__isnull=True),
+                                               name="lote_mineral_vigente_unico")]
 
 
 class ParteLote(models.Model):
@@ -50,7 +55,7 @@ class ParteLote(models.Model):
     nombre = models.CharField(max_length=80)
     numerador = models.PositiveSmallIntegerField()
     denominador = models.PositiveSmallIntegerField()
-    ruta = models.CharField(max_length=10, choices=Ruta.choices)
+    ruta = models.CharField(max_length=30, choices=Ruta.choices)
 
 
 class RepartoIngreso(models.Model):       # porcion de un ingreso tardio en un lote dividido
@@ -81,9 +86,10 @@ class Bigbag(models.Model):
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
 ```
 
-`Ruta` es un `TextChoices` con tres valores, y una constante del módulo asocia a cada ruta sus
-etapas en orden: zarandeo y ensacado; molienda y ensacado; zarandeo, molienda y ensacado. El secado
-no forma parte de ninguna ruta porque es común a todo el lote.
+`Ruta` es un `TextChoices` con tres valores —`ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO` y
+`ZARANDEO_MOLIENDA_ENSACADO`, con los nombres en pantalla «Zaranda», «Molido» y «Zarandeado y
+molido» (D-21)—, y una constante del módulo asocia a cada ruta sus etapas en orden. El secado no
+forma parte de ninguna ruta porque es común a todo el lote.
 
 Decisiones no obvias:
 

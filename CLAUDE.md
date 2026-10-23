@@ -6,6 +6,11 @@ de ingreso de mineral** (tesis 2027, empresa Construcción y Minería, Huánuco)
 curso: ya se retiraron `salidas`, `sincronizacion` y `Cliente`; el resto sigue pendiente
 (`docs/01-plan/PLAN_DE_TRABAJO.md` §8).
 
+**La fase documental está cerrada** desde el 23/10/2026 con la línea base 2.1
+(`docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`). Todo cambio a la documentación entra como decisión
+nueva —DR si cambia el alcance o una regla del dominio, D si cambia la forma de construirlo— con la
+revisión de lo que depende de ella (acta, §5). La documentación manda sobre la maqueta y el código.
+
 ## Fuentes de verdad, en este orden
 
 1. `docs/00-tesis/marco_tesis.md` — variables, indicadores, RF01 a RF10, reglas V1 a V5, módulos.

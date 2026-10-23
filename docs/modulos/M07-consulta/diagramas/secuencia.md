@@ -143,22 +143,30 @@ sequenceDiagram
     actor A as Administrativo
     participant NG as Angular
     participant API as Django REST
+    participant SRV as ServicioConsulta
     participant REP as RepositorioConsulta
+    participant EXP as ExportadorCSVListado
     participant DB as PostgreSQL
-    participant AUD as Auditoria M09
+    participant AUD as ServicioAuditoria M09
 
     A->>NG: Elige exportar el listado filtrado
     NG->>API: GET /api/v1/consulta/ingresos/exportar/ con los filtros
     alt Rol Supervisor de planta
         API-->>NG: 403 Accion no autorizada
     else Rol autorizado
-        API->>REP: listar(filtros) sin paginar
+        API->>SRV: exportar_listado(filtros, usuario)
+        SRV->>REP: listar(filtros) sin paginar
         REP->>DB: Consulta con los mismos filtros del listado
         DB-->>REP: Conjunto filtrado completo
+        REP-->>SRV: Ingresos
         alt Conjunto vacio
+            SRV-->>API: Sin ingresos
             API-->>NG: 400 No hay ingresos para exportar
         else Con ingresos
-            API->>AUD: Registrar evento EXPORTAR con filtros y numero de ingresos
+            SRV->>EXP: escribir(ingresos)
+            EXP-->>SRV: Archivo CSV en UTF-8
+            SRV->>AUD: Registrar evento EXPORTAR con filtros y numero de ingresos
+            SRV-->>API: Archivo
             API-->>NG: 200 Archivo CSV en UTF-8
             NG-->>A: Descarga del archivo
         end

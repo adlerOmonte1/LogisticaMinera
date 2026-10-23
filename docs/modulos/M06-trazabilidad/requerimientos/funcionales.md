@@ -8,10 +8,10 @@ ensacado. El cierre del lote con su destino forma parte de RF07 (DR-14), no es u
 | Listar lotes | Consulta con filtros por estado, tipo de mineral y fecha | HU-M06-01 | `GET /api/v1/lotes/` |
 | Abrir lote | Alta con nombre, tipo de mineral y fecha de apertura | HU-M06-01 | `POST /api/v1/lotes/` |
 | Agregar otro mineral | Suma un tipo de mineral a la lista del lote | HU-M06-01 | `POST /api/v1/lotes/{id}/minerales/` |
-| Quitar un mineral | Retira de la lista un tipo sin ingresos, con el lote Abierto | HU-M06-01 | `DELETE /api/v1/lotes/{id}/minerales/{id_tipo}/` |
+| Quitar un mineral | Retira de la lista, con baja lógica, un tipo sin ingresos, con el lote Abierto | HU-M06-01 | `POST /api/v1/lotes/{id}/minerales/{id_tipo}/quitar/` |
 | Consultar lote | Detalle con su estado, su composición, sus partes y su recorrido | HU-M06-01 | `GET /api/v1/lotes/{id}/` |
 | Asignar ingresos al lote | Incorpora uno o varios ingresos; en un lote En recorrido, como ingresos tardíos | HU-M06-01 | `POST /api/v1/lotes/{id}/ingresos/` |
-| Retirar un ingreso del lote | Devuelve a cancha un ingreso cuyo mineral aún no pasó por zarandeo ni molienda | HU-M06-01 | `DELETE /api/v1/lotes/{id}/ingresos/{id_ingreso}/` |
+| Retirar un ingreso del lote | Devuelve a cancha un ingreso cuyo mineral aún no pasó por zarandeo ni molienda | HU-M06-01 | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/retirar/` |
 | Iniciar el recorrido | Pasa el lote a En recorrido y registra la fecha de inicio | HU-M06-01 | `PATCH /api/v1/lotes/{id}/iniciar-recorrido/` |
 | Registrar paso por etapa | Anota el paso del lote o de una parte por una etapa, con la ruta cuando corresponde, y las horas de molienda o los bigbags si aplica | HU-M06-02 | `POST /api/v1/lotes/{id}/etapas/` |
 | Registrar secado de un ingreso tardío | Anota el secado propio del ingreso que llegó después del secado del lote y, si el lote está dividido, su reparto entre las partes | HU-M06-02, HU-M06-04 | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/secado/` |
@@ -22,9 +22,9 @@ ensacado. El cierre del lote con su destino forma parte de RF07 (DR-14), no es u
 | Consultar trazabilidad de un ingreso | Etapas de la ruta recorridas por el lote o las partes del ingreso | HU-M06-03 | `GET /api/v1/ingresos/{id}/trazabilidad/` |
 | Listar etapas y rutas | Catálogos cerrados de las cuatro etapas y las tres rutas | HU-M06-02 | `GET /api/v1/etapas/`, `GET /api/v1/rutas/` |
 
-`DELETE` sobre la asignación no borra ningún registro del negocio: deshace el vínculo entre un
-ingreso y un lote Abierto. El ingreso permanece intacto, y la prohibición de borrado (D-07) se
-refiere a los ingresos, no a esta relación.
+Ninguna función usa `DELETE` (D-22). Retirar un ingreso deshace su vínculo con el lote sin tocar
+ningún otro dato del ingreso, y quitar un mineral marca su fila de la lista como retirada, con fecha y
+usuario, en lugar de borrarla.
 
 ## Responsabilidad y límites
 

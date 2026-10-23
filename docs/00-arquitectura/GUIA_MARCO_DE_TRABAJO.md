@@ -303,9 +303,10 @@ REST_FRAMEWORK = {
 }
 ```
 
-`MEDIA_ROOT` es el valor por defecto para desarrollo. El medio definitivo de almacenamiento de
-imágenes —volumen del servidor o almacenamiento de objetos— lo fija D-14; cuando se cierre, esta
-sección se actualiza con el backend de `django-storages` correspondiente.
+`MEDIA_ROOT` es el valor por defecto para desarrollo. El código guarda y lee la imagen del ticket
+solo por la API de almacenamiento de Django (D-18), nunca con rutas de archivo escritas a mano. El
+medio definitivo —volumen del servidor o almacenamiento de objetos— lo fija D-14; cuando se cierre,
+esta sección se actualiza con el backend de `django-storages` correspondiente, sin tocar el código.
 
 `.env.example` (versionado, sin secretos reales):
 

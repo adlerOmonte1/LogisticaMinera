@@ -211,13 +211,18 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-13 | El dato reconocido no se guarda sin confirmación del usuario |
 | D-16 | Motor, versión y reglas no cambian entre el inicio y el fin de la medición |
 | D-17 | El peso neto lo calcula el servidor con la tara del vehículo; el ingreso conserva la tara aplicada |
+| D-18 | El almacén de imágenes se usa por la API de almacenamiento de Django, sin interfaz propia; el medio lo fija D-14 |
+| D-19 | El listado de ingresos pertenece solo a M07; M03 expone su recurso y los pendientes de destare |
+| D-20 | Respaldo mínimo ejecutable desde la semana 1 (volcado de la base y copia del volumen `media`, con restauración de prueba); servicio y política definitivos con el alojamiento de la presentación |
+| D-21 | Códigos de ruta: `ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO`, `ZARANDEO_MOLIENDA_ENSACADO` |
+| D-22 | Ninguna operación de la API usa `DELETE`: el retiro de un ingreso y el de un mineral del lote son acciones `POST`, y el mineral quitado queda con baja lógica |
 
 **Pendientes de cierre**
 
 | ID | Decisión | Criterio de cierre |
 |---|---|---|
-| D-12 | Motor de reconocimiento (OCR local, servicio en la nube o modelo multimodal por API) | Piloto con 20 a 30 tickets reales de dos o tres motores; se compara exactitud, costo y dependencia de conexión. La documentación usa `ReconocedorTicket` y no depende del motor |
-| D-14 | Almacenamiento de imágenes (volumen del servidor u objetos, compresión, retención, respaldo) | Se fija con el despliegue |
+| D-12 | Motor de reconocimiento (OCR local, servicio en la nube o modelo multimodal por API) | Piloto con 20 a 30 tickets reales de dos o tres motores, con el sistema funcional y antes del congelamiento de la semana 8. **Provisional:** adaptador local dentro del mismo backend |
+| D-14 | Almacenamiento de imágenes (volumen del servidor u objetos, compresión, retención, respaldo) | Con el servicio de alojamiento de la presentación. **Provisional:** volumen `media` del backend, por la API de Django (D-18) |
 | D-15 | Procesamiento síncrono o asíncrono del reconocimiento | Síncrono, salvo que el piloto de D-12 muestre tiempos de más de unos segundos por ticket |
 
 **Retiradas**

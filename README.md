@@ -15,7 +15,10 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 La documentación del sistema está en su **versión 2.1**: nueve módulos, 27 historias de usuario, sus
 requerimientos y diagramas, reformulados a partir de la revisión del prototipo navegable
 ([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-31. El informe de
-validación de esta versión está en [`docs/REVISION_V2_1.md`](docs/REVISION_V2_1.md). La versión 1 queda en
+validación de esta versión está en [`docs/REVISION_V2_1.md`](docs/REVISION_V2_1.md). **La fase documental
+quedó cerrada el 23/10/2026** con la línea base 2.1
+([`docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`](docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md)); lo que sigue
+es la implementación. La versión 1 queda en
 la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
 preparación del repositorio, antes de construir los módulos
 ([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).
@@ -27,15 +30,15 @@ preparación del repositorio, antes de construir los módulos
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|
-| M01 | Autenticación y roles | Versión 2 | Implementado; falta ampliar la matriz de permisos al alcance del Supervisor de planta |
-| M02 | Catálogo maestro | Versión 2 | Implementado; `Cliente` retirado, pendiente renombrar `Producto` a `TipoMineral` |
-| M03 | Registro de ingresos | Versión 2 | Implementado con el diseño anterior; pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Versión 2 | Sin código |
-| M05 | Validación automática de consistencia | Versión 2 | Sin código |
-| M06 | Trazabilidad del proceso | Versión 2 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Versión 2 | Sin código |
-| M08 | Consolidación de la producción | Versión 2 | Sin código |
-| M09 | Auditoría | Versión 2 | Esqueleto, sin lógica |
+| M01 | Autenticación y roles | Versión 2.1 | Implementado; falta la matriz completa de permisos, el restablecimiento de contraseñas y la reactivación (DR-30, DR-31) |
+| M02 | Catálogo maestro | Versión 2.1 | Implementado; `Cliente` retirado, pendiente renombrar `Producto` a `TipoMineral` |
+| M03 | Registro de ingresos | Versión 2.1 | Implementado con el diseño anterior; pendiente de refactor |
+| M04 | Reconocimiento automático del ticket | Versión 2.1 | Sin código |
+| M05 | Validación automática de consistencia | Versión 2.1 | Sin código |
+| M06 | Trazabilidad del proceso | Versión 2.1 | Sin código |
+| M07 | Consulta de ingresos y respaldo | Versión 2.1 | Sin código |
+| M08 | Consolidación de la producción | Versión 2.1 | Sin código |
+| M09 | Auditoría | Versión 2.1 | Esqueleto, sin lógica |
 
 La limpieza del backend es la preparación del repositorio de `PLAN_DE_TRABAJO.md` §8 y está en
 curso. El 22/10/2026 se retiraron `apps/salidas`, `apps/sincronizacion` y `Cliente`; falta retirar

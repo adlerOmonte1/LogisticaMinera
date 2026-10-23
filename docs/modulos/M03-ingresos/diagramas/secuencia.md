@@ -87,7 +87,7 @@ sequenceDiagram
     participant NG as Angular
     participant API as Django REST
     participant SRV as ServicioIngreso
-    participant LOT as RepositorioLote M06
+    participant LOT as RepositorioTrazabilidad M06
     participant VAL as ValidadorConsistencia M05
     participant DB as PostgreSQL
     participant AUD as Auditoria M09

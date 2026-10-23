@@ -135,12 +135,15 @@ servicio, no un cambio en el modelo de datos.
 
 ### Exportación del listado
 
-`exportadores/csv_listado.py` recibe el mismo `QuerySet` filtrado del listado, sin paginar, y lo
+`ExportadorCSVListado`, en `exportadores/csv_listado.py`, recibe el mismo `QuerySet` filtrado del listado, sin paginar, y lo
 escribe en CSV con `csv.writer`, separador punto y coma y codificación `utf-8-sig`, para que la hoja de
 cálculo de la planta reconozca las tildes (RNF-M07-15). La respuesta se entrega como
-`StreamingHttpResponse` para no cargar el archivo completo en memoria. Antes de responder, la vista
-registra el evento `EXPORTAR` con los filtros y el número de ingresos mediante `common/eventos.py`
-(RN-M07-17): M07 no escribe datos del dominio, pero toda salida de datos queda atribuida.
+`StreamingHttpResponse` para no cargar el archivo completo en memoria. La exportación la orquesta
+`ServicioConsulta.exportar_listado()`, no la vista: obtiene el conjunto del repositorio, lo entrega al
+exportador y registra el evento `EXPORTAR` con los filtros y el número de ingresos mediante
+`ServicioAuditoria` de M09, inyectado como en los demás servicios (RN-M07-17). Es el mismo esquema de
+la exportación del consolidado en M08. M07 no escribe datos del dominio, pero toda salida de datos
+queda atribuida.
 
 ## Frontend (Angular)
 
