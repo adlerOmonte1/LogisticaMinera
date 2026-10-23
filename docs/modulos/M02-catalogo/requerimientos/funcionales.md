@@ -11,11 +11,13 @@ provee los catálogos de los que M03 deriva ambos datos.
 | Registrar tara | Primera tara del vehículo, invocada por el destare de M03 | HU-M02-01, HU-M03-04 | (interno, desde M03) |
 | Modificar tara | Cambio de una tara ya registrada, con motivo obligatorio | HU-M02-01 | `PATCH /api/v1/catalogo/vehiculos/{id}/tara/` |
 | Desactivar vehículo | Baja lógica | HU-M02-01 | `PATCH /api/v1/catalogo/vehiculos/{id}/desactivar/` |
+| Reactivar vehículo | Devuelve el vehículo a los selectores, con su misma tara | HU-M02-01 | `PATCH /api/v1/catalogo/vehiculos/{id}/reactivar/` |
 | Listar tipos de mineral | Consulta con filtro por vigencia | HU-M02-02 | `GET /api/v1/catalogo/tipos-mineral/` |
 | Crear tipo de mineral | Alta; también invocada desde el registro de un ingreso, con el código opcional | HU-M02-02, HU-M03-01 | `POST /api/v1/catalogo/tipos-mineral/` |
 | Editar tipo de mineral | Modificación | HU-M02-02 | `PATCH /api/v1/catalogo/tipos-mineral/{id}/` |
 | Desactivar tipo de mineral | Baja lógica | HU-M02-02 | `PATCH /api/v1/catalogo/tipos-mineral/{id}/desactivar/` |
-| Gestionar transportistas | CRUD con baja lógica | HU-M02-03 | `/api/v1/catalogo/transportistas/` |
+| Reactivar tipo de mineral | Devuelve el tipo a los selectores | HU-M02-02 | `PATCH /api/v1/catalogo/tipos-mineral/{id}/reactivar/` |
+| Gestionar transportistas | Alta, consulta, edición, desactivación y reactivación; nunca eliminación | HU-M02-03 | `/api/v1/catalogo/transportistas/` y sus acciones `desactivar/` y `reactivar/` |
 
 ## Responsabilidad y límites
 
@@ -42,7 +44,7 @@ evaluarlas.
 | Dar de alta un tipo de mineral desde el registro de un ingreso | Sí | Sí | No |
 | Registrar la primera tara, desde el destare | Sí | Sí | Sí |
 | Modificar una tara ya registrada | Sí | No | No |
-| Desactivar | Sí | Sí | No |
+| Desactivar y reactivar | Sí | Sí | No |
 
 El Supervisor de planta no gestiona el catálogo, pero puede dar de alta un vehículo y registrar su
 primera tara porque ambas operaciones ocurren en planta, dentro del registro del ingreso (DR-17). No

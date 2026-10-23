@@ -43,10 +43,11 @@ un piloto con tickets reales.
 | Función | Administrador | Administrativo | Supervisor de planta |
 |---|:---:|:---:|:---:|
 | Reconocer ticket (dentro del registro) | Sí | Sí | Sí |
-| Consultar y listar reconocimientos | Sí | Sí | No |
+| Consultar y listar reconocimientos | Sí | Sí | Sí |
 
-La consulta comparativa queda fuera del alcance del Supervisor de planta porque su trabajo es
-registrar, no evaluar el desempeño de la lectura automática.
+Los tres roles consultan la comparación entre el dato reconocido y el confirmado (DR-31): el
+Supervisor de planta responde por lo que registró y necesita ver qué leyó el sistema. La consulta no
+modifica nada; la corrección del ingreso sigue reservada al Administrativo y al Administrador (M03).
 
 ## Dependencias
 

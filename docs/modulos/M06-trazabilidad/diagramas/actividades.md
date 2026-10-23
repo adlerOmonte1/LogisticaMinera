@@ -113,7 +113,7 @@ flowchart TD
     V3 -->|No| E3[Rechazar con el mensaje correspondiente]
     E3 --> L1
     V3 -->|Si| V4{Las fracciones suman la unidad?}
-    V4 -->|No| E4[Rechazar: Las fracciones de las partes deben sumar el total del lote]
+    V4 -->|No| E4[Rechazar: Las fracciones deben sumar la unidad]
     E4 --> L1
     V4 -->|Si| P1[Crear las partes y calcular toneladas aproximadas]
     P1 --> D1{Llega un ingreso tardio?}

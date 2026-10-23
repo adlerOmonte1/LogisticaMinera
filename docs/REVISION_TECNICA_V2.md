@@ -6,6 +6,7 @@
 | Alcance | Todo `docs/`, `skills/`, `scripts/`, `Mockup/` y el estado de `backend/` |
 | Propósito | Preparar la revisión del asesor técnico: qué arquitectura sigue el sistema, si la estructura de carpetas es correcta y qué queda sin resolver |
 | Índice de archivos | [`INDICE.md`](INDICE.md), generado por `scripts/indexar_docs.py` |
+| Estado | Histórico. El estado vigente de la documentación y de los puntos abiertos está en [`REVISION_V2_1.md`](REVISION_V2_1.md) |
 
 ---
 

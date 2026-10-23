@@ -174,7 +174,7 @@ sequenceDiagram
         API-->>NG: 400 con el mensaje correspondiente
     else Fracciones que no suman la unidad
         SRV-->>API: Rechazo RN-M06-16
-        API-->>NG: 400 Las fracciones de las partes deben sumar el total del lote
+        API-->>NG: 400 Las fracciones suman la cantidad indicada y deben sumar la unidad
     else Division admisible
         SRV->>DB: BEGIN TRANSACTION
         SRV->>DB: Crear las partes con su fraccion y su ruta

@@ -38,14 +38,20 @@ completó, ni una operación puede completarse sin que su evento quede registrad
 - Cada evento guarda: usuario, acción, entidad, identificador del registro afectado, fecha y hora.
 - En modificaciones: valores anteriores y nuevos del campo cambiado.
 - En creaciones: solo valores nuevos. En anulaciones: solo valores anteriores.
-- En las modificaciones que exigen motivo —corrección de un ingreso y cambio de la tara de un
-  vehículo—: el motivo escrito por el usuario.
+- En las operaciones que exigen motivo —corrección de un ingreso y su reversión, anulación, cambio
+  de la tara de un vehículo y unificación de un ingreso de otro tipo de mineral a un lote—: el motivo
+  o la autorización escritos por el usuario.
+- La desactivación y la reactivación de usuarios y de registros de catálogo se registran como
+  modificaciones de su estado. El restablecimiento de una contraseña se registra como modificación
+  del usuario, sin guardar ninguna contraseña.
+- La exportación del listado de ingresos y la del consolidado mensual se registran como
+  exportaciones, con el criterio y el número de registros exportados.
 - El destare se registra como modificación del vehículo, que recibe su tara, y de cada ingreso que
   pasa de En proceso a Registrado.
 - El registro sin foto se registra como creación del ingreso, con el motivo de la falta de imagen.
-- Las operaciones sobre un lote —apertura, asignación y retiro de ingresos, inicio del recorrido,
-  división, paso por etapa, bigbags y cierre— se registran como eventos del lote, con los códigos de
-  los ingresos afectados.
+- Las operaciones sobre un lote —apertura, tipos de mineral agregados o quitados, asignación, retiro
+  y traslado de ingresos, inicio del recorrido, división, paso por etapa, bigbags y cierre— se
+  registran como eventos del lote, con los códigos de los ingresos afectados.
 - El registro del evento es automático: ningún rol lo activa ni lo omite manualmente.
 
 **Criterios de aceptación**
@@ -92,8 +98,8 @@ memoria de nadie.
 
 El historial se consulta desde el detalle del ingreso y lo ven los tres roles. Reúne, en orden
 cronológico, los eventos del propio ingreso —reconocimiento, datos propuestos corregidos, registro,
-destare, corrección, anulación— y los eventos de su lote que lo afectan: su asignación, el inicio del
-recorrido, el paso por cada etapa y el cierre. Cada evento muestra la acción, el usuario, el momento
+destare, corrección, reversión de una corrección, anulación— y los eventos de su lote que lo afectan:
+su asignación, su retiro o traslado, el inicio del recorrido, el paso por cada etapa y el cierre. Cada evento muestra la acción, el usuario, el momento
 y el detalle del cambio, con el motivo cuando lo hubo.
 
 El historial es de solo lectura y no permite filtrar ni salir del ingreso: para revisar la auditoría
@@ -165,7 +171,7 @@ vehículo. Para las modificaciones muestra qué campo cambió y cuáles fueron l
 > valor anterior y el nuevo del campo afectado, y el motivo si lo hubo.
 
 > **CA04.** Dado que ningún evento cumple los filtros, cuando se aplican, entonces el sistema muestra
-> "Sin eventos registrados para este registro".
+> "No hay eventos con estos filtros".
 
 > **CA05.** Dado que el usuario tiene rol de Administrativo o de Supervisor de planta, cuando intenta
 > consultar la auditoría, entonces el sistema rechaza la operación mostrando "Acción no autorizada".

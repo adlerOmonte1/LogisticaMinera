@@ -1,7 +1,7 @@
 # ARQ-03 — Modelo C4 del sistema
 
 **Documento:** ARQ-03
-**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
+**Versión:** 3.1 — versión 2.1 del sistema (DR-11 a DR-31)
 **Estado:** En revisión
 **Alcance:** los cuatro niveles de abstracción del sistema, con la justificación de cada elemento
 **Deriva de:** `ARQ-01_Modulos_del_Sistema.md` y `ARQ-02_Arquitectura_Tecnica.md`
@@ -55,9 +55,9 @@ flowchart TB
 
 | Elemento | Por qué está | Qué pasaría sin él |
 |---|---|---|
-| **Supervisor de planta** | Está en el punto de pesaje y en la cancha: fotografía el ticket —o registra sin foto, con motivo—, da de alta el vehículo nuevo, registra el destare y el paso del lote por las etapas (DR-17) | El registro y el recorrido volverían a depender de que alguien transcriba el papel más tarde, que es la causa de la espera entre el pesaje y el registro |
-| **Administrativo** | Corrige datos reconocidos, gestiona los catálogos, compone y divide los lotes, consulta, consolida y exporta (DR-23) | Un dato mal leído por el motor quedaría sin forma de corregirse fuera del momento del registro, y los lotes no tendrían quién decidir su composición |
-| **Administrador** | Gestiona usuarios, modifica taras, anula ingresos y cierra los lotes con su destino (DR-14) | Sin gestión de usuarios y sin un responsable del cierre, ni las operaciones serían atribuibles ni el destino del mineral tendría quien responda de él |
+| **Supervisor de planta** | Está en el punto de pesaje y en la cancha: fotografía el ticket —o registra sin foto, con motivo—, da de alta el vehículo nuevo, registra el destare y el paso del lote por las etapas, y consulta lo registrado, con su reconocimiento y su validación (DR-17, DR-31) | El registro y el recorrido volverían a depender de que alguien transcriba el papel más tarde, que es la causa de la espera entre el pesaje y el registro |
+| **Administrativo** | Corrige datos reconocidos, gestiona los catálogos, compone y divide los lotes, consulta, consolida y exporta el consolidado y el listado de ingresos (DR-23, DR-30) | Un dato mal leído por el motor quedaría sin forma de corregirse fuera del momento del registro, y los lotes no tendrían quién decidir su composición |
+| **Administrador** | Gestiona usuarios y restablece sus contraseñas, modifica taras, anula ingresos y cierra los lotes con su destino (DR-14, DR-30) | Sin gestión de usuarios y sin un responsable del cierre, ni las operaciones serían atribuibles ni el destino del mineral tendría quien responda de él |
 | **Balanza de plataforma** | Frontera declarada: **no hay integración** | — |
 | **Motor de reconocimiento** | Sistema externo o local que lee la imagen; el sistema depende de su contrato, no de su implementación (D-12) | Sin él, el registro sería manual y RF02 no tendría cómo cumplirse |
 

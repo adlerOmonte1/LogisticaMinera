@@ -39,7 +39,7 @@ persiste el ingreso con sus valores reconocidos y confirmados.
 | M04 Reconocimiento | `ReconocedorTicket` | La placa, la fecha y el peso bruto del ticket, con su nivel de confianza |
 | M05 Validación | `ValidadorConsistencia` | La lista de inconsistencias de las reglas V1 a V5 |
 | M02 Catálogo | Servicio del catálogo | El vehículo vigente con su titularidad, capacidad y tara; el tipo de mineral; el alta rápida de un vehículo nuevo o de un tipo de mineral, y el registro de la tara en el destare |
-| M06 Trazabilidad | Lectura del lote del ingreso | El tipo de mineral del lote, para la corrección, y si el lote todavía reúne ingresos, para la anulación |
+| M06 Trazabilidad | Lectura del lote del ingreso | La lista de tipos de mineral del lote, para la corrección y su reversión, y si el lote todavía reúne ingresos, para la anulación |
 | M09 Auditoría | Servicio de eventos | El registro de la creación, la corrección, la anulación y el destare |
 
 M03 no sabe qué motor lee la imagen ni cómo se evalúa cada regla: recibe resultados y decide con
@@ -76,7 +76,7 @@ auditoría.
 |---|---|
 | M01 | Autenticación y atribución de cada operación a un usuario |
 | M02 | Vehículo vigente con su titularidad, capacidad y tara; alta rápida de vehículos y de tipos de mineral; catálogo de tipos de mineral |
-| M06 | Tipo de mineral del lote del ingreso y retirada del ingreso anulado de un lote que todavía reúne ingresos |
+| M06 | Lista de tipos de mineral del lote del ingreso y retirada del ingreso anulado de un lote que todavía reúne ingresos |
 | M04 | Propuesta de la placa, la fecha y el peso bruto del ticket |
 | M05 | Evaluación de las reglas V1 a V5 |
 | M09 | Registro de los eventos de creación, corrección, anulación y destare |

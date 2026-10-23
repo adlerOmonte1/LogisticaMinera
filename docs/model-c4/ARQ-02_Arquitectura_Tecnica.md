@@ -1,7 +1,7 @@
 # ARQ-02 — Arquitectura técnica (Django + Angular)
 
 **Documento:** ARQ-02
-**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
+**Versión:** 3.1 — versión 2.1 del sistema (DR-11 a DR-31)
 **Alcance:** organización del código, capas, y aplicación de los principios SOLID
 **Deriva de:** `ARQ-01_Modulos_del_Sistema.md`
 
@@ -70,7 +70,7 @@ backend/
     reconocimiento/    M04   lectura automática de los datos del ticket
     validacion/        M05   reglas V1 a V5 de consistencia del ticket
     trazabilidad/      M06   lotes, rutas, division por fracciones, etapas, bigbags y cierre
-    consulta/          M07   búsqueda por placa y fecha, con respaldo; calendario de llegadas
+    consulta/          M07   búsqueda por placa y fecha, con respaldo; listado y exportación; calendario; inicio y avisos
     consolidacion/     M08   total acumulado mensual por tipo de mineral
     auditoria/         M09   registro de eventos, historial de un ingreso y consulta
   utils/                  utilidades transversales, excepciones de dominio
@@ -218,9 +218,11 @@ Convención de rutas, coherente con los códigos de módulo:
 
 ```
 POST   /api/v1/auth/login/                            M01
+POST   /api/v1/usuarios/{id}/restablecer-clave/        M01  solo Administrador
 GET    /api/v1/catalogo/vehiculos/                     M02
 POST   /api/v1/catalogo/vehiculos/                     M02  tambien desde el registro
 PATCH  /api/v1/catalogo/vehiculos/{id}/tara/           M02  solo Administrador
+PATCH  /api/v1/catalogo/vehiculos/{id}/reactivar/      M02
 GET    /api/v1/catalogo/tipos-mineral/                 M02
 POST   /api/v1/catalogo/tipos-mineral/                 M02  tambien desde el registro
 POST   /api/v1/ingresos/borradores/                    M03
@@ -239,7 +241,10 @@ POST   /api/v1/lotes/{id}/bigbags/                     M06
 PATCH  /api/v1/lotes/{id}/cerrar/                      M06  solo Administrador
 GET    /api/v1/ingresos/{id}/trazabilidad/             M06
 GET    /api/v1/consulta/ingresos/                      M07
+GET    /api/v1/consulta/ingresos/exportar/             M07  Administrativo y Administrador
 GET    /api/v1/consulta/calendario/?anio&mes           M07
+GET    /api/v1/consulta/inicio/                        M07
+GET    /api/v1/consulta/avisos/                        M07  segun el rol
 GET    /api/v1/consolidacion/mensual/                  M08
 GET    /api/v1/ingresos/{id}/historial/                M09  los tres roles
 GET    /api/v1/auditoria/                              M09  solo Administrador

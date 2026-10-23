@@ -133,9 +133,9 @@ ni el sistema cambie de condiciones. De ahí cuatro exigencias que atraviesan to
 
 | Rol | Código | Alcance |
 |---|---|---|
-| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios, catálogos, anulaciones y el cierre del lote con su destino |
+| Administrador | `ADMINISTRADOR` | Acceso total, incluida gestión de usuarios y restablecimiento de contraseñas, catálogos, anulaciones y el cierre del lote con su destino |
 | Administrativo | `ADMINISTRATIVO` | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos y composición de lotes (DR-23) |
-| Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta (DR-17) |
+| Supervisor de planta | `SUPERVISOR` | Registro de ingresos, vehículos nuevos, destares y paso del lote por las etapas; consulta, incluidos el reconocimiento y la validación de cada ingreso (DR-17, DR-31) |
 
 ## Requerimientos funcionales
 
@@ -168,7 +168,7 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 | M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Sin código |
 | M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado, detrás de la interfaz `ValidadorConsistencia` | RF03 | Sin código |
 | M06 | Trazabilidad del proceso | Asignar ingresos a lotes de proceso y registrar su paso por cada etapa | RF07 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
+| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket; listado con exportación, calendario e inicio con avisos de pendientes | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
 | M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 | Sin código (`apps/reportes` es un esqueleto) |
 | M09 | Auditoría | Registrar quién hizo qué y cuándo sobre cada entidad, incluidos reconocimiento y corrección | — (transversal) | Sin código (`apps/auditoria` es un esqueleto) |
 
@@ -242,7 +242,7 @@ registro sin foto con motivo · DR-14 cierre del lote con destino, venta o trasl
 horas de molienda son datos descriptivos · DR-16 ruta por lote e I6 sobre la ruta · DR-17 alcance
 del Supervisor de planta · DR-18 división del lote por fracciones · DR-19 inicio del recorrido y
 cierre del lote · DR-20 reparto de ingresos tardíos por fracciones · DR-21 I6 en lotes divididos ·
-DR-22 retiro de ingresos solo con el lote Abierto (ampliada por DR-29) · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección · DR-29 retiro de ingresos del lote hasta el zarandeo o la molienda. Queda pendiente P-03.
+DR-22 retiro de ingresos solo con el lote Abierto (ampliada por DR-29) · DR-23 alcance del Administrativo según el catálogo y la trazabilidad · DR-24 la salida es el cierre del lote con destino · DR-25 destare obligatorio, por cualquier rol y sin plazo · DR-26 registro sin foto sin límite · DR-27 lote con varios tipos de mineral, agregados de forma explícita · DR-28 corrección en cadena y reversión de la última corrección · DR-29 retiro de ingresos del lote hasta el zarandeo o la molienda · DR-30 elementos de la maqueta 2.1 incorporados: inicio con avisos, exportación del listado, gestión de cuentas y bajas, búsqueda desde la cabecera · DR-31 el Supervisor consulta el reconocimiento y la validación. Queda pendiente P-03.
 
 ## Fuera de alcance — declarado
 

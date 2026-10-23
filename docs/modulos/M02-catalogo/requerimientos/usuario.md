@@ -5,7 +5,7 @@
 | RU-M02-01 | Necesito saber cuáles volquetes son nuestros y cuáles son alquilados, porque no se controlan igual |
 | RU-M02-02 | Quiero elegir el tipo de mineral de una lista, no escribirlo cada vez, porque a veces se escribe distinto y después no cuadra |
 | RU-M02-03 | Los transportistas deben estar registrados con su RUC para no confundirlos |
-| RU-M02-04 | Si dejamos de trabajar con un transportista o un vehículo, no quiero que desaparezca lo que ya movió |
+| RU-M02-04 | Si dejamos de trabajar con un transportista o un vehículo, no quiero que desaparezca lo que ya movió, y si volvemos a trabajar con él quiero retomarlo tal como estaba |
 | RU-M02-05 | La tara de cada volquete se saca una vez, cuando viene por primera vez, y ya no se cambia salvo que lo decida la Gerencia |
 | RU-M02-06 | Cuando llega un volquete nuevo, quiero registrarlo ahí mismo, sin salir del registro del ingreso |
 | RU-M02-07 | Si el mineral que llegó no está en la lista, quiero agregarlo desde el mismo registro, sin tener que inventar un código |

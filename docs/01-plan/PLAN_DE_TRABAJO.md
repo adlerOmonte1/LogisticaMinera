@@ -411,6 +411,8 @@ tipos de mineral (DR-27) y la ruta de cada lote o parte se registra según DR-16
 | Listado con filtros combinables | Fecha, tipo de mineral, vehículo, titularidad y estado | Tester |
 | Detalle completo del ingreso | Datos, imagen o marca de sin respaldo fotográfico, reconocimiento, validaciones y trazabilidad en una vista | Tester: HU-M07-01, HU-M07-02 |
 | Calendario de llegadas | Número de volquetes y toneladas por día del mes, con acceso a los ingresos del día | Tester: HU-M07-03 |
+| Exportación del listado y búsqueda desde la cabecera | CSV del conjunto filtrado, solo Administrativo y Administrador, auditado; un código abre el ingreso | Tester: HU-M07-02 |
+| Pantalla de inicio y avisos | Resumen del día y avisos de pendientes calculados según el rol | Tester: HU-M07-04, con una cuenta de cada rol |
 
 ### Semana 7 — M08 Consolidación
 

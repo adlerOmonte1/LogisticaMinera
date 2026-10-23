@@ -1,12 +1,13 @@
 # Historias de usuario — M07 Consulta de ingresos y respaldo
 
-**RF asociado:** RF08 · **Historias:** 3
+**RF asociado:** RF08 · **Historias:** 4
 
 > Módulo de lectura sobre los ingresos. Existe para responder una pregunta concreta y frecuente:
 > qué se registró de un volquete determinado en una fecha determinada, con el ticket a la vista y
-> el recorrido de su mineral en la planta. Ofrece además la vista de trabajo de un periodo y el
-> calendario de llegadas. No escribe nada ni tiene entidad propia: lee sobre M03 y presenta lo que
-> los demás módulos conservan.
+> el recorrido de su mineral en la planta. Ofrece además la vista de trabajo de un periodo, con su
+> exportación, el calendario de llegadas y la pantalla de inicio con el resumen del día y los avisos
+> de pendientes. No escribe datos del dominio ni tiene entidad propia: lee sobre M03 y presenta lo
+> que los demás módulos conservan.
 
 ---
 
@@ -132,6 +133,16 @@ historial de todo lo que le ocurrió (HU-M09-02). Cada bloque lo aporta el módu
 historia los reúne en una sola vista, organizada en pestañas: datos, ticket, reconocimiento,
 validación, trazabilidad e historial.
 
+El Administrativo y el Administrador pueden **exportar el listado** a un archivo CSV: el archivo
+contiene el conjunto filtrado completo, no solo la página visible, con los mismos estados que muestra
+el listado. Es una exportación de trabajo, no un reporte de producción: el total mensual por tipo de
+mineral se obtiene en la consolidación (M08). Cada exportación queda en auditoría (DR-30).
+
+Desde la **búsqueda de la cabecera**, presente en todas las pantallas, el usuario escribe el código
+de un ingreso —completo o solo sus dígitos finales— y el sistema abre su detalle. Si lo escrito no
+corresponde a ningún código, se toma como placa y lleva a la consulta por placa y fecha
+(HU-M07-01).
+
 **Detalles**
 - Filtros: rango de fechas —por defecto, el mes en curso hasta hoy—, tipo de mineral, vehículo,
   titularidad y estado; búsqueda por placa o código.
@@ -141,7 +152,11 @@ validación, trazabilidad e historial.
   los ingresos Registrados.
 - Los ingresos sin respaldo fotográfico se señalan en la lista.
 - El detalle incluye validaciones, reconocimiento, trazabilidad e historial.
-- Roles autorizados: los tres.
+- Exportación: CSV en UTF-8, con separador punto y coma, del conjunto filtrado completo; columnas
+  código, fecha y hora del pesaje, placa, tipo de vehículo, tipo de mineral, peso bruto, tara, peso
+  neto, estado y usuario que registró. Solo Administrativo y Administrador.
+- Búsqueda de la cabecera: código completo o dígitos finales; si no hay coincidencia, placa.
+- Roles autorizados: los tres para consultar; Administrativo y Administrador para exportar.
 
 **Criterios de aceptación**
 
@@ -183,6 +198,25 @@ validación, trazabilidad e historial.
 
 > **CA12.** Dado que el usuario abre la pestaña de historial del detalle, cuando el sistema la
 > presenta, entonces muestra los eventos del ingreso en orden cronológico (HU-M09-02).
+
+> **CA13.** Dado que el usuario es Administrativo o Administrador y el listado tiene resultados,
+> cuando elige exportar, entonces el sistema genera un archivo CSV con todos los ingresos del
+> conjunto filtrado, sin limitarse a la página visible, y registra la exportación en auditoría con
+> el número de ingresos.
+
+> **CA14.** Dado que el conjunto filtrado no tiene ingresos, cuando el usuario intenta exportarlo,
+> entonces el sistema rechaza la operación mostrando "No hay ingresos para exportar".
+
+> **CA15.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta exportar el
+> listado, entonces el sistema rechaza la operación mostrando "Acción no autorizada".
+
+> **CA16.** Dado que el usuario escribe en la búsqueda de la cabecera el código de un ingreso,
+> completo o sus dígitos finales, cuando la ejecuta, entonces el sistema abre el detalle de ese
+> ingreso.
+
+> **CA17.** Dado que lo escrito en la búsqueda de la cabecera no corresponde a ningún código, cuando
+> el usuario la ejecuta, entonces el sistema lleva a la consulta por placa y fecha con ese texto como
+> placa (HU-M07-01).
 
 ---
 
@@ -249,3 +283,85 @@ consolidación: solo suman los Registrados.
 > **CA08.** Dado que se calcula el total de toneladas de un mes en el calendario, cuando se compara
 > con el consolidado de ese mes, entonces ambos coinciden.
 
+---
+
+## HU-M07-04 — Resumen del día y avisos de pendientes
+
+| Campo | Descripción |
+|:--|:--|
+| **Identificador** | HU-M07-04 |
+| **Épica** | Consulta de ingresos y respaldo |
+| **Prioridad** | Media |
+
+**Historia**
+
+Como usuario del sistema, quiero ver al entrar lo que ocurrió hoy en la planta y lo que está
+pendiente de mi parte, para empezar a trabajar por lo que corresponde sin recorrer cada pantalla.
+
+**Descripción**
+
+La pantalla de inicio es la primera que ve el usuario tras iniciar sesión. Resume el día en cuatro
+cifras: los ingresos de hoy, sin contar los anulados, con la hora y la placa del último; las
+toneladas netas de hoy, que solo suman los Registrados e indican cuántos ingresos En proceso quedan
+fuera; los ingresos pendientes de destare, con las placas de sus vehículos; y los lotes en proceso,
+es decir, los Abiertos y los En recorrido que aún no están listos para cerrar. Debajo presenta los
+cinco ingresos más recientes y las toneladas netas de los últimos siete días, día por día.
+
+Junto al resumen, el sistema ofrece **avisos de pendientes**, calculados según el rol: los ingresos
+que esperan el destare; las advertencias V4 justificadas hoy; los lotes En recorrido con su siguiente
+paso; los lotes listos para cerrar con su destino, solo para el Administrador; y los ingresos
+Registrados que todavía no tienen lote, solo para quien compone los lotes. Cada aviso lleva a la
+pantalla donde se resuelve.
+
+Nada de esta pantalla se almacena: cifras y avisos se calculan sobre los ingresos y los lotes al
+consultarse, con el mismo criterio que el listado, el calendario y la consolidación (DR-30). Un aviso
+desaparece cuando se resuelve lo que lo originó, sin que nadie lo marque como leído.
+
+**Detalles**
+- Día de referencia: el de la fecha del pesaje, en la zona horaria de la planta.
+- Cifras: ingresos de hoy sin anulados; toneladas netas de hoy de los Registrados; pendientes de
+  destare; lotes en proceso.
+- Últimos ingresos: los cinco más recientes por fecha del pesaje, con su estado y acceso al detalle.
+- Toneladas de los últimos siete días: por día del pesaje, solo de los Registrados.
+- Avisos: según el rol; cada uno con acceso a la pantalla que lo resuelve.
+- Accesos directos: registrar un ingreso y consultar por placa, según el rol.
+- Cada cifra enlaza con su pantalla solo si el rol tiene acceso a ella.
+- Roles autorizados: los tres, con el contenido que corresponde a cada rol.
+
+**Criterios de aceptación**
+
+> **CA01.** Dado que el usuario inicia sesión, cuando se carga la pantalla de inicio, entonces el
+> sistema muestra los ingresos de hoy sin los anulados, las toneladas netas de hoy, los ingresos
+> pendientes de destare y los lotes en proceso.
+
+> **CA02.** Dado que hoy hay ingresos En proceso, cuando se muestran las toneladas netas del día,
+> entonces el sistema no suma su peso e indica "Sin contar {n} en proceso".
+
+> **CA03.** Dado que aún no se registró ningún ingreso hoy, cuando se carga la pantalla de inicio,
+> entonces el sistema muestra cero ingresos y la indicación "Aún no hay ingresos hoy".
+
+> **CA04.** Dado que se presentan las toneladas de los últimos siete días, cuando se compara la suma
+> de un día con la del calendario para ese día, entonces ambas coinciden.
+
+> **CA05.** Dado que el usuario elige uno de los últimos ingresos, cuando lo abre, entonces el
+> sistema muestra su detalle completo (HU-M07-02).
+
+> **CA06.** Dado que hay ingresos pendientes de destare, cuando el usuario abre los avisos, entonces
+> el sistema muestra uno por ingreso, con la placa y el peso bruto, y lleva al registro del destare.
+
+> **CA07.** Dado que el usuario es Administrador y un lote tiene todo su mineral ensacado, cuando
+> abre los avisos, entonces el sistema le indica que el lote está listo para cerrar con su destino y
+> lleva a su cierre.
+
+> **CA08.** Dado que el usuario es Supervisor de planta, cuando abre los avisos, entonces el sistema
+> no le muestra los lotes listos para cerrar ni los ingresos sin lote, porque no son operaciones de
+> su rol.
+
+> **CA09.** Dado que no hay nada pendiente para el rol del usuario, cuando abre los avisos, entonces
+> el sistema muestra "No hay nada pendiente".
+
+> **CA10.** Dado que se registra el destare que originó un aviso, cuando el usuario vuelve a abrir
+> los avisos, entonces ese aviso ya no aparece.
+
+> **CA11.** Dado que el rol del usuario no tiene acceso a la pantalla de una cifra, cuando se muestra
+> el resumen, entonces el sistema presenta la cifra sin enlace a esa pantalla.

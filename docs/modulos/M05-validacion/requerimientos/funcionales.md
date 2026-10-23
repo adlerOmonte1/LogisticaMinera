@@ -43,11 +43,12 @@ añadir una regla no modifica M03.
 |---|:---:|:---:|:---:|
 | Validar (dentro del registro o la corrección) | Sí | Sí | Sí |
 | Justificar una advertencia de V1 o V4 | Sí | Sí | Sí |
-| Consultar las validaciones de un ingreso | Sí | Sí | No |
+| Consultar las validaciones de un ingreso | Sí | Sí | Sí |
 
 La validación no es una operación que el usuario invoque por su cuenta: ocurre dentro del registro,
-con los permisos de este. La consulta del resultado sí es una operación propia y queda fuera del
-alcance del Supervisor de planta.
+con los permisos de este. La consulta del resultado es una operación propia, de solo lectura, que
+tienen los tres roles (DR-31): el Supervisor de planta justifica las advertencias en planta y
+consulta después qué reglas se evaluaron y con qué resultado.
 
 ## Dependencias
 

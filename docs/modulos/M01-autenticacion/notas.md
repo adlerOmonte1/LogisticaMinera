@@ -10,14 +10,20 @@ lote al Administrador (DR-14).
 ### Modelo
 
 `Usuario` extiende el modelo de autenticación de Django y añade `id_rol`, `activo`,
-`intentos_fallidos` y `ultimo_acceso`. `Rol` es un catálogo de tres valores:
+`intentos_fallidos`, `ultimo_acceso` y `debe_cambiar_clave`. `Rol` es un catálogo de tres valores:
 `ADMINISTRADOR`, `ADMINISTRATIVO`, `SUPERVISOR`.
 
 ### Servicio de autenticación
 
 `apps/accounts/services/autenticacion.py` concentra el bloqueo temporal (RN-M01-07) y la emisión del
-token; `apps/accounts/services/usuarios.py` concentra el alta, la edición, la desactivación y el
-cambio de contraseña.
+token; `apps/accounts/services/usuarios.py` concentra el alta, la edición, la desactivación, la
+reactivación, el restablecimiento y el cambio de contraseña.
+
+El restablecimiento genera la contraseña temporal con `secrets` —no con `random`—, la guarda con
+`set_password()` y pone `debe_cambiar_clave` en verdadero (RS-M01-12). Mientras la marca esté activa,
+una clase de permiso global solo admite el cambio de contraseña y el cierre de sesión (RS-M01-13). La
+contraseña temporal viaja una sola vez en la respuesta y nunca entra en `EVENTO_AUDITORIA`
+(RNF-M01-07).
 
 ### Permisos por rol
 
@@ -34,12 +40,15 @@ menos, permisos por acción para:
 | Corregir ingreso y revertir su última corrección | Administrador, Administrativo | M03 |
 | Anular ingreso | Administrador | M03 |
 | Dar de alta un vehículo desde el registro y registrar su destare | Los tres | M02, M03 |
-| Gestionar catálogos | Administrador, Administrativo | M02 |
+| Gestionar catálogos, incluida la reactivación de registros dados de baja | Administrador, Administrativo | M02 |
 | Modificar una tara ya registrada | Administrador | M02 |
+| Consultar el reconocimiento y la validación de un ingreso | Los tres | M04, M05 |
 | Componer lotes: abrir, agregar o quitar minerales, asignar, retirar, iniciar el recorrido y dividir | Administrador, Administrativo | M06 |
 | Registrar el paso por etapa, el secado de un ingreso tardío y los bigbags | Los tres | M06 |
 | Cerrar el lote con su destino | Administrador | M06 |
+| Exportar el listado de ingresos | Administrador, Administrativo | M07 |
 | Consolidar y exportar | Administrador, Administrativo | M08 |
+| Gestionar usuarios y restablecer contraseñas | Administrador | M01 |
 | Consultar la auditoría del sistema | Administrador | M09 |
 
 Los nombres de las clases se fijan al implementar cada módulo; lo que no cambia es que se definen

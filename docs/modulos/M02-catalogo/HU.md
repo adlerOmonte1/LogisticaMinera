@@ -48,7 +48,8 @@ reglas: el alta desde el registro no es un camino con menos controles.
 - Tara: sin valor al dar de alta; decimal positivo en toneladas, registrada en el destare del primer
   viaje, con su fecha y el usuario que la registró. Solo el Administrador la modifica, con motivo.
 - Transportista: obligatorio si la titularidad es EXTERNO; no se admite si es PROPIO.
-- Baja: lógica; un vehículo con ingresos asociados se desactiva, nunca se elimina.
+- Baja: lógica, nunca física, tenga o no ingresos asociados. El vehículo dado de baja puede
+  reactivarse y conserva su tara (DR-30).
 - Alta: desde el catálogo o desde el registro de un ingreso, con las mismas reglas.
 
 **Criterios de aceptación**
@@ -69,9 +70,9 @@ reglas: el alta desde el registro no es un camino con menos controles.
 > **CA05.** Dado que el usuario marca la titularidad como PROPIO, cuando guarda, entonces el sistema
 > acepta el registro sin transportista asociado.
 
-> **CA06.** Dado que un vehículo tiene ingresos asociados, cuando el usuario intenta eliminarlo,
-> entonces el sistema lo desactiva en lugar de eliminarlo y muestra "El vehículo se desactivó porque
-> tiene ingresos registrados".
+> **CA06.** Dado que un vehículo tiene ingresos asociados, cuando el usuario lo da de baja, entonces el
+> sistema lo desactiva —nunca lo elimina—, conserva sus ingresos y muestra "El vehículo se desactivó
+> porque tiene ingresos registrados".
 
 > **CA07.** Dado que un vehículo está desactivado, cuando se registra un ingreso nuevo, entonces el
 > sistema no permite asociarlo a ese ingreso.
@@ -94,6 +95,14 @@ reglas: el alta desde el registro no es un camino con menos controles.
 > **CA12.** Dado que la placa de un ticket no está en el catálogo, cuando el usuario da de alta el
 > vehículo desde la pantalla de registro, entonces el sistema aplica las mismas validaciones que el
 > alta desde el catálogo y devuelve al registro con el vehículo ya asociado.
+
+> **CA13.** Dado que un vehículo está desactivado, cuando el usuario lo reactiva, entonces el sistema
+> vuelve a ofrecerlo en el registro con su misma tara, registra el cambio en auditoría y muestra
+> "Vehículo reactivado".
+
+> **CA14.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta editar, dar de baja
+> o reactivar un vehículo desde el catálogo, entonces el sistema rechaza la operación mostrando
+> "Acción no autorizada"; el alta desde el registro y el destare siguen permitidos.
 
 ---
 
@@ -127,7 +136,8 @@ del nombre.
   del alta. Desde el registro es opcional: si se omite, el sistema genera uno que no se repite.
 - Nombre: obligatorio, único sin distinguir mayúsculas.
 - Unidad de medida: toneladas.
-- Baja: lógica; un tipo de mineral con ingresos asociados se desactiva, nunca se elimina.
+- Baja: lógica, nunca física, tenga o no ingresos asociados. El tipo dado de baja puede
+  reactivarse (DR-30).
 - Alta: desde el catálogo o desde el registro de un ingreso, por el Administrativo o el
   Administrador.
 
@@ -139,9 +149,9 @@ del nombre.
 > **CA02.** Dado que el código ya existe, cuando el usuario intenta guardar, entonces el sistema
 > rechaza la operación mostrando "El código ya está registrado".
 
-> **CA03.** Dado que un tipo de mineral tiene ingresos asociados, cuando el usuario intenta
-> eliminarlo, entonces el sistema lo desactiva en lugar de eliminarlo y muestra "El tipo de mineral
-> se desactivó porque tiene ingresos registrados".
+> **CA03.** Dado que un tipo de mineral tiene ingresos asociados, cuando el usuario lo da de baja,
+> entonces el sistema lo desactiva —nunca lo elimina—, conserva la clasificación de esos ingresos y
+> muestra "El tipo de mineral se desactivó porque tiene ingresos registrados".
 
 > **CA04.** Dado que un tipo de mineral está desactivado, cuando se abre el formulario de registro
 > de un ingreso, entonces no aparece entre las opciones seleccionables.
@@ -161,6 +171,14 @@ del nombre.
 > **CA08.** Dado que el usuario da de alta un tipo de mineral desde el registro sin indicar el
 > nombre, cuando intenta guardar, entonces el sistema rechaza la operación mostrando "Debe indicar el
 > nombre del tipo de mineral".
+
+> **CA09.** Dado que un tipo de mineral está desactivado, cuando el usuario lo reactiva, entonces el
+> sistema vuelve a ofrecerlo en el registro de ingresos y en la apertura de lotes, y registra el
+> cambio en auditoría.
+
+> **CA10.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta crear, editar, dar
+> de baja o reactivar un tipo de mineral, entonces el sistema rechaza la operación mostrando "Acción
+> no autorizada".
 
 ---
 
@@ -185,7 +203,8 @@ del que depende un vehículo con titularidad externa.
 - Razón social: obligatoria.
 - RUC: obligatorio, once dígitos, único.
 - Vehículos activos: el listado muestra cuántos vehículos activos tiene cada transportista.
-- Baja: lógica; un transportista con vehículos asociados se desactiva, nunca se elimina.
+- Baja: lógica, nunca física, tenga o no vehículos asociados. El transportista dado de baja puede
+  reactivarse (DR-30).
 
 **Criterios de aceptación**
 
@@ -195,9 +214,17 @@ del que depende un vehículo con titularidad externa.
 > **CA02.** Dado que el RUC no tiene once dígitos, cuando el usuario intenta guardar, entonces el
 > sistema lo rechaza mostrando "El RUC debe tener once dígitos".
 
-> **CA03.** Dado que un transportista tiene vehículos asociados, cuando el usuario intenta
-> eliminarlo, entonces el sistema lo desactiva y muestra "El transportista se desactivó porque tiene
-> vehículos asociados".
+> **CA03.** Dado que un transportista tiene vehículos asociados, cuando el usuario lo da de baja,
+> entonces el sistema lo desactiva —nunca lo elimina—, conserva la asociación con sus vehículos y
+> muestra "El transportista se desactivó porque tiene vehículos asociados".
 
 > **CA04.** Dado que el RUC ya está registrado para otro transportista, cuando el usuario intenta
 > guardar, entonces el sistema rechaza la operación mostrando "El RUC ya está registrado".
+
+> **CA05.** Dado que un transportista está desactivado, cuando el usuario lo reactiva, entonces el
+> sistema vuelve a ofrecerlo al registrar o editar un vehículo externo y registra el cambio en
+> auditoría.
+
+> **CA06.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta crear, editar, dar
+> de baja o reactivar un transportista, entonces el sistema rechaza la operación mostrando "Acción no
+> autorizada".

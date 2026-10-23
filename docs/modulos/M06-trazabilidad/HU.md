@@ -215,7 +215,8 @@ inventario de producto terminado ni miden pérdidas (DR-15).
 
 > **CA01.** Dado que el lote está En recorrido y le corresponde la siguiente etapa de su ruta, cuando
 > el usuario registra su paso indicando el momento, entonces el sistema lo registra y muestra "Etapa
-> {etapa} registrada para el lote {codigo}".
+> {etapa} registrada para {nombre}", con el nombre del lote o de la parte, que es como la planta
+> identifica cada carga (RN-M06-14).
 
 > **CA02.** Dado que el lote ya registró su secado y todavía no tiene ruta, cuando el usuario intenta
 > registrar el paso siguiente sin elegirla, entonces el sistema rechaza la operación mostrando
@@ -227,7 +228,7 @@ inventario de producto terminado ni miden pérdidas (DR-15).
 
 > **CA04.** Dado que la etapa ya fue registrada para ese lote o esa parte, cuando el usuario intenta
 > registrarla de nuevo, entonces el sistema rechaza la operación mostrando "La etapa {etapa} ya fue
-> registrada para el lote {codigo}".
+> registrada para {nombre}".
 
 > **CA05.** Dado que el lote está Abierto, cuando el usuario intenta registrar una etapa, entonces el
 > sistema rechaza la operación mostrando "El lote debe iniciar su recorrido antes de registrar
@@ -394,8 +395,8 @@ lote; el usuario puede ajustarlas, siempre que sumen la unidad (DR-20).
 > entonces el sistema rechaza la operación mostrando "Cada parte debe tener un nombre distinto".
 
 > **CA04.** Dado que las fracciones no suman la unidad, cuando el usuario intenta confirmar,
-> entonces el sistema rechaza la operación mostrando "Las fracciones de las partes deben sumar el
-> total del lote".
+> entonces el sistema rechaza la operación mostrando "Las fracciones suman {suma} y deben sumar la
+> unidad".
 
 > **CA05.** Dado que el usuario indica más de seis partes, cuando intenta confirmar, entonces el
 > sistema rechaza la operación mostrando "Puede dividir el lote en seis partes como máximo".
@@ -412,7 +413,7 @@ lote; el usuario puede ajustarlas, siempre que sumen la unidad (DR-20).
 
 > **CA09.** Dado que llega un ingreso tardío a un lote dividido, cuando el usuario lo reparte,
 > entonces el sistema propone las fracciones del lote, permite editarlas y rechaza el reparto si no
-> suman la unidad, con el mensaje de CA04.
+> suman la unidad, mostrando "Las fracciones del reparto suman {suma} y deben sumar la unidad".
 
 > **CA10.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta dividir un lote,
 > entonces el sistema rechaza la operación mostrando "Acción no autorizada".

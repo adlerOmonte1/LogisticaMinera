@@ -119,10 +119,12 @@ Simetría con el backend: M07 y M08 tampoco tienen `models/` propios aquí — c
 M05 y M06 (D-10).
 
 **El menú se construye con el rol que devuelve el inicio de sesión**, no con una lista fija. El
-Supervisor de planta ve el registro de ingresos, el registro de destares, los lotes —solo para
-registrar el paso por las etapas— y la consulta (DR-17); el Administrativo ve además la corrección,
-los catálogos, la composición de lotes y la consolidación (DR-23); el Administrador lo ve todo,
-incluidos usuarios, auditoría y el cierre del lote con su destino. Ocultar una opción no reemplaza
+Supervisor de planta ve el inicio con sus avisos, los ingresos —con su registro, el registro de
+destares y el calendario—, los lotes —solo para registrar el paso por las etapas— y la consulta
+(DR-17, HU-M01-03); el Administrativo ve además la corrección, la exportación del listado, los
+catálogos, la composición de lotes y la consolidación (DR-23, DR-30); el Administrador lo ve todo,
+incluidos usuarios, auditoría y el cierre del lote con su destino. La búsqueda de la cabecera y los
+avisos están en todas las pantallas (HU-M07-02, HU-M07-04). Ocultar una opción no reemplaza
 el control del servidor: `rol.guard.ts` evita navegar a una pantalla vacía, pero quien decide es la
 API (HU-M01-03).
 

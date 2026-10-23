@@ -9,7 +9,7 @@
 |---|---|---|
 | RN-M01-01 | El nombre de usuario es único en todo el sistema | Dos personas podrían compartir identidad y la atribución de cada registro se rompería |
 | RN-M01-02 | Todo usuario pertenece a exactamente un rol | Los permisos quedarían indeterminados |
-| RN-M01-03 | Un usuario con registros asociados nunca se elimina físicamente; solo se desactiva | Se perderían ingresos del histórico atribuidos a ese usuario |
+| RN-M01-03 | Ningún usuario se elimina físicamente: se desactiva, y puede reactivarse con su mismo historial | Se perderían ingresos del histórico atribuidos a ese usuario |
 | RN-M01-04 | La contraseña tiene un mínimo de ocho caracteres | Una contraseña corta facilitaría el acceso no autorizado en un equipo compartido en planta |
 | RN-M01-05 | Un usuario inactivo no puede autenticarse aunque sus credenciales sean correctas | Personal desvinculado seguiría pudiendo registrar operaciones |
 | RN-M01-06 | Solo el rol Administrador crea, modifica o desactiva usuarios | La segregación entre quien administra y quien opera desaparecería |
@@ -17,3 +17,5 @@
 | RN-M01-08 | El cambio de la propia contraseña exige la contraseña actual | Cualquiera con una sesión abierta y sin vigilancia podría apropiarse de la cuenta |
 | RN-M01-09 | El permiso se concede por operación, no por módulo: un rol que registra ingresos no obtiene por ello la corrección ni la anulación | El Supervisor de planta, que debe registrar en planta, podría corregir o anular ingresos ajenos sin trazabilidad de la decisión |
 | RN-M01-10 | Solo el rol Administrador cierra un lote con su destino | El destino del mineral, venta o traslado, quedaría decidido por quien no responde de él ante la gerencia |
+| RN-M01-11 | Solo el Administrador restablece la contraseña de otro usuario, y la contraseña temporal debe cambiarse en el siguiente inicio de sesión | La persona operaría con una contraseña que conoce otro, y sus registros dejarían de ser atribuibles solo a ella |
+| RN-M01-12 | Ningún usuario desactiva su propia cuenta | Un Administrador podría dejar el sistema sin quien gestione los usuarios |

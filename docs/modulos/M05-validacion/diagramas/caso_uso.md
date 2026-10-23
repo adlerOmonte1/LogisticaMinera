@@ -20,6 +20,7 @@ flowchart LR
     ADV --> UC3
     ADV --> UC4
     ADM --> UC4
+    SUP --> UC4
     CAT -.-> UC1
 ```
 
@@ -30,7 +31,7 @@ flowchart LR
 | Detectar inconsistencias del ticket | HU-M05-01 | Supervisor de planta, Administrativo | Ocurre sobre los datos propuestos, sobre los confirmados y, en el primer viaje, al registrar el destare |
 | Corregir un dato señalado | HU-M05-01 | Supervisor de planta, Administrativo | Al corregir, el sistema revalida y retira la alerta si la regla ya se cumple |
 | Justificar una advertencia | HU-M05-01 | Supervisor de planta, Administrativo | Única vía para confirmar con la advertencia V1 de posible duplicado o V4 de peso fuera de rango |
-| Consultar validaciones de un ingreso | HU-M05-01 | Administrativo, Administrador | Muestra qué reglas se evaluaron, su resultado y la justificación |
+| Consultar validaciones de un ingreso | HU-M05-01 | Los tres roles (DR-31) | Muestra qué reglas se evaluaron, su resultado y la justificación |
 
 El catálogo se dibuja como sistema de apoyo porque V2 y V4 necesitan la tara y la capacidad
 declaradas del vehículo; sin esos datos las reglas no pueden evaluarse.

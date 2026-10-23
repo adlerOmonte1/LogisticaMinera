@@ -225,4 +225,3 @@ de implementar y verificar que el personal reconoce las cargas, sus partes y su 
 | Pendiente | Efecto |
 |---|---|
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede abrirse ningún lote |
-| Ajuste del mockup (plan, pendiente 3) | El mockup divide en toneladas y solo ofrece la venta como destino; esta documentación sigue DR-18 y DR-14 |

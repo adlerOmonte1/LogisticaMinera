@@ -12,9 +12,10 @@ antes de registrarse, con el usuario siempre confirmando lo que el sistema propo
 
 ## Estado del proyecto
 
-La documentación del sistema está en su **versión 2**: nueve módulos, 26 historias de usuario, sus
+La documentación del sistema está en su **versión 2.1**: nueve módulos, 27 historias de usuario, sus
 requerimientos y diagramas, reformulados a partir de la revisión del prototipo navegable
-([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-29. La versión 1 queda en
+([`Mockup/index.html`](Mockup/index.html)) y de las decisiones DR-11 a DR-31. El informe de
+validación de esta versión está en [`docs/REVISION_V2_1.md`](docs/REVISION_V2_1.md). La versión 1 queda en
 la etiqueta `docs-v1`. El backend conserva apps de un alcance anterior que se retiran en la
 preparación del repositorio, antes de construir los módulos
 ([`docs/01-plan/PLAN_DE_TRABAJO.md`](docs/01-plan/PLAN_DE_TRABAJO.md) §8).
@@ -22,7 +23,7 @@ preparación del repositorio, antes de construir los módulos
 | Rama | Contenido |
 |---|---|
 | `main` | Documentación de la versión 2 hasta DR-23; backend con M01 y M02 implementados, bajo el diseño anterior |
-| `docs/version-2` | Documentación de la versión 2, reformulada con las decisiones DR-11 a DR-29; preparación del backend en curso |
+| `docs/version-2` | Documentación de la versión 2.1, validada con las decisiones DR-11 a DR-31; preparación del backend en curso |
 
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|
@@ -47,7 +48,7 @@ curso. El 22/10/2026 se retiraron `apps/salidas`, `apps/sincronizacion` y `Clien
 ```
 LogisticaMinera/
 ├── backend/          Django 5 + Django REST Framework, una app por módulo
-├── Mockup/           Prototipo navegable de la interfaz, alineado con las decisiones hasta DR-29
+├── Mockup/           Prototipo navegable de la interfaz, alineado con las decisiones hasta DR-31
 ├── docs/             Documentación completa del sistema y de la tesis
 │   ├── 00-tesis/            Marco de tesis, decisiones de reformulación, plantillas
 │   ├── 00-arquitectura/     Decisiones de diseño, modelo de datos, guías, convenciones

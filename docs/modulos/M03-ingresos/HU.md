@@ -134,8 +134,8 @@ rol las modifica.
 > modificarla antes de confirmar.
 
 > **CA11.** Dado que el ingreso se persiste, cuando concluye la operación, entonces el sistema
-> conserva la imagen asociada al ingreso, cuando la hay, guarda para cada campo reconocido el valor propuesto y el
-> confirmado, y registra el evento en auditoría.
+> conserva la imagen asociada al ingreso, cuando la hay, guarda para cada campo reconocido el valor
+> propuesto y el confirmado, y registra el evento en auditoría.
 
 > **CA12.** Dado que la operación falla en cualquier punto después de confirmar, cuando el sistema
 > la interrumpe, entonces no queda un ingreso a medio registrar: o se persiste todo o no se persiste
@@ -254,7 +254,7 @@ cambio igual de atribuible.
 > consolidado del mes o la trazabilidad, entonces las cifras reflejan el valor corregido.
 
 > **CA12.** Dado que un ingreso tiene una corrección vigente, cuando el usuario elige revertirla desde
-> el historial del ingreso e indica el motivo, entonces el sistema restaura los valores anteriores a
+> el detalle del ingreso o desde el listado e indica el motivo, entonces el sistema restaura los valores anteriores a
 > esa corrección, recalcula el peso neto y muestra "Corrección revertida en el ingreso {codigo}".
 
 > **CA13.** Dado que el usuario intenta revertir una corrección que no es la última vigente del

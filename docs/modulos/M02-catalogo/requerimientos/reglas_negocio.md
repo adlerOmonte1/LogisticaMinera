@@ -13,7 +13,7 @@
 | RN-M02-05 | La capacidad de carga de un vehículo es un decimal positivo | La regla V4 no tendría un límite válido contra el cual contrastar el peso neto |
 | RN-M02-06 | El código de tipo de mineral es único | Un ingreso podría clasificarse en dos categorías a la vez |
 | RN-M02-07 | El RUC de un transportista tiene exactamente once dígitos numéricos | Se registrarían identificadores que ningún documento formal reconoce |
-| RN-M02-08 | Ninguna entidad de catálogo con registros dependientes se elimina físicamente | Se romperían las referencias del histórico de ingresos |
+| RN-M02-08 | Ninguna entidad de catálogo se elimina físicamente, tenga o no registros dependientes: se desactiva | Se romperían las referencias del histórico de ingresos |
 | RN-M02-09 | Una entidad desactivada no se ofrece en el formulario de registro, pero sí aparece en consultas históricas | Los ingresos antiguos quedarían sin una etiqueta legible para su vehículo o su tipo de mineral |
 | RN-M02-10 | La unidad de medida de todo tipo de mineral es la tonelada | Los totales de la consolidación mezclarían unidades incompatibles |
 | RN-M02-11 | Un vehículo se da de alta sin tara; la primera tara se registra en el destare de su primer viaje, como decimal positivo en toneladas, con su fecha y el usuario que la registró | Se aceptaría una tara estimada o copiada de otro vehículo, y el peso neto de todos sus ingresos quedaría falseado |
@@ -24,6 +24,7 @@
 | RN-M02-16 | El código de un tipo de mineral tiene de dos a seis letras o números y no se modifica después del alta | Un cambio de código desconectaría la clasificación de los ingresos ya consolidados de su etiqueta |
 | RN-M02-17 | El alta de un tipo de mineral desde el registro de un ingreso la hacen solo el Administrativo y el Administrador, con las reglas RN-M02-06, RN-M02-15 y RN-M02-16; si no se indica el código, el sistema genera uno que no se repite | El catálogo crecería con denominaciones creadas en planta sin control administrativo |
 | RN-M02-18 | El RUC de un transportista es único | Dos registros del mismo proveedor dividirían sus vehículos entre ambos |
+| RN-M02-19 | Una entidad reactivada vuelve a ofrecerse con sus mismos datos; el vehículo conserva la tara que tenía (DR-30) | Reactivar un vehículo le exigiría un nuevo destare o le daría una tara que la Gerencia no decidió |
 
 ## Nota sobre RN-M02-05
 

@@ -1,6 +1,6 @@
 # Modelo de datos — Entidad-Relación
 
-**Versión:** 3.0 · **Estado:** En revisión · **Cambio:** versión 2 del sistema (DR-11 a DR-23)
+**Versión:** 3.1 · **Estado:** Validado · **Cambio:** versión 2.1 del sistema (DR-11 a DR-31)
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../00-tesis/decisiones_reformulacion.md`
 
 **Fuente única.** Todas las entidades del sistema se modelan aquí, sin importar cuántos módulos las
@@ -60,6 +60,7 @@ alcance que la reformulación dejó fuera.
 | activo | boolean | la baja es lógica |
 | intentos_fallidos | int | soporta el bloqueo temporal |
 | ultimo_acceso | datetime | |
+| debe_cambiar_clave | boolean | verdadero tras un restablecimiento; obliga a cambiar la contraseña temporal al iniciar sesión (DR-30) |
 
 **Para qué existe.** Atribuir cada operación a una persona. Sin ella, ningún registro es imputable.
 **Quién la usa.** La escribe M01; la referencian todos los módulos que persisten algo.
@@ -358,7 +359,7 @@ partes (DR-21). Un ingreso sin lote no ha recorrido ninguna.
 | id_entidad | int | identificador del registro afectado |
 | valores_anteriores | jsonb | nulo en creación |
 | valores_nuevos | jsonb | nulo en anulación |
-| motivo | text | explicación escrita por el usuario; obligatoria en la corrección de un ingreso y en el cambio de tara de un vehículo |
+| motivo | text | explicación o autorización escrita por el usuario; obligatoria en la corrección de un ingreso y su reversión, la anulación, el cambio de tara de un vehículo y la unificación de un ingreso de otro tipo de mineral a un lote |
 | fecha_hora | datetime | |
 | direccion_ip | varchar(45) | |
 | ingresos_relacionados | int[] | identificadores de los ingresos que afecta un evento de lote; índice GIN. Vacío en los demás eventos |
@@ -422,8 +423,7 @@ conservarse por el filtro del catálogo.
 |---|---|
 | Valores del catálogo `TIPO_MINERAL`, a definir con la empresa (DR-03) | Implementación de M02 y forma del total mensual de M08 |
 | Medio de almacenamiento y retención de `imagen_ticket` (D-14) | Implementación de M03 |
-| Quién registra el destare en planta y cómo se avisa de un vehículo pendiente (DR-10) | Flujo de ingresos En proceso de M03 |
-| Forma real de agrupar el mineral en cancha y de decidir la ruta, a confirmar con la jefatura de operaciones | Alcance de `LOTE_PROCESO`; si la planta procesara volquete por volquete, el lote podría simplificarse a un vínculo directo |
+
 
 ## 6. Referencias
 
