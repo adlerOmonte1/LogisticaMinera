@@ -1,0 +1,312 @@
+{
+  "info": {
+    "_postman_id": "bab490db-b4a8-4e27-b77f-b5ef5d1f09ba",
+    "name": "LogisticaMinera API v1",
+    "description": "Colección del sistema web inteligente para el control de inventarios de ingreso de mineral. Una carpeta por fase de PLAN-02 (docs/01-plan/PLAN_IMPLEMENTACION.md). Ejecute siempre «00 · Sesiones» antes de cualquier otra carpeta. Los criterios de aceptación de cada fase están en el Anexo A de PLAN-02.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Umbral de tiempo de respuesta (PLAN-02 §4.4). El reconocimiento usa limite_ms = 5000.",
+          "pm.test(\"Responde dentro del umbral\", () => {",
+          "  pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"limite_ms\") || 2000));",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · Sesiones",
+      "description": "Inicia sesión con las tres cuentas de prueba y guarda sus tokens. Requiere haber ejecutado `python manage.py cargar_datos_prueba`.",
+      "item": [
+        {
+          "name": "Sesión · ADMINISTRADOR -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_admin}}\",\n  \"password\": \"{{clave_admin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol ADMINISTRADOR\", () => pm.expect(b.usuario.rol).to.eql(\"ADMINISTRADOR\"));",
+                  "pm.environment.set(\"token_admin\", b.access);",
+                  "pm.environment.set(\"refresh_admin\", b.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión · ADMINISTRATIVO -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_administrativo}}\",\n  \"password\": \"{{clave_administrativo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol ADMINISTRATIVO\", () => pm.expect(b.usuario.rol).to.eql(\"ADMINISTRATIVO\"));",
+                  "pm.environment.set(\"token_administrativo\", b.access);",
+                  "pm.environment.set(\"refresh_administrativo\", b.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión · SUPERVISOR -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_supervisor}}\",\n  \"password\": \"{{clave_supervisor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol SUPERVISOR\", () => pm.expect(b.usuario.rol).to.eql(\"SUPERVISOR\"));",
+                  "pm.environment.set(\"token_supervisor\", b.access);",
+                  "pm.environment.set(\"refresh_supervisor\", b.refresh);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F0 · Salud y esquema",
+      "description": "Puerta de F0: el backend arranca con la línea base 2.1, publica su esquema y ya no expone las rutas del diseño anterior.",
+      "item": [
+        {
+          "name": "F0 · Esquema OpenAPI -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/esquema/?format=json"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Documento OpenAPI 3\", () => pm.expect(String(b.openapi)).to.match(/^3\\./));",
+                  "pm.test(\"Título de la línea base 2.1\", () => pm.expect(b.info.title).to.include(\"ingreso de mineral\"));",
+                  "pm.test(\"Publica la ruta de tipos de mineral\", () => pm.expect(Object.keys(b.paths)).to.include(\"/api/v1/catalogo/tipos-mineral/\"));",
+                  "pm.test(\"No publica rutas de productos\", () => pm.expect(Object.keys(b.paths).join(\" \")).to.not.include(\"productos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Documentación de la API -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/docs/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Interfaz de documentación\", () => pm.expect(pm.response.text().toLowerCase()).to.include(\"swagger\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Tipos de mineral con sesión -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Listado paginado\", () => {",
+                  "  pm.expect(b).to.have.property(\"count\");",
+                  "  pm.expect(b.results).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Tipos de mineral sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Cuerpo uniforme (D-23)\", () => {",
+                  "  pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\");",
+                  "});",
+                  "pm.test(\"Código NO_AUTENTICADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"NO_AUTENTICADO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Ruta anterior de productos -> 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/productos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404: la ruta del diseño anterior ya no existe\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Registro de ingresos aún sin rutas -> 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404: el registro del diseño anterior se retiró; M03 se publica en F3\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
