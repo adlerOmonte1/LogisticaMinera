@@ -1,19 +1,15 @@
-"""Filtros de listado del catálogo.
-
-`titularidad` sobre vehículos no es comodidad: es la consulta que alimenta el
-denominador del indicador I2 (cobertura por tipo de vehículo).
-"""
+"""Filtros de listado del catálogo."""
 
 import django_filters
 
-from apps.catalogo.models import Producto, Vehiculo
+from apps.catalogo.models import TipoMineral, Vehiculo
 
 
-class ProductoFilter(django_filters.FilterSet):
+class TipoMineralFilter(django_filters.FilterSet):
     activo = django_filters.BooleanFilter(field_name="activo")
 
     class Meta:
-        model = Producto
+        model = TipoMineral
         fields = ["activo"]
 
 

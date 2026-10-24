@@ -3,7 +3,7 @@
 from rest_framework.routers import DefaultRouter
 
 from apps.catalogo.views import (
-    ProductoViewSet,
+    TipoMineralViewSet,
     TransportistaViewSet,
     VehiculoViewSet,
 )
@@ -11,7 +11,7 @@ from apps.catalogo.views import (
 app_name = "catalogo"
 
 router = DefaultRouter()
-router.register("productos", ProductoViewSet, basename="producto")
+router.register("tipos-mineral", TipoMineralViewSet, basename="tipo-mineral")
 router.register("vehiculos", VehiculoViewSet, basename="vehiculo")
 router.register("transportistas", TransportistaViewSet, basename="transportista")
 

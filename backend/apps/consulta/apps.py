@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class BusquedaConfig(AppConfig):
+class ConsultaConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "apps.busqueda"
-    verbose_name = "M09 — Búsqueda"
+    name = "apps.consulta"
+    verbose_name = "M07 — Consulta de ingresos y respaldo"

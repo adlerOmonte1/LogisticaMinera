@@ -1,7 +1,7 @@
-from .productos import (
-    ProductoCreateSerializer,
-    ProductoSerializer,
-    ProductoUpdateSerializer,
+from .tipos_mineral import (
+    TipoMineralCreateSerializer,
+    TipoMineralSerializer,
+    TipoMineralUpdateSerializer,
 )
 from .transportistas import (
     TransportistaCreateSerializer,
@@ -15,7 +15,7 @@ from .vehiculos import (
 )
 
 __all__ = [
-    "ProductoCreateSerializer", "ProductoSerializer", "ProductoUpdateSerializer",
+    "TipoMineralCreateSerializer", "TipoMineralSerializer", "TipoMineralUpdateSerializer",
     "TransportistaCreateSerializer", "TransportistaSerializer", "TransportistaUpdateSerializer",
     "VehiculoCreateSerializer", "VehiculoSerializer", "VehiculoUpdateSerializer",
 ]

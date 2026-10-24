@@ -1,3 +1,3 @@
-from . import productos, transportistas, vehiculos
+from . import tipos_mineral, transportistas, vehiculos
 
-__all__ = ["productos", "transportistas", "vehiculos"]
+__all__ = ["tipos_mineral", "transportistas", "vehiculos"]

@@ -1,11 +1,11 @@
 """Consultas de lectura del catálogo. No escriben (solid-proyecto).
 
 Cada repositorio ofrece dos vistas del mismo dato:
-- `vigentes()`  -> lo que se ofrece en los formularios operativos (RN-M02-08).
+- `vigentes()`  -> lo que se ofrece en los formularios operativos (RN-M02-09).
 - `todos()`     -> incluye desactivados, para las consultas históricas.
 """
 
-from apps.catalogo.models import Producto, Transportista, Vehiculo
+from apps.catalogo.models import TipoMineral, Transportista, Vehiculo
 
 
 class _RepositorioCatalogo:
@@ -24,12 +24,12 @@ class _RepositorioCatalogo:
         return cls.modelo.objects.filter(pk=pk).first()
 
 
-class ProductoRepository(_RepositorioCatalogo):
-    modelo = Producto
+class TipoMineralRepository(_RepositorioCatalogo):
+    modelo = TipoMineral
 
     @staticmethod
     def existe_codigo(codigo, *, excluir_id=None):
-        qs = Producto.objects.filter(codigo=codigo)
+        qs = TipoMineral.objects.filter(codigo=codigo)
         if excluir_id is not None:
             qs = qs.exclude(pk=excluir_id)
         return qs.exists()

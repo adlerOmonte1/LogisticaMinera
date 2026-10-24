@@ -14,8 +14,8 @@ class Vehiculo(EntidadCatalogo):
     RN-M02-02 (placa única), RN-M02-03 (titularidad obligatoria y cerrada),
     RN-M02-04 / RN-M02-05 (coherencia titularidad ↔ transportista).
 
-    El índice sobre `tipo_titularidad` sostiene el indicador I2: la cobertura
-    de registro se agrupa por este campo (propio vs. externo).
+    El índice sobre `tipo_titularidad` sostiene el filtro por titularidad del
+    catálogo.
     """
 
     PROPIO = "PROPIO"

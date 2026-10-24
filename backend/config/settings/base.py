@@ -43,13 +43,15 @@ THIRD_PARTY_APPS = [
 
 # Una app por módulo (ARQ-01). El orden espeja el código del módulo.
 LOCAL_APPS = [
-    "apps.accounts",        # M01
-    "apps.catalogo",        # M02
-    "apps.ingresos",        # M03
-    "apps.existencias",     # M05
-    "apps.reportes",        # M06  — app de lectura, sin modelos (D-10)
-    "apps.auditoria",       # M08
-    "apps.busqueda",        # M09  — app de lectura, sin modelos (D-10)
+    "apps.accounts",        # M01 Autenticación y roles
+    "apps.catalogo",        # M02 Catálogo maestro
+    "apps.ingresos",        # M03 Registro de ingresos
+    "apps.reconocimiento",  # M04 Reconocimiento automático del ticket
+    "apps.validacion",      # M05 Validación automática de consistencia
+    "apps.trazabilidad",    # M06 Trazabilidad del proceso
+    "apps.consulta",        # M07 Consulta de ingresos y respaldo — app de lectura (D-10)
+    "apps.consolidacion",   # M08 Consolidación de la producción — app de lectura (D-10)
+    "apps.auditoria",       # M09 Auditoría
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -100,9 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # --- Localización -----------------------------------------------------------
-# America/Lima no es cosmético: el indicador I1 es la diferencia entre la hora
-# del ticket de balanza y la que asigna el servidor. Un desfase de zona horaria
-# contamina la medición (D-01, D-03).
+# America/Lima no es cosmético: las tres marcas de tiempo del ingreso (D-01) se
+# comparan entre sí y con la hora real de la planta. Un desfase de zona horaria
+# las desalinea sin que ninguna prueba lo note.
 
 LANGUAGE_CODE = "es-pe"
 TIME_ZONE = "America/Lima"
@@ -112,6 +114,22 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# --- Imágenes del ticket ------------------------------------------------------
+# Se guardan por la API de almacenamiento de Django (D-18). Provisionalmente en
+# el volumen `media` del mismo backend (D-14); cambiar de medio es cambiar
+# `STORAGES`, no el código. MEDIA_URL no se publica: la imagen solo se entrega
+# por la vista de M07 que comprueba la sesión (RN-M07-06).
+MEDIA_ROOT = env.path("MEDIA_ROOT", default=BASE_DIR / "media")
+MEDIA_URL = "media/"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+
+# RS-M03-01: imagen JPG o PNG de hasta 10 MB. Nginx debe admitir el mismo límite
+# (skill despliegue-docker).
+TAMANO_MAXIMO_IMAGEN_TICKET = 10 * 1024 * 1024
+
 # --- API --------------------------------------------------------------------
 
 REST_FRAMEWORK = {
@@ -120,7 +138,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-    "PAGE_SIZE": 25,  # HU-M03-05
+    "PAGE_SIZE": 25,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Provisional: se reemplaza por utils.paginacion.PaginacionEstandar al escribir utils/.
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -133,8 +151,8 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Sistema de Control de Producción y Existencias",
-    "DESCRIPTION": "API REST — módulos M01 a M09",
+    "TITLE": "Sistema web inteligente para el control de inventarios de ingreso de mineral",
+    "DESCRIPTION": "API REST — módulos M01 a M09 (línea base 2.1)",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }

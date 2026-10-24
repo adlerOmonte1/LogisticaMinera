@@ -1,16 +1,16 @@
 import factory
 
-from apps.catalogo.models import Producto, Transportista, Vehiculo
+from apps.catalogo.models import TipoMineral, Transportista, Vehiculo
 
 
-class ProductoFactory(factory.django.DjangoModelFactory):
+class TipoMineralFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Producto
+        model = TipoMineral
         django_get_or_create = ("codigo",)
 
-    codigo = factory.Sequence(lambda n: f"P{n:03d}")
-    nombre = factory.Sequence(lambda n: f"Producto {n}")
-    unidad_medida = Producto.TONELADA
+    codigo = factory.Sequence(lambda n: f"M{n:03d}")
+    nombre = factory.Sequence(lambda n: f"Mineral {n}")
+    unidad_medida = TipoMineral.TONELADA
 
 
 class TransportistaFactory(factory.django.DjangoModelFactory):

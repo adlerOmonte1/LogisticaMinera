@@ -1,8 +1,8 @@
-"""Controladores REST del catálogo (RF-03). HU-M02-01 a HU-M02-04.
+"""Controladores REST del catálogo (M02). HU-M02-01 a HU-M02-03.
 
 Un `ViewSet` por entidad, todos con la misma forma: listar (vigentes por
 defecto), crear, editar y desactivar. Sin `DELETE`: la baja es siempre lógica
-(RN-M02-07). La lógica de negocio vive en `services/`; aquí solo se traduce
+(RN-M02-08). La lógica de negocio vive en `services/`; aquí solo se traduce
 HTTP.
 """
 
@@ -11,17 +11,17 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.catalogo.filters import ProductoFilter, VehiculoFilter
+from apps.catalogo.filters import TipoMineralFilter, VehiculoFilter
 from apps.catalogo.permissions import PuedeGestionarCatalogo
 from apps.catalogo.repositories import (
-    ProductoRepository,
+    TipoMineralRepository,
     TransportistaRepository,
     VehiculoRepository,
 )
 from apps.catalogo.serializers import (
-    ProductoCreateSerializer,
-    ProductoSerializer,
-    ProductoUpdateSerializer,
+    TipoMineralCreateSerializer,
+    TipoMineralSerializer,
+    TipoMineralUpdateSerializer,
     TransportistaCreateSerializer,
     TransportistaSerializer,
     TransportistaUpdateSerializer,
@@ -29,7 +29,7 @@ from apps.catalogo.serializers import (
     VehiculoSerializer,
     VehiculoUpdateSerializer,
 )
-from apps.catalogo.services import productos, transportistas, vehiculos
+from apps.catalogo.services import tipos_mineral, transportistas, vehiculos
 
 _VERDADERO = {"1", "true", "True", "si", "sí"}
 
@@ -92,15 +92,15 @@ class CatalogoViewSet(
         return Response(cuerpo)
 
 
-class ProductoViewSet(CatalogoViewSet):
-    repositorio = ProductoRepository
-    serializer_salida = ProductoSerializer
-    serializer_alta = ProductoCreateSerializer
-    serializer_edicion = ProductoUpdateSerializer
-    filterset_class = ProductoFilter
-    fn_crear = staticmethod(productos.crear_producto)
-    fn_actualizar = staticmethod(productos.actualizar_producto)
-    fn_desactivar = staticmethod(productos.desactivar_producto)
+class TipoMineralViewSet(CatalogoViewSet):
+    repositorio = TipoMineralRepository
+    serializer_salida = TipoMineralSerializer
+    serializer_alta = TipoMineralCreateSerializer
+    serializer_edicion = TipoMineralUpdateSerializer
+    filterset_class = TipoMineralFilter
+    fn_crear = staticmethod(tipos_mineral.crear_tipo_mineral)
+    fn_actualizar = staticmethod(tipos_mineral.actualizar_tipo_mineral)
+    fn_desactivar = staticmethod(tipos_mineral.desactivar_tipo_mineral)
 
 
 class VehiculoViewSet(CatalogoViewSet):
@@ -124,4 +124,4 @@ class TransportistaViewSet(CatalogoViewSet):
     fn_desactivar = staticmethod(transportistas.desactivar_transportista)
 
 
-__all__ = ["ProductoViewSet", "VehiculoViewSet", "TransportistaViewSet"]
+__all__ = ["TipoMineralViewSet", "VehiculoViewSet", "TransportistaViewSet"]

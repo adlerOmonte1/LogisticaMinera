@@ -1,24 +1,24 @@
 from rest_framework import serializers
 
-from apps.catalogo.models import Producto
+from apps.catalogo.models import TipoMineral
 
 
-class ProductoSerializer(serializers.ModelSerializer):
+class TipoMineralSerializer(serializers.ModelSerializer):
     """Salida y listado."""
 
     class Meta:
-        model = Producto
+        model = TipoMineral
         fields = ["id", "codigo", "nombre", "unidad_medida", "activo"]
         read_only_fields = fields
 
 
-class ProductoCreateSerializer(serializers.Serializer):
-    codigo = serializers.CharField(max_length=20)
+class TipoMineralCreateSerializer(serializers.Serializer):
+    codigo = serializers.CharField(max_length=6)
     nombre = serializers.CharField(max_length=100)
     unidad_medida = serializers.ChoiceField(
-        choices=Producto.UNIDADES, default=Producto.TONELADA
+        choices=TipoMineral.UNIDADES, default=TipoMineral.TONELADA
     )
 
 
-class ProductoUpdateSerializer(serializers.Serializer):
+class TipoMineralUpdateSerializer(serializers.Serializer):
     nombre = serializers.CharField(max_length=100, required=False)
