@@ -3,8 +3,8 @@ from django.db import models
 
 class ContadorCorrelativo(models.Model):
     """Soporte técnico de D-02. No es una entidad del modelo entidad-relación:
-    es el contador que permite que `Ingreso.correlativo` sea único y
-    estrictamente creciente bajo concurrencia, con reinicio anual y prefijo
+    es el contador que permite que `Ingreso.codigo` sea único y estrictamente
+    creciente bajo concurrencia, con reinicio anual y prefijo
     (`ING-{año}-{cinco dígitos}`, ver `services/correlativo.py` y
     `skills/base-datos-postgresql`).
     """

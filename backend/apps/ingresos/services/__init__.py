@@ -1,3 +1,3 @@
-from . import correlativo, ingresos
+from . import correlativo
 
-__all__ = ["correlativo", "ingresos"]
+__all__ = ["correlativo"]

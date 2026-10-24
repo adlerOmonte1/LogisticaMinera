@@ -1,9 +1,7 @@
-"""Serie de correlativos de M03 (D-02).
+"""Serie de códigos de los ingresos (D-02).
 
-La mecánica vive en `common/correlativo.py`, compartida con las demás series
-del sistema. Aquí solo se ata el prefijo `ING` a la tabla de contadores de
-este módulo: M04 hará lo propio con `SAL` y su propia tabla, de modo que las
-dos series son independientes por construcción (RN-M04-10).
+La mecánica vive en `common/correlativo.py`. Aquí solo se ata el prefijo `ING`
+a la tabla de contadores de este módulo.
 """
 
 from common.correlativo import GeneradorCorrelativo, GeneradorCorrelativoPorAnio
