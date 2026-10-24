@@ -163,13 +163,13 @@ La auditoría (M09) es transversal: no tiene RF propio y **no suma ni resta** en
 | Módulo | Nombre | Responsabilidad | RF principal | Estado del código |
 |---|---|---|---|---|
 | M01 | Autenticación y roles | Identificar al usuario y limitar cada operación según su rol | RF10 | Implementado con pruebas (`apps/accounts`) |
-| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) | Implementado con pruebas (`apps/catalogo`); pendiente retirar clientes y definir tipo de mineral |
-| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 | Implementado con el diseño anterior (`apps/ingresos`); pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Sin código |
-| M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado, detrás de la interfaz `ValidadorConsistencia` | RF03 | Sin código |
-| M06 | Trazabilidad del proceso | Asignar ingresos a lotes de proceso y registrar su paso por cada etapa | RF07 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket; listado con exportación, calendario e inicio con avisos de pendientes | RF08 | Sin código (`apps/busqueda` es un esqueleto) |
-| M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 | Sin código (`apps/reportes` es un esqueleto) |
+| M02 | Catálogo maestro | Mantener tipos de mineral, vehículos con titularidad, capacidad y tara, y transportistas | RF06 (soporte) | Implementado con pruebas (`apps/catalogo`), con `TipoMineral` en lugar de `Producto`; falta la tara del vehículo y la reactivación (F2) |
+| M03 | Registro de ingresos | Registrar el ingreso a partir de la imagen del ticket, con corrección, confirmación, cálculo del peso neto, destare del primer viaje y código único | RF01, RF04, RF05, RF06 | Modelo `Ingreso` 3.1 sin servicio ni rutas; el registro se reescribe en F3 |
+| M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza, detrás de la interfaz `ReconocedorTicket` | RF02 | Esqueleto (`apps/reconocimiento`) |
+| M05 | Validación automática de consistencia | Aplicar V1 a V5 en el servidor y registrar el resultado, detrás de la interfaz `ValidadorConsistencia` | RF03 | Esqueleto (`apps/validacion`) |
+| M06 | Trazabilidad del proceso | Asignar ingresos a lotes de proceso y registrar su paso por cada etapa | RF07 | Esqueleto (`apps/trazabilidad`) |
+| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket; listado con exportación, calendario e inicio con avisos de pendientes | RF08 | Esqueleto de lectura (`apps/consulta`) |
+| M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 | Esqueleto de lectura (`apps/consolidacion`) |
 | M09 | Auditoría | Registrar quién hizo qué y cuándo sobre cada entidad, incluidos reconocimiento y corrección | — (transversal) | Sin código (`apps/auditoria` es un esqueleto) |
 
 Añadir un módulo consiste en crear su carpeta, agregar una fila a esta tabla y sus filas a la
@@ -177,8 +177,9 @@ matriz de trazabilidad. No se renumera nada ni se toca otro módulo.
 
 > **Nota sobre la renumeración.** Los módulos se renumeraron el 21/09/2026. Las carpetas de
 > `docs/modulos/` con la numeración antigua ya se retiraron. Las apps del backend que no figuran en
-> el mapa (`apps/salidas` entre ellas) corresponden al sistema anterior y se retiran en la
-> preparación del repositorio (`docs/01-plan/PLAN_DE_TRABAJO.md` §8). Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
+> el mapa (`apps/salidas`, `apps/sincronizacion` y `apps/existencias`) correspondían al sistema
+> anterior y se retiraron en la preparación del repositorio (fase F0 de
+> `docs/01-plan/PLAN_IMPLEMENTACION.md`). Los commits `M04:` de la rama `feature/M03-ingresos` anteriores a
 > esa fecha se refieren a Salidas, no a Reconocimiento. No documentes nada sobre esas carpetas ni
 > cites sus historias.
 

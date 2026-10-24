@@ -2,9 +2,9 @@
 
 Este repositorio documenta e implementa un **sistema web inteligente para el control de inventarios
 de ingreso de mineral** (tesis 2027, empresa Construcción y Minería, Huánuco). La documentación se reformuló entre el
-21/09/2026 y el 22/10/2026 desde un alcance anterior. La preparación del backend heredado está en
-curso: ya se retiraron `salidas`, `sincronizacion` y `Cliente`; el resto sigue pendiente
-(`docs/01-plan/PLAN_DE_TRABAJO.md` §8).
+21/09/2026 y el 22/10/2026 desde un alcance anterior. La preparación del backend heredado —fase F0 de
+`docs/01-plan/PLAN_IMPLEMENTACION.md`— está hecha en la rama `chore/F0-preparacion-backend`, a la
+espera de su puerta de supervisión; la bitácora de puertas está en `docs/03-pruebas/bitacora_puertas.md`.
 
 **La fase documental está cerrada** desde el 23/10/2026 con la línea base 2.1
 (`docs/01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.md`). Todo cambio a la documentación entra como decisión

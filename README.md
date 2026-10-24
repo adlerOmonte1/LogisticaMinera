@@ -32,18 +32,19 @@ preparación del repositorio, antes de construir los módulos
 | Módulo | Responsabilidad | Documentación | Código |
 |---|---|---|---|
 | M01 | Autenticación y roles | Versión 2.1 | Implementado; falta la matriz completa de permisos, el restablecimiento de contraseñas y la reactivación (DR-30, DR-31) |
-| M02 | Catálogo maestro | Versión 2.1 | Implementado; `Cliente` retirado, pendiente renombrar `Producto` a `TipoMineral` |
-| M03 | Registro de ingresos | Versión 2.1 | Implementado con el diseño anterior; pendiente de refactor |
-| M04 | Reconocimiento automático del ticket | Versión 2.1 | Sin código |
-| M05 | Validación automática de consistencia | Versión 2.1 | Sin código |
-| M06 | Trazabilidad del proceso | Versión 2.1 | Sin código |
-| M07 | Consulta de ingresos y respaldo | Versión 2.1 | Sin código |
-| M08 | Consolidación de la producción | Versión 2.1 | Sin código |
+| M02 | Catálogo maestro | Versión 2.1 | Implementado, con `TipoMineral`; falta la tara del vehículo y la reactivación (F2) |
+| M03 | Registro de ingresos | Versión 2.1 | Modelo 3.1 listo; servicio y rutas en F3 |
+| M04 | Reconocimiento automático del ticket | Versión 2.1 | Esqueleto |
+| M05 | Validación automática de consistencia | Versión 2.1 | Esqueleto |
+| M06 | Trazabilidad del proceso | Versión 2.1 | Esqueleto |
+| M07 | Consulta de ingresos y respaldo | Versión 2.1 | Esqueleto de lectura |
+| M08 | Consolidación de la producción | Versión 2.1 | Esqueleto de lectura |
 | M09 | Auditoría | Versión 2.1 | Esqueleto, sin lógica |
 
-La limpieza del backend es la preparación del repositorio de `PLAN_DE_TRABAJO.md` §8 y está en
-curso. El 22/10/2026 se retiraron `apps/salidas`, `apps/sincronizacion` y `Cliente`; falta retirar
-`apps/existencias`, refactorizar `apps/ingresos` y crear las apps nuevas.
+La limpieza del backend es la fase F0 de `PLAN_IMPLEMENTACION.md`: retiradas `apps/salidas`,
+`apps/sincronizacion`, `apps/existencias` y `Cliente`; `Producto` pasó a `TipoMineral`; `Ingreso`
+está en el modelo 3.1; y existen las apps de M04 a M08. Su puerta está en
+[`docs/03-pruebas/bitacora_puertas.md`](docs/03-pruebas/bitacora_puertas.md).
 
 ---
 

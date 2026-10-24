@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**139 archivos · 20552 líneas de texto.**
+**145 archivos · 20589 líneas de texto.**
 
 ## `Mockup/`
 
@@ -20,7 +20,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [REVISION_TECNICA_V2.pdf](REVISION_TECNICA_V2.pdf) | — | — | 275 |
 | [REVISION_V2_1.md](REVISION_V2_1.md) | Revisión y validación de la versión 2.1 de la documentación | 211 | 17 |
 | [REVISION_V2_1.pdf](REVISION_V2_1.pdf) | — | — | 353 |
-| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6333 |
+| [Requerimientos_y_Diagramas.pdf](Requerimientos_y_Diagramas.pdf) | — | — | 6335 |
 
 ## `docs/00-arquitectura/`
 
@@ -47,6 +47,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [ACTA_CIERRE_FASE_DOCUMENTAL.pdf](01-plan/ACTA_CIERRE_FASE_DOCUMENTAL.pdf) | — | — | 265 |
 | [PLAN_DE_TRABAJO.md](01-plan/PLAN_DE_TRABAJO.md) | PLAN-01 — Plan de trabajo, pruebas y entrega | 609 | 36 |
 | [PLAN_IMPLEMENTACION.md](01-plan/PLAN_IMPLEMENTACION.md) | PLAN-02 — Plan de implementación por fases, con validación en Postman | 1124 | 96 |
+| [PLAN_IMPLEMENTACION.pdf](01-plan/PLAN_IMPLEMENTACION.pdf) | — | — | 1206 |
 
 ## `docs/02-trazabilidad/`
 
@@ -58,7 +59,17 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
+| [bitacora_puertas.md](03-pruebas/bitacora_puertas.md) | Bitácora de puertas de fase | 10 | 0 |
 | [plan_de_pruebas.md](03-pruebas/plan_de_pruebas.md) | Plan de pruebas — Sistema web inteligente | 276 | 16 |
+
+## `docs/03-pruebas/evidencias/F0/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F0/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F0/newman.xml) | — | — | 5 |
+| [pytest.txt](03-pruebas/evidencias/F0/pytest.txt) | — | — | 2 |
+| [trazabilidad.md](03-pruebas/evidencias/F0/trazabilidad.md) | — | 23 | 6 |
 
 ## `docs/model-c4/`
 
@@ -308,7 +319,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [generar_pdf_requerimientos.py](../scripts/generar_pdf_requerimientos.py) | — | 827 | 39 |
 | [indexar_docs.py](../scripts/indexar_docs.py) | — | 66 | 2 |
 | [md_a_pdf.py](../scripts/md_a_pdf.py) | — | 101 | 4 |
-| [reporte_trazabilidad.py](../scripts/reporte_trazabilidad.py) | — | 121 | 5 |
+| [reporte_trazabilidad.py](../scripts/reporte_trazabilidad.py) | — | 124 | 5 |
 | [validar_docs.py](../scripts/validar_docs.py) | — | 172 | 6 |
 | [verificar_migracion.sh](../scripts/verificar_migracion.sh) | — | 36 | 1 |
 
@@ -340,7 +351,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 322 | 22 |
+| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 323 | 22 |
 
 ## `skills/despliegue-docker/`
 
