@@ -10,6 +10,7 @@ venv/
 htmlcov/
 .pytest_cache/
 .env
+backend/media/
 
 # Node / Angular
 node_modules/

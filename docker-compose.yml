@@ -1,0 +1,49 @@
+# Entorno de desarrollo (PLAN-02, F0): base de datos, backend y almacen de imagenes.
+# Los valores de este archivo son solo de desarrollo; produccion tiene su propio
+# archivo y sus secretos fuera del repositorio (F9, skill despliegue-docker).
+name: logistica-minera
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: logistica
+      POSTGRES_PASSWORD: desarrollo
+      POSTGRES_DB: logistica_minera_dev
+      TZ: America/Lima
+      PGTZ: America/Lima
+    # 5433 en el equipo, para no chocar con un PostgreSQL local en el 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logistica -d logistica_minera_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DJANGO_SECRET_KEY: clave-solo-de-desarrollo-no-usar-en-preproduccion-ni-produccion
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DATABASE_URL: postgres://logistica:desarrollo@db:5432/logistica_minera_dev
+      CORS_ALLOWED_ORIGINS: http://localhost:4200
+      MEDIA_ROOT: /app/media
+      TZ: America/Lima
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # Imagenes del ticket en el mismo backend (D-14 provisional, D-18).
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db:
+  media:
