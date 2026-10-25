@@ -7,4 +7,4 @@ columnas técnicas; el supervisor, el resultado y las observaciones.
 
 | Fase | Fecha | Commit | pytest | Newman | Trazabilidad | Resultado | Supervisor | Observaciones |
 |---|---|---|---|---|---|---|---|---|
-| F0 | 25/10/2026 | `9e5c600` | 71 aprobadas sobre PostgreSQL 16 del Compose, 0 fallos; cobertura 94 % | 9 solicitudes, 32 aserciones, 0 fallos, contra el Compose | Estricto, sin códigos huérfanos | Pendiente de supervisión | — | Repetida sobre PostgreSQL 16 tras la primera ejecución en SQLite del 24/10/2026 |
+| F0 | 25/10/2026 | `9e5c600` | 71 aprobadas sobre PostgreSQL 16 del Compose, 0 fallos; cobertura 94 % | 9 solicitudes, 32 aserciones, 0 fallos, contra el Compose | Estricto, sin códigos huérfanos | Aprobada | Autor, en el chat del 25/10/2026 | Repetida sobre PostgreSQL 16 tras la primera ejecución en SQLite del 24/10/2026 |
