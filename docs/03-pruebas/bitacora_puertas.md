@@ -7,4 +7,4 @@ columnas técnicas; el supervisor, el resultado y las observaciones.
 
 | Fase | Fecha | Commit | pytest | Newman | Trazabilidad | Resultado | Supervisor | Observaciones |
 |---|---|---|---|---|---|---|---|---|
-| F0 | 24/10/2026 | Sin commit; rama `chore/F0-preparacion-backend` | 71 aprobadas, 0 fallos; cobertura 94 % | 9 solicitudes, 32 aserciones, 0 fallos | Estricto, sin códigos huérfanos | Pendiente de supervisión | — | Newman ejecutado sobre SQLite porque Docker Desktop estaba en pausa; falta repetirlo sobre el PostgreSQL 16 del Compose |
+| F0 | 25/10/2026 | `9e5c600` | 71 aprobadas sobre PostgreSQL 16 del Compose, 0 fallos; cobertura 94 % | 9 solicitudes, 32 aserciones, 0 fallos, contra el Compose | Estricto, sin códigos huérfanos | Pendiente de supervisión | — | Repetida sobre PostgreSQL 16 tras la primera ejecución en SQLite del 24/10/2026 |
