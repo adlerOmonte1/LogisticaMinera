@@ -7,7 +7,7 @@ Validación de la API fase por fase, según
 |---|---|
 | `LogisticaMinera.postman_collection.json` | La colección: «00 · Sesiones» y una carpeta por fase |
 | `entornos/local.postman_environment.json` | Backend en el equipo, con las cuentas de prueba del comando de carga |
-| `archivos/` | Imágenes de prueba del registro de ingresos (se agregan en F3) |
+| `archivos/` | Archivos del registro de ingresos (F3): `ticket_legible.jpg`, ticket sintético con el formato de la maqueta y fecha pasada; `ticket_ilegible.png`, sin texto; `documento.pdf`, formato no admitido. Newman se ejecuta desde la raíz del repositorio para encontrarlos |
 
 Las credenciales del entorno local son de prueba: las crea `cargar_datos_prueba`, que solo corre con
 `DEBUG` activo. Ninguna credencial real entra en este directorio.

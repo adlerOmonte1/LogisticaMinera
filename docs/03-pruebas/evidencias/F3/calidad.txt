@@ -1,0 +1,11 @@
+# ruff
+All checks passed!
+
+# makemigrations --check
+No changes detected
+
+# check
+System check identified no issues (0 silenced).
+
+# motor local
+Tesseract 5.5.0 dentro del contenedor; ticket_legible.jpg: placa V2K-841 (0,735), fecha 2026-10-30 (0,86), peso 29,80 t (0,906); ticket_ilegible.png: ILEGIBLE
