@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**155 archivos · 20692 líneas de texto.**
+**153 archivos · 20693 líneas de texto.**
 
 ## `Mockup/`
 
@@ -13,7 +13,6 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [.DS_Store](.DS_Store) | — | — | 8 |
 | [HistoriasUsuario.md](HistoriasUsuario.md) | Historias de usuario — índice | 117 | 4 |
 | [Historias_de_Usuario.pdf](Historias_de_Usuario.pdf) | — | — | 892 |
 | [REVISION_TECNICA_V2.md](REVISION_TECNICA_V2.md) | Revisión técnica de la versión 2 — arquitectura, estructura y puntos abiertos | 218 | 17 |
@@ -97,12 +96,6 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [ARQ-02_Arquitectura_Tecnica.md](model-c4/ARQ-02_Arquitectura_Tecnica.md) | ARQ-02 — Arquitectura técnica (Django + Angular) | 284 | 14 |
 | [ARQ-03_Modelo_C4.md](model-c4/ARQ-03_Modelo_C4.md) | ARQ-03 — Modelo C4 del sistema | 591 | 32 |
 | [ARQ-03_Modelo_C4.pdf](model-c4/ARQ-03_Modelo_C4.pdf) | — | — | 603 |
-
-## `docs/modulos/`
-
-| Archivo | Título | Líneas | KB |
-|---|---|---:|---:|
-| [.DS_Store](modulos/.DS_Store) | — | — | 8 |
 
 ## `docs/modulos/M01-autenticacion/`
 
@@ -335,7 +328,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 |---|---|---:|---:|
 | [generar_pdf_hu.py](../scripts/generar_pdf_hu.py) | — | 508 | 23 |
 | [generar_pdf_requerimientos.py](../scripts/generar_pdf_requerimientos.py) | — | 827 | 39 |
-| [indexar_docs.py](../scripts/indexar_docs.py) | — | 66 | 2 |
+| [indexar_docs.py](../scripts/indexar_docs.py) | — | 67 | 2 |
 | [md_a_pdf.py](../scripts/md_a_pdf.py) | — | 101 | 4 |
 | [reporte_trazabilidad.py](../scripts/reporte_trazabilidad.py) | — | 124 | 5 |
 | [respaldo.sh](../scripts/respaldo.sh) | — | 16 | 0 |

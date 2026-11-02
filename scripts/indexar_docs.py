@@ -36,7 +36,8 @@ def main():
     total_archivos = total_lineas = 0
     for carpeta in CARPETAS:
         for ruta in sorted((RAIZ / carpeta).rglob("*")):
-            if not ruta.is_file() or ruta.name in IGNORAR or "__pycache__" in ruta.parts or ruta.name.startswith("_build"):
+            if (not ruta.is_file() or ruta.name in IGNORAR or "__pycache__" in ruta.parts
+                    or ruta.name.startswith(("_build", "."))):
                 continue
             rel = ruta.relative_to(RAIZ)
             texto = ruta.suffix in {".md", ".py", ".sh", ".html"}
