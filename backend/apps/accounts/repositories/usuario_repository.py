@@ -11,6 +11,11 @@ class UsuarioRepository:
         return Usuario.objects.select_related("rol").filter(is_active=True)
 
     @staticmethod
+    def listar_todos():
+        """Incluye los inactivos, para poder reactivarlos (HU-M01-02 CA10)."""
+        return Usuario.objects.select_related("rol").all()
+
+    @staticmethod
     def obtener_por_id(usuario_id):
         return Usuario.objects.select_related("rol").filter(pk=usuario_id).first()
 

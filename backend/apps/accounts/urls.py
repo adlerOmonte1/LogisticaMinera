@@ -14,6 +14,8 @@ from apps.accounts.views import (
     UsuarioDesactivarView,
     UsuarioDetailView,
     UsuarioListCreateView,
+    UsuarioReactivarView,
+    UsuarioRestablecerClaveView,
 )
 
 app_name = "accounts"
@@ -26,4 +28,10 @@ urlpatterns = [
     path("usuarios/cambiar-clave/", CambiarPasswordView.as_view(), name="cambiar-clave"),
     path("usuarios/<int:pk>/", UsuarioDetailView.as_view(), name="usuario-detalle"),
     path("usuarios/<int:pk>/desactivar/", UsuarioDesactivarView.as_view(), name="usuario-desactivar"),
+    path("usuarios/<int:pk>/reactivar/", UsuarioReactivarView.as_view(), name="usuario-reactivar"),
+    path(
+        "usuarios/<int:pk>/restablecer-clave/",
+        UsuarioRestablecerClaveView.as_view(),
+        name="usuario-restablecer-clave",
+    ),
 ]

@@ -1,4 +1,4 @@
-"""Controladores HTTP de sesión (RF-08). HU-M01-01, HU-M01-02.
+"""Controladores HTTP de sesión (RF10). HU-M01-01.
 
 Solo entrada/salida HTTP: validan el cuerpo, delegan en
 `services.autenticacion` y traducen el resultado a JSON. Ninguna regla de
@@ -7,7 +7,7 @@ negocio vive aquí (solid-proyecto, SRP).
 
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.serializers import LoginSerializer, LogoutSerializer
@@ -20,11 +20,12 @@ def _tokens_para(usuario) -> dict:
     return {"access": str(refresh.access_token), "refresh": str(refresh)}
 
 
-class LoginView(APIView):
-    """`POST /api/v1/auth/login/` — HU-M01-01 CA01-CA05."""
+class LoginView(GenericAPIView):
+    """`POST /api/v1/auth/login/` — HU-M01-01."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    serializer_class = LoginSerializer
 
     def post(self, request):
         entrada = LoginSerializer(data=request.data)
@@ -42,15 +43,17 @@ class LoginView(APIView):
             "username": usuario.username,
             "nombre_completo": usuario.nombre_completo,
             "rol": usuario.rol.nombre,
+            "debe_cambiar_clave": usuario.debe_cambiar_clave,
         }
         return Response(cuerpo)
 
 
-class LogoutView(APIView):
-    """`POST /api/v1/auth/logout/` — HU-M01-02 CA01. Invalida el refresh."""
+class LogoutView(GenericAPIView):
+    """`POST /api/v1/auth/logout/` — HU-M01-01 CA05. Invalida el refresh."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    serializer_class = LogoutSerializer
 
     def post(self, request):
         entrada = LogoutSerializer(data=request.data)

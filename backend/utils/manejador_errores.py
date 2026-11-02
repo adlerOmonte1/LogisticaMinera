@@ -4,7 +4,9 @@ from rest_framework.views import exception_handler as manejador_por_defecto
 
 from common.excepciones import (
     AccionNoAutorizada,
+    AutenticacionFallida,
     ConflictoDeConcurrencia,
+    CuentaBloqueadaTemporalmente,
     ErrorDeDominio,
     ErrorDeValidacionDeDominio,
 )
@@ -13,8 +15,10 @@ from common.red import ip_del_cliente
 
 _ESTADO_HTTP_POR_EXCEPCION = {
     ErrorDeValidacionDeDominio: 400,
+    AutenticacionFallida: 401,
     AccionNoAutorizada: 403,
     ConflictoDeConcurrencia: 409,
+    CuentaBloqueadaTemporalmente: 423,
 }
 
 
@@ -53,7 +57,12 @@ def manejador_uniforme(exc, context):
     if respuesta is None:
         return None
 
-    if isinstance(exc, (drf_exceptions.NotAuthenticated, drf_exceptions.AuthenticationFailed)):
+    codigo_propio = getattr(exc, "codigo_uniforme", None)
+    if codigo_propio:
+        # Rechazos con mensaje literal de un criterio: sesión expirada (HU-M01-01
+        # CA06) y contraseña temporal pendiente (HU-M01-01 CA09).
+        respuesta.data = {"codigo": codigo_propio, "mensaje": str(exc.detail), "detalles": {}}
+    elif isinstance(exc, (drf_exceptions.NotAuthenticated, drf_exceptions.AuthenticationFailed)):
         respuesta.data = {"codigo": "NO_AUTENTICADO", "mensaje": "Credenciales inválidas o ausentes", "detalles": {}}
     elif isinstance(exc, drf_exceptions.PermissionDenied):
         respuesta.data = {"codigo": "ACCION_NO_AUTORIZADA", "mensaje": "Acción no autorizada", "detalles": {}}
