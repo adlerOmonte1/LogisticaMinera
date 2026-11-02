@@ -1,0 +1,17 @@
+# ruff
+All checks passed!
+
+# makemigrations --check
+No changes detected
+
+# check
+System check identified no issues (0 silenced).
+
+# datos de prueba
+Restablecido: admin.prueba (ADMINISTRADOR)
+Restablecido: administrativo.prueba (ADMINISTRATIVO)
+Restablecido: supervisor.prueba (SUPERVISOR)
+Catálogo provisional — Tipos de mineral: 3
+Catálogo provisional — Transportistas: 3
+Catálogo provisional — Vehículos: 7 (uno pendiente de destare)
+Catálogo provisional de la maqueta, pendiente de los valores de la empresa (DR-03)

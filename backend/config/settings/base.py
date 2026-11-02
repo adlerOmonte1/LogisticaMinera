@@ -30,6 +30,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
 ]
 
 THIRD_PARTY_APPS = [
@@ -134,7 +135,7 @@ TAMANO_MAXIMO_IMAGEN_TICKET = 10 * 1024 * 1024
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.accounts.autenticacion.AutenticacionJWT",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
@@ -158,3 +159,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+
+# Patrón de placa vehicular (D-24). Lo usan el alta de vehículos de M02 y la
+# regla V3 de M05; se cambia por configuración, no en el código (RNF-M05-08).
+PATRON_PLACA = env("PATRON_PLACA", default=r"^[A-Z0-9]{3}-[A-Z0-9]{3}$")

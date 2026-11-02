@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**145 archivos · 20589 líneas de texto.**
+**155 archivos · 20692 líneas de texto.**
 
 ## `Mockup/`
 
@@ -29,7 +29,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [GUIA_FRONTEND_ANGULAR.md](00-arquitectura/GUIA_FRONTEND_ANGULAR.md) | Guía del frontend — Angular en repositorio separado | 344 | 13 |
 | [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 912 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
-| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 437 | 25 |
+| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 461 | 28 |
 | [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 437 | 23 |
 
 ## `docs/00-tesis/`
@@ -59,7 +59,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [bitacora_puertas.md](03-pruebas/bitacora_puertas.md) | Bitácora de puertas de fase | 10 | 0 |
+| [bitacora_puertas.md](03-pruebas/bitacora_puertas.md) | Bitácora de puertas de fase | 12 | 1 |
 | [plan_de_pruebas.md](03-pruebas/plan_de_pruebas.md) | Plan de pruebas — Sistema web inteligente | 276 | 16 |
 
 ## `docs/03-pruebas/evidencias/F0/`
@@ -70,6 +70,24 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [newman.xml](03-pruebas/evidencias/F0/newman.xml) | — | — | 5 |
 | [pytest.txt](03-pruebas/evidencias/F0/pytest.txt) | — | — | 2 |
 | [trazabilidad.md](03-pruebas/evidencias/F0/trazabilidad.md) | — | 23 | 6 |
+
+## `docs/03-pruebas/evidencias/F1/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F1/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F1/newman.xml) | — | — | 23 |
+| [pytest.txt](03-pruebas/evidencias/F1/pytest.txt) | — | — | 3 |
+| [trazabilidad.md](03-pruebas/evidencias/F1/trazabilidad.md) | — | 23 | 6 |
+
+## `docs/03-pruebas/evidencias/F2/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F2/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F2/newman.xml) | — | — | 50 |
+| [pytest.txt](03-pruebas/evidencias/F2/pytest.txt) | — | — | 13 |
+| [trazabilidad.md](03-pruebas/evidencias/F2/trazabilidad.md) | — | 23 | 5 |
 
 ## `docs/model-c4/`
 
@@ -320,6 +338,8 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [indexar_docs.py](../scripts/indexar_docs.py) | — | 66 | 2 |
 | [md_a_pdf.py](../scripts/md_a_pdf.py) | — | 101 | 4 |
 | [reporte_trazabilidad.py](../scripts/reporte_trazabilidad.py) | — | 124 | 5 |
+| [respaldo.sh](../scripts/respaldo.sh) | — | 16 | 0 |
+| [restaurar.sh](../scripts/restaurar.sh) | — | 14 | 0 |
 | [validar_docs.py](../scripts/validar_docs.py) | — | 172 | 6 |
 | [verificar_migracion.sh](../scripts/verificar_migracion.sh) | — | 36 | 1 |
 
@@ -351,7 +371,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 323 | 22 |
+| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 324 | 22 |
 
 ## `skills/despliegue-docker/`
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Lower
 
 from .base import EntidadCatalogo
 
@@ -7,7 +8,9 @@ class TipoMineral(EntidadCatalogo):
     """Catálogo único de tipos de mineral (DR-03): clasifica el ingreso al
     registrarlo y agrupa la producción al consolidar.
 
-    RN-M02-06 (código único), RN-M02-10 (la unidad es siempre la tonelada).
+    RN-M02-06 (código único), RN-M02-10 (la unidad es siempre la tonelada),
+    RN-M02-15 (nombre único sin distinguir mayúsculas), RN-M02-16 (código de dos a
+    seis letras o números, que no cambia tras el alta).
     """
 
     TONELADA = "TONELADA"
@@ -24,6 +27,9 @@ class TipoMineral(EntidadCatalogo):
         verbose_name = "Tipo de mineral"
         verbose_name_plural = "Tipos de mineral"
         ordering = ["nombre"]
+        constraints = [
+            models.UniqueConstraint(Lower("nombre"), name="uq_tipo_mineral_nombre"),
+        ]
 
     def __str__(self):
         return f"{self.codigo} — {self.nombre}"

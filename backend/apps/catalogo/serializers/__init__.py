@@ -11,11 +11,13 @@ from .transportistas import (
 from .vehiculos import (
     VehiculoCreateSerializer,
     VehiculoSerializer,
+    VehiculoTaraSerializer,
     VehiculoUpdateSerializer,
 )
 
 __all__ = [
     "TipoMineralCreateSerializer", "TipoMineralSerializer", "TipoMineralUpdateSerializer",
     "TransportistaCreateSerializer", "TransportistaSerializer", "TransportistaUpdateSerializer",
-    "VehiculoCreateSerializer", "VehiculoSerializer", "VehiculoUpdateSerializer",
+    "VehiculoCreateSerializer", "VehiculoSerializer", "VehiculoTaraSerializer",
+    "VehiculoUpdateSerializer",
 ]

@@ -6,6 +6,9 @@ existen, las devuelve a su estado inicial —activas, con su rol, su clave y sin
 bloqueo—, porque la colección de Postman desactiva, bloquea y cambia claves de
 otras cuentas, pero se ejecuta siempre desde estas tres.
 
+Después carga el catálogo provisional de cada módulo que lo tenga
+(`apps/<app>/datos_prueba.py`, desde F2).
+
 Se niega a correr con `DEBUG` desactivado: sus claves están en el repositorio y
 estas cuentas nunca deben existir en preproducción ni en producción.
 """
@@ -15,6 +18,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.accounts.models import Rol, Usuario
+from apps.catalogo import datos_prueba as catalogo
 
 # Credenciales solo para el entorno local; coinciden con el entorno de Postman.
 CLAVE_PRUEBA = "Prueba-Local-2027"
@@ -48,6 +52,11 @@ class Command(BaseCommand):
                 usuario.is_active = True
                 usuario.intentos_fallidos = 0
                 usuario.bloqueado_hasta = None
+                usuario.debe_cambiar_clave = False
                 usuario.set_password(CLAVE_PRUEBA)
                 usuario.save()
                 self.stdout.write(f"{'Creado' if creado else 'Restablecido'}: {username} ({rol})")
+
+            supervisor = Usuario.objects.get(username="supervisor.prueba")
+            for linea in catalogo.cargar(usuario_destare=supervisor):
+                self.stdout.write(f"Catálogo provisional — {linea}")

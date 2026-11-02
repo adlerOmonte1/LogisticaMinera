@@ -34,6 +34,13 @@ class TipoMineralRepository(_RepositorioCatalogo):
             qs = qs.exclude(pk=excluir_id)
         return qs.exists()
 
+    @staticmethod
+    def existe_nombre(nombre, *, excluir_id=None):
+        qs = TipoMineral.objects.filter(nombre__iexact=nombre)
+        if excluir_id is not None:
+            qs = qs.exclude(pk=excluir_id)
+        return qs.exists()
+
 
 class TransportistaRepository(_RepositorioCatalogo):
     modelo = Transportista
@@ -41,6 +48,13 @@ class TransportistaRepository(_RepositorioCatalogo):
     @staticmethod
     def tiene_vehiculos(transportista):
         return transportista.vehiculos.exists()
+
+    @staticmethod
+    def existe_ruc(ruc, *, excluir_id=None):
+        qs = Transportista.objects.filter(ruc=ruc)
+        if excluir_id is not None:
+            qs = qs.exclude(pk=excluir_id)
+        return qs.exists()
 
 
 class VehiculoRepository(_RepositorioCatalogo):
