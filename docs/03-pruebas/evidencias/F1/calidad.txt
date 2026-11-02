@@ -1,0 +1,11 @@
+# ruff
+All checks passed!
+
+# makemigrations --check
+No changes detected
+
+# check
+System check identified no issues (0 silenced).
+
+# respaldo y restauracion
+Restauracion probada el 25/10/2026: base y volumen media vuelven al estado del respaldo
