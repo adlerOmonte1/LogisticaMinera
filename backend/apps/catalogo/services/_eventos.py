@@ -16,11 +16,12 @@ def registrar_creacion(entidad: str, obj, usuario, *, nuevos=None, registrador=r
 
 def registrar_modificacion(
     entidad: str, obj, usuario, *, anteriores=None, nuevos=None, motivo="",
-    registrador=registrador_por_defecto,
+    ingresos_relacionados=None, registrador=registrador_por_defecto,
 ):
     registrador.registrar(
         accion=Accion.MODIFICAR, entidad=entidad, id_entidad=obj.pk, usuario=usuario,
         valores_anteriores=anteriores, valores_nuevos=nuevos, motivo=motivo,
+        ingresos_relacionados=ingresos_relacionados,
     )
 
 

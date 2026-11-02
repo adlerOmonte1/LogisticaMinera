@@ -1,9 +1,12 @@
-"""Rutas de M03 (contrato ARQ-02 §6). Se monta en /api/v1/ingresos/.
+"""Rutas de M03 (contrato ARQ-02 §6). Se monta en /api/v1/ingresos/."""
 
-El registro, la corrección, la reversión, la anulación y el destare se exponen
-al implementar M03; hasta entonces el módulo no publica rutas.
-"""
+from rest_framework.routers import DefaultRouter
+
+from apps.ingresos.views import IngresoViewSet
 
 app_name = "ingresos"
 
-urlpatterns = []
+router = DefaultRouter()
+router.register("", IngresoViewSet, basename="ingreso")
+
+urlpatterns = router.urls
