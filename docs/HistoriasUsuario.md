@@ -1,6 +1,6 @@
 # Historias de usuario — índice
 
-**Versión:** 3.0 · **Total: 26 historias en 9 módulos** · versión 2 del sistema
+**Versión:** 3.1 · **Total: 27 historias en 9 módulos** · versión 2.1 del sistema
 
 Este archivo es un **índice**. El detalle de cada historia —descripción, campos y criterios de
 aceptación— vive únicamente en el `HU.md` de su módulo; aquí solo constan el identificador, el
@@ -84,6 +84,7 @@ operación. Se reserva historia propia para lo que tiene lógica dedicada.
 | HU-M07-01 | Consulta de un ingreso por placa y fecha con su respaldo | Administrativo | Crítica |
 | HU-M07-02 | Listado y detalle de ingresos | Administrativo | Alta |
 | HU-M07-03 | Calendario de llegadas | Administrativo | Media |
+| HU-M07-04 | Resumen del día y avisos de pendientes | Todos | Media |
 
 ## M08 — Consolidación de la producción
 

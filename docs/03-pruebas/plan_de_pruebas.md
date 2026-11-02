@@ -1,8 +1,10 @@
 # Plan de pruebas — Sistema web inteligente
 
 **Documento:** PLAN-03
-**Versión:** 2.0 — versión 2 del sistema: hora del pesaje propuesta, registro sin foto, ruta del lote,
-división por fracciones y cierre con destino (DR-11 a DR-22)
+**Versión:** 2.1 — versión 2.1 del sistema: hora del pesaje propuesta, registro sin foto, ruta del
+lote, división por fracciones y cierre con destino (DR-11 a DR-22); varios tipos de mineral por lote,
+corrección en cadena, retiro hasta el zarandeo o la molienda, inicio con avisos, exportación del
+listado y gestión de cuentas (DR-23 a DR-31)
 **Estado:** Vigente
 **Depende de:** `../01-plan/PLAN_DE_TRABAJO.md` §6, `../00-tesis/marco_tesis.md`,
 `../00-tesis/decisiones_reformulacion.md`
@@ -21,7 +23,11 @@ lo ejecuta y qué evidencia deja. Los tres frentes son:
 3. **El protocolo de tareas de usabilidad** (T01 a T06).
 
 Los casos de prueba por criterio de aceptación (`CP-HU-Mxx-nn-nn`) no están aquí: viven en las
-pruebas automatizadas de cada módulo, junto al código que verifican.
+pruebas automatizadas de cada módulo, junto al código que verifican. Las capacidades que la versión
+2.1 incorporó sin RF nuevo —el resumen del día y los avisos (HU-M07-04), la exportación del listado
+y la búsqueda desde la cabecera (HU-M07-02), y la gestión de cuentas y bajas (HU-M01-02, HU-M02-01 a
+HU-M02-03)— se verifican por esos casos y no modifican la lista de control: CP01 a CP10 siguen siendo
+los del instrumento validado.
 
 ---
 

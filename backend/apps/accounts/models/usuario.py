@@ -66,6 +66,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     # serializer: los asigna exclusivamente el servicio de autenticación.
     intentos_fallidos = models.PositiveSmallIntegerField(default=0, editable=False)
     bloqueado_hasta = models.DateTimeField(null=True, blank=True, editable=False)
+    # RS-M01-12: verdadero tras un restablecimiento; la cuenta solo puede
+    # cambiar su contraseña hasta retirarlo (RS-M01-13).
+    debe_cambiar_clave = models.BooleanField(default=False, editable=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["nombres", "apellidos"]

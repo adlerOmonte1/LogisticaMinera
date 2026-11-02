@@ -62,7 +62,7 @@ flowchart TD
     V1 -->|Si| L1[Indicar usuario accion o referencia]
     L1 --> C1[Consultar eventos que cumplen todos los filtros]
     C1 --> D1{Hay eventos?}
-    D1 -->|No| M1[Informar: Sin eventos registrados para este registro]
+    D1 -->|No| M1[Informar: No hay eventos con estos filtros]
     D1 -->|Si| C2[Ordenar del mas reciente al mas antiguo]
     C2 --> C3[Distinguir escrituras y accesos rechazados]
     C3 --> F([Eventos con entidad referencia autor y cambio])

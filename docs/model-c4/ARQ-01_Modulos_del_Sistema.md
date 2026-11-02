@@ -1,7 +1,7 @@
 # ARQ-01 — Definición de módulos del sistema
 
 **Documento:** ARQ-01
-**Versión:** 3.0 — versión 2 del sistema (DR-11 a DR-23)
+**Versión:** 3.1 — versión 2.1 del sistema (DR-11 a DR-31)
 **Estado:** En revisión
 **Alcance:** la lista cerrada de módulos del sistema web inteligente, con la justificación de cada uno
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../00-tesis/decisiones_reformulacion.md`
@@ -47,7 +47,7 @@ dentro de otro.
 | M04 | Reconocimiento automático del ticket | Leer la placa, la fecha y el peso bruto del ticket con su nivel de confianza | RF02 |
 | M05 | Validación automática de consistencia | Aplicar las reglas V1 a V5 y registrar su resultado | RF03 |
 | M06 | Trazabilidad del proceso | Agrupar ingresos en lotes, decidir la ruta de cada lote o parte, registrar su paso por las etapas y cerrar el lote con su destino | RF07 |
-| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket | RF08 |
+| M07 | Consulta de ingresos y respaldo | Localizar un ingreso por placa y fecha y presentar su ticket; listado con exportación, calendario e inicio con avisos de pendientes | RF08 |
 | M08 | Consolidación de la producción | Calcular y exportar el total acumulado mensual por producto | RF09 |
 | M09 | Auditoría | Registrar quién hizo qué y cuándo, incluidos reconocimiento y corrección | — (transversal) |
 
@@ -97,8 +97,10 @@ indirección y ese ciclo son la responsabilidad del módulo. Cubre RF07.
 
 **M07 — Consulta de ingresos y respaldo.** Recuperar un ingreso concreto por placa y fecha, con la
 imagen de su ticket, es una lectura con sus propios índices y su propio contrato. Presenta además
-el calendario de llegadas del mes y señala los ingresos sin respaldo fotográfico. No tiene entidad
-propia: lee sobre M03 y M06 (D-10). Cubre RF08.
+el listado de un periodo con su exportación, el calendario de llegadas del mes y la pantalla de
+inicio con el resumen del día y los avisos de pendientes según el rol (DR-30), y señala los ingresos
+sin respaldo fotográfico. No tiene entidad propia: lee sobre M03 a M06 y deja en M09 el evento de
+cada exportación (D-10). Cubre RF08.
 
 **M08 — Consolidación de la producción.** Agrega los ingresos Registrados del mes por tipo de
 mineral y entrega el total, con su exportación (DR-06). Tampoco tiene entidad propia. Cubre RF09.

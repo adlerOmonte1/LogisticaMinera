@@ -1,8 +1,11 @@
 # Matriz de trazabilidad — HU · RF · indicador · tarea · caso de prueba
 
-**Versión:** 2.0 · **Estado:** En revisión · **Cambio:** versión 2 del sistema: registro sin foto,
-ruta del lote, división por fracciones, cierre con destino, calendario de llegadas, historial y
-auditoría visibles por rol, e I6 reformulado (DR-11 a DR-22)
+**Versión:** 2.1 · **Estado:** Validada · **Cambio:** versión 2.1 del sistema: a lo de la versión 2
+—registro sin foto, ruta del lote, división por fracciones, cierre con destino, calendario de
+llegadas, historial y auditoría visibles por rol, e I6 reformulado (DR-11 a DR-22)— se suman el lote
+con varios tipos de mineral, la corrección en cadena con reversión, el retiro de ingresos hasta el
+zarandeo o la molienda, la pantalla de inicio con avisos, la exportación del listado, la gestión de
+cuentas y bajas, y la consulta del reconocimiento y la validación por los tres roles (DR-23 a DR-31)
 **Deriva de:** `../00-tesis/marco_tesis.md` y `../model-c4/ARQ-01_Modulos_del_Sistema.md`
 
 Este es el **único documento del repositorio donde el sistema se relaciona con los indicadores de la
@@ -21,10 +24,12 @@ entidad de catálogo —alta, edición, listado y baja lógica— es una sola hi
 aceptación por operación. Se reserva historia propia para lo que tiene lógica dedicada: el
 reconocimiento, la validación, la anulación con motivo, el destare, la exportación.
 
-Por eso el backlog tiene **26 historias** y no las 34 del sistema anterior, pese a cubrir más
+Por eso el backlog tiene **27 historias** y no las 34 del sistema anterior, pese a cubrir más
 funcionalidad. La versión 2 añadió cuatro: la división del lote y su cierre con destino (M06), el
 calendario de llegadas (M07) y la separación entre el historial de un ingreso y la auditoría del
-sistema (M09). El registro sin foto no es una historia nueva: es una excepción de HU-M03-01 (DR-13).
+sistema (M09). La versión 2.1 añade una: el resumen del día con los avisos de pendientes (M07,
+DR-30). El registro sin foto no es una historia nueva: es una excepción de HU-M03-01 (DR-13); la
+exportación del listado y la búsqueda desde la cabecera tampoco: amplían HU-M07-02.
 
 ## 2. Matriz
 
@@ -58,6 +63,7 @@ sistema (M09). El registro sin foto no es una historia nueva: es una excepción 
 | HU-M07-01 | Consulta de un ingreso por placa y fecha con su respaldo | Administrativo | Crítica | RF08 | I4 | T03 | CP08 |
 | HU-M07-02 | Listado y detalle de ingresos | Administrativo | Alta | RF08 | I4 | T03 | CP08 |
 | HU-M07-03 | Calendario de llegadas | Administrativo | Media | RF08 | — | — | CP08 |
+| HU-M07-04 | Resumen del día y avisos de pendientes | Todos | Media | — | — | — | — |
 | **M08 — Consolidación de la producción** |
 | HU-M08-01 | Total acumulado mensual por tipo de mineral | Administrativo | Crítica | RF09 | I5 | T05 | CP09 |
 | HU-M08-02 | Exportación del total acumulado mensual | Administrativo | Alta | RF09 | I5 | T06 | CP09 |
@@ -66,7 +72,7 @@ sistema (M09). El registro sin foto no es una historia nueva: es una excepción 
 | HU-M09-02 | Historial de un ingreso | Supervisor de planta | Media | — | — | — | — |
 | HU-M09-03 | Consulta de la auditoría del sistema | Administrador | Media | — | — | — | — |
 
-**Total: 26 historias.**
+**Total: 27 historias.**
 
 ## 3. Comprobación: cada RF tiene al menos una historia
 
@@ -84,8 +90,9 @@ sistema (M09). El registro sin foto no es una historia nueva: es una excepción 
 | RF10 | Gestionar usuarios y roles de acceso | HU-M01-01, HU-M01-02, HU-M01-03 | M01 |
 
 **Resultado: los diez RF están cubiertos.** Ninguna historia queda sin RF salvo HU-M03-03
-(anulación) y las tres de M09, que sostienen la integridad del histórico y no pertenecen a la lista
-de control: no suman ni restan en el avance. HU-M06-05 (cierre con destino) se asocia a RF07 por
+(anulación), HU-M07-04 (resumen del día y avisos, DR-30) y las tres de M09: las primeras sostienen la
+integridad del histórico y el resumen es una vista de trabajo sobre capacidades ya cubiertas. Ninguna
+pertenece a la lista de control: no suman ni restan en el avance. HU-M06-05 (cierre con destino) se asocia a RF07 por
 DR-14, que la declara historia de M06 y no un RF nuevo; tampoco amplía el denominador del avance.
 
 ## 4. Comprobación: cada tarea tiene al menos una historia

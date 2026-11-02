@@ -99,3 +99,25 @@ flowchart TD
 Los ingresos En proceso cuentan como llegadas pero no suman toneladas, y los anulados no cuentan
 ni suman: el total del mes coincide con el consolidado (RN-M07-12).
 
+## A-M07-05 · Avisos de pendientes según el rol (RN-M07-15)
+
+```mermaid
+flowchart TD
+    I([Usuario abre los avisos]) --> C1[Calcular ingresos que esperan destare]
+    C1 --> C2[Calcular advertencias V4 justificadas hoy]
+    C2 --> C3[Calcular lotes En recorrido con su siguiente paso]
+    C3 --> D1{Rol compone lotes?}
+    D1 -->|Si| C4[Agregar ingresos Registrados sin lote]
+    D1 -->|No| D2
+    C4 --> D2{Rol es Administrador?}
+    D2 -->|Si| C5[Agregar lotes listos para cerrar]
+    D2 -->|No| D3
+    C5 --> D3{Hay avisos?}
+    D3 -->|No| M1[Mostrar: No hay nada pendiente]
+    D3 -->|Si| M2[Mostrar cada aviso con acceso a su pantalla]
+    M1 --> F([Fin])
+    M2 --> F
+```
+
+Ningún aviso se guarda: el cálculo se repite en cada consulta, de modo que un aviso desaparece en
+cuanto se resuelve lo que lo originó, sin marcarlo como leído (RN-M07-15).

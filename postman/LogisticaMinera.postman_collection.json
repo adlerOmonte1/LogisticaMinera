@@ -1,0 +1,2668 @@
+{
+  "info": {
+    "_postman_id": "bab490db-b4a8-4e27-b77f-b5ef5d1f09ba",
+    "name": "LogisticaMinera API v1",
+    "description": "Colección del sistema web inteligente para el control de inventarios de ingreso de mineral. Una carpeta por fase de PLAN-02 (docs/01-plan/PLAN_IMPLEMENTACION.md). Ejecute siempre «00 · Sesiones» antes de cualquier otra carpeta. Los criterios de aceptación de cada fase están en el Anexo A de PLAN-02.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Umbral de tiempo de respuesta (PLAN-02 §4.4). El reconocimiento usa limite_ms = 5000.",
+          "pm.test(\"Responde dentro del umbral\", () => {",
+          "  pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"limite_ms\") || 2000));",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · Sesiones",
+      "description": "Inicia sesión con las tres cuentas de prueba y guarda sus tokens. Requiere haber ejecutado `python manage.py cargar_datos_prueba`.",
+      "item": [
+        {
+          "name": "Sesión · ADMINISTRADOR -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_admin}}\",\n  \"password\": \"{{clave_admin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol ADMINISTRADOR\", () => pm.expect(b.usuario.rol).to.eql(\"ADMINISTRADOR\"));",
+                  "pm.environment.set(\"token_admin\", b.access);",
+                  "pm.environment.set(\"refresh_admin\", b.refresh);",
+                  "pm.environment.set(\"id_admin\", b.usuario.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión · ADMINISTRATIVO -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_administrativo}}\",\n  \"password\": \"{{clave_administrativo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol ADMINISTRATIVO\", () => pm.expect(b.usuario.rol).to.eql(\"ADMINISTRATIVO\"));",
+                  "pm.environment.set(\"token_administrativo\", b.access);",
+                  "pm.environment.set(\"refresh_administrativo\", b.refresh);",
+                  "pm.environment.set(\"id_administrativo\", b.usuario.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión · SUPERVISOR -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_supervisor}}\",\n  \"password\": \"{{clave_supervisor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Inicia sesión con la cuenta de prueba del rol y guarda sus tokens en el entorno."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Entrega access y refresh\", () => {",
+                  "  pm.expect(b.access).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(b.refresh).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"Rol SUPERVISOR\", () => pm.expect(b.usuario.rol).to.eql(\"SUPERVISOR\"));",
+                  "pm.environment.set(\"token_supervisor\", b.access);",
+                  "pm.environment.set(\"refresh_supervisor\", b.refresh);",
+                  "pm.environment.set(\"id_supervisor\", b.usuario.id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F0 · Salud y esquema",
+      "description": "Puerta de F0: el backend arranca con la línea base 2.1, publica su esquema y ya no expone las rutas del diseño anterior.",
+      "item": [
+        {
+          "name": "F0 · Esquema OpenAPI -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/esquema/?format=json"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Documento OpenAPI 3\", () => pm.expect(String(b.openapi)).to.match(/^3\\./));",
+                  "pm.test(\"Título de la línea base 2.1\", () => pm.expect(b.info.title).to.include(\"ingreso de mineral\"));",
+                  "pm.test(\"Publica la ruta de tipos de mineral\", () => pm.expect(Object.keys(b.paths)).to.include(\"/api/v1/catalogo/tipos-mineral/\"));",
+                  "pm.test(\"No publica rutas de productos\", () => pm.expect(Object.keys(b.paths).join(\" \")).to.not.include(\"productos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Documentación de la API -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/docs/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Interfaz de documentación\", () => pm.expect(pm.response.text().toLowerCase()).to.include(\"swagger\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Tipos de mineral con sesión -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Listado paginado\", () => {",
+                  "  pm.expect(b).to.have.property(\"count\");",
+                  "  pm.expect(b.results).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Tipos de mineral sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Cuerpo uniforme (D-23)\", () => {",
+                  "  pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\");",
+                  "});",
+                  "pm.test(\"Código NO_AUTENTICADO\", () => pm.expect(pm.response.json().codigo).to.eql(\"NO_AUTENTICADO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Ruta anterior de productos -> 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/productos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404: la ruta del diseño anterior ya no existe\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F0 · Registro de ingresos aún sin rutas -> 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404: el registro del diseño anterior se retiró; M03 se publica en F3\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F1 · M01 Autenticacion y roles",
+      "description": "Puerta de F1: HU-M01-01 a HU-M01-03 (Anexo A de PLAN-02). Se ejecuta en orden; crea dos usuarios desechables por corrida. La expiración por tiempo (CA06) y los eventos de auditoría se prueban con pytest; en F4 se consultan por la API.",
+      "item": [
+        {
+          "name": "Preparación · Crea el usuario desechable -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"Desechable\",\n  \"password\": \"Clave-Prueba-1\",\n  \"rol\": \"SUPERVISOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set(\"id_desechable\", pm.response.json().id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"usuario_desechable\", \"desechable.\" + Date.now());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Crea el usuario para el bloqueo -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_bloqueo}}\",\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"Desechable\",\n  \"password\": \"Clave-Prueba-1\",\n  \"rol\": \"SUPERVISOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"usuario_bloqueo\", \"bloqueo.\" + Date.now());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA01 · Credenciales válidas -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"password\": \"Clave-Prueba-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Rol y marca de clave\", () => { pm.expect(b.usuario.rol).to.eql(\"SUPERVISOR\"); pm.expect(b.usuario.debe_cambiar_clave).to.eql(false); });",
+                  "pm.environment.set(\"token_desechable\", b.access);",
+                  "pm.environment.set(\"refresh_desechable\", b.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA02 · Credenciales inválidas -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"password\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Usuario o contraseña incorrectos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA03 · Quinto intento fallido bloquea -> 423",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_bloqueo}}\",\n  \"password\": \"mala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 423\", () => pm.response.to.have.status(423));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Cuenta bloqueada temporalmente. Intente nuevamente en 15 minutos\"));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Cuatro intentos fallidos en serie antes del quinto, que es esta solicitud.",
+                  "const intento = (n) => {",
+                  "  if (n === 0) return;",
+                  "  pm.sendRequest({ url: pm.environment.get(\"base_url\") + \"/auth/login/\", method: \"POST\", header: { \"Content-Type\": \"application/json\" },",
+                  "    body: { mode: \"raw\", raw: JSON.stringify({ username: pm.environment.get(\"usuario_bloqueo\"), password: \"mala\" }) } }, () => intento(n - 1));",
+                  "};",
+                  "intento(4);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA03 · Bloqueada aun con la clave correcta -> 423",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_bloqueo}}\",\n  \"password\": \"Clave-Prueba-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 423\", () => pm.response.to.have.status(423));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Cuenta bloqueada temporalmente. Intente nuevamente en 15 minutos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA06 · Token inválido -> 401",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_invalido}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"token_invalido\", \"token.alterado.invalido\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA02 · Nombre de usuario duplicado -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"Desechable\",\n  \"password\": \"Clave-Prueba-1\",\n  \"rol\": \"SUPERVISOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El nombre de usuario ya está registrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA04 · Supervisor en la gestión de usuarios -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA04 · Administrativo en la gestión de usuarios -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-03 · CA02 · Supervisor crea usuarios -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA06 · Contraseña actual incorrecta -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/cambiar-clave/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_actual\": \"mala\",\n  \"password_nueva\": \"Otra-Clave-2\",\n  \"password_nueva_confirmacion\": \"Otra-Clave-2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La contraseña actual no es correcta\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA07 · Contraseña nueva corta -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/cambiar-clave/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_actual\": \"Clave-Prueba-1\",\n  \"password_nueva\": \"corta\",\n  \"password_nueva_confirmacion\": \"corta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La contraseña debe tener al menos ocho caracteres\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA11 · Las contraseñas no coinciden -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/cambiar-clave/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_actual\": \"Clave-Prueba-1\",\n  \"password_nueva\": \"Otra-Clave-2\",\n  \"password_nueva_confirmacion\": \"Distinta-2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Las contraseñas no coinciden\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA08 · Restablecer contraseña -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{id_desechable}}/restablecer-clave/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Contraseña temporal de al menos 8\", () => pm.expect(b.clave_temporal.length).to.be.at.least(8));",
+                  "pm.environment.set(\"clave_temporal\", b.clave_temporal);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA09 · Sesión con la contraseña temporal -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"password\": \"{{clave_temporal}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Marca de cambio obligatorio\", () => pm.expect(b.usuario.debe_cambiar_clave).to.eql(true));",
+                  "pm.environment.set(\"token_desechable\", b.access);",
+                  "pm.environment.set(\"refresh_desechable\", b.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA09 · Otra operación con la temporal -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe cambiar la contraseña temporal antes de continuar\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA05 · Cambio de la propia contraseña -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/cambiar-clave/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_actual\": \"{{clave_temporal}}\",\n  \"password_nueva\": \"Clave-Prueba-1\",\n  \"password_nueva_confirmacion\": \"Clave-Prueba-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Contraseña cambiada. Inicie sesión nuevamente\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA09 · Tras el cambio, opera normalmente -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-03 · CA03 · Antes del cambio de rol -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-03 · CA03 · El administrador le da el rol Administrador -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{id_desechable}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rol\": \"ADMINISTRADOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Rol nuevo\", () => pm.expect(pm.response.json().rol).to.eql(\"ADMINISTRADOR\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-03 · CA03 · Siguiente acción con el mismo token -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_desechable}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA09 · Desactivar la propia cuenta -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{id_admin}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No puede desactivar su propia cuenta\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA03 · Desactivar un usuario -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{id_desechable}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Usuario desactivado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA04 · Cuenta inactiva -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuario_desechable}}\",\n  \"password\": \"Clave-Prueba-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La cuenta se encuentra inactiva. Contacte al administrador\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-02 · CA10 · Reactivar un usuario -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{id_desechable}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje y rol\", () => { const b = pm.response.json(); pm.expect(b.mensaje).to.eql(\"Usuario reactivado\"); pm.expect(b.rol).to.eql(\"ADMINISTRADOR\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA05 · Cerrar sesión -> 204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/logout/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_desechable}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M01-01 · CA05 · El refresh cerrado ya no sirve -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auth/refresh/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_desechable}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F2 · M02 Catalogo maestro",
+      "description": "Puerta de F2 (PLAN-02). Crea un vehículo, un transportista y dos tipos de mineral propios de la corrida; solo toca del catálogo provisional la tara de V2K-841, que cambia y devuelve. La baja con ingresos asociados (HU-M02-01 CA06, HU-M02-02 CA03) se valida con ingresos en F3; aquí la cubren las pruebas automáticas.",
+      "item": [
+        {
+          "name": "Preparación · Datos de la corrida y vehículo con tara del catálogo provisional -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/?placa=V2K-841"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json().results;",
+                  "pm.test(\"El catálogo provisional está cargado\", () => pm.expect(v).to.have.lengthOf(1));",
+                  "pm.test(\"V2K-841 con tara 11.80\", () => pm.expect(v[0].tara_tn).to.eql(\"11.80\"));",
+                  "pm.environment.set('id_vehiculo_tara', v[0].id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const az = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', dg = '0123456789';",
+                  "const al = (s, n) => Array.from({length: n}, () => s[Math.floor(Math.random() * s.length)]).join('');",
+                  "pm.environment.set('placa_f2', 'P' + al(az, 2) + '-' + al(dg, 3));",
+                  "pm.environment.set('placa_externo_f2', 'Q' + al(az, 2) + '-' + al(dg, 3));",
+                  "pm.environment.set('ruc_f2', '20' + al(dg, 9));",
+                  "pm.environment.set('codigo_f2', 'Z' + al(az, 5));",
+                  "pm.environment.set('nombre_f2', 'Mineral Postman ' + Date.now());",
+                  "pm.environment.set('nombre_registro_f2', 'Mineral registro ' + Date.now());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA01 · Alta de vehículo propio -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_f2}}\",\n  \"tipo_titularidad\": \"PROPIO\",\n  \"capacidad_tn\": \"18.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Activo y propio, sin transportista (CA05)\", () => { pm.expect(b.activo).to.eql(true); pm.expect(b.transportista).to.eql(null); });",
+                  "pm.test(\"Sin tara, pendiente de destare (CA08)\", () => { pm.expect(b.tara_tn).to.eql(null); pm.expect(b.pendiente_destare).to.eql(true); });",
+                  "pm.environment.set('id_vehiculo_f2', b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA02 · Placa duplicada -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_f2}}\",\n  \"tipo_titularidad\": \"PROPIO\",\n  \"capacidad_tn\": \"18.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La placa ya está registrada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA03 · Placa con formato inválido -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"1234\",\n  \"tipo_titularidad\": \"PROPIO\",\n  \"capacidad_tn\": \"18.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El formato de la placa no es válido\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA04 · Externo sin transportista -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_externo_f2}}\",\n  \"tipo_titularidad\": \"EXTERNO\",\n  \"capacidad_tn\": \"18.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el transportista para un vehículo externo\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA01 · Alta de transportista -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razon_social\": \"Transportes Postman\",\n  \"ruc\": \"{{ruc_f2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Activo\", () => pm.expect(pm.response.json().activo).to.eql(true));",
+                  "pm.environment.set('id_transportista_f2', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA02 · RUC de diez dígitos -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razon_social\": \"RUC corto\",\n  \"ruc\": \"2060412345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El RUC debe tener once dígitos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA04 · RUC duplicado -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razon_social\": \"Otro\",\n  \"ruc\": \"{{ruc_f2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El RUC ya está registrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA12 · Supervisor da de alta un externo desde el registro -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_externo_f2}}\",\n  \"tipo_titularidad\": \"EXTERNO\",\n  \"capacidad_tn\": \"20.00\",\n  \"transportista\": \"{{id_transportista_f2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Asociado al transportista\", () => pm.expect(pm.response.json().transportista).to.eql(Number(pm.environment.get(\"id_transportista_f2\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA14 · Supervisor edita un vehículo -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"capacidad_tn\": \"19.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA14 · Supervisor da de baja un vehículo -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA09 · Administrativo modifica la tara -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_tara}}/tara/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tara_tn\": \"11.90\",\n  \"motivo\": \"Prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Solo el Administrador puede modificar la tara del vehículo\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA09 · La edición genérica no cambia la tara -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"capacidad_tn\": \"18.50\",\n  \"tara_tn\": \"99.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Capacidad cambiada, tara intacta\", () => { pm.expect(b.capacidad_tn).to.eql(\"18.50\"); pm.expect(b.tara_tn).to.eql(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA10 · Cambio de tara sin motivo -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_tara}}/tara/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tara_tn\": \"11.90\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el motivo del cambio de tara\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA11 · Cambio de tara con motivo -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_tara}}/tara/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tara_tn\": \"11.90\",\n  \"motivo\": \"Validación F2 en Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tara nueva\", () => pm.expect(pm.response.json().tara_tn).to.eql(\"11.90\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA11 · Devuelve la tara del catálogo provisional -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_tara}}/tara/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tara_tn\": \"11.80\",\n  \"motivo\": \"Restablece el valor del catálogo provisional\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tara restablecida\", () => pm.expect(pm.response.json().tara_tn).to.eql(\"11.80\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA06 · Baja de vehículo sin ingresos -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Vehículo desactivado\"));",
+                  "pm.test(\"Inactivo\", () => pm.expect(pm.response.json().activo).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA07 · El vehículo dado de baja no se ofrece -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/?placa={{placa_f2}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"No figura entre los vigentes\", () => pm.expect(pm.response.json().count).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA14 · Supervisor reactiva un vehículo -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA13 · Reactivar vehículo -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Vehículo reactivado\"));",
+                  "pm.test(\"Activo de nuevo\", () => pm.expect(pm.response.json().activo).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA03 · Baja de transportista con vehículos -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/{{id_transportista_f2}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El transportista se desactivó porque tiene vehículos asociados\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA06 · Supervisor reactiva un transportista -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/{{id_transportista_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-03 · CA05 · Reactivar transportista -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/transportistas/{{id_transportista_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Activo de nuevo\", () => pm.expect(pm.response.json().activo).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA01 · Alta de tipo de mineral -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{codigo_f2}}\",\n  \"nombre\": \"{{nombre_f2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Activo y en toneladas\", () => { pm.expect(b.activo).to.eql(true); pm.expect(b.unidad_medida).to.eql(\"TONELADA\"); });",
+                  "pm.environment.set('id_tipo_f2', b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA02 · Código duplicado -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{codigo_f2}}\",\n  \"nombre\": \"Otro nombre {{codigo_f2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El código ya está registrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA05 · Nombre duplicado en mayúsculas -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ZZ1\",\n  \"nombre\": \"MINERAL ÓXIDO PINGÜINO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Ya existe un tipo de mineral con ese nombre\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA06 · Código de siete caracteres -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ABCDEFG\",\n  \"nombre\": \"Código largo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El código debe tener de 2 a 6 letras o números\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA07 · Alta desde el registro sin código -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{nombre_registro_f2}}\",\n  \"desde_registro\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Código generado de 2 a 6 caracteres\", () => pm.expect(b.codigo).to.match(/^[A-Z0-9]{2,6}$/));",
+                  "pm.test(\"Activo\", () => pm.expect(b.activo).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA08 · Alta desde el registro sin nombre -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"desde_registro\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el nombre del tipo de mineral\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA10 · Supervisor crea un tipo de mineral -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"SUP1\",\n  \"nombre\": \"Supervisor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA03 · Baja de tipo de mineral -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/{{id_tipo_f2}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Inactivo\", () => pm.expect(pm.response.json().activo).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA04 · El tipo dado de baja no se ofrece -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/?codigo={{codigo_f2}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"No figura entre los vigentes\", () => pm.expect(pm.response.json().count).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA10 · Supervisor reactiva un tipo de mineral -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/{{id_tipo_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-02 · CA09 · Reactivar tipo de mineral -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/{{id_tipo_f2}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Activo de nuevo\", () => pm.expect(pm.response.json().activo).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M02-08 · Ninguna ruta del catálogo elimina -> 405",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_f2}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M02-09 · La consulta histórica muestra el desactivado -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/?placa=D3P-552&incluir_inactivos=1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json().results;",
+                  "pm.test(\"D3P-552 figura inactivo\", () => { pm.expect(v).to.have.lengthOf(1); pm.expect(v[0].activo).to.eql(false); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Localiza D3P-552, dado de baja con tara -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/?placa=D3P-552&incluir_inactivos=1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('id_vehiculo_baja', pm.response.json().results[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA13 · Reactivar un vehículo con tara la conserva -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_baja}}/reactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Vehículo reactivado\"));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Misma tara (RN-M02-19)\", () => { pm.expect(b.tara_tn).to.eql(\"12.30\"); pm.expect(b.pendiente_destare).to.eql(false); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Limpieza · Devuelve D3P-552 a su baja del catálogo provisional -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/{{id_vehiculo_baja}}/desactivar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Vehículo desactivado\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

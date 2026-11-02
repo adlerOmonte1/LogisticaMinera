@@ -12,6 +12,7 @@
 | RU-M06-08 | Siguen llegando volquetes cuando la carga ya empezó a secarse, y quiero sumarlos sin desordenar lo que ya se anotó |
 | RU-M06-09 | Quiero anotar cuántos bigbags salieron y cuántas horas trabajó el molino |
 | RU-M06-10 | Cuando todo está ensacado, quiero cerrar la carga y dejar anotado si se vendió o se llevó a otro lado |
+| RU-M06-11 | A veces en cancha se junta más de un mineral; quiero poder agregarlo al lote y ver cuánto hay de cada uno |
 
 ## Contexto del diagnóstico
 

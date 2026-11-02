@@ -303,9 +303,10 @@ REST_FRAMEWORK = {
 }
 ```
 
-`MEDIA_ROOT` es el valor por defecto para desarrollo. El medio definitivo de almacenamiento de
-imágenes —volumen del servidor o almacenamiento de objetos— lo fija D-14; cuando se cierre, esta
-sección se actualiza con el backend de `django-storages` correspondiente.
+`MEDIA_ROOT` es el valor por defecto para desarrollo. El código guarda y lee la imagen del ticket
+solo por la API de almacenamiento de Django (D-18), nunca con rutas de archivo escritas a mano. El
+medio definitivo —volumen del servidor o almacenamiento de objetos— lo fija D-14; cuando se cierre,
+esta sección se actualiza con el backend de `django-storages` correspondiente, sin tocar el código.
 
 `.env.example` (versionado, sin secretos reales):
 
@@ -524,7 +525,7 @@ def manejador_uniforme(exc, context):
     if isinstance(exc, ReglaDeNegocioError):
         return Response(
             {"codigo": exc.codigo, "mensaje": str(exc), "detalles": exc.detalles},
-            status=422,
+            status=400,  # D-23: 400 regla, 403 permiso, 409 conflicto de estado
         )
     respuesta = exception_handler(exc, context)
     if respuesta is not None:

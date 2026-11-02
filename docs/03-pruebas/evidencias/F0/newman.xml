@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="LogisticaMinera API v1" tests="9" time="0.482">
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRADOR -> 200" id="1e3d5a11-40f8-4bd5-b480-9e2ea6aa24e2" timestamp="2026-10-25T15:54:38.165Z" tests="4" failures="0" errors="0" time="0.169">
+    <testcase name="Responde dentro del umbral" time="0.169" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="HTTP 200" time="0.169" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Entrega access y refresh" time="0.169" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Rol ADMINISTRADOR" time="0.169" classname="00SesionesSesionAdministrador200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRATIVO -> 200" id="25f1d9b5-4974-46cc-9db8-fc240aec9a48" timestamp="2026-10-25T15:54:38.165Z" tests="4" failures="0" errors="0" time="0.098">
+    <testcase name="Responde dentro del umbral" time="0.098" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="HTTP 200" time="0.098" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Entrega access y refresh" time="0.098" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Rol ADMINISTRATIVO" time="0.098" classname="00SesionesSesionAdministrativo200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · SUPERVISOR -> 200" id="6c38542c-5aff-47ff-be61-2c7ae5346bf5" timestamp="2026-10-25T15:54:38.165Z" tests="4" failures="0" errors="0" time="0.097">
+    <testcase name="Responde dentro del umbral" time="0.097" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="HTTP 200" time="0.097" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Entrega access y refresh" time="0.097" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Rol SUPERVISOR" time="0.097" classname="00SesionesSesionSupervisor200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Esquema OpenAPI -> 200" id="a74e872d-99f6-475f-b3bf-b5dccb5164c3" timestamp="2026-10-25T15:54:38.165Z" tests="6" failures="0" errors="0" time="0.063">
+    <testcase name="Responde dentro del umbral" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="HTTP 200" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Documento OpenAPI 3" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Título de la línea base 2.1" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Publica la ruta de tipos de mineral" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="No publica rutas de productos" time="0.063" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Documentación de la API -> 200" id="6adc6046-7d38-45c0-9c52-ce5d7fa0a876" timestamp="2026-10-25T15:54:38.165Z" tests="3" failures="0" errors="0" time="0.006">
+    <testcase name="Responde dentro del umbral" time="0.006" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="HTTP 200" time="0.006" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="Interfaz de documentación" time="0.006" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral con sesión -> 200" id="9feb9d19-f8e8-44df-80eb-fd44613d72dd" timestamp="2026-10-25T15:54:38.165Z" tests="3" failures="0" errors="0" time="0.028">
+    <testcase name="Responde dentro del umbral" time="0.028" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="HTTP 200" time="0.028" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="Listado paginado" time="0.028" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral sin sesión -> 401" id="79786b23-4d76-47b2-96c4-55d5252d3d55" timestamp="2026-10-25T15:54:38.165Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="Responde dentro del umbral" time="0.005" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="HTTP 401" time="0.005" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Cuerpo uniforme (D-23)" time="0.005" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Código NO_AUTENTICADO" time="0.005" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Ruta anterior de productos -> 404" id="eeedfdd1-6dfd-443f-aaf8-428b50a84de8" timestamp="2026-10-25T15:54:38.165Z" tests="2" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+    <testcase name="HTTP 404: la ruta del diseño anterior ya no existe" time="0.012" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Registro de ingresos aún sin rutas -> 404" id="d1e12fa2-64d5-4ca1-bbbd-328aafb81c0d" timestamp="2026-10-25T15:54:38.165Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="Responde dentro del umbral" time="0.004" classname="F0SaludYEsquemaF0RegistroDeIngresosAunSinRutas404"/>
+    <testcase name="HTTP 404: el registro del diseño anterior se retiró; M03 se publica en F3" time="0.004" classname="F0SaludYEsquemaF0RegistroDeIngresosAunSinRutas404"/>
+  </testsuite>
+</testsuites>

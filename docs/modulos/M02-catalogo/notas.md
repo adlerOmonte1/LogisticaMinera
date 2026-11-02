@@ -93,5 +93,5 @@ que el valor no cambie, y otro como Administrador sin motivo y espera el rechazo
 | Pendiente | Efecto |
 |---|---|
 | Valores del catálogo de tipos de mineral, a definir con la empresa (DR-03) | Bloquea la carga inicial de datos, no la estructura del modelo; el alta desde el registro reduce el bloqueo |
-| Preparación del repositorio (`PLAN_DE_TRABAJO.md` §8): retiro de `Cliente` y cambio de `Producto` a `TipoMineral` | El modelo descrito en estas notas supone esa preparación hecha |
+| Preparación del repositorio (`PLAN_DE_TRABAJO.md` §8): cambio de `Producto` a `TipoMineral`. El retiro de `Cliente` ya se hizo (migración `0002_retira_cliente`) | El modelo descrito en estas notas supone esa preparación hecha |
 | Carga de la tara de los vehículos que ya operan antes de la puesta en marcha | Sin ella, todos sus primeros ingresos quedarán En proceso hasta un nuevo destare |

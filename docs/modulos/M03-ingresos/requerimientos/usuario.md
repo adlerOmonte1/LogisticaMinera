@@ -15,6 +15,7 @@
 | RU-M03-11 | Cuando un carro viene por primera vez, quiero anotar su tara al destararlo, y que después el sistema saque el neto solo |
 | RU-M03-12 | Si el ticket se pierde o no lo puedo fotografiar, quiero registrar igual el ingreso, explicando por qué no tiene foto |
 | RU-M03-13 | Si llega un mineral que no está en la lista, quiero que alguien de la oficina pueda agregarlo sin que yo pierda el registro |
+| RU-M03-14 | Si corrijo un ingreso por error, quiero poder deshacer esa corrección sin tener que corregirlo a mano otra vez |
 
 ## Contexto del diagnóstico
 

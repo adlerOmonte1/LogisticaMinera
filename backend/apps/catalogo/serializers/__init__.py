@@ -1,8 +1,7 @@
-from .clientes import ClienteCreateSerializer, ClienteSerializer, ClienteUpdateSerializer
-from .productos import (
-    ProductoCreateSerializer,
-    ProductoSerializer,
-    ProductoUpdateSerializer,
+from .tipos_mineral import (
+    TipoMineralCreateSerializer,
+    TipoMineralSerializer,
+    TipoMineralUpdateSerializer,
 )
 from .transportistas import (
     TransportistaCreateSerializer,
@@ -12,12 +11,13 @@ from .transportistas import (
 from .vehiculos import (
     VehiculoCreateSerializer,
     VehiculoSerializer,
+    VehiculoTaraSerializer,
     VehiculoUpdateSerializer,
 )
 
 __all__ = [
-    "ClienteCreateSerializer", "ClienteSerializer", "ClienteUpdateSerializer",
-    "ProductoCreateSerializer", "ProductoSerializer", "ProductoUpdateSerializer",
+    "TipoMineralCreateSerializer", "TipoMineralSerializer", "TipoMineralUpdateSerializer",
     "TransportistaCreateSerializer", "TransportistaSerializer", "TransportistaUpdateSerializer",
-    "VehiculoCreateSerializer", "VehiculoSerializer", "VehiculoUpdateSerializer",
+    "VehiculoCreateSerializer", "VehiculoSerializer", "VehiculoTaraSerializer",
+    "VehiculoUpdateSerializer",
 ]

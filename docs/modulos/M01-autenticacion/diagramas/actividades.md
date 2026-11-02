@@ -26,22 +26,29 @@ flowchart TD
     V5 -->|Si| R1[Reiniciar intentos fallidos]
     R1 --> T1[Emitir token]
     T1 --> A1[Registrar evento en auditoria]
-    A1 --> D1[Dirigir a pantalla principal del rol]
+    A1 --> V7{Contrasena temporal?}
+    V7 -->|Si| C1[Exigir el cambio de contrasena antes de continuar]
+    C1 --> D1
+    V7 -->|No| D1[Dirigir a pantalla principal del rol]
     D1 --> Fin
 ```
 
-## A-M01-02 · Desactivación de usuario (RN-M01-03, RN-M01-06)
+## A-M01-02 · Desactivación de usuario (RN-M01-03, RN-M01-06, RN-M01-12)
 
 ```mermaid
 flowchart TD
-    Start([Administrador solicita eliminar usuario]) --> V1{Rol es Administrador?}
+    Start([Administrador solicita desactivar un usuario]) --> V1{Rol es Administrador?}
     V1 -->|No| E1[Rechazar: Accion no autorizada]
     E1 --> Fin([Fin])
-    V1 -->|Si| B1[Baja logica: activo pasa a falso]
+    V1 -->|Si| V2{Es su propia cuenta?}
+    V2 -->|Si| E2[Rechazar: No puede desactivar su propia cuenta]
+    E2 --> Fin
+    V2 -->|No| B1[Baja logica: activo pasa a falso]
     B1 --> A1[Registrar evento en auditoria]
     A1 --> M1[Confirmar: Usuario desactivado]
     M1 --> Fin
 ```
 
 El sistema **nunca** elimina físicamente un usuario, tenga o no registros asociados: la baja lógica
-es la única vía, con independencia de esa condición (D-07).
+es la única vía, con independencia de esa condición (D-07). La reactivación sigue el camino inverso,
+con el mismo control de rol, y conserva el rol y el historial del usuario.

@@ -40,7 +40,7 @@ flowchart LR
 
 | Caso | HU | Actores | Nota |
 |---|---|---|---|
-| Abrir y componer un lote | HU-M06-01 | Administrativo, Administrador | Incluye asignar y retirar ingresos mientras el lote está Abierto, y agregar ingresos tardíos mientras está En recorrido |
+| Abrir y componer un lote | HU-M06-01 | Administrativo, Administrador | Incluye asignar ingresos mientras el lote está Abierto, agregar ingresos tardíos mientras está En recorrido y retirar un ingreso hasta que su mineral pase por zarandeo o molienda |
 | Iniciar el recorrido | HU-M06-01 | Administrativo, Administrador | El lote deja de reunir ingresos y empieza por el secado. Exige al menos un ingreso |
 | Registrar paso por una etapa | HU-M06-02 | Los tres roles | Solo sobre lotes En recorrido y en el orden de la ruta, que se elige después del secado |
 | Consultar trazabilidad de un ingreso | HU-M06-03 | Los tres roles | Responde a través del lote o de sus partes, sobre las etapas de su ruta |

@@ -7,7 +7,7 @@
 |---|---|
 | Documento | Marco de tesis |
 | Origen | Anexos 01 a 05 de la tesis, validados por juicio de expertos |
-| Fecha | 21/09/2026 · actualizado el 20/10/2026 con DR-11 a DR-18 y el 21/10/2026 con DR-21 |
+| Fecha | 21/09/2026 · actualizado el 20/10/2026 con DR-11 a DR-18, el 21/10/2026 con DR-21 y el 23/10/2026 con DR-29 a DR-31 (roles) |
 | Estado | Vigente |
 
 ---
@@ -149,9 +149,9 @@ inconsistencias sembradas, 2 por regla. Motor y reglas congelados durante toda l
 
 | Rol | Alcance |
 |---|---|
-| Administrador | Acceso total, incluidos usuarios, catálogos, anulaciones y el cierre del lote con su destino |
-| Administrativo | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos, salvo modificar una tara ya registrada, y composición de lotes: apertura, asignación, inicio del recorrido y división (DR-23) |
-| Supervisor de planta | Registro de ingresos, de vehículos nuevos, de destares y del paso del lote por las etapas; consulta (DR-17) |
+| Administrador | Acceso total, incluidos usuarios y el restablecimiento de sus contraseñas, catálogos, anulaciones y el cierre del lote con su destino (DR-30) |
+| Administrativo | Registro, corrección, consultas, consolidación y exportación; gestión de catálogos, salvo modificar una tara ya registrada, y composición de lotes: apertura, asignación y retiro de ingresos, inicio del recorrido y división (DR-23, DR-29) |
+| Supervisor de planta | Registro de ingresos, de vehículos nuevos, de destares y del paso del lote por las etapas; consulta, incluidos el reconocimiento y la validación de cada ingreso (DR-17, DR-31) |
 
 ## 9. Módulos
 

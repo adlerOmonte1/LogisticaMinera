@@ -7,7 +7,7 @@ class Transportista(EntidadCatalogo):
     """Empresa de transporte de un vehículo EXTERNO (RN-M02-04)."""
 
     razon_social = models.CharField(max_length=150, verbose_name="Razón social")
-    ruc = models.CharField(max_length=11, verbose_name="RUC")
+    ruc = models.CharField(max_length=11, unique=True, verbose_name="RUC")  # RN-M02-18
 
     class Meta:
         db_table = "transportista"

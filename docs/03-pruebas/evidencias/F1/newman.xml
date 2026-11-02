@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="LogisticaMinera API v1" tests="37" time="2.206">
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRADOR -> 200" id="43034057-21db-4997-8b6e-1a079ec2ebe8" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.155">
+    <testcase name="Responde dentro del umbral" time="0.155" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="HTTP 200" time="0.155" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Entrega access y refresh" time="0.155" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Rol ADMINISTRADOR" time="0.155" classname="00SesionesSesionAdministrador200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRATIVO -> 200" id="e90dfdd4-5e71-4f25-a318-1e6bc0cdeabe" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.110">
+    <testcase name="Responde dentro del umbral" time="0.110" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="HTTP 200" time="0.110" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Entrega access y refresh" time="0.110" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Rol ADMINISTRATIVO" time="0.110" classname="00SesionesSesionAdministrativo200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · SUPERVISOR -> 200" id="a4eae5dc-64b0-49a1-bd43-0d6b5a517886" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.100">
+    <testcase name="Responde dentro del umbral" time="0.100" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="HTTP 200" time="0.100" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Entrega access y refresh" time="0.100" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Rol SUPERVISOR" time="0.100" classname="00SesionesSesionSupervisor200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Esquema OpenAPI -> 200" id="577c26fe-fad6-40a0-bfae-31ce5197ff7e" timestamp="2026-10-25T16:02:27.325Z" tests="6" failures="0" errors="0" time="0.033">
+    <testcase name="Responde dentro del umbral" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="HTTP 200" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Documento OpenAPI 3" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Título de la línea base 2.1" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Publica la ruta de tipos de mineral" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="No publica rutas de productos" time="0.033" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Documentación de la API -> 200" id="8b2dcf0b-86a1-4834-a423-a731267f2a37" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="Responde dentro del umbral" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="HTTP 200" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="Interfaz de documentación" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral con sesión -> 200" id="0d012cb3-4cf5-408b-896d-c48dbeb4b0a5" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="HTTP 200" time="0.015" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="Listado paginado" time="0.015" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral sin sesión -> 401" id="586a103f-230c-42ab-89db-33e3d7114d6b" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="Responde dentro del umbral" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="HTTP 401" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Cuerpo uniforme (D-23)" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Código NO_AUTENTICADO" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Ruta anterior de productos -> 404" id="1a11adb5-d445-4475-93dd-f8b7fb189621" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+    <testcase name="HTTP 404: la ruta del diseño anterior ya no existe" time="0.015" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Registro de ingresos aún sin rutas -> 404" id="8f72db2e-79ae-4469-a9cf-42f92951d8c9" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F0SaludYEsquemaF0RegistroDeIngresosAunSinRutas404"/>
+    <testcase name="HTTP 404: el registro del diseño anterior se retiró; M03 se publica en F3" time="0.007" classname="F0SaludYEsquemaF0RegistroDeIngresosAunSinRutas404"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / Preparación · Crea el usuario desechable -> 201" id="4925957f-79ce-4b12-afe1-b33d7e7b0b8b" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.106">
+    <testcase name="Responde dentro del umbral" time="0.106" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioDesechable201"/>
+    <testcase name="HTTP 201" time="0.106" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioDesechable201"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / Preparación · Crea el usuario para el bloqueo -> 201" id="b620dc43-25a7-452b-81a7-bd7bb223655c" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.102">
+    <testcase name="Responde dentro del umbral" time="0.102" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioParaElBloqueo201"/>
+    <testcase name="HTTP 201" time="0.102" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioParaElBloqueo201"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA01 · Credenciales válidas -> 200" id="fdcb433b-d07e-44dc-bdc0-b27cd6d037d8" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.092">
+    <testcase name="Responde dentro del umbral" time="0.092" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+    <testcase name="HTTP 200" time="0.092" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+    <testcase name="Rol y marca de clave" time="0.092" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA02 · Credenciales inválidas -> 401" id="1ed139ff-5819-4cc5-bcd8-f947d51e495c" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.100">
+    <testcase name="Responde dentro del umbral" time="0.100" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="HTTP 401" time="0.100" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="Cuerpo uniforme" time="0.100" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="Mensaje literal" time="0.100" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA03 · Quinto intento fallido bloquea -> 423" id="34683430-92e1-4b9b-a0e0-2f616b5b6a8a" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.084">
+    <testcase name="Responde dentro del umbral" time="0.084" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="HTTP 423" time="0.084" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="Cuerpo uniforme" time="0.084" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="Mensaje literal" time="0.084" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA03 · Bloqueada aun con la clave correcta -> 423" id="d7a12c5d-f540-4340-bf18-70be67b85767" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="HTTP 423" time="0.007" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="Cuerpo uniforme" time="0.007" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="Mensaje literal" time="0.007" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA06 · Token inválido -> 401" id="ab3d0188-7c51-4d3b-8612-2c46fe116e1b" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="Responde dentro del umbral" time="0.003" classname="F1M01AutenticacionYRolesHuM0101Ca06TokenInvalido401"/>
+    <testcase name="HTTP 401" time="0.003" classname="F1M01AutenticacionYRolesHuM0101Ca06TokenInvalido401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA02 · Nombre de usuario duplicado -> 400" id="e02be21c-2848-435f-97e6-b78de23fd961" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="HTTP 400" time="0.008" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="Cuerpo uniforme" time="0.008" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="Mensaje literal" time="0.008" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA04 · Supervisor en la gestión de usuarios -> 403" id="f9cb1775-3141-42ce-bf97-798004c83144" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="HTTP 403" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA04 · Administrativo en la gestión de usuarios -> 403" id="30f421bf-f823-4be6-b746-5fef7ee8e8cf" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="HTTP 403" time="0.010" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA02 · Supervisor crea usuarios -> 403" id="ae8d03ec-02ad-483f-a311-9778314cb007" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="HTTP 403" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA06 · Contraseña actual incorrecta -> 400" id="61e9afbd-9353-473e-9f56-235becc5cbed" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.089">
+    <testcase name="Responde dentro del umbral" time="0.089" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="HTTP 400" time="0.089" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="Cuerpo uniforme" time="0.089" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="Mensaje literal" time="0.089" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA07 · Contraseña nueva corta -> 400" id="dae16289-0e4b-4d98-b98c-01f5b07661b0" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.084">
+    <testcase name="Responde dentro del umbral" time="0.084" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="HTTP 400" time="0.084" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="Cuerpo uniforme" time="0.084" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="Mensaje literal" time="0.084" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA11 · Las contraseñas no coinciden -> 400" id="f3b1f799-1293-494b-b1b1-686c84344780" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.091">
+    <testcase name="Responde dentro del umbral" time="0.091" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="HTTP 400" time="0.091" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="Cuerpo uniforme" time="0.091" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="Mensaje literal" time="0.091" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA08 · Restablecer contraseña -> 200" id="5cbe0b6e-255e-4987-b0be-ce07abffdfb3" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.096">
+    <testcase name="Responde dentro del umbral" time="0.096" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+    <testcase name="HTTP 200" time="0.096" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+    <testcase name="Contraseña temporal de al menos 8" time="0.096" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Sesión con la contraseña temporal -> 200" id="b8dea4bf-1125-44b6-8a7d-2020d6826475" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.096">
+    <testcase name="Responde dentro del umbral" time="0.096" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+    <testcase name="HTTP 200" time="0.096" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+    <testcase name="Marca de cambio obligatorio" time="0.096" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Otra operación con la temporal -> 403" id="9565e9a0-a6dc-4939-b6ff-3820bd2f87d1" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="HTTP 403" time="0.010" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA05 · Cambio de la propia contraseña -> 200" id="db450e98-631d-4921-8ac4-a9d6cc8f46d1" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.178">
+    <testcase name="Responde dentro del umbral" time="0.178" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+    <testcase name="HTTP 200" time="0.178" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+    <testcase name="Mensaje" time="0.178" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Tras el cambio, opera normalmente -> 200" id="409e5125-16ab-4fd7-8ddf-82797c56d22a" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca09TrasElCambioOperaNormalmente200"/>
+    <testcase name="HTTP 200" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca09TrasElCambioOperaNormalmente200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · Antes del cambio de rol -> 403" id="53102eb2-bc94-4174-999b-eff8b2bae0c3" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="HTTP 403" time="0.008" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="Cuerpo uniforme" time="0.008" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="Mensaje literal" time="0.008" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · El administrador le da el rol Administrador -> 200" id="79b92f1e-c3b3-4225-a9b0-b235ad0e184a" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.028">
+    <testcase name="Responde dentro del umbral" time="0.028" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+    <testcase name="HTTP 200" time="0.028" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+    <testcase name="Rol nuevo" time="0.028" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · Siguiente acción con el mismo token -> 200" id="b48ecb57-6b59-474f-9e00-e212aec42417" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03SiguienteAccionConElMismoToken200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03SiguienteAccionConElMismoToken200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA09 · Desactivar la propia cuenta -> 400" id="3bd3a61f-7c94-426f-bae6-2f9914aa002b" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="HTTP 400" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA03 · Desactivar un usuario -> 200" id="8d33d32e-4951-4e3d-a5db-0f4f9c11c280" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+    <testcase name="Mensaje" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA04 · Cuenta inactiva -> 401" id="6d6e517e-fef3-4109-a2cd-7e35caa80c04" timestamp="2026-10-25T16:02:27.325Z" tests="4" failures="0" errors="0" time="0.104">
+    <testcase name="Responde dentro del umbral" time="0.104" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="HTTP 401" time="0.104" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="Cuerpo uniforme" time="0.104" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="Mensaje literal" time="0.104" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA10 · Reactivar un usuario -> 200" id="be546af9-5e2e-4d0e-9920-11176e8ecf52" timestamp="2026-10-25T16:02:27.325Z" tests="3" failures="0" errors="0" time="0.026">
+    <testcase name="Responde dentro del umbral" time="0.026" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+    <testcase name="HTTP 200" time="0.026" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+    <testcase name="Mensaje y rol" time="0.026" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA05 · Cerrar sesión -> 204" id="a721d225-372c-4e0b-9566-1af4265a1dc6" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.018">
+    <testcase name="Responde dentro del umbral" time="0.018" classname="F1M01AutenticacionYRolesHuM0101Ca05CerrarSesion204"/>
+    <testcase name="HTTP 204" time="0.018" classname="F1M01AutenticacionYRolesHuM0101Ca05CerrarSesion204"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA05 · El refresh cerrado ya no sirve -> 401" id="f8390813-58dc-4727-b58b-19b0ffaa4f08" timestamp="2026-10-25T16:02:27.325Z" tests="2" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F1M01AutenticacionYRolesHuM0101Ca05ElRefreshCerradoYaNoSirve401"/>
+    <testcase name="HTTP 401" time="0.015" classname="F1M01AutenticacionYRolesHuM0101Ca05ElRefreshCerradoYaNoSirve401"/>
+  </testsuite>
+</testsuites>

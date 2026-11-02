@@ -1,13 +1,11 @@
 from .repositorios import (
-    ClienteRepository,
-    ProductoRepository,
+    TipoMineralRepository,
     TransportistaRepository,
     VehiculoRepository,
 )
 
 __all__ = [
-    "ClienteRepository",
-    "ProductoRepository",
+    "TipoMineralRepository",
     "TransportistaRepository",
     "VehiculoRepository",
 ]

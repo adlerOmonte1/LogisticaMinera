@@ -138,13 +138,13 @@ operativa, nunca eliminar.
 
 | Es requerido por | Para |
 |---|---|
-| M01 | Registrar inicio de sesión, cierre de sesión y acceso rechazado |
-| M02 | Registrar altas, ediciones y bajas del catálogo |
+| M01 | Registrar inicio de sesión, cierre de sesión, acceso rechazado, desactivación, reactivación y restablecimiento de contraseña |
+| M02 | Registrar altas, ediciones, bajas y reactivaciones del catálogo |
 | M03 | Registrar creación, corrección y anulación de ingresos |
 | M04 | Registrar el reconocimiento y la corrección de datos propuestos |
 | M05 | Registrar el resultado de la validación de un ingreso |
 | M06 | Registrar las operaciones sobre un lote, con los ingresos que afectan |
-| M07 | Presentar el historial de un ingreso en su detalle |
+| M07 | Presentar el historial de un ingreso en su detalle y registrar la exportación del listado |
 | M08 | Registrar cada exportación |
 
 ## Pendientes que afectan a este módulo

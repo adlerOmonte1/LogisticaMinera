@@ -55,7 +55,7 @@ flowchart LR
 |---|---|---|---|
 | Registrar ingreso desde el ticket | HU-M03-01 | Los tres roles | Empieza con la captura de la imagen; la hora del pesaje se propone y el usuario la ajusta; el código, la hora de fin y el peso neto los asigna el servidor |
 | Revisar y corregir datos propuestos | HU-M03-01 | Los tres roles | Ocurre antes de confirmar; la placa leída puede corregirse; nada se persiste hasta entonces |
-| Consultar ingresos | HU-M03-01 | Los tres roles | Listado y detalle del propio recurso. La búsqueda por placa y fecha es de M07 |
+| Consultar ingresos | HU-M03-01 | Los tres roles | Recurso del ingreso y lista de pendientes de destare. El listado, la búsqueda por placa y fecha y el detalle completo son de M07 (D-19) |
 | Corregir ingreso registrado | HU-M03-02 | Administrativo, Administrador | Exige motivo y vuelve a validar. El Supervisor de planta no corrige |
 | Anular ingreso | HU-M03-03 | Administrador | Exige motivo. No elimina: excluye de los totales y conserva el registro |
 | Dar de alta vehículo nuevo | HU-M03-01 | Los tres roles | En la misma pantalla del registro, sin perder lo capturado. Es el primer viaje: el ingreso queda En proceso |

@@ -7,12 +7,13 @@ literal del criterio de aceptación.
 
 import re
 
+from django.conf import settings
+
 from common.excepciones import ErrorDeValidacionDeDominio
 
-# Placa vehicular peruana: tres letras, guion, tres dígitos (p. ej. ABC-123).
-# Decisión D-M02-01: se adopta este formato único; los formatos antiguos y de
-# vehículo menor quedan fuera de alcance (no circulan volquetes con ellos).
-_PLACA = re.compile(r"^[A-Z]{3}-\d{3}$")
+# El patrón de placa no se escribe aquí: viene de `settings.PATRON_PLACA` (D-24),
+# el mismo que leerá la regla V3 de M05 (RNF-M05-08). Por defecto, tres letras o
+# dígitos, guion y tres letras o dígitos, como ABC-123 o C9K-741.
 _RUC = re.compile(r"^\d{11}$")
 
 MENSAJE_PLACA_INVALIDA = "El formato de la placa no es válido"
@@ -25,7 +26,7 @@ def normalizar_placa(placa: str) -> str:
 
 def validar_placa(placa: str) -> str:
     placa = normalizar_placa(placa)
-    if not _PLACA.match(placa):
+    if not re.fullmatch(settings.PATRON_PLACA, placa):
         raise ErrorDeValidacionDeDominio(MENSAJE_PLACA_INVALIDA, codigo="PLACA_INVALIDA")
     return placa
 

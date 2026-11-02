@@ -1,39 +1,35 @@
-"""Controladores REST del catálogo (RF-03). HU-M02-01 a HU-M02-04.
+"""Controladores REST del catálogo (M02). HU-M02-01 a HU-M02-03.
 
 Un `ViewSet` por entidad, todos con la misma forma: listar (vigentes por
-defecto), crear, editar y desactivar. Sin `DELETE`: la baja es siempre lógica
-(RN-M02-07). La lógica de negocio vive en `services/`; aquí solo se traduce
+defecto), crear, editar, desactivar y reactivar; el vehículo añade el cambio de
+tara. Sin `DELETE`: la baja es siempre lógica (RN-M02-08, D-22). La lógica de negocio vive en `services/`; aquí solo se traduce
 HTTP.
 """
 
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.catalogo.filters import ProductoFilter, VehiculoFilter
-from apps.catalogo.permissions import PuedeGestionarCatalogo
+from apps.catalogo.filters import TipoMineralFilter, VehiculoFilter
+from apps.catalogo.permissions import permisos_de
 from apps.catalogo.repositories import (
-    ClienteRepository,
-    ProductoRepository,
+    TipoMineralRepository,
     TransportistaRepository,
     VehiculoRepository,
 )
 from apps.catalogo.serializers import (
-    ClienteCreateSerializer,
-    ClienteSerializer,
-    ClienteUpdateSerializer,
-    ProductoCreateSerializer,
-    ProductoSerializer,
-    ProductoUpdateSerializer,
+    TipoMineralCreateSerializer,
+    TipoMineralSerializer,
+    TipoMineralUpdateSerializer,
     TransportistaCreateSerializer,
     TransportistaSerializer,
     TransportistaUpdateSerializer,
     VehiculoCreateSerializer,
     VehiculoSerializer,
+    VehiculoTaraSerializer,
     VehiculoUpdateSerializer,
 )
-from apps.catalogo.services import clientes, productos, transportistas, vehiculos
+from apps.catalogo.services import tipos_mineral, transportistas, vehiculos
 
 _VERDADERO = {"1", "true", "True", "si", "sí"}
 
@@ -51,7 +47,7 @@ class CatalogoViewSet(
     excluir `PUT` — `update()` siempre trata la edición como parcial."""
 
     http_method_names = ["get", "post", "patch", "head", "options"]
-    permission_classes = [IsAuthenticated, PuedeGestionarCatalogo]
+    alta_abierta = False
 
     repositorio = None
     serializer_salida = None
@@ -60,8 +56,16 @@ class CatalogoViewSet(
     fn_crear = None
     fn_actualizar = None
     fn_desactivar = None
+    fn_reactivar = None
+
+    def get_permissions(self):
+        return permisos_de(self.action, alta_abierta=self.alta_abierta)
 
     def get_queryset(self):
+        if self.action not in ("list", None):
+            # Las acciones de detalle alcanzan también a los desactivados:
+            # sin ello no se podría reactivar ni consultar un histórico.
+            return self.repositorio.todos()
         incluir_inactivos = self.request.query_params.get("incluir_inactivos") in _VERDADERO
         return self.repositorio.todos() if incluir_inactivos else self.repositorio.vigentes()
 
@@ -85,26 +89,32 @@ class CatalogoViewSet(
         obj = self.fn_actualizar(obj, entrada.validated_data, request.user)
         return Response(self.serializer_salida(obj).data)
 
-    @action(detail=True, methods=["patch"])
-    def desactivar(self, request, pk=None):
-        obj = self.get_object()
-        resultado = self.fn_desactivar(obj, request.user)
+    def _con_mensaje(self, resultado):
         cuerpo = self.serializer_salida(resultado).data
         mensaje = getattr(resultado, "mensaje", None)
         if mensaje:
             cuerpo = {"mensaje": mensaje, **cuerpo}
         return Response(cuerpo)
 
+    @action(detail=True, methods=["patch"])
+    def desactivar(self, request, pk=None):
+        return self._con_mensaje(self.fn_desactivar(self.get_object(), request.user))
 
-class ProductoViewSet(CatalogoViewSet):
-    repositorio = ProductoRepository
-    serializer_salida = ProductoSerializer
-    serializer_alta = ProductoCreateSerializer
-    serializer_edicion = ProductoUpdateSerializer
-    filterset_class = ProductoFilter
-    fn_crear = staticmethod(productos.crear_producto)
-    fn_actualizar = staticmethod(productos.actualizar_producto)
-    fn_desactivar = staticmethod(productos.desactivar_producto)
+    @action(detail=True, methods=["patch"])
+    def reactivar(self, request, pk=None):
+        return self._con_mensaje(self.fn_reactivar(self.get_object(), request.user))
+
+
+class TipoMineralViewSet(CatalogoViewSet):
+    repositorio = TipoMineralRepository
+    serializer_salida = TipoMineralSerializer
+    serializer_alta = TipoMineralCreateSerializer
+    serializer_edicion = TipoMineralUpdateSerializer
+    filterset_class = TipoMineralFilter
+    fn_crear = staticmethod(tipos_mineral.crear_tipo_mineral)
+    fn_actualizar = staticmethod(tipos_mineral.actualizar_tipo_mineral)
+    fn_desactivar = staticmethod(tipos_mineral.desactivar_tipo_mineral)
+    fn_reactivar = staticmethod(tipos_mineral.reactivar_tipo_mineral)
 
 
 class VehiculoViewSet(CatalogoViewSet):
@@ -116,6 +126,19 @@ class VehiculoViewSet(CatalogoViewSet):
     fn_crear = staticmethod(vehiculos.crear_vehiculo)
     fn_actualizar = staticmethod(vehiculos.actualizar_vehiculo)
     fn_desactivar = staticmethod(vehiculos.desactivar_vehiculo)
+    fn_reactivar = staticmethod(vehiculos.reactivar_vehiculo)
+    alta_abierta = True
+
+    @action(detail=True, methods=["patch"], serializer_class=VehiculoTaraSerializer)
+    def tara(self, request, pk=None):
+        """HU-M02-01 CA09 a CA11. El permiso es solo del Administrador."""
+        vehiculo = self.get_object()
+        entrada = VehiculoTaraSerializer(data=request.data)
+        entrada.is_valid(raise_exception=True)
+        vehiculo = vehiculos.modificar_tara(
+            vehiculo, entrada.validated_data["tara_tn"], entrada.validated_data["motivo"], request.user
+        )
+        return Response(self.serializer_salida(vehiculo).data)
 
 
 class TransportistaViewSet(CatalogoViewSet):
@@ -126,16 +149,7 @@ class TransportistaViewSet(CatalogoViewSet):
     fn_crear = staticmethod(transportistas.crear_transportista)
     fn_actualizar = staticmethod(transportistas.actualizar_transportista)
     fn_desactivar = staticmethod(transportistas.desactivar_transportista)
+    fn_reactivar = staticmethod(transportistas.reactivar_transportista)
 
 
-class ClienteViewSet(CatalogoViewSet):
-    repositorio = ClienteRepository
-    serializer_salida = ClienteSerializer
-    serializer_alta = ClienteCreateSerializer
-    serializer_edicion = ClienteUpdateSerializer
-    fn_crear = staticmethod(clientes.crear_cliente)
-    fn_actualizar = staticmethod(clientes.actualizar_cliente)
-    fn_desactivar = staticmethod(clientes.desactivar_cliente)
-
-
-__all__ = ["ProductoViewSet", "VehiculoViewSet", "TransportistaViewSet", "ClienteViewSet"]
+__all__ = ["TipoMineralViewSet", "VehiculoViewSet", "TransportistaViewSet"]

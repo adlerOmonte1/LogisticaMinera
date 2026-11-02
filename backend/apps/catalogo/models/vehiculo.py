@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -11,11 +12,13 @@ MENSAJE_PROPIO_CON_TRANSPORTISTA = "Un vehículo propio no lleva transportista a
 class Vehiculo(EntidadCatalogo):
     """Volquete que ingresa a planta.
 
-    RN-M02-02 (placa única), RN-M02-03 (titularidad obligatoria y cerrada),
-    RN-M02-04 / RN-M02-05 (coherencia titularidad ↔ transportista).
+    RN-M02-01 (placa única), RN-M02-02 (titularidad obligatoria y cerrada),
+    RN-M02-03 / RN-M02-04 (coherencia titularidad ↔ transportista),
+    RN-M02-05 (capacidad positiva). La tara nace nula y se registra en el destare
+    del primer viaje, con su fecha y su usuario (RN-M02-11, DR-10, DR-25).
 
-    El índice sobre `tipo_titularidad` sostiene el indicador I2: la cobertura
-    de registro se agrupa por este campo (propio vs. externo).
+    El índice sobre `tipo_titularidad` sostiene el filtro por titularidad del
+    catálogo.
     """
 
     PROPIO = "PROPIO"
@@ -37,6 +40,21 @@ class Vehiculo(EntidadCatalogo):
         related_name="vehiculos",
         verbose_name="Transportista",
     )
+    tara_tn = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True, editable=False, verbose_name="Tara (tn)"
+    )
+    fecha_destare = models.DateTimeField(
+        null=True, blank=True, editable=False, verbose_name="Fecha del destare"
+    )
+    usuario_destare = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="+",
+        verbose_name="Registró la tara",
+    )
 
     class Meta:
         db_table = "vehiculo"
@@ -47,6 +65,10 @@ class Vehiculo(EntidadCatalogo):
 
     def __str__(self):
         return f"{self.placa} ({self.get_tipo_titularidad_display()})"
+
+    @property
+    def pendiente_destare(self) -> bool:
+        return self.tara_tn is None
 
     def clean(self):
         """Salvaguarda de dominio: RN-M02-04 y RN-M02-05. El servicio ya las

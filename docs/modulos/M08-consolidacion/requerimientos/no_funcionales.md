@@ -6,8 +6,8 @@
 | RNF-M08-02 | Eficiencia de desempeño — comportamiento temporal | La exportación se genera y descarga en menos de 5 segundos para un mes con hasta 1000 ingresos | Cronometraje con datos sintéticos |
 | RNF-M08-03 | Adecuación funcional — corrección | El total calculado coincide exactamente con la suma manual de los pesos netos no anulados del periodo | Consulta de verificación sobre la base contrastada con cálculo independiente |
 | RNF-M08-04 | Mantenibilidad — modularidad | Añadir un formato de exportación no modifica el repositorio del cálculo ni los exportadores existentes | Inspección de código |
-| RNF-M08-05 | Fiabilidad — exactitud | El total exportado es idéntico, campo por campo, al que muestra la consulta en pantalla para el mismo periodo | Prueba automatizada que compara ambas salidas |
-| RNF-M08-06 | Usabilidad — operabilidad | El periodo se selecciona con un control de mes y año, sin escribir fechas completas | Inspección en dispositivo real |
+| RNF-M08-05 | Adecuación funcional — corrección | El total exportado es idéntico, campo por campo, al que muestra la consulta en pantalla para el mismo periodo | Prueba automatizada que compara ambas salidas |
+| RNF-M08-06 | Capacidad de interacción — operabilidad | El periodo se selecciona con un control de mes y año, sin escribir fechas completas | Inspección en dispositivo real |
 
 ## Nota sobre RNF-M08-01
 

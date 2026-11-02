@@ -10,11 +10,13 @@ flowchart LR
     UC2["Cerrar sesion"]
     UC3["Cambiar contrasena propia"]
     UC4["Gestionar usuarios"]
+    UC5["Restablecer contrasena de un usuario"]
 
     ADM --> UC1
     ADM --> UC2
     ADM --> UC3
     ADM --> UC4
+    ADM --> UC5
 
     ADV --> UC1
     ADV --> UC2
@@ -43,4 +45,5 @@ definirse: este es el diagrama que fija su definición canónica.
 | Iniciar sesión | HU-M01-01 | Los tres |
 | Cerrar sesión | HU-M01-01 | Los tres |
 | Cambiar contraseña propia | HU-M01-02 | Los tres |
-| Gestionar usuarios | HU-M01-02 | Administrador |
+| Gestionar usuarios | HU-M01-02 | Administrador. Incluye alta, edición, desactivación y reactivación; nunca la propia cuenta |
+| Restablecer contraseña de un usuario | HU-M01-02 | Administrador. La contraseña temporal se cambia en el siguiente inicio de sesión |

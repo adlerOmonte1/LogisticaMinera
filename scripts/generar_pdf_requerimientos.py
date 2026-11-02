@@ -26,7 +26,13 @@ import generar_pdf_hu as base  # noqa: E402  estilo y lector de Markdown compart
 
 RAIZ = base.RAIZ
 CODIGO_DOC = "SWI-ERS-01"
-VERSION = "1.0"
+VERSION = "2.1"
+# Historial de versiones del documento: (versión, fecha, cambio). La última fila toma la fecha de
+# emisión y el recuento de contenidos al generarse.
+HISTORIAL = [
+    ("1.0", "22/09/2026", "Emisión inicial con el alcance reformulado (DR-01 a DR-08)."),
+    ("2.0", "22/10/2026", "Versión 2 del sistema, a partir de la revisión de la maqueta (DR-09 a DR-28)."),
+]
 MODULOS = list(base.NOMBRES_MODULO.keys())
 MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
 
@@ -436,7 +442,8 @@ def portada(hoy):
 </div>"""
 
 
-def control(hoy, commit, totales):
+def control(hoy, commit, rama, totales):
+    filas_historial = "".join(f"<tr><td>{v}</td><td>{f}</td><td>{c}</td></tr>" for v, f, c in HISTORIAL)
     return f"""
 <div class="seccion" id="control">
 <h2 class="seccion-tit"><span class="num">I</span>Control del documento</h2>
@@ -448,13 +455,13 @@ def control(hoy, commit, totales):
 <tr><th>Versión</th><td>{VERSION}</td></tr>
 <tr><th>Estado</th><td>Vigente</td></tr>
 <tr><th>Fecha de emisión</th><td>{hoy}</td></tr>
-<tr><th>Origen</th><td>Generado desde el repositorio del proyecto, rama <code>docs/reformulacion/sistema-inteligente</code>, revisión <code>{commit}</code></td></tr>
+<tr><th>Origen</th><td>Generado desde el repositorio del proyecto, rama <code>{rama}</code>, revisión <code>{commit}</code></td></tr>
 <tr><th>Documento relacionado</th><td>Especificación de historias de usuario (<code>Historias_de_Usuario.pdf</code>)</td></tr>
 </tbody></table>
 
 <div class="rotulo">Historial de versiones</div>
 <table><thead><tr><th style="width:18mm">Versión</th><th style="width:26mm">Fecha</th><th>Descripción del cambio</th></tr></thead>
-<tbody><tr><td>{VERSION}</td><td>{hoy}</td><td>Emisión inicial: {totales}.</td></tr></tbody></table>
+<tbody>{filas_historial}<tr><td>{VERSION}</td><td>{hoy}</td><td>Revisión y validación de la versión 2.1 (DR-29 a DR-31): {totales}.</td></tr></tbody></table>
 
 <div class="rotulo">Contenido</div>
 {{INDICE}}
@@ -760,6 +767,11 @@ def main():
                                 capture_output=True, text=True).stdout.strip() or "—"
     except OSError:
         commit = "—"
+    try:
+        rama = subprocess.run(["git", "-C", str(RAIZ), "branch", "--show-current"],
+                              capture_output=True, text=True).stdout.strip() or "—"
+    except OSError:
+        rama = "—"
 
     marco = leer_marco()
     decisiones, reformulacion = leer_decisiones()
@@ -775,7 +787,7 @@ def main():
                f"{tot['RS']} de sistema, {tot['FN']} funciones, {tot['RNF']} no funcionales, "
                f"{tot['RN']} reglas de negocio, {tot['CU']} casos de uso y "
                f"{9 + tot['S'] + tot['A']} diagramas")
-    control_html = control(hoy, commit, totales).replace("{INDICE}", indice(modulos))
+    control_html = control(hoy, commit, rama, totales).replace("{INDICE}", indice(modulos))
 
     doc = f"""<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
