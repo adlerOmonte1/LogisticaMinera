@@ -163,3 +163,12 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 # Patrón de placa vehicular (D-24). Lo usan el alta de vehículos de M02 y la
 # regla V3 de M05; se cambia por configuración, no en el código (RNF-M05-08).
 PATRON_PLACA = env("PATRON_PLACA", default=r"^[A-Z0-9]{3}-[A-Z0-9]{3}$")
+
+# --- Reconocimiento del ticket (M04) -----------------------------------------
+# Motor activo (D-12): un adaptador de `apps/reconocimiento/motores/`. El
+# provisional es Tesseract dentro del mismo backend; las pruebas usan el
+# determinista. Umbral y tiempo de espera de HU-M04-01 y RNF-M04-02.
+RECONOCEDOR_ACTIVO = env("RECONOCEDOR_ACTIVO", default="tesseract")
+RECONOCIMIENTO_UMBRAL_CONFIANZA = env.float("RECONOCIMIENTO_UMBRAL_CONFIANZA", default=0.80)
+RECONOCIMIENTO_TIEMPO_ESPERA_S = env.int("RECONOCIMIENTO_TIEMPO_ESPERA_S", default=10)
+OCR_IDIOMA = env("OCR_IDIOMA", default="eng")

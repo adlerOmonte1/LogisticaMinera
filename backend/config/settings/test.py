@@ -23,3 +23,6 @@ DATABASES = {
 
 # Hashing rápido: las pruebas crean muchos usuarios y no miden criptografía.
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# Las pruebas no dependen de un motor real (D-12): cada una fija lo que «lee».
+RECONOCEDOR_ACTIVO = "determinista"
