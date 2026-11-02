@@ -382,6 +382,30 @@ el código, y que un mismo tipo de error responda igual en los nueve módulos.
 **Si se revierte.** Cada módulo elegiría su código, el interceptor del frontend tendría que distinguir
 casos que deberían ser uno y las pruebas de contrato dejarían de ser comparables.
 
+## D-24. Placa configurable y alta rápida del catálogo
+
+**Módulos afectados:** M02, M03, M05 · **Fecha:** 26/10/2026
+
+Se toma durante la fase F2 de la implementación, porque la línea base dice «formato de placa
+vehicular peruana» sin fijar la expresión, y el alta desde el registro sin decir cómo se distingue
+del alta desde el catálogo.
+
+| Aspecto | Decisión |
+|---|---|
+| Patrón de placa | `^[A-Z0-9]{3}-[A-Z0-9]{3}$`, tres letras o dígitos, guion y tres letras o dígitos, como las placas de la maqueta (`V2K-841`, `C9K-741`). Vive en `settings.PATRON_PLACA` y se cambia por la variable de entorno del mismo nombre; la placa se normaliza a mayúsculas antes de validarla |
+| Quién lo usa | El alta y la edición de vehículos de M02 y, cuando se programe, la regla V3 de M05, que lee la misma configuración (RNF-M05-08) |
+| Alta rápida de tipo de mineral | El registro de M03 llama al mismo `POST /api/v1/catalogo/tipos-mineral/` con `"desde_registro": true`; solo entonces el código es opcional y lo genera el sistema (RN-M02-17). No hay un endpoint abreviado |
+| Búsqueda exacta | `?placa=` en vehículos y `?codigo=` en tipos de mineral, sin distinguir mayúsculas, para que el registro encuentre la placa reconocida sin recorrer el listado |
+| Vehículo propio con transportista | Se rechaza con 400 «Un vehículo propio no lleva transportista asociado» (RS-M02-03); el criterio no fija un mensaje y se usa el que ya tenía el modelo |
+| Mensajes sin criterio propio | La baja y la reactivación sin un mensaje fijado en la historia usan los de la maqueta: «Vehículo desactivado» y, para tipos de mineral y transportistas, «Cambios guardados» |
+
+**Qué protege.** Que V3 y el catálogo acepten y rechacen las mismas placas, y que el alta desde el
+registro pase por las mismas reglas que la del catálogo (riesgo de implementación de M02).
+
+**Si se revierte.** Un patrón escrito en dos lugares divergiría con el primer cambio: el catálogo
+aceptaría placas que V3 bloquea, o al revés. **Pendiente:** contrastar el patrón con las placas
+reales del catálogo de la empresa (notas de M05) y ajustarlo por configuración si alguna no cumple.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04

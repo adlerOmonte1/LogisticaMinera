@@ -218,6 +218,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-21 | Códigos de ruta: `ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO`, `ZARANDEO_MOLIENDA_ENSACADO` |
 | D-22 | Ninguna operación de la API usa `DELETE`: el retiro de un ingreso y el de un mineral del lote son acciones `POST`, y el mineral quitado queda con baja lógica |
 | D-23 | Códigos HTTP: 400 regla o dato, 401 autenticación, 403 permiso o contraseña temporal, 404 inexistente, 409 conflicto de estado, 423 cuenta bloqueada |
+| D-24 | El patrón de placa vive en `settings.PATRON_PLACA` y lo comparten M02 y V3; el alta rápida de tipo de mineral es el mismo `POST` con `desde_registro` |
 
 **Pendientes de cierre**
 
