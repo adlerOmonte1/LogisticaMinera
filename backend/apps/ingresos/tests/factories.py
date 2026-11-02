@@ -32,4 +32,4 @@ class IngresoFactory(factory.django.DjangoModelFactory):
     usuario_registro = factory.SubFactory(UsuarioFactory)
     estado = Ingreso.REGISTRADO
     sin_respaldo_fotografico = True
-    motivo_sin_respaldo = "Otro"
+    motivo_sin_respaldo = Ingreso.OTRO

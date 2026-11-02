@@ -50,16 +50,18 @@ class RegistradorDeEventos(Protocol):
         valores_nuevos: dict | None = None,
         motivo: str = "",
         ingresos_relacionados: list[int] | None = None,
-    ) -> None: ...
+    ):
+        """Devuelve el evento registrado: la reversión de una corrección lo
+        referencia (RN-M03-29)."""
 
 
 class _RegistradorDiferido:
     """Resuelve `ServicioAuditoria` en el momento de registrar."""
 
-    def registrar(self, **evento) -> None:
+    def registrar(self, **evento):
         from apps.auditoria.services import servicio_auditoria
 
-        servicio_auditoria.registrar(**evento)
+        return servicio_auditoria.registrar(**evento)
 
 
 registrador_por_defecto = _RegistradorDiferido()
