@@ -1,0 +1,8 @@
+# ruff
+All checks passed!
+
+# makemigrations --check
+No changes detected
+
+# check
+System check identified no issues (0 silenced).

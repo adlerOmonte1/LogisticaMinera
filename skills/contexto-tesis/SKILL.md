@@ -220,6 +220,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-23 | Códigos HTTP: 400 regla o dato, 401 autenticación, 403 permiso o contraseña temporal, 404 inexistente, 409 conflicto de estado, 423 cuenta bloqueada |
 | D-24 | El patrón de placa vive en `settings.PATRON_PLACA` y lo comparten M02 y V3; el alta rápida de tipo de mineral es el mismo `POST` con `desde_registro` |
 | D-25 | El borrador del registro viaja firmado por el servidor y no se guarda; correcciones y reversiones se reconstruyen desde la auditoría; `causa_fallo` en el reconocimiento |
+| D-26 | La carga de M06: lote, parte, secado propio del tardío y su porción por ruta; `fecha_asignacion_lote` en el ingreso; eventos del lote con la entidad `Lote` |
 
 **Pendientes de cierre**
 

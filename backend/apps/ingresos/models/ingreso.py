@@ -95,6 +95,21 @@ class Ingreso(models.Model):
     motivo_anulacion = models.TextField(
         null=True, blank=True, verbose_name="Motivo de anulación"
     )
+    # M06 escribe estos dos campos a través de su servicio: un ingreso pertenece
+    # a un lote como máximo (RN-M06-01). La fecha de asignación distingue el
+    # ingreso tardío y si llegó antes o después del secado del lote (D-26).
+    lote = models.ForeignKey(
+        "trazabilidad.LoteProceso",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="ingresos",
+        verbose_name="Lote de proceso",
+    )
+    fecha_asignacion_lote = models.DateTimeField(
+        null=True, blank=True, editable=False, verbose_name="Asignación al lote"
+    )
 
     class Meta:
         db_table = "ingreso"
@@ -108,6 +123,8 @@ class Ingreso(models.Model):
             models.Index(fields=["fecha_hora_pesaje", "tipo_mineral"], name="idx_ingreso_fecha_mineral"),
             # Excluir anulados y En proceso de todo total.
             models.Index(fields=["estado"], name="idx_ingreso_estado"),
+            # Composición de un lote y recorrido de un ingreso (M06).
+            models.Index(fields=["lote"], name="idx_ingreso_lote"),
         ]
         constraints = [
             models.CheckConstraint(

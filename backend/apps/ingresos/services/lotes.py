@@ -1,9 +1,9 @@
 """Puerto hacia M06 para la corrección y la anulación (RN-M03-25, RN-M03-27).
 
 M03 no gestiona lotes: pregunta a M06 a qué lote pertenece el ingreso, qué
-minerales admite y si todavía reúne ingresos, y le pide retirar el anulado. M06
-se construye en F5 y aporta entonces su adaptador; hasta ese momento ningún
-ingreso pertenece a un lote y el puerto responde en consecuencia.
+minerales admite y si todavía reúne ingresos, y le pide retirar el anulado. El adaptador de producción es
+`apps.trazabilidad.services.puerto_m03.LotesM06`; `SinLotes` queda para las
+pruebas que no necesitan lotes.
 """
 
 from dataclasses import dataclass
@@ -24,7 +24,7 @@ class PuertoLotes(Protocol):
 
 
 class SinLotes:
-    """Adaptador vigente mientras M06 no existe."""
+    """Ningún ingreso pertenece a un lote."""
 
     def lote_del_ingreso(self, ingreso) -> LoteDelIngreso | None:
         return None

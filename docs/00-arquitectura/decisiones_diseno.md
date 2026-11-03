@@ -436,6 +436,30 @@ cliente, y que el registro sea reintentable sin crear dos ingresos con la misma 
 la advertencia sin justificar. Tienen el mismo orden de fuente; la regla del mensaje de esta decisión
 satisface los tres criterios y se revisa con el asesor.
 
+## D-26. Decisiones de construcción de la trazabilidad del proceso
+
+**Módulos afectados:** M03, M06, M09 · **Fecha:** 02/11/2026
+
+Se toma durante la fase F5 de la implementación, en los puntos que la especificación de M06 deja
+abiertos.
+
+| Aspecto | Decisión |
+|---|---|
+| La carga | Recorre etapas el lote —su secado común y, sin dividir, su ruta—, cada parte, el secado propio de un ingreso tardío y la porción de ese ingreso en cada ruta, como en la maqueta. Cada porción registra sus etapas por separado: así se cumple que el retiro mire si «alguna de sus partes empezó su ruta» (HU-M06-01 CA09) y que el cierre exija el recorrido terminado de los tardíos |
+| Unicidad del paso | Una sola restricción sobre lote, parte, ingreso tardío y etapa, con los nulos tratados como iguales. Cubre las cuatro clases de carga; el modelo de datos 3.1 hablaba de tres restricciones porque no contaba la porción del tardío |
+| Ingreso tardío | `INGRESO.fecha_asignacion_lote` guarda cuándo entró al lote. Es tardío si entró después del inicio del recorrido, y tiene secado propio si entró después del registro del secado común (`PASO_ETAPA.fecha_registro`, asignada por el servidor) |
+| Tardío que se secó antes de la división | Al dividir el lote se reparte con las fracciones del lote (DR-20) |
+| Código del lote | `LOT-{año}-{cinco dígitos}`, con el mismo generador correlativo del ingreso (D-02) |
+| Ingresos disponibles | `GET /lotes/{id}/ingresos/` devuelve los del mineral del lote y, aparte, los de otro mineral agrupados por tipo (HU-M06-01 CA05) |
+| Proporción en un lote dividido | Una etapa de la unión de las rutas cuenta como recorrida cuando todas las partes que la incluyen la completaron |
+| Eventos del lote | Entidad `Lote`, acción `CREAR` en la apertura y `MODIFICAR` en lo demás, con `valores_nuevos.operacion` (`ASIGNAR`, `TRASLADAR`, `RETIRAR`, `AGREGAR_MINERAL`, `QUITAR_MINERAL`, `INICIAR_RECORRIDO`, `ETAPA`, `SECADO_PROPIO`, `DIVIDIR`, `BIGBAGS`, `CERRAR`) y los ingresos que afecta en `ingresos_relacionados` |
+| Pendientes del cierre | Se unen con punto y coma en el mensaje y se devuelven también como lista en `detalles.pendientes` |
+| Mensajes sin criterio propio | De la maqueta: mineral agregado o quitado, quitar solo con el lote Abierto, conservar un mineral, ingreso retirado, secado propio y bigbags asociados. Decididos aquí: «Divida el lote en dos partes como mínimo», «El recorrido del lote {nombre} ya se inició», «La etapa {etapa} no forma parte de la ruta de {nombre}», «Indique la parte del lote dividido», «El ingreso {codigo} se seca junto con el lote» y «La fracción {fraccion} no es válida» |
+| Conexión con M03 | `LotesM06` reemplaza a `SinLotes` en el puerto de M03 (D-25): la corrección consulta los minerales del lote y la anulación retira el ingreso del lote Abierto |
+
+**Qué protege.** Que el recorrido anotado describa el mineral que de verdad lo hizo, incluido el que
+llegó tarde, y que cada operación del lote llegue al historial de cada ingreso que afecta.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04

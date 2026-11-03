@@ -138,6 +138,7 @@ Administrador puede modificarla, con motivo, y el cambio queda en auditoría (D-
 | tara_tn | decimal(8,2) | tara del vehículo **aplicada** a este ingreso, copiada del catálogo; nula mientras esté En proceso |
 | peso_neto_tn | decimal(8,2) | **calculado por el servidor**: `peso_bruto_tn − tara_tn`; `editable=False`; nulo mientras esté En proceso (D-17) |
 | id_lote | FK → LOTE_PROCESO | nulo mientras el ingreso no se asigne a un lote; un ingreso pertenece a un lote como máximo |
+| fecha_asignacion_lote | datetime | cuándo entró al lote; distingue el ingreso tardío y si tiene secado propio (D-26); `editable=False` |
 | id_usuario_registro | FK → USUARIO | `editable=False` |
 | estado | enum | EN_PROCESO / REGISTRADO / ANULADO (D-07, D-17) |
 | motivo_anulacion | text | obligatorio si estado = ANULADO |
@@ -328,10 +329,12 @@ Porción de un ingreso tardío asignado a un lote ya dividido (DR-20).
 | fecha_hora | datetime | no posterior al registro ni anterior a la etapa previa o al inicio del recorrido |
 | horas_molienda | decimal(6,2) | opcional, solo en molienda; mayor que cero. Dato descriptivo (DR-15) |
 | id_usuario_registro | FK → USUARIO | `editable=False` |
+| fecha_registro | datetime | asignada por el servidor al registrar el paso; `editable=False` (D-26) |
 | observacion | text | opcional |
 
-Tres restricciones de unicidad condicionales garantizan un solo paso por etapa para el lote, para
-cada parte y para el secado propio de cada ingreso tardío.
+Una restricción de unicidad sobre lote, parte, ingreso tardío y etapa, con los nulos tratados como
+iguales, garantiza un solo paso por etapa para el lote, para cada parte, para el secado propio de
+cada ingreso tardío y para cada porción de ese ingreso en su ruta (D-26).
 
 ### BIGBAG (M06)
 
