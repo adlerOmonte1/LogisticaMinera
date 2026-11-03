@@ -48,6 +48,7 @@ _PERMISOS = {
 
 class IngresoViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     http_method_names = ["get", "post", "patch", "head", "options"]
+    lookup_value_regex = r"\d+"
     serializer_class = IngresoSerializer
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 

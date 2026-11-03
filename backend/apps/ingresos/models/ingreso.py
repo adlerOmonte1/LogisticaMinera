@@ -4,6 +4,15 @@ from apps.accounts.models import Usuario
 from apps.catalogo.models import TipoMineral, Vehiculo
 
 
+class IngresoQuerySet(models.QuerySet):
+    def computables(self):
+        """Los ingresos que suman toneladas: solo los Registrados. Es el único
+        criterio del sistema para cualquier total —lote, listado, calendario,
+        inicio y consolidado (RN-M07-02, RN-M07-12)—: «distinto de anulado»
+        sumaría los En proceso, que no tienen peso neto (notas de M07)."""
+        return self.filter(estado=Ingreso.REGISTRADO)
+
+
 class Ingreso(models.Model):
     """Unidad de registro del sistema: un volquete que entrega mineral en planta,
     con su respaldo y las tres marcas de tiempo que describen cómo se registró
@@ -110,6 +119,8 @@ class Ingreso(models.Model):
     fecha_asignacion_lote = models.DateTimeField(
         null=True, blank=True, editable=False, verbose_name="Asignación al lote"
     )
+
+    objects = IngresoQuerySet.as_manager()
 
     class Meta:
         db_table = "ingreso"
