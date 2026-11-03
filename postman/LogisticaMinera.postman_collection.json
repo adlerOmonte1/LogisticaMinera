@@ -4408,6 +4408,482 @@
           ]
         }
       ]
+    },
+    {
+      "name": "F4 · M09 Auditoria",
+      "description": "Puerta de F4 (PLAN-02). Se ejecuta después de F1 a F3 en la misma corrida: busca en la auditoría los eventos que esas carpetas dejaron —registro, reconocimiento, corrección con valor anterior y nuevo, reversión, anulación, destare, restablecimiento de contraseña sin la contraseña y accesos rechazados— y comprueba el historial de un ingreso para los tres roles. La exportación (HU-M09-01 CA06) se valida en F6 y F7.",
+      "item": [
+        {
+          "name": "HU-M09-03 · CA05 · El Administrativo no consulta la auditoría -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA05 · El Supervisor no consulta la auditoría -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA01 · Del más reciente al más antiguo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Orden descendente\", () => pm.expect(r.map(e => e.id)).to.eql([...r.map(e => e.id)].sort((a, b) => b - a)));",
+                  "pm.test(\"Entidad, referencia y autor\", () => r.forEach(e => { pm.expect(e).to.have.property(\"entidad\"); pm.expect(e).to.have.property(\"referencia\"); pm.expect(e).to.have.property(\"usuario\"); }));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA01 · Registro del ingreso de F3 -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=CREAR&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Un evento CREAR del ingreso\", () => { pm.expect(r).to.have.lengthOf(1); pm.expect(r[0].referencia).to.eql(pm.environment.get(\"codigo_f3\")); });",
+                  "pm.test(\"Lo registró el Supervisor\", () => pm.expect(r[0].usuario).to.eql(pm.environment.get(\"usuario_supervisor\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA05 · Reconocimiento del ticket -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=RECONOCER&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Un evento RECONOCER con motor y versión\", () => { const r = pm.response.json().results; pm.expect(r).to.have.lengthOf(1); pm.expect(r[0].valores_nuevos.motor).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA02 · Correcciones del Administrativo sobre el ingreso -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=MODIFICAR&usuario={{usuario_administrativo}}&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "const corr = r.filter(e => e.operacion === \"CORRECCION\");",
+                  "const rev = r.filter(e => e.operacion === \"REVERSION\");",
+                  "pm.test(\"Dos correcciones y dos reversiones\", () => { pm.expect(corr).to.have.lengthOf(2); pm.expect(rev).to.have.lengthOf(2); });",
+                  "pm.test(\"Corrección con anterior, nuevo y motivo (HU-M09-03 CA03)\", () => { const peso = corr.find(e => e.motivo === \"El peso se leyó mal\"); pm.expect(peso.cambios.find(c => c.campo === \"peso_bruto_tn\")).to.eql({campo: \"peso_bruto_tn\", anterior: pm.environment.get(\"peso_f3\"), nuevo: pm.environment.get(\"peso_corregido_f3\")}); });",
+                  "pm.test(\"La reversión referencia la corrección (RN-M03-29)\", () => rev.forEach(e => pm.expect(e.valores_nuevos.revierte).to.be.a(\"number\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA07 · Anulación con su motivo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=ANULAR&texto={{codigo_dup_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Motivo y responsable\", () => { pm.expect(r[0].motivo).to.eql(\"Registro duplicado de prueba\"); pm.expect(r[0].usuario).to.eql(pm.environment.get(\"usuario_admin\")); });",
+                  "pm.test(\"Solo valores anteriores\", () => { pm.expect(r[0].valores_anteriores.estado).to.eql(\"REGISTRADO\"); pm.expect(r[0].valores_nuevos).to.eql(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA02 · Destare del vehículo nuevo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto={{placa_nueva_f3}}&accion=MODIFICAR"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "const tara = r.find(e => e.entidad === \"Vehiculo\");",
+                  "pm.test(\"Tara de nula a su valor, con los ingresos afectados\", () => { pm.expect(tara.valores_anteriores.tara_tn).to.eql(null); pm.expect(tara.valores_nuevos.tara_tn).to.eql(\"12.00\"); pm.expect(tara.ingresos_relacionados).to.have.lengthOf(1); });",
+                  "pm.test(\"El ingreso pasa a Registrado\", () => pm.expect(r.some(e => e.entidad === \"Ingreso\" && e.operacion === \"DESTARE\")).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RS-M09-16 · Restablecimiento de contraseña sin la contraseña -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto={{usuario_desechable}}&accion=MODIFICAR"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const cuerpo = pm.response.text();",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Queda el restablecimiento\", () => pm.expect(r.some(e => e.motivo === \"Restablecimiento de contraseña\")).to.eql(true));",
+                  "pm.test(\"Ninguna contraseña en los eventos\", () => { pm.expect(cuerpo).to.not.include(pm.environment.get(\"clave_temporal\")); pm.expect(cuerpo).to.not.include(\"Clave-Prueba-1\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA04 · Accesos rechazados de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=ACCESO_RECHAZADO&usuario={{usuario_supervisor}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con usuario y operación intentada\", () => { const r = pm.response.json().results; pm.expect(r.length).to.be.above(0); pm.expect(r[0].valores_nuevos).to.have.property(\"ruta\"); pm.expect(r[0].valores_nuevos).to.have.property(\"metodo\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA04 · Filtros sin resultados -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto=NO-EXISTE-0000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay eventos con estos filtros\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA01 · Historial del ingreso para el Supervisor -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Cronológico\", () => pm.expect(b.results.map(e => e.id)).to.eql([...b.results.map(e => e.id)].sort((x, y) => x - y)));",
+                  "pm.test(\"Desde el reconocimiento hasta las reversiones\", () => { pm.expect(b.results[0].accion).to.eql(\"RECONOCER\"); pm.expect(b.results.filter(e => e.operacion === \"REVERSION\")).to.have.lengthOf(2); });",
+                  "pm.test(\"Sin acceso a la auditoría completa (CA05)\", () => pm.expect(b.puede_ver_auditoria).to.eql(false));",
+                  "pm.test(\"Solo eventos del ingreso (RS-M09-15)\", () => b.results.forEach(e => pm.expect(e.entidad).to.eql(\"Ingreso\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA04 · El mismo historial para el Administrativo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sin acceso a la auditoría completa\", () => pm.expect(pm.response.json().puede_ver_auditoria).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA05 · El Administrador sí la tiene -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ofrece la auditoría\", () => pm.expect(pm.response.json().puede_ver_auditoria).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M09-02 · Ningún evento se crea por la API -> 405",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accion\": \"CREAR\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M09-02 · Ningún evento se elimina por la API -> 405",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F4 · La auditoría sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
