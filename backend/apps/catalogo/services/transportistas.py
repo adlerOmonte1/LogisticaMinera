@@ -7,7 +7,7 @@ from apps.catalogo.models import Transportista
 from apps.catalogo.repositories import TransportistaRepository
 from common.excepciones import ErrorDeValidacionDeDominio
 
-from ._eventos import cambiar_estado, registrar_creacion, registrar_modificacion
+from ._eventos import cambiar_estado, registrar_creacion, registrar_edicion
 from .validadores import validar_ruc
 
 MENSAJE_RUC_DUPLICADO = "El RUC ya está registrado"
@@ -37,6 +37,7 @@ def crear_transportista(datos: dict, usuario) -> Transportista:
 
 
 def actualizar_transportista(transportista: Transportista, datos: dict, usuario) -> Transportista:
+    antes = {"razon_social": transportista.razon_social, "ruc": transportista.ruc}
     if "razon_social" in datos:
         transportista.razon_social = datos["razon_social"]
     if "ruc" in datos:
@@ -44,7 +45,10 @@ def actualizar_transportista(transportista: Transportista, datos: dict, usuario)
     with transaction.atomic():
         transportista.full_clean()
         transportista.save()
-        registrar_modificacion("Transportista", transportista, usuario)
+        registrar_edicion(
+            "Transportista", transportista, usuario, antes,
+            {"razon_social": transportista.razon_social, "ruc": transportista.ruc},
+        )
     return transportista
 
 

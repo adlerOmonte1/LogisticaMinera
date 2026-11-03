@@ -14,7 +14,7 @@ from apps.catalogo.models.vehiculo import MENSAJE_PROPIO_CON_TRANSPORTISTA
 from apps.catalogo.repositories import VehiculoRepository
 from common.excepciones import ConflictoDeConcurrencia, ErrorDeValidacionDeDominio
 
-from ._eventos import cambiar_estado, registrar_creacion, registrar_modificacion
+from ._eventos import cambiar_estado, registrar_creacion, registrar_edicion, registrar_modificacion
 from .validadores import validar_placa
 
 MENSAJE_PLACA_DUPLICADA = "La placa ya está registrada"
@@ -78,8 +78,18 @@ def crear_vehiculo(datos: dict, usuario) -> Vehiculo:
     return vehiculo
 
 
+def _datos_auditables(vehiculo: Vehiculo) -> dict:
+    return {
+        "placa": vehiculo.placa,
+        "tipo_titularidad": vehiculo.tipo_titularidad,
+        "capacidad_tn": str(vehiculo.capacidad_tn),
+        "transportista": vehiculo.transportista_id,
+    }
+
+
 def actualizar_vehiculo(vehiculo: Vehiculo, datos: dict, usuario) -> Vehiculo:
     """Datos distintos de la tara: la tara solo cambia por `modificar_tara`."""
+    antes = _datos_auditables(vehiculo)
     if "placa" in datos:
         placa = validar_placa(datos["placa"])
         if VehiculoRepository.existe_placa(placa, excluir_id=vehiculo.pk):
@@ -103,7 +113,7 @@ def actualizar_vehiculo(vehiculo: Vehiculo, datos: dict, usuario) -> Vehiculo:
     with transaction.atomic():
         vehiculo.full_clean()
         vehiculo.save()
-        registrar_modificacion("Vehiculo", vehiculo, usuario)
+        registrar_edicion("Vehiculo", vehiculo, usuario, antes, _datos_auditables(vehiculo))
     return vehiculo
 
 

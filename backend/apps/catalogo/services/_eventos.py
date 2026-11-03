@@ -4,7 +4,7 @@ La baja y la reactivación se auditan como `MODIFICAR` del campo `activo`:
 `ANULAR` está reservado para los ingresos.
 """
 
-from common.eventos import Accion, registrador_por_defecto
+from common.eventos import Accion, diferencias, registrador_por_defecto
 
 
 def registrar_creacion(entidad: str, obj, usuario, *, nuevos=None, registrador=registrador_por_defecto):
@@ -23,6 +23,12 @@ def registrar_modificacion(
         valores_anteriores=anteriores, valores_nuevos=nuevos, motivo=motivo,
         ingresos_relacionados=ingresos_relacionados,
     )
+
+
+def registrar_edicion(entidad: str, obj, usuario, antes: dict, despues: dict) -> None:
+    """Edición de datos: solo los campos que cambiaron, con ambos valores (RS-M09-06)."""
+    anteriores, nuevos = diferencias(antes, despues)
+    registrar_modificacion(entidad, obj, usuario, anteriores=anteriores, nuevos=nuevos)
 
 
 def registrar_cambio_de_estado(entidad: str, obj, usuario, activo: bool, *, registrador=registrador_por_defecto):

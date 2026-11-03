@@ -37,6 +37,12 @@ class Accion:
     ]
 
 
+def diferencias(antes: dict, despues: dict) -> tuple[dict, dict]:
+    """Solo los campos que cambiaron, con su valor anterior y el nuevo (RS-M09-06)."""
+    campos = [k for k in despues if antes.get(k) != despues[k]]
+    return {k: antes.get(k) for k in campos}, {k: despues[k] for k in campos}
+
+
 class RegistradorDeEventos(Protocol):
     def registrar(
         self,

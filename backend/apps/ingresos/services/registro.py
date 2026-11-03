@@ -345,6 +345,8 @@ class ServicioIngreso:
                 usuario=usuario,
                 ip=ip,
                 valores_nuevos=self._instantanea(ingreso),
+                # HU-M09-01: el registro sin foto se audita con el motivo de la falta de imagen.
+                motivo=ingreso.get_motivo_sin_respaldo_display() if ingreso.sin_respaldo_fotografico else "",
             )
         return ingreso
 
@@ -396,6 +398,7 @@ class ServicioIngreso:
             "peso_neto_tn": _texto_peso(ingreso.peso_neto_tn),
             "estado": ingreso.estado,
             "sin_respaldo_fotografico": ingreso.sin_respaldo_fotografico,
+            "motivo_sin_respaldo": ingreso.motivo_sin_respaldo,
         }
         return valores if campos is None else {k: valores[k] for k in campos}
 
