@@ -406,6 +406,36 @@ registro pase por las mismas reglas que la del catálogo (riesgo de implementaci
 aceptaría placas que V3 bloquea, o al revés. **Pendiente:** contrastar el patrón con las placas
 reales del catálogo de la empresa (notas de M05) y ajustarlo por configuración si alguna no cumple.
 
+## D-25. Decisiones de construcción del registro de ingresos
+
+**Módulos afectados:** M03, M04, M05 · **Fecha:** 02/11/2026
+
+Se toma durante la fase F3 de la implementación. La especificación fija qué hace el registro, pero
+deja abiertos estos puntos de forma.
+
+| Aspecto | Decisión |
+|---|---|
+| Borrador del registro | No es una entidad ni se guarda en la base. `POST /ingresos/borradores/` devuelve un borrador **firmado por el servidor** con la hora de inicio, la imagen recibida, lo que leyó el motor y la validación de la propuesta; `POST /ingresos/` lo recibe de vuelta. La firma impide que el cliente altere la hora de inicio (D-01) o lo leído (RN-M04-10). No vence, porque el borrador se conserva en el dispositivo sin señal (RNF-M03-05) |
+| Borrador inválido o ajeno | Se trata como si no hubiera imagen: «Debe adjuntar la imagen del ticket de balanza» (HU-M03-01 CA02) |
+| Borrador ya registrado | Un borrador con imagen registra un solo ingreso. El segundo intento responde 409 «Este borrador ya se registró como el ingreso {codigo}». El borrador sin foto no tiene esa comprobación; V1 advierte el duplicado |
+| Mensaje del rechazo por inconsistencias | En el registro: «Debe corregir o justificar las inconsistencias señaladas» si hay una bloqueante o varias advertencias, y el mensaje de la justificación que falta si es una sola. En la corrección, el mensaje literal de la regla. Los detalles llevan siempre todas las inconsistencias |
+| Justificaciones | Por regla: `{"V1": "…", "V4": "…"}`. En el destare, por ingreso: `{"ING-2027-00001": "…"}`. La justificación ya dada sigue valiendo en una corrección mientras la advertencia persista |
+| Causa del reconocimiento fallido | `RECONOCIMIENTO_TICKET.causa_fallo` distingue la imagen ilegible (`ILEGIBLE`) del motor no disponible (`NO_DISPONIBLE`), para que la consulta muestre el motivo (HU-M04-02 CA03) |
+| Valor confirmado del reconocimiento | Es el aceptado al registrar. Una corrección posterior no lo cambia: queda en auditoría |
+| Historial de correcciones | Cada corrección, reversión o destare se audita como `MODIFICAR` con `valores_nuevos.operacion` igual a `CORRECCION`, `REVERSION` o `DESTARE`; la reversión lleva `revierte` con el evento que anula. Sin corrección vigente: 409 «El ingreso {codigo} no tiene una corrección vigente que revertir» |
+| V5 en la corrección | Compara la fecha del pesaje corregida con la hora de fin del registro, no con el momento de la corrección |
+| Lotes | M03 consulta a M06 por el puerto `PuertoLotes`. Hasta F5 rige `SinLotes`: ningún ingreso pertenece a un lote |
+| Motivos del registro sin foto | Códigos `TICKET_EXTRAVIADO`, `SIN_CAMARA`, `BALANZA_SIN_TICKET` y `OTRO`, con los textos de la historia |
+| Imagen del ticket | Se entrega por `GET /ingresos/{id}/imagen/`, con sesión (RNF-M03-11) |
+| Motor provisional | Tesseract dentro del mismo backend (D-12), con `RECONOCEDOR_ACTIVO=tesseract`. Las pruebas usan el adaptador determinista |
+
+**Qué protege.** Que las marcas de tiempo y lo leído por el motor no dependan de lo que envía el
+cliente, y que el registro sea reintentable sin crear dos ingresos con la misma fotografía.
+
+**Contradicción reportada.** HU-M03-01 CA06 y HU-M05-01 CA02 y CA10 piden mensajes distintos para
+la advertencia sin justificar. Tienen el mismo orden de fuente; la regla del mensaje de esta decisión
+satisface los tres criterios y se revisa con el asesor.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04

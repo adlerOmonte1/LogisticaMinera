@@ -20,6 +20,18 @@ class Ingreso(models.Model):
       registro sin foto, que lleva su marca y su motivo (DR-13).
     """
 
+    # Lista cerrada de motivos del registro sin foto (RN-M03-21, HU-M03-01).
+    TICKET_EXTRAVIADO = "TICKET_EXTRAVIADO"
+    SIN_CAMARA = "SIN_CAMARA"
+    BALANZA_SIN_TICKET = "BALANZA_SIN_TICKET"
+    OTRO = "OTRO"
+    MOTIVOS_SIN_FOTO = [
+        (TICKET_EXTRAVIADO, "Ticket extraviado o dañado"),
+        (SIN_CAMARA, "Sin cámara o sin señal en el punto de pesaje"),
+        (BALANZA_SIN_TICKET, "La balanza no emitió ticket"),
+        (OTRO, "Otro"),
+    ]
+
     EN_PROCESO = "EN_PROCESO"
     REGISTRADO = "REGISTRADO"
     ANULADO = "ANULADO"
@@ -33,7 +45,11 @@ class Ingreso(models.Model):
         default=False, editable=False, verbose_name="Sin respaldo fotográfico"
     )
     motivo_sin_respaldo = models.CharField(
-        max_length=60, blank=True, editable=False, verbose_name="Motivo del registro sin foto"
+        max_length=60,
+        choices=MOTIVOS_SIN_FOTO,
+        blank=True,
+        editable=False,
+        verbose_name="Motivo del registro sin foto",
     )
     fecha_hora_pesaje = models.DateTimeField(verbose_name="Fecha y hora del pesaje")
     hora_inicio_registro = models.DateTimeField(
@@ -53,7 +69,12 @@ class Ingreso(models.Model):
         max_digits=8, decimal_places=2, verbose_name="Peso bruto (tn)"
     )
     tara_tn = models.DecimalField(
-        max_digits=8, decimal_places=2, null=True, blank=True, verbose_name="Tara aplicada (tn)"
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Tara aplicada (tn)",
     )
     peso_neto_tn = models.DecimalField(
         max_digits=8,
@@ -99,7 +120,45 @@ class Ingreso(models.Model):
                 check=models.Q(tara_tn__isnull=True) | models.Q(tara_tn__lt=models.F("peso_bruto_tn")),
                 name="ck_ingreso_tara_menor_bruto",
             ),
+            # D-17: el neto es exactamente bruto menos la tara aplicada.
+            models.CheckConstraint(
+                check=models.Q(peso_neto_tn__isnull=True)
+                | models.Q(peso_neto_tn=models.F("peso_bruto_tn") - models.F("tara_tn")),
+                name="ck_ingreso_neto_calculado",
+            ),
+            # RN-M03-17: En proceso sin tara ni neto; Registrado con ambos.
+            models.CheckConstraint(
+                check=models.Q(estado="ANULADO")
+                | models.Q(estado="EN_PROCESO", tara_tn__isnull=True, peso_neto_tn__isnull=True)
+                | models.Q(estado="REGISTRADO", tara_tn__isnull=False, peso_neto_tn__isnull=False),
+                name="ck_ingreso_estado_y_pesos",
+            ),
+            # DR-13: exactamente una de dos cosas, la imagen o la marca con su motivo.
+            models.CheckConstraint(
+                check=(
+                    models.Q(sin_respaldo_fotografico=False, imagen_ticket__isnull=False)
+                    & ~models.Q(imagen_ticket="")
+                    & models.Q(motivo_sin_respaldo="")
+                )
+                | (
+                    models.Q(sin_respaldo_fotografico=True)
+                    & ~models.Q(motivo_sin_respaldo="")
+                    & (models.Q(imagen_ticket__isnull=True) | models.Q(imagen_ticket=""))
+                ),
+                name="ck_ingreso_respaldo",
+            ),
+            # D-07: la anulación lleva su motivo.
+            models.CheckConstraint(
+                check=~models.Q(estado="ANULADO")
+                | (models.Q(motivo_anulacion__isnull=False) & ~models.Q(motivo_anulacion="")),
+                name="ck_ingreso_anulacion_motivo",
+            ),
         ]
 
     def __str__(self):
         return self.codigo
+
+    @property
+    def tipo_vehiculo(self) -> str:
+        """Derivado de la titularidad del catálogo, no editable (RS-M03-06)."""
+        return self.vehiculo.tipo_titularidad

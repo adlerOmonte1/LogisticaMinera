@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="LogisticaMinera API v1" tests="121" time="3.726">
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRADOR -> 200" id="83ab4a7f-5885-4c44-a807-64631afa4eae" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.186">
+    <testcase name="Responde dentro del umbral" time="0.186" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="HTTP 200" time="0.186" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Entrega access y refresh" time="0.186" classname="00SesionesSesionAdministrador200"/>
+    <testcase name="Rol ADMINISTRADOR" time="0.186" classname="00SesionesSesionAdministrador200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · ADMINISTRATIVO -> 200" id="4db2cb32-a156-4783-a1b7-70bd2ad9348c" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.105">
+    <testcase name="Responde dentro del umbral" time="0.105" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="HTTP 200" time="0.105" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Entrega access y refresh" time="0.105" classname="00SesionesSesionAdministrativo200"/>
+    <testcase name="Rol ADMINISTRATIVO" time="0.105" classname="00SesionesSesionAdministrativo200"/>
+  </testsuite>
+  <testsuite name="00 · Sesiones / Sesión · SUPERVISOR -> 200" id="3816def1-6f9a-47c7-a324-04bfad76c608" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.106">
+    <testcase name="Responde dentro del umbral" time="0.106" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="HTTP 200" time="0.106" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Entrega access y refresh" time="0.106" classname="00SesionesSesionSupervisor200"/>
+    <testcase name="Rol SUPERVISOR" time="0.106" classname="00SesionesSesionSupervisor200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Esquema OpenAPI -> 200" id="892f8a4f-8422-42e7-a1e4-e52a1ca99c4f" timestamp="2026-11-02T17:19:56.176Z" tests="6" failures="0" errors="0" time="0.042">
+    <testcase name="Responde dentro del umbral" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="HTTP 200" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Documento OpenAPI 3" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Título de la línea base 2.1" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="Publica la ruta de tipos de mineral" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+    <testcase name="No publica rutas de productos" time="0.042" classname="F0SaludYEsquemaF0EsquemaOpenApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Documentación de la API -> 200" id="c7c6c133-521b-45c3-b425-3c3bcf5a1ab0" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="Responde dentro del umbral" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="HTTP 200" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+    <testcase name="Interfaz de documentación" time="0.005" classname="F0SaludYEsquemaF0DocumentacionDeLaApi200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral con sesión -> 200" id="d5440e74-f818-4479-8aad-cdd10c5b7b74" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.032">
+    <testcase name="Responde dentro del umbral" time="0.032" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="HTTP 200" time="0.032" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+    <testcase name="Listado paginado" time="0.032" classname="F0SaludYEsquemaF0TiposDeMineralConSesion200"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Tipos de mineral sin sesión -> 401" id="80fd873e-40a0-4aa7-9b2e-7a4bb3262bab" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="Responde dentro del umbral" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="HTTP 401" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Cuerpo uniforme (D-23)" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+    <testcase name="Código NO_AUTENTICADO" time="0.003" classname="F0SaludYEsquemaF0TiposDeMineralSinSesion401"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Ruta anterior de productos -> 404" id="7bdb0d90-098a-48c3-8360-4fce04b9e7bb" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="Responde dentro del umbral" time="0.005" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+    <testcase name="HTTP 404: la ruta del diseño anterior ya no existe" time="0.005" classname="F0SaludYEsquemaF0RutaAnteriorDeProductos404"/>
+  </testsuite>
+  <testsuite name="F0 · Salud y esquema / F0 · Ruta de salidas del alcance anterior retirada -> 404" id="75cb271a-39d4-49b0-b6dc-0105d017b848" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="Responde dentro del umbral" time="0.003" classname="F0SaludYEsquemaF0RutaDeSalidasDelAlcanceAnteriorRetirada404"/>
+    <testcase name="HTTP 404: las salidas del alcance anterior se retiraron" time="0.003" classname="F0SaludYEsquemaF0RutaDeSalidasDelAlcanceAnteriorRetirada404"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / Preparación · Crea el usuario desechable -> 201" id="6e4a752a-882b-4cb8-9e09-1797ff52a6f0" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.107">
+    <testcase name="Responde dentro del umbral" time="0.107" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioDesechable201"/>
+    <testcase name="HTTP 201" time="0.107" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioDesechable201"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / Preparación · Crea el usuario para el bloqueo -> 201" id="213dcb35-48f3-43dd-a2f5-01d035257f45" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.109">
+    <testcase name="Responde dentro del umbral" time="0.109" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioParaElBloqueo201"/>
+    <testcase name="HTTP 201" time="0.109" classname="F1M01AutenticacionYRolesPreparacionCreaElUsuarioParaElBloqueo201"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA01 · Credenciales válidas -> 200" id="6d19e87a-5c3d-4132-9912-a25926e3e5b2" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.094">
+    <testcase name="Responde dentro del umbral" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+    <testcase name="HTTP 200" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+    <testcase name="Rol y marca de clave" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca01CredencialesValidas200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA02 · Credenciales inválidas -> 401" id="c7104b8a-a08f-46af-8d63-a138ebb3ef97" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.093">
+    <testcase name="Responde dentro del umbral" time="0.093" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="HTTP 401" time="0.093" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="Cuerpo uniforme" time="0.093" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+    <testcase name="Mensaje literal" time="0.093" classname="F1M01AutenticacionYRolesHuM0101Ca02CredencialesInvalidas401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA03 · Quinto intento fallido bloquea -> 423" id="cfd109d7-cb8e-4b58-838a-ca4b9db2f891" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.094">
+    <testcase name="Responde dentro del umbral" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="HTTP 423" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="Cuerpo uniforme" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+    <testcase name="Mensaje literal" time="0.094" classname="F1M01AutenticacionYRolesHuM0101Ca03QuintoIntentoFallidoBloquea423"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA03 · Bloqueada aun con la clave correcta -> 423" id="82e41642-5ecf-433d-bf9f-bcc6f43a341e" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="HTTP 423" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F1M01AutenticacionYRolesHuM0101Ca03BloqueadaAunConLaClaveCorrecta423"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA06 · Token inválido -> 401" id="20a73473-a26b-4aae-93c8-5d77573651cb" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="Responde dentro del umbral" time="0.004" classname="F1M01AutenticacionYRolesHuM0101Ca06TokenInvalido401"/>
+    <testcase name="HTTP 401" time="0.004" classname="F1M01AutenticacionYRolesHuM0101Ca06TokenInvalido401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA02 · Nombre de usuario duplicado -> 400" id="b77dd5cc-dfd9-4797-96e9-15275214bb8f" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="HTTP 400" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F1M01AutenticacionYRolesHuM0102Ca02NombreDeUsuarioDuplicado400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA04 · Supervisor en la gestión de usuarios -> 403" id="137c9c44-a492-4c28-8d02-2720ad78906b" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="HTTP 403" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca04SupervisorEnLaGestionDeUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA04 · Administrativo en la gestión de usuarios -> 403" id="a2819d2e-b366-40a0-9142-acc01bc3f8fc" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="HTTP 403" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca04AdministrativoEnLaGestionDeUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA02 · Supervisor crea usuarios -> 403" id="dfd94fb3-5203-409f-a551-3d36be550910" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="HTTP 403" time="0.013" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="Cuerpo uniforme" time="0.013" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+    <testcase name="Mensaje literal" time="0.013" classname="F1M01AutenticacionYRolesHuM0103Ca02SupervisorCreaUsuarios403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA06 · Contraseña actual incorrecta -> 400" id="736fc13b-a181-4587-92bc-48e46e256e2a" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.098">
+    <testcase name="Responde dentro del umbral" time="0.098" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="HTTP 400" time="0.098" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="Cuerpo uniforme" time="0.098" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+    <testcase name="Mensaje literal" time="0.098" classname="F1M01AutenticacionYRolesHuM0102Ca06ContrasenaActualIncorrecta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA07 · Contraseña nueva corta -> 400" id="0015baa3-e200-477c-8cd7-b2d3f4a95432" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.102">
+    <testcase name="Responde dentro del umbral" time="0.102" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="HTTP 400" time="0.102" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="Cuerpo uniforme" time="0.102" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+    <testcase name="Mensaje literal" time="0.102" classname="F1M01AutenticacionYRolesHuM0102Ca07ContrasenaNuevaCorta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA11 · Las contraseñas no coinciden -> 400" id="8465556b-8c0d-41ab-99ce-b460458d6d9d" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.114">
+    <testcase name="Responde dentro del umbral" time="0.114" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="HTTP 400" time="0.114" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="Cuerpo uniforme" time="0.114" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+    <testcase name="Mensaje literal" time="0.114" classname="F1M01AutenticacionYRolesHuM0102Ca11LasContrasenasNoCoinciden400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA08 · Restablecer contraseña -> 200" id="f947f481-2772-4017-b5e6-93d030209e5c" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.135">
+    <testcase name="Responde dentro del umbral" time="0.135" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+    <testcase name="HTTP 200" time="0.135" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+    <testcase name="Contraseña temporal de al menos 8" time="0.135" classname="F1M01AutenticacionYRolesHuM0102Ca08RestablecerContrasena200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Sesión con la contraseña temporal -> 200" id="8d11d3c5-9d22-421d-96b6-c26d83f29b29" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.117">
+    <testcase name="Responde dentro del umbral" time="0.117" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+    <testcase name="HTTP 200" time="0.117" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+    <testcase name="Marca de cambio obligatorio" time="0.117" classname="F1M01AutenticacionYRolesHuM0101Ca09SesionConLaContrasenaTemporal200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Otra operación con la temporal -> 403" id="09e340f0-859d-4221-a88a-c2b55894c7e5" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="HTTP 403" time="0.011" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F1M01AutenticacionYRolesHuM0101Ca09OtraOperacionConLaTemporal403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA05 · Cambio de la propia contraseña -> 200" id="1ef34610-6cd9-4886-839d-bdbd6af05520" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.182">
+    <testcase name="Responde dentro del umbral" time="0.182" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+    <testcase name="HTTP 200" time="0.182" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+    <testcase name="Mensaje" time="0.182" classname="F1M01AutenticacionYRolesHuM0102Ca05CambioDeLaPropiaContrasena200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA09 · Tras el cambio, opera normalmente -> 200" id="250e4f6b-c6c2-4110-a775-061178138112" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F1M01AutenticacionYRolesHuM0101Ca09TrasElCambioOperaNormalmente200"/>
+    <testcase name="HTTP 200" time="0.015" classname="F1M01AutenticacionYRolesHuM0101Ca09TrasElCambioOperaNormalmente200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · Antes del cambio de rol -> 403" id="dcaa7a89-e8aa-492a-aef0-1a8b25a3b9f5" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="HTTP 403" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03AntesDelCambioDeRol403"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · El administrador le da el rol Administrador -> 200" id="df51f214-dd86-4241-80a0-a67e04dc899e" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+    <testcase name="HTTP 200" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+    <testcase name="Rol nuevo" time="0.012" classname="F1M01AutenticacionYRolesHuM0103Ca03ElAdministradorLeDaElRolAdministrador200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-03 · CA03 · Siguiente acción con el mismo token -> 200" id="866d339f-fadc-446c-a29a-5f1da13f436a" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03SiguienteAccionConElMismoToken200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F1M01AutenticacionYRolesHuM0103Ca03SiguienteAccionConElMismoToken200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA09 · Desactivar la propia cuenta -> 400" id="42a73ecf-7723-4ec0-91fc-735a593aded1" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="HTTP 400" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F1M01AutenticacionYRolesHuM0102Ca09DesactivarLaPropiaCuenta400"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA03 · Desactivar un usuario -> 200" id="07fa65c9-8b4b-41fa-a8a6-1f7e95155143" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+    <testcase name="HTTP 200" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+    <testcase name="Mensaje" time="0.009" classname="F1M01AutenticacionYRolesHuM0102Ca03DesactivarUnUsuario200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA04 · Cuenta inactiva -> 401" id="46ef6a7f-8e0f-4966-960c-8ae48d8d5aed" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.083">
+    <testcase name="Responde dentro del umbral" time="0.083" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="HTTP 401" time="0.083" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="Cuerpo uniforme" time="0.083" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+    <testcase name="Mensaje literal" time="0.083" classname="F1M01AutenticacionYRolesHuM0101Ca04CuentaInactiva401"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-02 · CA10 · Reactivar un usuario -> 200" id="5196a57f-4d9a-466a-9fe4-0eb91cc2056c" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.017">
+    <testcase name="Responde dentro del umbral" time="0.017" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+    <testcase name="HTTP 200" time="0.017" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+    <testcase name="Mensaje y rol" time="0.017" classname="F1M01AutenticacionYRolesHuM0102Ca10ReactivarUnUsuario200"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA05 · Cerrar sesión -> 204" id="2b7abcb2-0c66-40d3-8430-4b813d322a70" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.027">
+    <testcase name="Responde dentro del umbral" time="0.027" classname="F1M01AutenticacionYRolesHuM0101Ca05CerrarSesion204"/>
+    <testcase name="HTTP 204" time="0.027" classname="F1M01AutenticacionYRolesHuM0101Ca05CerrarSesion204"/>
+  </testsuite>
+  <testsuite name="F1 · M01 Autenticacion y roles / HU-M01-01 · CA05 · El refresh cerrado ya no sirve -> 401" id="72570ba8-e058-4c0a-8521-e4834bafdc02" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F1M01AutenticacionYRolesHuM0101Ca05ElRefreshCerradoYaNoSirve401"/>
+    <testcase name="HTTP 401" time="0.013" classname="F1M01AutenticacionYRolesHuM0101Ca05ElRefreshCerradoYaNoSirve401"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / Preparación · Datos de la corrida y vehículo con tara del catálogo provisional -> 200" id="c851bd34-dc7b-4ad3-8d88-8197538b9f77" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.017">
+    <testcase name="Responde dentro del umbral" time="0.017" classname="F2M02CatalogoMaestroPreparacionDatosDeLaCorridaYVehiculoConTaraDelCatalogoProvisional200"/>
+    <testcase name="HTTP 200" time="0.017" classname="F2M02CatalogoMaestroPreparacionDatosDeLaCorridaYVehiculoConTaraDelCatalogoProvisional200"/>
+    <testcase name="El catálogo provisional está cargado" time="0.017" classname="F2M02CatalogoMaestroPreparacionDatosDeLaCorridaYVehiculoConTaraDelCatalogoProvisional200"/>
+    <testcase name="V2K-841 con tara 11.80" time="0.017" classname="F2M02CatalogoMaestroPreparacionDatosDeLaCorridaYVehiculoConTaraDelCatalogoProvisional200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA01 · Alta de vehículo propio -> 201" id="a7969a67-9150-4279-ae98-9d27ab2b4490" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.017">
+    <testcase name="Responde dentro del umbral" time="0.017" classname="F2M02CatalogoMaestroHuM0201Ca01AltaDeVehiculoPropio201"/>
+    <testcase name="HTTP 201" time="0.017" classname="F2M02CatalogoMaestroHuM0201Ca01AltaDeVehiculoPropio201"/>
+    <testcase name="Activo y propio, sin transportista (CA05)" time="0.017" classname="F2M02CatalogoMaestroHuM0201Ca01AltaDeVehiculoPropio201"/>
+    <testcase name="Sin tara, pendiente de destare (CA08)" time="0.017" classname="F2M02CatalogoMaestroHuM0201Ca01AltaDeVehiculoPropio201"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA02 · Placa duplicada -> 400" id="90d166ae-b9c7-4742-9872-b3bebbc71f91" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca02PlacaDuplicada400"/>
+    <testcase name="HTTP 400" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca02PlacaDuplicada400"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca02PlacaDuplicada400"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca02PlacaDuplicada400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA03 · Placa con formato inválido -> 400" id="cc26ba1b-a937-4978-995b-4104535fcd26" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca03PlacaConFormatoInvalido400"/>
+    <testcase name="HTTP 400" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca03PlacaConFormatoInvalido400"/>
+    <testcase name="Cuerpo uniforme" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca03PlacaConFormatoInvalido400"/>
+    <testcase name="Mensaje literal" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca03PlacaConFormatoInvalido400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA04 · Externo sin transportista -> 400" id="a23b0595-399b-4655-a328-cbacce4d3fc7" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F2M02CatalogoMaestroHuM0201Ca04ExternoSinTransportista400"/>
+    <testcase name="HTTP 400" time="0.013" classname="F2M02CatalogoMaestroHuM0201Ca04ExternoSinTransportista400"/>
+    <testcase name="Cuerpo uniforme" time="0.013" classname="F2M02CatalogoMaestroHuM0201Ca04ExternoSinTransportista400"/>
+    <testcase name="Mensaje literal" time="0.013" classname="F2M02CatalogoMaestroHuM0201Ca04ExternoSinTransportista400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA01 · Alta de transportista -> 201" id="ff51c029-d0d5-426c-a96b-6858b395870d" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca01AltaDeTransportista201"/>
+    <testcase name="HTTP 201" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca01AltaDeTransportista201"/>
+    <testcase name="Activo" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca01AltaDeTransportista201"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA02 · RUC de diez dígitos -> 400" id="75a946b1-3508-4b52-900b-a45c02117ebf" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.025">
+    <testcase name="Responde dentro del umbral" time="0.025" classname="F2M02CatalogoMaestroHuM0203Ca02RucDeDiezDigitos400"/>
+    <testcase name="HTTP 400" time="0.025" classname="F2M02CatalogoMaestroHuM0203Ca02RucDeDiezDigitos400"/>
+    <testcase name="Cuerpo uniforme" time="0.025" classname="F2M02CatalogoMaestroHuM0203Ca02RucDeDiezDigitos400"/>
+    <testcase name="Mensaje literal" time="0.025" classname="F2M02CatalogoMaestroHuM0203Ca02RucDeDiezDigitos400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA04 · RUC duplicado -> 400" id="e060225a-2736-4ce4-bcf4-301e94e999c3" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca04RucDuplicado400"/>
+    <testcase name="HTTP 400" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca04RucDuplicado400"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca04RucDuplicado400"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F2M02CatalogoMaestroHuM0203Ca04RucDuplicado400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA12 · Supervisor da de alta un externo desde el registro -> 201" id="cca9a1a0-8f73-4bd9-8877-f17f8b32a23d" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca12SupervisorDaDeAltaUnExternoDesdeElRegistro201"/>
+    <testcase name="HTTP 201" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca12SupervisorDaDeAltaUnExternoDesdeElRegistro201"/>
+    <testcase name="Asociado al transportista" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca12SupervisorDaDeAltaUnExternoDesdeElRegistro201"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA14 · Supervisor edita un vehículo -> 403" id="e80ea772-4271-4076-a597-4b996f2b24a0" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorEditaUnVehiculo403"/>
+    <testcase name="HTTP 403" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorEditaUnVehiculo403"/>
+    <testcase name="Cuerpo uniforme" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorEditaUnVehiculo403"/>
+    <testcase name="Mensaje literal" time="0.008" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorEditaUnVehiculo403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA14 · Supervisor da de baja un vehículo -> 403" id="86a66e3f-58ea-428d-8308-f4ef7a042fcf" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorDaDeBajaUnVehiculo403"/>
+    <testcase name="HTTP 403" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorDaDeBajaUnVehiculo403"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorDaDeBajaUnVehiculo403"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorDaDeBajaUnVehiculo403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA09 · Administrativo modifica la tara -> 403" id="cd270a54-efc5-4d69-9d13-4c95c91e155a" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca09AdministrativoModificaLaTara403"/>
+    <testcase name="HTTP 403" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca09AdministrativoModificaLaTara403"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca09AdministrativoModificaLaTara403"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca09AdministrativoModificaLaTara403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA09 · La edición genérica no cambia la tara -> 200" id="61e2626a-d164-4c62-9e90-f6cb3f95ef04" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca09LaEdicionGenericaNoCambiaLaTara200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca09LaEdicionGenericaNoCambiaLaTara200"/>
+    <testcase name="Capacidad cambiada, tara intacta" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca09LaEdicionGenericaNoCambiaLaTara200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA10 · Cambio de tara sin motivo -> 400" id="81fcfeb4-0318-4da6-9350-482eaf9c564f" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca10CambioDeTaraSinMotivo400"/>
+    <testcase name="HTTP 400" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca10CambioDeTaraSinMotivo400"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca10CambioDeTaraSinMotivo400"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca10CambioDeTaraSinMotivo400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA11 · Cambio de tara con motivo -> 200" id="04751ac4-437d-44ea-97a7-1ab1401be6f8" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca11CambioDeTaraConMotivo200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca11CambioDeTaraConMotivo200"/>
+    <testcase name="Tara nueva" time="0.014" classname="F2M02CatalogoMaestroHuM0201Ca11CambioDeTaraConMotivo200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA11 · Devuelve la tara del catálogo provisional -> 200" id="d325c9b8-9a3f-495b-bc10-d100e2d20b72" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca11DevuelveLaTaraDelCatalogoProvisional200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca11DevuelveLaTaraDelCatalogoProvisional200"/>
+    <testcase name="Tara restablecida" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca11DevuelveLaTaraDelCatalogoProvisional200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA06 · Baja de vehículo sin ingresos -> 200" id="a5637521-eca3-4726-b4a4-727829bca522" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca06BajaDeVehiculoSinIngresos200"/>
+    <testcase name="HTTP 200" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca06BajaDeVehiculoSinIngresos200"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca06BajaDeVehiculoSinIngresos200"/>
+    <testcase name="Inactivo" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca06BajaDeVehiculoSinIngresos200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA07 · El vehículo dado de baja no se ofrece -> 200" id="6c33f76f-f384-4dee-bb09-7486ff8d8506" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca07ElVehiculoDadoDeBajaNoSeOfrece200"/>
+    <testcase name="HTTP 200" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca07ElVehiculoDadoDeBajaNoSeOfrece200"/>
+    <testcase name="No figura entre los vigentes" time="0.009" classname="F2M02CatalogoMaestroHuM0201Ca07ElVehiculoDadoDeBajaNoSeOfrece200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA14 · Supervisor reactiva un vehículo -> 403" id="a4c74822-df01-4c67-948f-2e62edb10e16" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorReactivaUnVehiculo403"/>
+    <testcase name="HTTP 403" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorReactivaUnVehiculo403"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorReactivaUnVehiculo403"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F2M02CatalogoMaestroHuM0201Ca14SupervisorReactivaUnVehiculo403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA13 · Reactivar vehículo -> 200" id="97f57b8c-37fe-4535-ab68-f380c94739b0" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarVehiculo200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarVehiculo200"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarVehiculo200"/>
+    <testcase name="Activo de nuevo" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarVehiculo200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA03 · Baja de transportista con vehículos -> 200" id="c9f33087-0784-48e2-b41f-c70a69f67cb1" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0203Ca03BajaDeTransportistaConVehiculos200"/>
+    <testcase name="HTTP 200" time="0.009" classname="F2M02CatalogoMaestroHuM0203Ca03BajaDeTransportistaConVehiculos200"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F2M02CatalogoMaestroHuM0203Ca03BajaDeTransportistaConVehiculos200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA06 · Supervisor reactiva un transportista -> 403" id="6da56765-4cd1-4c37-bcbc-1070e2ac2ddf" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.021">
+    <testcase name="Responde dentro del umbral" time="0.021" classname="F2M02CatalogoMaestroHuM0203Ca06SupervisorReactivaUnTransportista403"/>
+    <testcase name="HTTP 403" time="0.021" classname="F2M02CatalogoMaestroHuM0203Ca06SupervisorReactivaUnTransportista403"/>
+    <testcase name="Cuerpo uniforme" time="0.021" classname="F2M02CatalogoMaestroHuM0203Ca06SupervisorReactivaUnTransportista403"/>
+    <testcase name="Mensaje literal" time="0.021" classname="F2M02CatalogoMaestroHuM0203Ca06SupervisorReactivaUnTransportista403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-03 · CA05 · Reactivar transportista -> 200" id="a4046a21-89fc-473d-b3fc-5eddac0753f1" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F2M02CatalogoMaestroHuM0203Ca05ReactivarTransportista200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F2M02CatalogoMaestroHuM0203Ca05ReactivarTransportista200"/>
+    <testcase name="Activo de nuevo" time="0.011" classname="F2M02CatalogoMaestroHuM0203Ca05ReactivarTransportista200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA01 · Alta de tipo de mineral -> 201" id="33485d8a-43a4-42f4-882b-b70433ffbd5a" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.033">
+    <testcase name="Responde dentro del umbral" time="0.033" classname="F2M02CatalogoMaestroHuM0202Ca01AltaDeTipoDeMineral201"/>
+    <testcase name="HTTP 201" time="0.033" classname="F2M02CatalogoMaestroHuM0202Ca01AltaDeTipoDeMineral201"/>
+    <testcase name="Activo y en toneladas" time="0.033" classname="F2M02CatalogoMaestroHuM0202Ca01AltaDeTipoDeMineral201"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA02 · Código duplicado -> 400" id="81d40c80-2e65-4b39-a75f-f66a8669ff57" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.020">
+    <testcase name="Responde dentro del umbral" time="0.020" classname="F2M02CatalogoMaestroHuM0202Ca02CodigoDuplicado400"/>
+    <testcase name="HTTP 400" time="0.020" classname="F2M02CatalogoMaestroHuM0202Ca02CodigoDuplicado400"/>
+    <testcase name="Cuerpo uniforme" time="0.020" classname="F2M02CatalogoMaestroHuM0202Ca02CodigoDuplicado400"/>
+    <testcase name="Mensaje literal" time="0.020" classname="F2M02CatalogoMaestroHuM0202Ca02CodigoDuplicado400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA05 · Nombre duplicado en mayúsculas -> 400" id="c1a8f05b-0f35-4a40-9145-55ba2f3cc26f" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F2M02CatalogoMaestroHuM0202Ca05NombreDuplicadoEnMayusculas400"/>
+    <testcase name="HTTP 400" time="0.009" classname="F2M02CatalogoMaestroHuM0202Ca05NombreDuplicadoEnMayusculas400"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F2M02CatalogoMaestroHuM0202Ca05NombreDuplicadoEnMayusculas400"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F2M02CatalogoMaestroHuM0202Ca05NombreDuplicadoEnMayusculas400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA06 · Código de siete caracteres -> 400" id="4ca6dc14-2a8b-4d61-a1c4-6c4939e75073" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F2M02CatalogoMaestroHuM0202Ca06CodigoDeSieteCaracteres400"/>
+    <testcase name="HTTP 400" time="0.007" classname="F2M02CatalogoMaestroHuM0202Ca06CodigoDeSieteCaracteres400"/>
+    <testcase name="Cuerpo uniforme" time="0.007" classname="F2M02CatalogoMaestroHuM0202Ca06CodigoDeSieteCaracteres400"/>
+    <testcase name="Mensaje literal" time="0.007" classname="F2M02CatalogoMaestroHuM0202Ca06CodigoDeSieteCaracteres400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA07 · Alta desde el registro sin código -> 201" id="0b2c1be7-5eaf-4fa1-8a00-e932c64c9dee" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F2M02CatalogoMaestroHuM0202Ca07AltaDesdeElRegistroSinCodigo201"/>
+    <testcase name="HTTP 201" time="0.012" classname="F2M02CatalogoMaestroHuM0202Ca07AltaDesdeElRegistroSinCodigo201"/>
+    <testcase name="Código generado de 2 a 6 caracteres" time="0.012" classname="F2M02CatalogoMaestroHuM0202Ca07AltaDesdeElRegistroSinCodigo201"/>
+    <testcase name="Activo" time="0.012" classname="F2M02CatalogoMaestroHuM0202Ca07AltaDesdeElRegistroSinCodigo201"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA08 · Alta desde el registro sin nombre -> 400" id="20e75e64-c0e4-4efd-99c2-5d40d0f50ead" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca08AltaDesdeElRegistroSinNombre400"/>
+    <testcase name="HTTP 400" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca08AltaDesdeElRegistroSinNombre400"/>
+    <testcase name="Cuerpo uniforme" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca08AltaDesdeElRegistroSinNombre400"/>
+    <testcase name="Mensaje literal" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca08AltaDesdeElRegistroSinNombre400"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA10 · Supervisor crea un tipo de mineral -> 403" id="efd71593-a148-40a8-8cae-2a454ce7dd46" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorCreaUnTipoDeMineral403"/>
+    <testcase name="HTTP 403" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorCreaUnTipoDeMineral403"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorCreaUnTipoDeMineral403"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorCreaUnTipoDeMineral403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA03 · Baja de tipo de mineral -> 200" id="f3216c24-bd9d-4642-8466-8ac54583f8c0" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F2M02CatalogoMaestroHuM0202Ca03BajaDeTipoDeMineral200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F2M02CatalogoMaestroHuM0202Ca03BajaDeTipoDeMineral200"/>
+    <testcase name="Inactivo" time="0.011" classname="F2M02CatalogoMaestroHuM0202Ca03BajaDeTipoDeMineral200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA04 · El tipo dado de baja no se ofrece -> 200" id="ecf3f80e-7775-4dd6-ae61-a01cb64becf1" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca04ElTipoDadoDeBajaNoSeOfrece200"/>
+    <testcase name="HTTP 200" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca04ElTipoDadoDeBajaNoSeOfrece200"/>
+    <testcase name="No figura entre los vigentes" time="0.008" classname="F2M02CatalogoMaestroHuM0202Ca04ElTipoDadoDeBajaNoSeOfrece200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA10 · Supervisor reactiva un tipo de mineral -> 403" id="c8be25db-3d5d-47ff-b4e6-b78784143680" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorReactivaUnTipoDeMineral403"/>
+    <testcase name="HTTP 403" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorReactivaUnTipoDeMineral403"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorReactivaUnTipoDeMineral403"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca10SupervisorReactivaUnTipoDeMineral403"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-02 · CA09 · Reactivar tipo de mineral -> 200" id="bc99a9f7-7536-42c9-936e-3331375c4fd5" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca09ReactivarTipoDeMineral200"/>
+    <testcase name="HTTP 200" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca09ReactivarTipoDeMineral200"/>
+    <testcase name="Activo de nuevo" time="0.010" classname="F2M02CatalogoMaestroHuM0202Ca09ReactivarTipoDeMineral200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / RN-M02-08 · Ninguna ruta del catálogo elimina -> 405" id="51ca6f43-6421-4831-9a27-d8797c462ab5" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F2M02CatalogoMaestroRnM0208NingunaRutaDelCatalogoElimina405"/>
+    <testcase name="HTTP 405" time="0.007" classname="F2M02CatalogoMaestroRnM0208NingunaRutaDelCatalogoElimina405"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / RN-M02-09 · La consulta histórica muestra el desactivado -> 200" id="71d5bb4f-4444-4243-aa72-93f4ea63d82f" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F2M02CatalogoMaestroRnM0209LaConsultaHistoricaMuestraElDesactivado200"/>
+    <testcase name="HTTP 200" time="0.010" classname="F2M02CatalogoMaestroRnM0209LaConsultaHistoricaMuestraElDesactivado200"/>
+    <testcase name="D3P-552 figura inactivo" time="0.010" classname="F2M02CatalogoMaestroRnM0209LaConsultaHistoricaMuestraElDesactivado200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / Preparación · Localiza D3P-552, dado de baja con tara -> 200" id="c59c6851-5b1e-4c92-ba36-deb224262a7d" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F2M02CatalogoMaestroPreparacionLocalizaD3P552DadoDeBajaConTara200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F2M02CatalogoMaestroPreparacionLocalizaD3P552DadoDeBajaConTara200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / HU-M02-01 · CA13 · Reactivar un vehículo con tara la conserva -> 200" id="59a1da65-6c39-4d37-a21f-7a1676ebface" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarUnVehiculoConTaraLaConserva200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarUnVehiculoConTaraLaConserva200"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarUnVehiculoConTaraLaConserva200"/>
+    <testcase name="Misma tara (RN-M02-19)" time="0.011" classname="F2M02CatalogoMaestroHuM0201Ca13ReactivarUnVehiculoConTaraLaConserva200"/>
+  </testsuite>
+  <testsuite name="F2 · M02 Catalogo maestro / Limpieza · Devuelve D3P-552 a su baja del catálogo provisional -> 200" id="d0d1afa0-bc9d-480b-a3a6-e15afe35cb6d" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F2M02CatalogoMaestroLimpiezaDevuelveD3P552ASuBajaDelCatalogoProvisional200"/>
+    <testcase name="HTTP 200" time="0.014" classname="F2M02CatalogoMaestroLimpiezaDevuelveD3P552ASuBajaDelCatalogoProvisional200"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F2M02CatalogoMaestroLimpiezaDevuelveD3P552ASuBajaDelCatalogoProvisional200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / Preparación · Datos de la corrida -> 200" id="93e0fba0-9475-4712-975c-19b1b0477d9a" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionPreparacionDatosDeLaCorrida200"/>
+    <testcase name="HTTP 200" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionPreparacionDatosDeLaCorrida200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M04-01 · CA01 · Borrador con el ticket legible -> 200" id="476a77d9-ad6c-4e70-89d9-20870bcce08e" timestamp="2026-11-02T17:19:56.176Z" tests="6" failures="0" errors="0" time="0.224">
+    <testcase name="Responde dentro del umbral" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+    <testcase name="HTTP 200" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+    <testcase name="Tres campos con su confianza entre 0 y 1" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+    <testcase name="Motor y versión (RN-M04-04)" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+    <testcase name="Hora del pesaje propuesta (HU-M03-01 CA10)" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+    <testcase name="Supervisor sin alta de mineral (HU-M03-01 CA15)" time="0.224" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca01BorradorConElTicketLegible200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA07 · Archivo que no es JPG ni PNG -> 400" id="2294508a-4ee8-4b4a-8f8f-1e0e73d18051" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca07ArchivoQueNoEsJpgNiPng400"/>
+    <testcase name="HTTP 400" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca07ArchivoQueNoEsJpgNiPng400"/>
+    <testcase name="Cuerpo uniforme" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca07ArchivoQueNoEsJpgNiPng400"/>
+    <testcase name="Mensaje literal" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca07ArchivoQueNoEsJpgNiPng400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M04-01 · CA04 · Ticket ilegible -> 200" id="ae52a36a-924b-4ccd-b994-b7462b16448b" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.119">
+    <testcase name="Responde dentro del umbral" time="0.119" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca04TicketIlegible200"/>
+    <testcase name="HTTP 200" time="0.119" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca04TicketIlegible200"/>
+    <testcase name="Permite continuar a mano" time="0.119" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0401Ca04TicketIlegible200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA02 · Confirmar sin borrador -> 400" id="ec974628-78a2-4ae4-86ab-d968a9e65f2d" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca02ConfirmarSinBorrador400"/>
+    <testcase name="HTTP 400" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca02ConfirmarSinBorrador400"/>
+    <testcase name="Cuerpo uniforme" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca02ConfirmarSinBorrador400"/>
+    <testcase name="Mensaje literal" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca02ConfirmarSinBorrador400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA03 · Faltan la hora y el tipo de mineral -> 400" id="57c88da1-d454-4749-af4b-748521599ed0" timestamp="2026-11-02T17:19:56.176Z" tests="5" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca03FaltanLaHoraYElTipoDeMineral400"/>
+    <testcase name="HTTP 400" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca03FaltanLaHoraYElTipoDeMineral400"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca03FaltanLaHoraYElTipoDeMineral400"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca03FaltanLaHoraYElTipoDeMineral400"/>
+    <testcase name="Indica cuáles faltan" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca03FaltanLaHoraYElTipoDeMineral400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA06 · Regla bloqueante V2 -> 400" id="d99c5382-6121-4e07-921b-0c9766f42fe0" timestamp="2026-11-02T17:19:56.176Z" tests="5" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca06ReglaBloqueanteV2400"/>
+    <testcase name="HTTP 400" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca06ReglaBloqueanteV2400"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca06ReglaBloqueanteV2400"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca06ReglaBloqueanteV2400"/>
+    <testcase name="Señala V2 (HU-M05-01 CA07)" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca06ReglaBloqueanteV2400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M05-01 · CA02 · Peso fuera de rango sin justificar -> 400" id="ea6b5cc6-af2f-4b79-850b-ac3a5e9bf324" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca02PesoFueraDeRangoSinJustificar400"/>
+    <testcase name="HTTP 400" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca02PesoFueraDeRangoSinJustificar400"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca02PesoFueraDeRangoSinJustificar400"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca02PesoFueraDeRangoSinJustificar400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA01 · Registro con tara -> 201" id="6dc415b8-7bb5-4323-93db-3959958fb74f" timestamp="2026-11-02T17:19:56.176Z" tests="5" failures="0" errors="0" time="0.019">
+    <testcase name="Responde dentro del umbral" time="0.019" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca01RegistroConTara201"/>
+    <testcase name="HTTP 201" time="0.019" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca01RegistroConTara201"/>
+    <testcase name="Mensaje con el código" time="0.019" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca01RegistroConTara201"/>
+    <testcase name="Neto = bruto − tara (CA08)" time="0.019" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca01RegistroConTara201"/>
+    <testcase name="Tres marcas distintas (CA09)" time="0.019" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca01RegistroConTara201"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / D-25 · El mismo borrador no registra dos ingresos -> 409" id="629579a7-3c6b-40cd-a798-2c8c4a0669f3" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionD25ElMismoBorradorNoRegistraDosIngresos409"/>
+    <testcase name="HTTP 409" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionD25ElMismoBorradorNoRegistraDosIngresos409"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionD25ElMismoBorradorNoRegistraDosIngresos409"/>
+    <testcase name="Nombra el ingreso ya registrado" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionD25ElMismoBorradorNoRegistraDosIngresos409"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA09 · Detalle del ingreso -> 200" id="2d1f89f4-84c2-4b61-989c-37197060726f" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.016">
+    <testcase name="Responde dentro del umbral" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca09DetalleDelIngreso200"/>
+    <testcase name="HTTP 200" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca09DetalleDelIngreso200"/>
+    <testcase name="Con imagen protegida (CA11)" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca09DetalleDelIngreso200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA11 · La imagen solo con sesión -> 401" id="409ecc41-76ee-4d95-bb7b-29901d42d0ec" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.002">
+    <testcase name="Responde dentro del umbral" time="0.002" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca11LaImagenSoloConSesion401"/>
+    <testcase name="HTTP 401" time="0.002" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca11LaImagenSoloConSesion401"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M04-02 · CA04 y CA05 · Comparación para el Supervisor -> 200" id="27a9c24e-27b7-4675-bd69-a181c3ee0e7a" timestamp="2026-11-02T17:19:56.176Z" tests="5" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca04YCa05ComparacionParaElSupervisor200"/>
+    <testcase name="HTTP 200" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca04YCa05ComparacionParaElSupervisor200"/>
+    <testcase name="Solo lectura" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca04YCa05ComparacionParaElSupervisor200"/>
+    <testcase name="Tres campos con reconocido y confirmado (CA01)" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca04YCa05ComparacionParaElSupervisor200"/>
+    <testcase name="Motor y versión" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca04YCa05ComparacionParaElSupervisor200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M04-02 · CA06 · Sin sesión -> 401" id="e1331076-7db4-4ac3-b31b-621a9f4927d7" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.002">
+    <testcase name="Responde dentro del umbral" time="0.002" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca06SinSesion401"/>
+    <testcase name="HTTP 401" time="0.002" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0402Ca06SinSesion401"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M05-01 · CA08 · Resultado de las cinco reglas -> 200" id="7bc3d4b4-3b4a-4ba7-9f58-e4d622639e55" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca08ResultadoDeLasCincoReglas200"/>
+    <testcase name="HTTP 200" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca08ResultadoDeLasCincoReglas200"/>
+    <testcase name="V1 a V5" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca08ResultadoDeLasCincoReglas200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA16 · Borrador sin foto -> 200" id="fe42883a-f638-41c0-b038-e5dc19436e4d" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.008">
+    <testcase name="Responde dentro del umbral" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca16BorradorSinFoto200"/>
+    <testcase name="HTTP 200" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca16BorradorSinFoto200"/>
+    <testcase name="Sin reconocimiento" time="0.008" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca16BorradorSinFoto200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M05-01 · CA10 · Posible duplicado sin justificar -> 400" id="9b05c4bd-9fc1-4632-9035-067724ef0282" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="Responde dentro del umbral" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca10PosibleDuplicadoSinJustificar400"/>
+    <testcase name="HTTP 400" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca10PosibleDuplicadoSinJustificar400"/>
+    <testcase name="Cuerpo uniforme" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca10PosibleDuplicadoSinJustificar400"/>
+    <testcase name="Mensaje literal" time="0.012" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca10PosibleDuplicadoSinJustificar400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M05-01 · CA03 · Duplicado justificado, sin foto -> 201" id="6f6993d1-3484-4d73-b1e5-27485507354e" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca03DuplicadoJustificadoSinFoto201"/>
+    <testcase name="HTTP 201" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca03DuplicadoJustificadoSinFoto201"/>
+    <testcase name="Sin respaldo fotográfico con su motivo (CA17)" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0501Ca03DuplicadoJustificadoSinFoto201"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA06 · El Supervisor no corrige -> 403" id="04bff480-3e69-4e9b-8ac4-2c72b531b7ba" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca06ElSupervisorNoCorrige403"/>
+    <testcase name="HTTP 403" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca06ElSupervisorNoCorrige403"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca06ElSupervisorNoCorrige403"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca06ElSupervisorNoCorrige403"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA02 · Corrección sin motivo -> 400" id="6bdb6a26-c407-4291-bec0-d33373c88a28" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca02CorreccionSinMotivo400"/>
+    <testcase name="HTTP 400" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca02CorreccionSinMotivo400"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca02CorreccionSinMotivo400"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca02CorreccionSinMotivo400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA01 · Primera corrección -> 200" id="4da697ce-d440-4560-927e-c6d5786007cd" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.020">
+    <testcase name="Responde dentro del umbral" time="0.020" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01PrimeraCorreccion200"/>
+    <testcase name="HTTP 200" time="0.020" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01PrimeraCorreccion200"/>
+    <testcase name="Mensaje" time="0.020" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01PrimeraCorreccion200"/>
+    <testcase name="Ignora tara y código (CA04)" time="0.020" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01PrimeraCorreccion200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA10 · Sin cambios -> 400" id="efef8598-b131-49c0-8c46-45b188804897" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca10SinCambios400"/>
+    <testcase name="HTTP 400" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca10SinCambios400"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca10SinCambios400"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca10SinCambios400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA03 · Corrección que incumple V5 -> 400" id="9178b7f0-6b49-4507-9e3a-e4a37ad27096" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.015">
+    <testcase name="Responde dentro del umbral" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca03CorreccionQueIncumpleV5400"/>
+    <testcase name="HTTP 400" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca03CorreccionQueIncumpleV5400"/>
+    <testcase name="Cuerpo uniforme" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca03CorreccionQueIncumpleV5400"/>
+    <testcase name="Mensaje literal" time="0.015" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca03CorreccionQueIncumpleV5400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA01 · Segunda corrección -> 200" id="aaf5e994-7fe2-4a4a-8866-a0326d5496ef" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.016">
+    <testcase name="Responde dentro del umbral" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01SegundaCorreccion200"/>
+    <testcase name="HTTP 200" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca01SegundaCorreccion200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA13 · Revertir una que no es la última -> 409" id="a6e7abdf-dd04-479a-9f4f-4f943d7ff85e" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca13RevertirUnaQueNoEsLaUltima409"/>
+    <testcase name="HTTP 409" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca13RevertirUnaQueNoEsLaUltima409"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca13RevertirUnaQueNoEsLaUltima409"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca13RevertirUnaQueNoEsLaUltima409"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA12 · Revertir la última -> 200" id="35232c6f-9735-4749-a934-f47484f5dbbc" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.023">
+    <testcase name="Responde dentro del umbral" time="0.023" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirLaUltima200"/>
+    <testcase name="HTTP 200" time="0.023" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirLaUltima200"/>
+    <testcase name="Mensaje" time="0.023" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirLaUltima200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA14 · La reversión se revalida -> 400" id="2c6e7953-72c2-4873-a195-2f946f14055d" timestamp="2026-11-02T17:19:56.176Z" tests="5" failures="0" errors="0" time="0.016">
+    <testcase name="Responde dentro del umbral" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca14LaReversionSeRevalida400"/>
+    <testcase name="HTTP 400" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca14LaReversionSeRevalida400"/>
+    <testcase name="Cuerpo uniforme" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca14LaReversionSeRevalida400"/>
+    <testcase name="Mensaje literal" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca14LaReversionSeRevalida400"/>
+    <testcase name="El peso restaurado coincide con el ingreso sin foto (V1)" time="0.016" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca14LaReversionSeRevalida400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA12 · Revertir también la primera -> 200" id="7a7e2975-e32c-413f-984e-027e9668146a" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.018">
+    <testcase name="Responde dentro del umbral" time="0.018" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirTambienLaPrimera200"/>
+    <testcase name="HTTP 200" time="0.018" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirTambienLaPrimera200"/>
+    <testcase name="Vuelve el bruto del ticket" time="0.018" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca12RevertirTambienLaPrimera200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-03 · CA04 · El Administrativo no anula -> 403" id="4737279f-61b3-4a6d-8577-755623fdcbe1" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca04ElAdministrativoNoAnula403"/>
+    <testcase name="HTTP 403" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca04ElAdministrativoNoAnula403"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca04ElAdministrativoNoAnula403"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca04ElAdministrativoNoAnula403"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-03 · CA02 · Anular sin motivo -> 400" id="86b28a22-f34c-481a-9802-88d061a6b268" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca02AnularSinMotivo400"/>
+    <testcase name="HTTP 400" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca02AnularSinMotivo400"/>
+    <testcase name="Cuerpo uniforme" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca02AnularSinMotivo400"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca02AnularSinMotivo400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-03 · CA01 · Anular con motivo -> 200" id="fd349027-29c9-410b-aca8-e03454fb3ac4" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca01AnularConMotivo200"/>
+    <testcase name="HTTP 200" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca01AnularConMotivo200"/>
+    <testcase name="Mensaje" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca01AnularConMotivo200"/>
+    <testcase name="Motivo y responsable (CA05)" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca01AnularConMotivo200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-03 · CA03 · Anular otra vez -> 409" id="36ed5f7b-d7fe-41bb-ac3c-90cd9e90cd0a" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca03AnularOtraVez409"/>
+    <testcase name="HTTP 409" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca03AnularOtraVez409"/>
+    <testcase name="Cuerpo uniforme" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca03AnularOtraVez409"/>
+    <testcase name="Mensaje literal" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0303Ca03AnularOtraVez409"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-02 · CA05 · Corregir un anulado -> 409" id="954257cd-d5d8-42e2-bc25-3acf8bfac49f" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca05CorregirUnAnulado409"/>
+    <testcase name="HTTP 409" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca05CorregirUnAnulado409"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca05CorregirUnAnulado409"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0302Ca05CorregirUnAnulado409"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / Preparación · Borrador sin foto para la placa no registrada -> 200" id="00d7e1ad-c01e-4c03-bdd4-54cbbd98a340" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionPreparacionBorradorSinFotoParaLaPlacaNoRegistrada200"/>
+    <testcase name="HTTP 200" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionPreparacionBorradorSinFotoParaLaPlacaNoRegistrada200"/>
+    <testcase name="Sin reconocimiento" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionPreparacionBorradorSinFotoParaLaPlacaNoRegistrada200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA04 · Placa no registrada -> 400" id="7a778f20-1ec7-4120-91b6-d403340a23e9" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca04PlacaNoRegistrada400"/>
+    <testcase name="HTTP 400" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca04PlacaNoRegistrada400"/>
+    <testcase name="Cuerpo uniforme" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca04PlacaNoRegistrada400"/>
+    <testcase name="Mensaje literal" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca04PlacaNoRegistrada400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA13 · Vehículo dado de baja -> 400" id="3a132674-66ec-429b-8ea3-4ea56ae61bc2" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="Responde dentro del umbral" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca13VehiculoDadoDeBaja400"/>
+    <testcase name="HTTP 400" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca13VehiculoDadoDeBaja400"/>
+    <testcase name="Cuerpo uniforme" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca13VehiculoDadoDeBaja400"/>
+    <testcase name="Mensaje literal" time="0.011" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca13VehiculoDadoDeBaja400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M02-01 · CA12 · Alta del vehículo desde el registro -> 201" id="049d24fd-00c0-4b23-9b4b-1b6db7e2a2d7" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0201Ca12AltaDelVehiculoDesdeElRegistro201"/>
+    <testcase name="HTTP 201" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0201Ca12AltaDelVehiculoDesdeElRegistro201"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-01 · CA05 · Primer viaje queda En proceso -> 201" id="ab0bb57c-2fa8-4682-a9fb-120aeb353ecc" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca05PrimerViajeQuedaEnProceso201"/>
+    <testcase name="HTTP 201" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca05PrimerViajeQuedaEnProceso201"/>
+    <testcase name="Mensaje" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca05PrimerViajeQuedaEnProceso201"/>
+    <testcase name="Sin neto" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0301Ca05PrimerViajeQuedaEnProceso201"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA06 · Pendientes de destare -> 200" id="bf70a97f-093d-4278-aee7-35b23e6cc058" timestamp="2026-11-02T17:19:56.176Z" tests="3" failures="0" errors="0" time="0.013">
+    <testcase name="Responde dentro del umbral" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca06PendientesDeDestare200"/>
+    <testcase name="HTTP 200" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca06PendientesDeDestare200"/>
+    <testcase name="Lista el vehículo nuevo" time="0.013" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca06PendientesDeDestare200"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA02 · Destare sin tara -> 400" id="81fd4d75-eb7e-4e33-ba00-153d16295ef7" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca02DestareSinTara400"/>
+    <testcase name="HTTP 400" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca02DestareSinTara400"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca02DestareSinTara400"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca02DestareSinTara400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA03 · Tara mayor que el bruto -> 400" id="416aa963-7e85-4e63-9684-5b8f4abfba83" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca03TaraMayorQueElBruto400"/>
+    <testcase name="HTTP 400" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca03TaraMayorQueElBruto400"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca03TaraMayorQueElBruto400"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca03TaraMayorQueElBruto400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA09 · Destare con fecha futura -> 400" id="b2b91594-aa68-4368-a70d-5db6b50af287" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="Responde dentro del umbral" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca09DestareConFechaFutura400"/>
+    <testcase name="HTTP 400" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca09DestareConFechaFutura400"/>
+    <testcase name="Cuerpo uniforme" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca09DestareConFechaFutura400"/>
+    <testcase name="Mensaje literal" time="0.010" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca09DestareConFechaFutura400"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA01 · Destare registrado -> 201" id="bf4e42ac-d78e-4d8f-a889-b4f7a4ff39e0" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Responde dentro del umbral" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca01DestareRegistrado201"/>
+    <testcase name="HTTP 201" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca01DestareRegistrado201"/>
+    <testcase name="Mensaje literal" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca01DestareRegistrado201"/>
+    <testcase name="Completa el ingreso (CA07)" time="0.014" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca01DestareRegistrado201"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / HU-M03-04 · CA05 · Destare repetido -> 409" id="f9ed999e-990d-4085-a95a-d59d6ba76db9" timestamp="2026-11-02T17:19:56.176Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="Responde dentro del umbral" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca05DestareRepetido409"/>
+    <testcase name="HTTP 409" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca05DestareRepetido409"/>
+    <testcase name="Cuerpo uniforme" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca05DestareRepetido409"/>
+    <testcase name="Mensaje literal" time="0.009" classname="F3M03M04M05RegistroReconocimientoYValidacionHuM0304Ca05DestareRepetido409"/>
+  </testsuite>
+  <testsuite name="F3 · M03 M04 M05 Registro reconocimiento y validacion / RN-M03-14 · Ningún ingreso se elimina -> 405" id="f078e80f-99d1-4fc6-8c15-58add07aa38b" timestamp="2026-11-02T17:19:56.176Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="Responde dentro del umbral" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionRnM0314NingunIngresoSeElimina405"/>
+    <testcase name="HTTP 405" time="0.007" classname="F3M03M04M05RegistroReconocimientoYValidacionRnM0314NingunIngresoSeElimina405"/>
+  </testsuite>
+</testsuites>

@@ -285,7 +285,7 @@
           ]
         },
         {
-          "name": "F0 · Registro de ingresos aún sin rutas -> 404",
+          "name": "F0 · Ruta de salidas del alcance anterior retirada -> 404",
           "request": {
             "method": "GET",
             "header": [
@@ -295,7 +295,7 @@
                 "type": "text"
               }
             ],
-            "url": "{{base_url}}/ingresos/"
+            "url": "{{base_url}}/salidas/"
           },
           "event": [
             {
@@ -303,7 +303,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"HTTP 404: el registro del diseño anterior se retiró; M03 se publica en F3\", () => pm.response.to.have.status(404));"
+                  "pm.test(\"HTTP 404: las salidas del alcance anterior se retiraron\", () => pm.response.to.have.status(404));"
                 ]
               }
             }
@@ -2657,6 +2657,2227 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Vehículo desactivado\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F3 · M03 M04 M05 Registro reconocimiento y validacion",
+      "description": "Puerta de F3 (PLAN-02). Recorre el registro con foto y sin foto, el reconocimiento, las reglas V1 a V5, la corrección con su reversión, la anulación y el primer viaje con su destare. Usa los archivos de postman/archivos/; Newman se ejecuta desde la raíz del repositorio. La concurrencia del código (CP05), la atomicidad (CA12) y el motor que no responde (HU-M04-01 CA05) se prueban con pytest.",
+      "item": [
+        {
+          "name": "Preparación · Datos de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/?codigo=MOA"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('id_mineral_f3', pm.response.json().results[0].id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ayer = new Date(Date.now() - 86400000);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.environment.set('fecha_f3', `${ayer.getFullYear()}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
+                  "pm.environment.set('fecha_futura_f3', `${ayer.getFullYear() + 1}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
+                  "// Bruto distinto en cada corrida para no chocar con V1 entre corridas del mismo día.",
+                  "const bruto = 20 + Math.floor(Math.random() * 900) / 100;",
+                  "pm.environment.set('peso_f3', bruto.toFixed(2));",
+                  "pm.environment.set('neto_f3', (bruto - 11.80).toFixed(2));",
+                  "pm.environment.set('peso_corregido_f3', (bruto - 0.50).toFixed(2));",
+                  "const az = 'ABCDEFGHJKLMNPQRSTUVWXYZ', dg = '0123456789';",
+                  "const al = (s, n) => Array.from({length: n}, () => s[Math.floor(Math.random() * s.length)]).join('');",
+                  "pm.environment.set('placa_nueva_f3', 'R' + al(az, 2) + '-' + al(dg, 3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M04-01 · CA01 · Borrador con el ticket legible -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "imagen",
+                  "type": "file",
+                  "src": "postman/archivos/ticket_legible.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('borrador_f3', b.borrador);",
+                  "pm.test(\"Tres campos con su confianza entre 0 y 1\", () => {",
+                  "  pm.expect(b.reconocimiento.campos).to.have.lengthOf(3);",
+                  "  b.reconocimiento.campos.forEach(c => { if (c.confianza !== null) pm.expect(c.confianza).to.be.within(0, 1); });",
+                  "});",
+                  "pm.test(\"Motor y versión (RN-M04-04)\", () => pm.expect(b.reconocimiento.motor).to.be.a(\"string\").and.not.empty);",
+                  "pm.test(\"Hora del pesaje propuesta (HU-M03-01 CA10)\", () => pm.expect(b.propuesta.hora_es_propuesta).to.eql(true));",
+                  "pm.test(\"Supervisor sin alta de mineral (HU-M03-01 CA15)\", () => pm.expect(b.aviso_tipo_mineral).to.eql(\"Si no está en la lista, pida a un administrativo que lo registre\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA07 · Archivo que no es JPG ni PNG -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "imagen",
+                  "type": "file",
+                  "src": "postman/archivos/documento.pdf"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La imagen debe estar en formato JPG o PNG y no superar los 10 MB\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M04-01 · CA04 · Ticket ilegible -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "imagen",
+                  "type": "file",
+                  "src": "postman/archivos/ticket_ilegible.png"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Permite continuar a mano\", () => pm.expect(pm.response.json().reconocimiento.aviso).to.eql(\"No fue posible leer el ticket. Tome una nueva fotografía o ingrese los datos manualmente\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA02 · Confirmar sin borrador -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_vacio_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe adjuntar la imagen del ticket de balanza\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA03 · Faltan la hora y el tipo de mineral -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe completar los campos obligatorios\"));",
+                  "pm.test(\"Indica cuáles faltan\", () => pm.expect(pm.response.json().detalles.campos).to.have.members([\"hora\", \"tipo_mineral\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA06 · Regla bloqueante V2 -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"11.00\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe corregir o justificar las inconsistencias señaladas\"));",
+                  "pm.test(\"Señala V2 (HU-M05-01 CA07)\", () => pm.expect(pm.response.json().detalles.inconsistencias[0].regla).to.eql(\"V2\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M05-01 · CA02 · Peso fuera de rango sin justificar -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"45.00\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar la justificación del peso fuera de rango\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA01 · Registro con tara -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('id_ingreso_f3', b.id);",
+                  "pm.environment.set('codigo_f3', b.codigo);",
+                  "pm.test(\"Mensaje con el código\", () => pm.expect(b.mensaje).to.eql(\"Ingreso registrado con el código \" + b.codigo));",
+                  "pm.test(\"Neto = bruto − tara (CA08)\", () => { pm.expect(b.tara_tn).to.eql(\"11.80\"); pm.expect(b.peso_neto_tn).to.eql(pm.environment.get(\"neto_f3\")); });",
+                  "pm.test(\"Tres marcas distintas (CA09)\", () => pm.expect(new Set([b.fecha_hora_pesaje, b.hora_inicio_registro, b.hora_fin_registro]).size).to.eql(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D-25 · El mismo borrador no registra dos ingresos -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"09:30\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Nombra el ingreso ya registrado\", () => pm.expect(pm.response.json().mensaje).to.include(pm.environment.get(\"codigo_f3\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA09 · Detalle del ingreso -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('id_reconocimiento_f3', b.reconocimiento.id);",
+                  "pm.test(\"Con imagen protegida (CA11)\", () => pm.expect(b.imagen_url).to.include(\"/imagen/\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA11 · La imagen solo con sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/imagen/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M04-02 · CA04 y CA05 · Comparación para el Supervisor -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/reconocimientos/{{id_reconocimiento_f3}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Solo lectura\", () => pm.expect(b.puede_corregir_ingreso).to.eql(false));",
+                  "pm.test(\"Tres campos con reconocido y confirmado (CA01)\", () => pm.expect(b.campos).to.have.lengthOf(3));",
+                  "pm.test(\"Motor y versión\", () => { pm.expect(b.motor).to.be.a(\"string\"); pm.expect(b.version_motor).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M04-02 · CA06 · Sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/reconocimientos/{{id_reconocimiento_f3}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M05-01 · CA08 · Resultado de las cinco reglas -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/validaciones/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const conf = pm.response.json().filter(r => r.momento === \"CONFIRMACION\").map(r => r.regla).sort();",
+                  "pm.test(\"V1 a V5\", () => pm.expect(conf).to.eql([\"V1\", \"V2\", \"V3\", \"V4\", \"V5\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA16 · Borrador sin foto -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "TICKET_EXTRAVIADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set(\"borrador_dup_f3\", pm.response.json().borrador);",
+                  "pm.test(\"Sin reconocimiento\", () => pm.expect(pm.response.json().reconocimiento).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M05-01 · CA10 · Posible duplicado sin justificar -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_dup_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar la justificación del posible duplicado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M05-01 · CA03 · Duplicado justificado, sin foto -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_dup_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}},\n  \"justificaciones\": {\n    \"V1\": \"Segundo viaje del día con el mismo peso\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('id_ingreso_dup_f3', b.id);",
+                  "pm.environment.set('codigo_dup_f3', b.codigo);",
+                  "pm.test(\"Sin respaldo fotográfico con su motivo (CA17)\", () => { pm.expect(b.sin_respaldo_fotografico).to.eql(true); pm.expect(b.motivo_sin_respaldo_texto).to.eql(\"Ticket extraviado o dañado\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA06 · El Supervisor no corrige -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso_bruto_tn\": \"{{peso_corregido_f3}}\",\n  \"motivo\": \"Error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA02 · Corrección sin motivo -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso_bruto_tn\": \"{{peso_corregido_f3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el motivo de la corrección\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA01 · Primera corrección -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso_bruto_tn\": \"{{peso_corregido_f3}}\",\n  \"motivo\": \"El peso se leyó mal\",\n  \"tara_tn\": \"1.00\",\n  \"codigo\": \"X\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('id_correccion_1', b.correccion_revertible);",
+                  "pm.test(\"Mensaje\", () => pm.expect(b.mensaje).to.eql(\"Ingreso \" + pm.environment.get(\"codigo_f3\") + \" actualizado\"));",
+                  "pm.test(\"Ignora tara y código (CA04)\", () => { pm.expect(b.tara_tn).to.eql(\"11.80\"); pm.expect(b.codigo).to.eql(pm.environment.get(\"codigo_f3\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA10 · Sin cambios -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso_bruto_tn\": \"{{peso_corregido_f3}}\",\n  \"motivo\": \"Nada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay cambios que guardar\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA03 · Corrección que incumple V5 -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{fecha_futura_f3}}\",\n  \"motivo\": \"Error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La fecha del ticket no puede ser posterior a la fecha de registro\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA01 · Segunda corrección -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hora\": \"07:45\",\n  \"motivo\": \"Hora real del pesaje\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA13 · Revertir una que no es la última -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/revertir-correccion/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Volver\",\n  \"correccion\": {{id_correccion_1}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Solo puede revertirse la última corrección del ingreso\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA12 · Revertir la última -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/revertir-correccion/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"La hora era correcta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Corrección revertida en el ingreso \" + pm.environment.get(\"codigo_f3\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA14 · La reversión se revalida -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/revertir-correccion/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El peso era correcto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar la justificación del posible duplicado\"));",
+                  "pm.test(\"El peso restaurado coincide con el ingreso sin foto (V1)\", () => pm.expect(pm.response.json().detalles.inconsistencias[0].regla).to.eql(\"V1\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA12 · Revertir también la primera -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/revertir-correccion/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El peso era correcto\",\n  \"justificaciones\": {\n    \"V1\": \"Dos viajes con el mismo peso\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Vuelve el bruto del ticket\", () => pm.expect(pm.response.json().peso_bruto_tn).to.eql(pm.environment.get(\"peso_f3\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-03 · CA04 · El Administrativo no anula -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_dup_f3}}/anular/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Duplicado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-03 · CA02 · Anular sin motivo -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_dup_f3}}/anular/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el motivo de la anulación\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-03 · CA01 · Anular con motivo -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_dup_f3}}/anular/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Registro duplicado de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Ingreso \" + pm.environment.get(\"codigo_dup_f3\") + \" anulado\"));",
+                  "pm.test(\"Motivo y responsable (CA05)\", () => { const b = pm.response.json(); pm.expect(b.estado).to.eql(\"ANULADO\"); pm.expect(b.anulado_por).to.eql(pm.environment.get(\"usuario_admin\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-03 · CA03 · Anular otra vez -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_dup_f3}}/anular/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Otra vez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El ingreso \" + pm.environment.get(\"codigo_dup_f3\") + \" ya fue anulado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-02 · CA05 · Corregir un anulado -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_dup_f3}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso_bruto_tn\": \"20.00\",\n  \"motivo\": \"Error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No se puede corregir un ingreso anulado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto para la placa no registrada -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "TICKET_EXTRAVIADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set(\"borrador_placa_f3\", pm.response.json().borrador);",
+                  "pm.test(\"Sin reconocimiento\", () => pm.expect(pm.response.json().reconocimiento).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA04 · Placa no registrada -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_placa_f3}}\",\n  \"placa\": \"{{placa_nueva_f3}}\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La placa \" + pm.environment.get(\"placa_nueva_f3\") + \" no está registrada. Complete los datos del vehículo para continuar\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA13 · Vehículo dado de baja -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_placa_f3}}\",\n  \"placa\": \"D3P-552\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El vehículo D3P-552 está dado de baja: no puede asociarse a un ingreso\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M02-01 · CA12 · Alta del vehículo desde el registro -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_nueva_f3}}\",\n  \"tipo_titularidad\": \"PROPIO\",\n  \"capacidad_tn\": \"25.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('id_vehiculo_nuevo_f3', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-01 · CA05 · Primer viaje queda En proceso -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_placa_f3}}\",\n  \"placa\": \"{{placa_nueva_f3}}\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Mensaje\", () => pm.expect(b.mensaje).to.eql(\"Ingreso \" + b.codigo + \" registrado en proceso: pendiente del destare del vehículo \" + pm.environment.get(\"placa_nueva_f3\")));",
+                  "pm.test(\"Sin neto\", () => { pm.expect(b.estado).to.eql(\"EN_PROCESO\"); pm.expect(b.peso_neto_tn).to.eql(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA06 · Pendientes de destare -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/?estado=EN_PROCESO"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Lista el vehículo nuevo\", () => pm.expect(pm.response.json().results.map(r => r.placa)).to.include(pm.environment.get(\"placa_nueva_f3\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA02 · Destare sin tara -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_nuevo_f3}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar la tara del vehículo\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA03 · Tara mayor que el bruto -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_nuevo_f3}},\n  \"tara_tn\": \"35.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La tara no puede ser mayor o igual que el peso bruto\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA09 · Destare con fecha futura -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_nuevo_f3}},\n  \"tara_tn\": \"12.00\",\n  \"fecha_destare\": \"{{fecha_futura_f3}}T10:00:00-05:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La fecha del destare no puede ser posterior a la fecha actual\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA01 · Destare registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_nuevo_f3}},\n  \"tara_tn\": \"12.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Destare registrado\"));",
+                  "pm.test(\"Completa el ingreso (CA07)\", () => pm.expect(pm.response.json().ingresos[0].estado).to.eql(\"REGISTRADO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M03-04 · CA05 · Destare repetido -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_nuevo_f3}},\n  \"tara_tn\": \"12.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El vehículo \" + pm.environment.get(\"placa_nueva_f3\") + \" ya tiene tara registrada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M03-14 · Ningún ingreso se elimina -> 405",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F4 · M09 Auditoria",
+      "description": "Puerta de F4 (PLAN-02). Se ejecuta después de F1 a F3 en la misma corrida: busca en la auditoría los eventos que esas carpetas dejaron —registro, reconocimiento, corrección con valor anterior y nuevo, reversión, anulación, destare, restablecimiento de contraseña sin la contraseña y accesos rechazados— y comprueba el historial de un ingreso para los tres roles. La exportación (HU-M09-01 CA06) se valida en F6 y F7.",
+      "item": [
+        {
+          "name": "HU-M09-03 · CA05 · El Administrativo no consulta la auditoría -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA05 · El Supervisor no consulta la auditoría -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA01 · Del más reciente al más antiguo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Orden descendente\", () => pm.expect(r.map(e => e.id)).to.eql([...r.map(e => e.id)].sort((a, b) => b - a)));",
+                  "pm.test(\"Entidad, referencia y autor\", () => r.forEach(e => { pm.expect(e).to.have.property(\"entidad\"); pm.expect(e).to.have.property(\"referencia\"); pm.expect(e).to.have.property(\"usuario\"); }));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA01 · Registro del ingreso de F3 -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=CREAR&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Un evento CREAR del ingreso\", () => { pm.expect(r).to.have.lengthOf(1); pm.expect(r[0].referencia).to.eql(pm.environment.get(\"codigo_f3\")); });",
+                  "pm.test(\"Lo registró el Supervisor\", () => pm.expect(r[0].usuario).to.eql(pm.environment.get(\"usuario_supervisor\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA05 · Reconocimiento del ticket -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=RECONOCER&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Un evento RECONOCER con motor y versión\", () => { const r = pm.response.json().results; pm.expect(r).to.have.lengthOf(1); pm.expect(r[0].valores_nuevos.motor).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA02 · Correcciones del Administrativo sobre el ingreso -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=MODIFICAR&usuario={{usuario_administrativo}}&texto={{codigo_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "const corr = r.filter(e => e.operacion === \"CORRECCION\");",
+                  "const rev = r.filter(e => e.operacion === \"REVERSION\");",
+                  "pm.test(\"Dos correcciones y dos reversiones\", () => { pm.expect(corr).to.have.lengthOf(2); pm.expect(rev).to.have.lengthOf(2); });",
+                  "pm.test(\"Corrección con anterior, nuevo y motivo (HU-M09-03 CA03)\", () => { const peso = corr.find(e => e.motivo === \"El peso se leyó mal\"); pm.expect(peso.cambios.find(c => c.campo === \"peso_bruto_tn\")).to.eql({campo: \"peso_bruto_tn\", anterior: pm.environment.get(\"peso_f3\"), nuevo: pm.environment.get(\"peso_corregido_f3\")}); });",
+                  "pm.test(\"La reversión referencia la corrección (RN-M03-29)\", () => rev.forEach(e => pm.expect(e.valores_nuevos.revierte).to.be.a(\"number\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA07 · Anulación con su motivo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=ANULAR&texto={{codigo_dup_f3}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Motivo y responsable\", () => { pm.expect(r[0].motivo).to.eql(\"Registro duplicado de prueba\"); pm.expect(r[0].usuario).to.eql(pm.environment.get(\"usuario_admin\")); });",
+                  "pm.test(\"Solo valores anteriores\", () => { pm.expect(r[0].valores_anteriores.estado).to.eql(\"REGISTRADO\"); pm.expect(r[0].valores_nuevos).to.eql(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA02 · Destare del vehículo nuevo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto={{placa_nueva_f3}}&accion=MODIFICAR"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "const tara = r.find(e => e.entidad === \"Vehiculo\");",
+                  "pm.test(\"Tara de nula a su valor, con los ingresos afectados\", () => { pm.expect(tara.valores_anteriores.tara_tn).to.eql(null); pm.expect(tara.valores_nuevos.tara_tn).to.eql(\"12.00\"); pm.expect(tara.ingresos_relacionados).to.have.lengthOf(1); });",
+                  "pm.test(\"El ingreso pasa a Registrado\", () => pm.expect(r.some(e => e.entidad === \"Ingreso\" && e.operacion === \"DESTARE\")).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RS-M09-16 · Restablecimiento de contraseña sin la contraseña -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto={{usuario_desechable}}&accion=MODIFICAR"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const cuerpo = pm.response.text();",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"Queda el restablecimiento\", () => pm.expect(r.some(e => e.motivo === \"Restablecimiento de contraseña\")).to.eql(true));",
+                  "pm.test(\"Ninguna contraseña en los eventos\", () => { pm.expect(cuerpo).to.not.include(pm.environment.get(\"clave_temporal\")); pm.expect(cuerpo).to.not.include(\"Clave-Prueba-1\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA04 · Accesos rechazados de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=ACCESO_RECHAZADO&usuario={{usuario_supervisor}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con usuario y operación intentada\", () => { const r = pm.response.json().results; pm.expect(r.length).to.be.above(0); pm.expect(r[0].valores_nuevos).to.have.property(\"ruta\"); pm.expect(r[0].valores_nuevos).to.have.property(\"metodo\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-03 · CA04 · Filtros sin resultados -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?texto=NO-EXISTE-0000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay eventos con estos filtros\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA01 · Historial del ingreso para el Supervisor -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Cronológico\", () => pm.expect(b.results.map(e => e.id)).to.eql([...b.results.map(e => e.id)].sort((x, y) => x - y)));",
+                  "pm.test(\"Desde el reconocimiento hasta las reversiones\", () => { pm.expect(b.results[0].accion).to.eql(\"RECONOCER\"); pm.expect(b.results.filter(e => e.operacion === \"REVERSION\")).to.have.lengthOf(2); });",
+                  "pm.test(\"Sin acceso a la auditoría completa (CA05)\", () => pm.expect(b.puede_ver_auditoria).to.eql(false));",
+                  "pm.test(\"Solo eventos del ingreso (RS-M09-15)\", () => b.results.forEach(e => pm.expect(e.entidad).to.eql(\"Ingreso\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA04 · El mismo historial para el Administrativo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sin acceso a la auditoría completa\", () => pm.expect(pm.response.json().puede_ver_auditoria).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA05 · El Administrador sí la tiene -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_ingreso_f3}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ofrece la auditoría\", () => pm.expect(pm.response.json().puede_ver_auditoria).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M09-02 · Ningún evento se crea por la API -> 405",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"accion\": \"CREAR\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M09-02 · Ningún evento se elimina por la API -> 405",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 405\", () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F4 · La auditoría sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auditoria/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
                 ]
               }
             }

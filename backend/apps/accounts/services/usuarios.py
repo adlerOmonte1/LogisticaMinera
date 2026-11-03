@@ -13,7 +13,7 @@ from django.db import transaction
 
 from apps.accounts.models import Usuario
 from apps.accounts.repositories import UsuarioRepository
-from common.eventos import Accion, RegistradorDeEventos, registrador_por_defecto
+from common.eventos import Accion, RegistradorDeEventos, diferencias, registrador_por_defecto
 from common.excepciones import ErrorDeValidacionDeDominio
 
 # Mensajes literales de HU-M01-02.
@@ -93,9 +93,10 @@ def actualizar_usuario(
     with transaction.atomic():
         usuario.full_clean(exclude=["password"])
         usuario.save()
+        antes, despues = diferencias(anteriores, _datos(usuario))
         registrador.registrar(
             accion=Accion.MODIFICAR, entidad="Usuario", id_entidad=usuario.pk, usuario=autor,
-            valores_anteriores=anteriores, valores_nuevos=_datos(usuario),
+            valores_anteriores=antes, valores_nuevos=despues,
         )
     return usuario
 

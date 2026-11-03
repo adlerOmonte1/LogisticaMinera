@@ -14,7 +14,7 @@ from apps.catalogo.models import TipoMineral
 from apps.catalogo.repositories import TipoMineralRepository
 from common.excepciones import ErrorDeValidacionDeDominio
 
-from ._eventos import cambiar_estado, registrar_creacion, registrar_modificacion
+from ._eventos import cambiar_estado, registrar_creacion, registrar_edicion
 
 MENSAJE_CODIGO_DUPLICADO = "El código ya está registrado"
 MENSAJE_CODIGO_INVALIDO = "El código debe tener de 2 a 6 letras o números"
@@ -97,9 +97,7 @@ def actualizar_tipo_mineral(tipo: TipoMineral, datos: dict, usuario) -> TipoMine
     with transaction.atomic():
         tipo.full_clean()
         tipo.save()
-        registrar_modificacion(
-            "TipoMineral", tipo, usuario, anteriores={"nombre": anterior}, nuevos={"nombre": tipo.nombre}
-        )
+        registrar_edicion("TipoMineral", tipo, usuario, {"nombre": anterior}, {"nombre": tipo.nombre})
     return tipo
 
 

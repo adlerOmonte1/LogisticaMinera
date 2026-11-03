@@ -180,7 +180,8 @@ motor, frente a lo que confirmó la persona.
 | version_motor | varchar(30) | no cambia durante la medición (D-16) |
 | fecha_proceso | datetime | |
 | umbral_confianza | decimal(3,2) | vigente al procesar; 0,80 por defecto |
-| exito | boolean | falso si la imagen resultó ilegible |
+| exito | boolean | falso si la imagen resultó ilegible o el motor no respondió |
+| causa_fallo | enum | ILEGIBLE / NO_DISPONIBLE; vacío si hubo éxito (D-25) |
 
 ### CAMPO_RECONOCIDO (M04)
 
