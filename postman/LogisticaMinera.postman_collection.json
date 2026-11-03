@@ -3016,7 +3016,7 @@
             "url": "{{base_url}}/ingresos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4884,6 +4884,2976 @@
           ]
         }
       ]
+    },
+    {
+      "name": "F5 · M06 Trazabilidad",
+      "item": [
+        {
+          "name": "Preparación · Datos de la corrida y minerales -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/?codigo=MOB"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('id_mob_f5', pm.response.json().results[0].id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ayer = new Date(Date.now() - 86400000); const p = n => String(n).padStart(2, '0');",
+                  "pm.environment.set('fecha_f5', `${ayer.getFullYear()}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
+                  "const ahora = new Date(); pm.environment.set('hoy_f5', `${ahora.getFullYear()}-${p(ahora.getMonth() + 1)}-${p(ahora.getDate())}`);",
+                  "pm.environment.set('base_f5', (20 + Math.floor(Math.random() * 800) / 100).toFixed(2));",
+                  "pm.environment.set('sufijo_f5', String(Date.now()));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Tipo de mineral MOA -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/?codigo=MOA"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('id_moa_f5', pm.response.json().results[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso A -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_a_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso A registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_a_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"00:30\",\n  \"peso_bruto_tn\": \"{{peso_a_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_a_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_a_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_a_f5', (Number(pm.environment.get('base_f5')) + 0 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso B -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_b_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso B registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_b_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"01:30\",\n  \"peso_bruto_tn\": \"{{peso_b_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_b_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_b_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_b_f5', (Number(pm.environment.get('base_f5')) + 1 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso C -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_c_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso C registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_c_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"02:30\",\n  \"peso_bruto_tn\": \"{{peso_c_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_c_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_c_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_c_f5', (Number(pm.environment.get('base_f5')) + 2 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso D -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_d_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso D registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_d_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"03:30\",\n  \"peso_bruto_tn\": \"{{peso_d_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_d_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_d_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_d_f5', (Number(pm.environment.get('base_f5')) + 3 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso E -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_e_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso E registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_e_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"04:30\",\n  \"peso_bruto_tn\": \"{{peso_e_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_e_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_e_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_e_f5', (Number(pm.environment.get('base_f5')) + 4 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso F -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_f_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso F registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_f_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"05:30\",\n  \"peso_bruto_tn\": \"{{peso_f_f5}}\",\n  \"tipo_mineral\": {{id_mob_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_f_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_f_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_f_f5', (Number(pm.environment.get('base_f5')) + 5 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso G -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_g_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso G registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_g_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"06:30\",\n  \"peso_bruto_tn\": \"{{peso_g_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_g_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_g_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_g_f5', (Number(pm.environment.get('base_f5')) + 6 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto del ingreso H -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "OTRO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_h_f5', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso H registrado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_h_f5}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f5}}\",\n  \"hora\": \"07:30\",\n  \"peso_bruto_tn\": \"{{peso_h_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('ing_h_f5', pm.response.json().id);",
+                  "pm.environment.set('codigo_h_f5', pm.response.json().codigo);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('peso_h_f5', (Number(pm.environment.get('base_f5')) + 7 * 0.1).toFixed(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA15 · El Supervisor no abre lotes -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA03 · Apertura futura -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Futuro {{sufijo_f5}}\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La fecha de apertura no puede ser posterior a hoy\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M06-09 · Rutas cerradas -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/rutas/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tres rutas\", () => pm.expect(pm.response.json().rutas.map(r => r.codigo)).to.eql([\"ZARANDEO_ENSACADO\", \"MOLIENDA_ENSACADO\", \"ZARANDEO_MOLIENDA_ENSACADO\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA01 · Abrir el lote 1 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman {{sufijo_f5}} 1\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1 abierto\"));",
+                  "pm.environment.set('id_lote1_f5', pm.response.json().id);",
+                  "pm.environment.set('id_lote1_f5_codigo', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA02 · Nombre repetido -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman {{sufijo_f5}} 1\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Ya existe un lote con el nombre «Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1»\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA05 · Etapa con el lote abierto -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"SECADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El lote debe iniciar su recorrido antes de registrar etapas\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA11 · Iniciar sin ingresos -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/iniciar-recorrido/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El lote no tiene ingresos asignados\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA14 · Sin selección -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Seleccione al menos un ingreso\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA04 · Asignar un ingreso -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_a_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Total del lote\", () => pm.expect(pm.response.json().total.ingresos).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA10 · Iniciar el recorrido -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/iniciar-recorrido/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Recorrido del lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1 iniciado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA03 · Zarandeo antes del secado -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ZARANDEO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El lote debe pasar primero por la etapa Secado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA01 · Secado -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"SECADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Etapa Secado registrada para Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA04 · Secado repetido -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"SECADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La etapa Secado ya fue registrada para Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA02 · Etapa sin elegir la ruta -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ZARANDEO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Elija qué etapa sigue después del secado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA01 · Zarandeo eligiendo la ruta -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruta\": \"ZARANDEO_ENSACADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA23 · Retirar el único ingreso -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/ingresos/{{ing_a_f5}}/retirar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA13 · Bigbags sin ensacado -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/bigbags/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Los bigbags se asocian al registrar el ensacado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA11 · Ensacado con bigbags -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ENSACADO\",\n  \"bigbags\": {\n    \"cantidad\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Peso estimado\", () => pm.expect(pm.response.json().paso.bigbags.es_estimacion).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA12 · Más bigbags sin recalcular -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/bigbags/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lo registrado ya está ensacado: marque Recalcular e indique el peso de cada bigbag\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA06 · Resumen sin pendientes -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/resumen/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sin pendientes y con estimación\", () => { const b = pm.response.json(); pm.expect(b.pendientes).to.eql([]); pm.expect(b.es_estimacion).to.eql(true); pm.expect(b.bigbags).to.eql(2); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA05 · El Administrativo no cierra -> 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/cerrar/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"VENTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA03 · Cierre sin destino -> 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/cerrar/",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar el destino del lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA01 · Cierre con destino -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/cerrar/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"VENTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 1 cerrado con destino venta\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA04 · Cerrar de nuevo -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/cerrar/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"VENTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El lote ya fue cerrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA15 · Etapa en un lote cerrado -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote1_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ENSACADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El lote \" + pm.environment.get(\"id_lote1_f5_codigo\") + \" ya fue cerrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-03 · CA08 · Trazabilidad con destino -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{ing_a_f5}}/trazabilidad/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Completo, con destino\", () => { const b = pm.response.json(); pm.expect(b.proceso_completo).to.eql(true); pm.expect(b.lote.destino).to.eql(\"VENTA\"); pm.expect([b.etapas_recorridas, b.etapas_totales]).to.eql([3, 3]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA01 · Abrir el lote 2 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman {{sufijo_f5}} 2\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 2 abierto\"));",
+                  "pm.environment.set('id_lote2_f5', pm.response.json().id);",
+                  "pm.environment.set('id_lote2_f5_codigo', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA04 · Tres ingresos -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_b_f5}},\n    {{ing_c_f5}},\n    {{ing_d_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Iniciar el lote 2 -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/iniciar-recorrido/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Secado del lote 2 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"SECADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA22 · Retiro tras el secado -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/ingresos/{{ing_b_f5}}/retirar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Ingreso retirado del lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Zarandeo del lote 2 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruta\": \"ZARANDEO_ENSACADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA09 · Retiro tras el zarandeo -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote2_f5}}/ingresos/{{ing_c_f5}}/retirar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El mineral del ingreso \" + pm.environment.get(\"codigo_c_f5\") + \" ya pasó por zarandeo o molienda\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA01 · Abrir el lote 3 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman {{sufijo_f5}} 3\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 3 abierto\"));",
+                  "pm.environment.set('id_lote3_f5', pm.response.json().id);",
+                  "pm.environment.set('id_lote3_f5_codigo', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Composición · Un ingreso de MOA -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_e_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA17 · Agregar otro mineral -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/minerales/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo_mineral\": {{id_mob_f5}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Mineral óxido tipo B agregado al lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA18 · Agregarlo de nuevo -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/minerales/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo_mineral\": {{id_mob_f5}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"El mineral Mineral óxido tipo B ya está en el lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M06-23 · Quitar el mineral sin ingresos -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/minerales/{{id_mob_f5}}/quitar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Mineral óxido tipo B quitado del lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA19 · Quitar un mineral con ingresos -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/minerales/{{id_moa_f5}}/quitar/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No se puede quitar Mineral óxido Pingüino: tiene ingresos en el lote\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA05 · Otro mineral se ofrece aparte -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/ingresos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"En «Agregar de otro tipo de mineral»\", () => pm.expect(pm.response.json().otros_minerales.some(g => g.ingresos.some(i => i.id === Number(pm.environment.get(\"ing_f_f5\"))))).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA20 · Otro mineral sin autorización -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_f_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Indique quién autorizó o el motivo para unificar otro tipo de mineral\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA21 · Otro mineral con autorización -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote3_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_f_f5}}\n  ],\n  \"autorizacion\": \"Aprobado por el gerente de planta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Marcado Otro mineral\", () => pm.expect(pm.response.json().composicion.find(g => g.otro_mineral).autorizacion).to.eql(\"Aprobado por el gerente de planta\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA01 · Abrir el lote 4 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman {{sufijo_f5}} 4\",\n  \"tipo_mineral\": {{id_moa_f5}},\n  \"fecha_apertura\": \"{{hoy_f5}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote Postman \" + pm.environment.get(\"sufijo_f5\") + \" 4 abierto\"));",
+                  "pm.environment.set('id_lote4_f5', pm.response.json().id);",
+                  "pm.environment.set('id_lote4_f5_codigo', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Composición · Ingreso del lote 4 -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_g_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Iniciar el lote 4 -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/iniciar-recorrido/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Secado del lote 4 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"SECADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-04 · CA04 · Fracciones que no suman -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/division/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partes\": [\n    {\n      \"nombre\": \"Molino\",\n      \"fraccion\": \"1/2\",\n      \"ruta\": \"MOLIENDA_ENSACADO\"\n    },\n    {\n      \"nombre\": \"Zaranda\",\n      \"fraccion\": \"1/3\",\n      \"ruta\": \"ZARANDEO_ENSACADO\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Las fracciones suman 5/6 y deben sumar la unidad\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-04 · CA10 · El Supervisor no divide -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/division/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partes\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-04 · CA01 · División en 1/3 y 2/3 -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/division/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partes\": [\n    {\n      \"nombre\": \"Molino\",\n      \"fraccion\": \"1/3\",\n      \"ruta\": \"MOLIENDA_ENSACADO\"\n    },\n    {\n      \"nombre\": \"Zaranda\",\n      \"fraccion\": \"2/3\",\n      \"ruta\": \"ZARANDEO_ENSACADO\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Lote dividido en 2 partes\"));",
+                  "const p = pm.response.json().partes;",
+                  "pm.environment.set('parte_molino_f5', p.find(x => x.nombre === 'Molino').id);",
+                  "pm.environment.set('parte_zaranda_f5', p.find(x => x.nombre === 'Zaranda').id);",
+                  "pm.test(\"Toneladas estimadas (CA08)\", () => p.forEach(x => pm.expect(x.es_estimacion).to.eql(true)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-01 · CA13 · Tardío después del secado -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingresos\": [\n    {{ing_h_f5}}\n  ],\n  \"autorizacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-04 · CA09 · Reparto que no suma -> 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/ingresos/{{ing_h_f5}}/secado/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fracciones\": [\n    {\n      \"parte\": {{parte_molino_f5}},\n      \"fraccion\": \"1/2\"\n    },\n    {\n      \"parte\": {{parte_zaranda_f5}},\n      \"fraccion\": \"1/4\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Las fracciones del reparto suman 3/4 y deben sumar la unidad\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-02 · CA14 · Secado propio del tardío -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/ingresos/{{ing_h_f5}}/secado/",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Secado de \" + pm.environment.get(\"codigo_h_f5\") + \" registrado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Molienda de la parte Molino -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"MOLIENDA\",\n  \"parte\": {{parte_molino_f5}},\n  \"horas_molienda\": \"2.50\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Ensacado de Molino -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ENSACADO\",\n  \"parte\": {{parte_molino_f5}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Zarandeo de Zaranda -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ZARANDEO\",\n  \"parte\": {{parte_zaranda_f5}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recorrido · Ensacado de Zaranda -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/etapas/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"etapa\": \"ENSACADO\",\n  \"parte\": {{parte_zaranda_f5}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-03 · CA06 · CP07: cuatro etapas de cuatro -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{ing_g_f5}}/trazabilidad/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Unión de las rutas de las partes\", () => { const b = pm.response.json(); pm.expect([b.etapas_recorridas, b.etapas_totales, b.proceso_completo]).to.eql([4, 4, true]); pm.expect(b.lineas.map(l => l.nombre)).to.eql([\"Molino\", \"Zaranda\"]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M06-05 · CA02 · Pendientes del tardío -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/lotes/{{id_lote4_f5}}/cerrar/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"TRASLADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Lista las porciones del tardío\", () => pm.expect(pm.response.json().mensaje).to.include(pm.environment.get(\"codigo_h_f5\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-02 · CA03 · El historial del ingreso muestra su lote -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{ing_g_f5}}/historial/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Asignación, inicio, etapas y división\", () => { const ops = pm.response.json().results.filter(e => e.entidad === \"Lote\").map(e => e.operacion); [\"ASIGNAR\", \"INICIAR_RECORRIDO\", \"ETAPA\", \"DIVIDIR\"].forEach(o => pm.expect(ops).to.include(o)); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Puerta de F5 (PLAN-02): lote simple hasta el cierre, retiro hasta el zarandeo, varios minerales con autorización, y división con un ingreso tardío y su reparto, que termina en CP07. Registra sus propios ingresos sin foto al empezar."
     }
   ]
 }
