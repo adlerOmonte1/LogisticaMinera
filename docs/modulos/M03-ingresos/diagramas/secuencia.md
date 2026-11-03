@@ -87,7 +87,7 @@ sequenceDiagram
     participant NG as Angular
     participant API as Django REST
     participant SRV as ServicioIngreso
-    participant LOT as RepositorioLote M06
+    participant LOT as RepositorioTrazabilidad M06
     participant VAL as ValidadorConsistencia M05
     participant DB as PostgreSQL
     participant AUD as Auditoria M09
@@ -110,14 +110,14 @@ sequenceDiagram
     else Correccion admisible
         SRV->>SRV: Descartar campos no corregibles RS-M03-12
         opt Cambia el tipo de mineral y el ingreso esta en un lote
-            SRV->>LOT: Leer tipo de mineral del lote
-            LOT-->>SRV: Tipo de mineral del lote
+            SRV->>LOT: Leer la lista de minerales del lote
+            LOT-->>SRV: Minerales del lote
         end
         SRV->>VAL: validar(datos corregidos)
 
-        alt Tipo de mineral distinto del lote
+        alt Mineral fuera de la lista del lote
             SRV-->>API: Rechazo RN-M03-25
-            API-->>NG: 400 El ingreso corresponde a otro tipo de mineral que el lote
+            API-->>NG: 400 El mineral no esta en el lote
         else Regla bloqueante incumplida
             VAL-->>SRV: Rechazo con mensaje literal
             API-->>NG: 400 con el campo afectado

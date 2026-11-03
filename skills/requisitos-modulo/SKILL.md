@@ -128,12 +128,19 @@ que no se puede verificar no es un requisito: es un deseo.
 | RNF-M{nn}-02 | Adecuación funcional — corrección | La imagen se acepta en JPG o PNG hasta 10 MB y se rechaza cualquier otro formato | Prueba automatizada con archivos de muestra |
 | RNF-M{nn}-03 | Fiabilidad — tolerancia a fallos | El borrador del registro (imagen y campos editados) se conserva en el dispositivo ante pérdida de conexión y se reanuda al recuperarla | Inspección en dispositivo real con la red desactivada |
 | RNF-M{nn}-04 | Seguridad — no repudio | La imagen del ticket se conserva sin modificación mientras exista el ingreso | Consulta de verificación sobre el almacén de imágenes |
-| RNF-M{nn}-05 | Usabilidad — protección contra errores del usuario | Los campos con confianza inferior al umbral se resaltan antes de confirmar | Inspección en dispositivo real |
+| RNF-M{nn}-05 | Capacidad de interacción — protección contra errores del usuario | Los campos con confianza inferior al umbral se resaltan antes de confirmar | Inspección en dispositivo real |
 ```
 
-Características utilizadas en el repositorio: *Adecuación funcional — corrección* · *Eficiencia de
-desempeño — comportamiento temporal* · *Usabilidad — operabilidad* · *Usabilidad — protección contra
-errores del usuario* · *Fiabilidad — tolerancia a fallos* · *Seguridad — no repudio*.
+Se usan los nombres de la edición 2023, no los de 2011: *Usabilidad* pasó a llamarse **Capacidad de
+interacción** (con *operabilidad*, *reconocibilidad de la adecuación*, *protección contra errores del
+usuario* e *inclusividad*, entre otras), *Portabilidad* pasó a **Flexibilidad** y *madurez* pasó a
+*ausencia de fallos*. Características utilizadas en el repositorio: *Adecuación funcional —
+corrección* · *Eficiencia de desempeño — comportamiento temporal, utilización de recursos y
+capacidad* · *Compatibilidad — interoperabilidad* · *Capacidad de interacción — operabilidad,
+reconocibilidad de la adecuación, protección contra errores del usuario e inclusividad* ·
+*Fiabilidad — ausencia de fallos, disponibilidad, tolerancia a fallos y capacidad de recuperación* ·
+*Seguridad — confidencialidad, integridad, no repudio y autenticidad* · *Mantenibilidad —
+modularidad, capacidad de modificación y capacidad de prueba*.
 
 Todo umbral es numérico y va con su condición de medición: «menos de 3 segundos **con 1000 ingresos
 en base**». Un umbral sin carga declarada no es medible.

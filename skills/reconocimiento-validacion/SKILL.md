@@ -16,8 +16,10 @@ confirmación— aunque sean apps y responsabilidades separadas.
 ## M04 — La interfaz, no el motor
 
 `ReconocedorTicket` es el único punto de acoplamiento entre el servicio de registro y el motor
-concreto. El motor lo elige D-12, tras un piloto con 20 a 30 tickets reales; **el código no se
-escribe pensando en un motor específico**.
+concreto. El motor lo elige D-12, tras un piloto con 20 a 30 tickets reales hecho cuando el sistema
+sea funcional; mientras tanto, el primer adaptador corre dentro del mismo backend, con procesamiento
+local, y las pruebas usan un adaptador determinista. **El código no se escribe pensando en un motor
+específico**.
 
 ```python
 class ReconocedorTicket(Protocol):

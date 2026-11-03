@@ -1,53 +1,89 @@
 from django.db import models
 
 from apps.accounts.models import Usuario
-from apps.catalogo.models import Producto, Vehiculo
+from apps.catalogo.models import TipoMineral, Vehiculo
 
 
 class Ingreso(models.Model):
-    """Unidad de registro del sistema (RS-M03-01 a RS-M03-10).
+    """Unidad de registro del sistema: un volquete que entrega mineral en planta,
+    con su respaldo y las tres marcas de tiempo que describen cómo se registró
+    (modelo de datos 3.1).
 
-    `hora_pesaje` la ingresa el usuario desde el ticket; `hora_registro` la
-    asigna el servicio, nunca `auto_now_add` (D-01, D-03): para un ingreso
-    capturado sin conexión el valor correcto es la hora de captura local, no
-    la de inserción en la base. `correlativo` lo asigna
-    `services/correlativo.py` dentro de una transacción con bloqueo (D-02).
-
-    Los índices de `idx_ingreso_correlativo` e `idx_ingreso_vehiculo` del
-    modelo ER ya quedan cubiertos por `unique=True` en `correlativo` y por el
-    índice implícito de la FK `vehiculo`; no se duplican aquí.
+    - D-01: `fecha_hora_pesaje`, `hora_inicio_registro` y `hora_fin_registro` son
+      independientes. Las dos últimas las asigna el servidor y nadie las edita.
+    - D-02: `codigo` lo asigna `services/correlativo.py` dentro de una transacción
+      con bloqueo. Es el único identificador del ingreso (DR-12).
+    - D-17: el peso neto lo calcula el servidor como bruto menos la tara del
+      vehículo, y el ingreso conserva la tara aplicada. Ambos quedan nulos
+      mientras el ingreso está En proceso, a la espera del destare.
+    - D-18: la imagen se guarda por el almacenamiento de Django; falta solo en el
+      registro sin foto, que lleva su marca y su motivo (DR-13).
     """
 
+    # Lista cerrada de motivos del registro sin foto (RN-M03-21, HU-M03-01).
+    TICKET_EXTRAVIADO = "TICKET_EXTRAVIADO"
+    SIN_CAMARA = "SIN_CAMARA"
+    BALANZA_SIN_TICKET = "BALANZA_SIN_TICKET"
+    OTRO = "OTRO"
+    MOTIVOS_SIN_FOTO = [
+        (TICKET_EXTRAVIADO, "Ticket extraviado o dañado"),
+        (SIN_CAMARA, "Sin cámara o sin señal en el punto de pesaje"),
+        (BALANZA_SIN_TICKET, "La balanza no emitió ticket"),
+        (OTRO, "Otro"),
+    ]
+
+    EN_PROCESO = "EN_PROCESO"
     REGISTRADO = "REGISTRADO"
     ANULADO = "ANULADO"
-    ESTADOS = [(REGISTRADO, "Registrado"), (ANULADO, "Anulado")]
+    ESTADOS = [(EN_PROCESO, "En proceso"), (REGISTRADO, "Registrado"), (ANULADO, "Anulado")]
 
-    correlativo = models.CharField(
-        max_length=20, unique=True, editable=False, verbose_name="Correlativo"
+    codigo = models.CharField(max_length=20, unique=True, editable=False, verbose_name="Código")
+    imagen_ticket = models.ImageField(
+        upload_to="tickets/%Y/%m/", null=True, blank=True, verbose_name="Imagen del ticket"
     )
-    uuid_local = models.UUIDField(
-        null=True, blank=True, unique=True, verbose_name="Identificador local"
+    sin_respaldo_fotografico = models.BooleanField(
+        default=False, editable=False, verbose_name="Sin respaldo fotográfico"
     )
-    fecha_pesaje = models.DateField(verbose_name="Fecha de pesaje")
-    hora_pesaje = models.TimeField(verbose_name="Hora de pesaje")
-    hora_registro = models.DateTimeField(editable=False, verbose_name="Hora de registro")
-    hora_sincronizacion = models.DateTimeField(
-        null=True, blank=True, verbose_name="Hora de sincronización"
+    motivo_sin_respaldo = models.CharField(
+        max_length=60,
+        choices=MOTIVOS_SIN_FOTO,
+        blank=True,
+        editable=False,
+        verbose_name="Motivo del registro sin foto",
     )
+    fecha_hora_pesaje = models.DateTimeField(verbose_name="Fecha y hora del pesaje")
+    hora_inicio_registro = models.DateTimeField(
+        editable=False, verbose_name="Inicio del registro"
+    )
+    hora_fin_registro = models.DateTimeField(editable=False, verbose_name="Fin del registro")
     vehiculo = models.ForeignKey(
         Vehiculo, on_delete=models.PROTECT, related_name="ingresos", verbose_name="Vehículo"
     )
-    producto = models.ForeignKey(
-        Producto, on_delete=models.PROTECT, related_name="ingresos", verbose_name="Producto"
+    tipo_mineral = models.ForeignKey(
+        TipoMineral,
+        on_delete=models.PROTECT,
+        related_name="ingresos",
+        verbose_name="Tipo de mineral",
     )
     peso_bruto_tn = models.DecimalField(
         max_digits=8, decimal_places=2, verbose_name="Peso bruto (tn)"
     )
-    tara_tn = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Tara (tn)")
-    peso_neto_tn = models.DecimalField(
-        max_digits=8, decimal_places=2, editable=False, verbose_name="Peso neto (tn)"
+    tara_tn = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Tara aplicada (tn)",
     )
-    numero_ticket = models.CharField(max_length=20, verbose_name="Número de ticket")
+    peso_neto_tn = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Peso neto (tn)",
+    )
     usuario_registro = models.ForeignKey(
         Usuario,
         on_delete=models.PROTECT,
@@ -55,10 +91,7 @@ class Ingreso(models.Model):
         related_name="ingresos_registrados",
         verbose_name="Registrado por",
     )
-    capturado_offline = models.BooleanField(default=False, verbose_name="Capturado sin conexión")
-    estado = models.CharField(
-        max_length=10, choices=ESTADOS, default=REGISTRADO, verbose_name="Estado"
-    )
+    estado = models.CharField(max_length=12, choices=ESTADOS, verbose_name="Estado")
     motivo_anulacion = models.TextField(
         null=True, blank=True, verbose_name="Motivo de anulación"
     )
@@ -67,28 +100,65 @@ class Ingreso(models.Model):
         db_table = "ingreso"
         verbose_name = "Ingreso"
         verbose_name_plural = "Ingresos"
-        ordering = ["-fecha_pesaje", "-hora_pesaje"]
+        ordering = ["-fecha_hora_pesaje"]
         indexes = [
-            # I5, I6: consolidados y búsqueda por fecha y producto.
-            models.Index(fields=["fecha_pesaje", "producto"], name="idx_ingreso_fecha_producto"),
+            # Consulta por placa y fecha (M07) y búsqueda de un posible duplicado (V1).
+            models.Index(fields=["vehiculo", "fecha_hora_pesaje"], name="idx_ingreso_vehiculo_fecha"),
+            # Total acumulado mensual por tipo de mineral (M08).
+            models.Index(fields=["fecha_hora_pesaje", "tipo_mineral"], name="idx_ingreso_fecha_mineral"),
+            # Excluir anulados y En proceso de todo total.
+            models.Index(fields=["estado"], name="idx_ingreso_estado"),
         ]
         constraints = [
-            # RN-M03-05: el ticket es único solo entre los ingresos no anulados.
-            models.UniqueConstraint(
-                fields=["numero_ticket"],
-                condition=models.Q(estado="REGISTRADO"),
-                name="uq_ingreso_ticket_no_anulado",
-            ),
-            # RN-M03-03, salvaguarda de dominio además del mensaje de servicio.
             models.CheckConstraint(
-                check=models.Q(tara_tn__lt=models.F("peso_bruto_tn")),
+                check=models.Q(peso_bruto_tn__gt=0)
+                & (models.Q(tara_tn__isnull=True) | models.Q(tara_tn__gt=0)),
+                name="ck_ingreso_pesos_positivos",
+            ),
+            # V2 como salvaguarda de base, además del mensaje del validador.
+            models.CheckConstraint(
+                check=models.Q(tara_tn__isnull=True) | models.Q(tara_tn__lt=models.F("peso_bruto_tn")),
                 name="ck_ingreso_tara_menor_bruto",
             ),
+            # D-17: el neto es exactamente bruto menos la tara aplicada.
             models.CheckConstraint(
-                check=models.Q(peso_bruto_tn__gt=0) & models.Q(tara_tn__gt=0),
-                name="ck_ingreso_pesos_positivos",
+                check=models.Q(peso_neto_tn__isnull=True)
+                | models.Q(peso_neto_tn=models.F("peso_bruto_tn") - models.F("tara_tn")),
+                name="ck_ingreso_neto_calculado",
+            ),
+            # RN-M03-17: En proceso sin tara ni neto; Registrado con ambos.
+            models.CheckConstraint(
+                check=models.Q(estado="ANULADO")
+                | models.Q(estado="EN_PROCESO", tara_tn__isnull=True, peso_neto_tn__isnull=True)
+                | models.Q(estado="REGISTRADO", tara_tn__isnull=False, peso_neto_tn__isnull=False),
+                name="ck_ingreso_estado_y_pesos",
+            ),
+            # DR-13: exactamente una de dos cosas, la imagen o la marca con su motivo.
+            models.CheckConstraint(
+                check=(
+                    models.Q(sin_respaldo_fotografico=False, imagen_ticket__isnull=False)
+                    & ~models.Q(imagen_ticket="")
+                    & models.Q(motivo_sin_respaldo="")
+                )
+                | (
+                    models.Q(sin_respaldo_fotografico=True)
+                    & ~models.Q(motivo_sin_respaldo="")
+                    & (models.Q(imagen_ticket__isnull=True) | models.Q(imagen_ticket=""))
+                ),
+                name="ck_ingreso_respaldo",
+            ),
+            # D-07: la anulación lleva su motivo.
+            models.CheckConstraint(
+                check=~models.Q(estado="ANULADO")
+                | (models.Q(motivo_anulacion__isnull=False) & ~models.Q(motivo_anulacion="")),
+                name="ck_ingreso_anulacion_motivo",
             ),
         ]
 
     def __str__(self):
-        return f"{self.correlativo} — {self.numero_ticket}"
+        return self.codigo
+
+    @property
+    def tipo_vehiculo(self) -> str:
+        """Derivado de la titularidad del catálogo, no editable (RS-M03-06)."""
+        return self.vehiculo.tipo_titularidad

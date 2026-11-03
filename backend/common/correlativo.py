@@ -1,17 +1,11 @@
-"""Generación de correlativos por año (D-02).
+"""Generación de códigos correlativos por año (D-02).
 
-Cada documento numerado del sistema —ingresos (M03) y salidas (M04)— lleva su
-**serie independiente** (RN-M04-10). La independencia se consigue por
-construcción: cada módulo mantiene su propia tabla de contadores y le pasa a
-este generador su modelo y su prefijo. No hay una tabla compartida que
-pudiera solapar dos series en la misma fila del año.
+Aquí vive solo la mecánica —bloqueo, incremento, formato—. La tabla de
+contadores la aporta el módulo que numera, porque es su infraestructura y no una
+entidad del modelo entidad-relación (D-10). Hoy la usa M03 para el código del
+ingreso; una serie futura usaría otra tabla y otro prefijo, sin solaparse.
 
-Aquí vive solo la mecánica —bloqueo, incremento, formato—, que es idéntica
-para todas las series. La tabla concreta la aporta cada módulo, porque es su
-infraestructura y no una entidad del modelo entidad-relación (D-10).
-
-Formato: `{PREFIJO}-{año}-{cinco dígitos}` (p. ej. `ING-2026-00001`,
-`SAL-2026-00001`).
+Formato: `{PREFIJO}-{año}-{cinco dígitos}` (p. ej. `ING-2027-00001`).
 """
 
 from datetime import datetime

@@ -12,6 +12,9 @@ flowchart LR
     UC4["Consultar el detalle de un ingreso"]
     UC5["Ver el calendario de llegadas"]
     UC6["Ver el historial de un ingreso"]
+    UC7["Ver el resumen del dia y los avisos"]
+    UC8["Buscar desde la cabecera"]
+    UC9["Exportar el listado de ingresos"]
 
     SUP --> UC1
     SUP --> UC2
@@ -19,18 +22,26 @@ flowchart LR
     SUP --> UC4
     SUP --> UC5
     SUP --> UC6
+    SUP --> UC7
+    SUP --> UC8
     ADV --> UC1
     ADV --> UC2
     ADV --> UC3
     ADV --> UC4
     ADV --> UC5
     ADV --> UC6
+    ADV --> UC7
+    ADV --> UC8
+    ADV --> UC9
     ADM --> UC1
     ADM --> UC2
     ADM --> UC3
     ADM --> UC4
     ADM --> UC5
     ADM --> UC6
+    ADM --> UC7
+    ADM --> UC8
+    ADM --> UC9
 ```
 
 ## Casos de uso
@@ -43,6 +54,9 @@ flowchart LR
 | Consultar el detalle de un ingreso | HU-M07-01, HU-M07-02 | Los tres roles | Reúne datos, imagen, validaciones, reconocimiento, trazabilidad e historial |
 | Ver el calendario de llegadas | HU-M07-03 | Los tres roles | Llegadas y toneladas por día del mes, con acceso a los ingresos de cada día |
 | Ver el historial de un ingreso | HU-M09-02 | Los tres roles | Pestaña del detalle; lo provee M09 |
+| Ver el resumen del día y los avisos | HU-M07-04 | Los tres roles | Pantalla de inicio. Los avisos se calculan al consultarse y se filtran por rol |
+| Buscar desde la cabecera | HU-M07-02 | Los tres roles | Un código abre el ingreso; si no hay coincidencia, el texto se busca como placa |
+| Exportar el listado de ingresos | HU-M07-02 | Administrativo, Administrador | CSV del conjunto filtrado completo; queda en auditoría |
 
 Los ingresos anulados aparecen en todos los casos de uso, señalados como tales: ocultarlos haría
 creer que el volquete nunca se registró.

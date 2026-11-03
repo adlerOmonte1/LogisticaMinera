@@ -9,9 +9,12 @@ flowchart TD
     V0 -->|Si| E0[Rechazar con el mensaje correspondiente]
     E0 --> A1
     V0 -->|No| L1[Seleccionar ingresos para la carga]
-    L1 --> V1{Mismo tipo de mineral?}
-    V1 -->|No| E1[Rechazar: El ingreso corresponde a otro tipo de mineral]
+    L1 --> V1{Mineral del ingreso en la lista del lote?}
+    V1 -->|No| D0{Unificar desde Agregar de otro tipo con autorizacion?}
+    D0 -->|No| E1[No se asigna: el mineral no esta en el lote]
     E1 --> L1
+    D0 -->|Si| M1[Registrar la autorizacion sumar el mineral y marcar Otro mineral]
+    M1 --> V2
     V1 -->|Si| V2{Ingreso anulado o En proceso?}
     V2 -->|Si| E2[Rechazar con el mensaje de la regla]
     E2 --> L1
@@ -22,7 +25,13 @@ flowchart TD
     V3 -->|No| E3[Rechazar: El lote no tiene ingresos asignados]
     E3 --> L1
     V3 -->|Si| P2[Iniciar el recorrido y pasar a En recorrido]
-    P2 --> D2{Llega un volquete tardio?}
+    P2 --> D4{Ingreso agregado por error?}
+    D4 -->|Si| V4{Su mineral paso por zarandeo o molienda?}
+    V4 -->|Si| E4[Rechazar: el mineral ya paso por zarandeo o molienda]
+    V4 -->|No| P5[Retirar el ingreso y devolverlo a cancha]
+    E4 --> D2
+    P5 --> D2
+    D4 -->|No| D2{Llega un volquete tardio?}
     D2 -->|Si| D3{Secado del lote registrado?}
     D3 -->|No| P3[Agregarlo para secarse con el lote]
     D3 -->|Si| P4[Agregarlo con secado propio]
@@ -31,8 +40,10 @@ flowchart TD
     D2 -->|No| F([Lote recorriendo su ruta hasta el cierre])
 ```
 
-Mientras el lote está Abierto, un ingreso puede retirarse o trasladarse a otro lote Abierto. Desde
-el inicio del recorrido ningún ingreso vuelve a cancha: solo se suman ingresos tardíos (RN-M06-04).
+Mientras el lote está Abierto, un ingreso puede retirarse o trasladarse a otro lote. Desde el inicio
+del recorrido se suman ingresos tardíos, y un ingreso agregado por error todavía puede retirarse
+hasta que su mineral pase por zarandeo o molienda, siempre que el lote conserve al menos un ingreso.
+El secado ya registrado se conserva (RN-M06-04).
 
 ## A-M06-02 · Recorrido del lote por su ruta (RN-M06-05 a RN-M06-08, RN-M06-15, RN-M06-19)
 
@@ -102,7 +113,7 @@ flowchart TD
     V3 -->|No| E3[Rechazar con el mensaje correspondiente]
     E3 --> L1
     V3 -->|Si| V4{Las fracciones suman la unidad?}
-    V4 -->|No| E4[Rechazar: Las fracciones de las partes deben sumar el total del lote]
+    V4 -->|No| E4[Rechazar: Las fracciones deben sumar la unidad]
     E4 --> L1
     V4 -->|Si| P1[Crear las partes y calcular toneladas aproximadas]
     P1 --> D1{Llega un ingreso tardio?}

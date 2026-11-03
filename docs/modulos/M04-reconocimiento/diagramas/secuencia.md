@@ -16,17 +16,17 @@ sequenceDiagram
     alt Motor sin respuesta o fuera de tiempo
         MOT--xREC: Tiempo de espera agotado RNF-M04-02
         REC-->>SRV: Resultado vacio con causa
-        SRV-->>NG: Seis campos vacios y editables
+        SRV-->>NG: Tres campos vacios y editables
         NG-->>S: El reconocimiento no esta disponible
     else Imagen ilegible
         MOT-->>REC: Sin lectura utilizable
         REC-->>SRV: exito falso
-        SRV-->>NG: Seis campos vacios y editables
+        SRV-->>NG: Tres campos vacios y editables
         NG-->>S: No fue posible leer el ticket
     else Lectura obtenida
         MOT-->>REC: Valores por campo con confianza
         REC->>REC: Comparar cada confianza con el umbral
-        REC-->>SRV: Seis campos con confianza y marca de duda
+        REC-->>SRV: Tres campos con confianza y marca de duda
         SRV-->>NG: Propuesta sin persistir RN-M04-01
         NG-->>S: Campos precargados con los dudosos resaltados
     end

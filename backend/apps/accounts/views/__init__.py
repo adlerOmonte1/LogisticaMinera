@@ -4,6 +4,8 @@ from .usuarios import (
     UsuarioDesactivarView,
     UsuarioDetailView,
     UsuarioListCreateView,
+    UsuarioReactivarView,
+    UsuarioRestablecerClaveView,
 )
 
 __all__ = [
@@ -13,4 +15,6 @@ __all__ = [
     "UsuarioDesactivarView",
     "UsuarioDetailView",
     "UsuarioListCreateView",
+    "UsuarioReactivarView",
+    "UsuarioRestablecerClaveView",
 ]

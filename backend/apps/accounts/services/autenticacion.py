@@ -1,4 +1,4 @@
-"""RS-M01-01, RS-M01-03, RS-M01-04, RS-M01-08. HU-M01-01, HU-M01-02.
+"""RS-M01-01, RS-M01-03, RS-M01-04, RS-M01-08. HU-M01-01.
 
 No importa nada de `rest_framework`: el dominio del login es independiente
 del transporte (backend-django, "Excepciones de dominio"). La vista traduce
@@ -13,7 +13,11 @@ from django.utils import timezone
 from apps.accounts.models import Usuario
 from apps.accounts.repositories import UsuarioRepository
 from common.eventos import Accion, RegistradorDeEventos, registrador_por_defecto
-from common.excepciones import ErrorDeValidacionDeDominio
+from common.excepciones import (
+    AutenticacionFallida,
+    CuentaBloqueadaTemporalmente,
+    ErrorDeValidacionDeDominio,
+)
 
 MAX_INTENTOS_FALLIDOS = 5  # RN-M01-07
 MINUTOS_BLOQUEO = 15  # RS-M01-04
@@ -27,19 +31,19 @@ MENSAJE_CUENTA_INACTIVA = "La cuenta se encuentra inactiva. Contacte al administ
 MENSAJE_TOKEN_INVALIDO = "El token de sesión no es válido"
 
 
-class CredencialesInvalidas(ErrorDeValidacionDeDominio):
-    """No distingue usuario inexistente de contraseña incorrecta (RNF-M01-02)."""
+class CredencialesInvalidas(AutenticacionFallida):
+    """No distingue usuario inexistente de contraseña incorrecta (HU-M01-01 CA02)."""
 
     def __init__(self):
         super().__init__(MENSAJE_CREDENCIALES_INVALIDAS, codigo="CREDENCIALES_INVALIDAS")
 
 
-class CuentaBloqueada(ErrorDeValidacionDeDominio):
+class CuentaBloqueada(CuentaBloqueadaTemporalmente):
     def __init__(self):
         super().__init__(MENSAJE_CUENTA_BLOQUEADA, codigo="CUENTA_BLOQUEADA")
 
 
-class CuentaInactiva(ErrorDeValidacionDeDominio):
+class CuentaInactiva(AutenticacionFallida):
     def __init__(self):
         super().__init__(MENSAJE_CUENTA_INACTIVA, codigo="CUENTA_INACTIVA")
 
@@ -111,12 +115,12 @@ def cerrar_sesion(
     ip: str | None = None,
     registrador: RegistradorDeEventos = registrador_por_defecto,
 ) -> None:
-    """HU-M01-02 CA01: invalida el token vigente.
+    """HU-M01-01 CA05: invalida el token vigente.
 
     Requiere `rest_framework_simplejwt.token_blacklist` instalada (ver
     settings): sin la tabla de lista negra, `blacklist()` no tiene dónde
     persistir la invalidación y el token seguiría siendo válido hasta expirar
-    por tiempo — contradiría CA01 y CA02.
+    por tiempo — contradiría CA05.
 
     El usuario se toma del propio token: el endpoint de cierre de sesión no
     exige cabecera de autorización (basta con presentar el refresh), así que

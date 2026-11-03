@@ -30,11 +30,24 @@ class AccionNoAutorizada(ErrorDeDominio):
     """El rol del solicitante no habilita la operación. Se traduce a HTTP 403.
 
     Todo lugar que lance esta excepción debe hacerlo con el mensaje literal
-    "Acción no autorizada" (backend-auth-permisos) y queda registrado en
+    "Acción no autorizada" (backend-auth-permisos), salvo la modificación de
+    tara, cuyo criterio fija otro (HU-M02-01 CA09). Queda registrado en
     auditoría por el manejador uniforme.
     """
 
     codigo = "ACCION_NO_AUTORIZADA"
+
+
+class AutenticacionFallida(ErrorDeDominio):
+    """Credenciales inválidas o cuenta inactiva. HTTP 401 (D-23)."""
+
+    codigo = "AUTENTICACION_FALLIDA"
+
+
+class CuentaBloqueadaTemporalmente(ErrorDeDominio):
+    """Bloqueo por intentos fallidos. HTTP 423 (D-23)."""
+
+    codigo = "CUENTA_BLOQUEADA"
 
 
 class ConflictoDeConcurrencia(ErrorDeDominio):

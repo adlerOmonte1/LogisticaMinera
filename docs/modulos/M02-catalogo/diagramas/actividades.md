@@ -46,7 +46,9 @@ flowchart TD
 ```
 
 La entidad nunca se elimina, tenga o no dependencias. El conteo de registros dependientes solo
-determina el mensaje que ve el usuario, no el comportamiento del sistema.
+determina el mensaje que ve el usuario, no el comportamiento del sistema. La reactivación recorre el
+mismo control de rol, devuelve la entidad a los selectores con sus mismos datos (RN-M02-19) y queda
+en auditoría.
 
 ## A-M02-03 · Modificación de la tara de un vehículo (RN-M02-12, RN-M02-13)
 

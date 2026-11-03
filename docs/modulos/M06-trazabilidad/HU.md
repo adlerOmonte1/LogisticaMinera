@@ -31,14 +31,25 @@ seguir su avance por las etapas sin tener que anotar cada volquete por separado.
 
 **Descripción**
 
-Un lote reúne los ingresos de un mismo tipo de mineral que se procesarán como una sola carga. Se
-abre con un nombre, el tipo de mineral y la fecha de apertura, y recibe ingresos mientras está
-Abierto. Mientras tanto la agrupación es una decisión revisable: un ingreso puede retirarse del lote
-o trasladarse a otro lote Abierto.
+Un lote reúne los ingresos que se procesarán como una sola carga. Se abre con un nombre, un tipo de
+mineral y la fecha de apertura, y recibe ingresos mientras está Abierto. Si la carga mezcla
+minerales, el usuario lo declara con la acción **Agregar otro mineral**: el tipo se suma a la lista
+del lote y desde entonces admite sus ingresos (DR-27). El lote muestra sus ingresos y sus toneladas
+agrupados por tipo de mineral, de modo que la mezcla siempre es visible y nunca accidental.
+
+También se puede unificar un ingreso de otro tipo de mineral directamente al agregar ingresos: la
+opción **Agregar de otro tipo de mineral** muestra esos ingresos agrupados por mineral. Elegir uno
+exige indicar la autorización o el motivo —por ejemplo, que el gerente aprobó procesarlo junto—; su
+mineral se suma a la lista del lote y el ingreso queda marcado «Otro mineral», con esa autorización
+visible en la composición. Mientras el lote está Abierto, la agrupación es una decisión revisable: un ingreso puede
+retirarse del lote o trasladarse a otro.
 
 Cuando la carga está reunida, el usuario **inicia el recorrido**: el lote pasa a En recorrido y su
-siguiente paso es el secado. Desde entonces ningún ingreso vuelve a cancha, pero el lote todavía
-admite **ingresos tardíos**, porque pueden llegar volquetes que se suman a una carga ya en marcha.
+siguiente paso es el secado. El lote todavía admite **ingresos tardíos**, porque pueden llegar
+volquetes que se suman a una carga ya en marcha. Y como agregar un ingreso al lote equivocado es un
+error posible del usuario, el ingreso puede retirarse —y volver a cancha— hasta que su mineral pase
+por zarandeo o molienda: después de esas etapas el mineral ya se transformó junto con el resto y el
+retiro dejaría de describir lo ocurrido (DR-29). El secado ya registrado del lote se conserva.
 Un ingreso tardío que llega antes del secado del lote se seca junto con el resto; uno que llega
 después tiene su propio secado. Si el lote está dividido, el ingreso tardío se reparte entre las
 partes (HU-M06-04).
@@ -50,13 +61,16 @@ historia aparte (HU-M06-05).
 **Detalles**
 - Código del lote: asignado por el servidor, único.
 - Nombre: obligatorio, único entre los lotes.
-- Tipo de mineral: obligatorio, del catálogo; todos los ingresos del lote comparten el mismo.
+- Tipos de mineral: uno obligatorio al abrir, del catálogo; otros se agregan con «Agregar otro
+  mineral». Un tipo sin ingresos puede quitarse mientras el lote está Abierto.
+- Composición: ingresos y toneladas agrupados por tipo de mineral.
 - Fecha de apertura: obligatoria, no posterior a la fecha actual.
 - Fecha de inicio del recorrido: se asigna al iniciarlo.
 - Estado: Abierto, En recorrido o Cerrado.
 - Solo se asignan ingresos en estado Registrado: ni los anulados ni los que siguen En proceso,
   pendientes del destare, porque aún no tienen peso neto.
-- Retiro y traslado de ingresos: solo mientras el lote está Abierto.
+- Retiro y traslado de ingresos: mientras el mineral del ingreso no haya pasado por zarandeo ni
+  molienda; un lote En recorrido conserva al menos un ingreso (DR-29).
 - Ingresos tardíos: admitidos mientras el lote está En recorrido, señalados como tales.
 - Roles autorizados: Administrativo y Administrador.
 
@@ -73,13 +87,13 @@ historia aparte (HU-M06-05).
 > crear el lote, entonces el sistema rechaza la operación mostrando "La fecha de apertura no puede
 > ser posterior a hoy".
 
-> **CA04.** Dado que un lote está Abierto, cuando el usuario le asigna ingresos Registrados del mismo
-> tipo de mineral, entonces el sistema los incorpora y muestra el total de ingresos y de toneladas
-> del lote.
+> **CA04.** Dado que un lote está Abierto, cuando el usuario le asigna ingresos Registrados de un
+> tipo de mineral que está en la lista del lote, entonces el sistema los incorpora y muestra el total
+> de ingresos y de toneladas del lote, y el de cada tipo de mineral.
 
-> **CA05.** Dado que un ingreso es de un tipo de mineral distinto al del lote, cuando el usuario
-> intenta asignarlo, entonces el sistema rechaza la operación mostrando "El ingreso {codigo}
-> corresponde a otro tipo de mineral".
+> **CA05.** Dado que un ingreso es de un tipo de mineral que no está en la lista del lote, cuando el
+> usuario abre la asignación, entonces el sistema no lo ofrece entre los ingresos del lote, sino en
+> «Agregar de otro tipo de mineral», agrupado por su tipo de mineral.
 
 > **CA06.** Dado que un ingreso está anulado, cuando el usuario intenta asignarlo a un lote,
 > entonces el sistema rechaza la operación mostrando "No se puede asignar un ingreso anulado".
@@ -88,12 +102,14 @@ historia aparte (HU-M06-05).
 > entonces el sistema rechaza la operación mostrando "El ingreso {codigo} está en proceso: falta el
 > destare del vehículo".
 
-> **CA08.** Dado que un ingreso pertenece a otro lote Abierto, cuando el usuario lo asigna a este,
-> entonces el sistema lo traslada y deja constancia del cambio en ambos lotes.
+> **CA08.** Dado que un ingreso pertenece a otro lote cuyo mineral aún no pasó por zarandeo ni
+> molienda, cuando el usuario lo asigna a este, entonces el sistema lo traslada y deja constancia del
+> cambio en ambos lotes.
 
-> **CA09.** Dado que el lote ya inició su recorrido, cuando el usuario intenta retirar un ingreso o
-> trasladarlo a otro lote, entonces el sistema rechaza la operación mostrando "El lote {codigo} ya
-> inició su recorrido".
+> **CA09.** Dado que el mineral del ingreso ya pasó por zarandeo o molienda —en alguna parte del lote
+> o, si es un ingreso tardío con secado propio, en alguna de sus partes—, cuando el usuario intenta
+> retirarlo o trasladarlo a otro lote, entonces el sistema rechaza la operación mostrando "El mineral
+> del ingreso {codigo} ya pasó por zarandeo o molienda".
 
 > **CA10.** Dado que un lote Abierto tiene al menos un ingreso, cuando el usuario inicia el
 > recorrido, entonces el sistema registra la fecha de inicio, pasa el lote a En recorrido y muestra
@@ -119,6 +135,35 @@ historia aparte (HU-M06-05).
 > **CA16.** Dado que el usuario consulta un lote, cuando el sistema lo muestra, entonces presenta su
 > estado y su composición —los ingresos con su código, su fecha y su peso neto, con los tardíos
 > señalados— y el total de toneladas.
+
+> **CA17.** Dado que el lote no está Cerrado, cuando el usuario elige «Agregar otro mineral» e indica
+> un tipo de mineral del catálogo, entonces el sistema lo suma a la lista del lote, muestra su grupo
+> sin ingresos y registra el cambio en auditoría.
+
+> **CA18.** Dado que un tipo de mineral ya está en el lote, cuando el usuario intenta agregarlo de
+> nuevo, entonces el sistema rechaza la operación mostrando "El mineral {mineral} ya está en el
+> lote".
+
+> **CA19.** Dado que un tipo de mineral del lote tiene ingresos asignados, cuando el usuario intenta
+> quitarlo, entonces el sistema rechaza la operación mostrando "No se puede quitar {mineral}: tiene
+> ingresos en el lote".
+
+> **CA20.** Dado que el usuario eligió ingresos de otro tipo de mineral, cuando intenta agregarlos sin
+> indicar la autorización o el motivo, entonces el sistema rechaza la operación mostrando "Indique
+> quién autorizó o el motivo para unificar otro tipo de mineral".
+
+> **CA21.** Dado que el usuario agrega un ingreso de otro tipo de mineral con su autorización, cuando
+> el sistema lo incorpora, entonces suma ese mineral a la lista del lote, muestra el ingreso en su
+> grupo marcado «Otro mineral» con la autorización, y registra ambos actos en auditoría.
+
+> **CA22.** Dado que el lote está En recorrido y ninguna de sus partes registró zarandeo ni molienda,
+> cuando el usuario retira un ingreso agregado por error, entonces el sistema lo devuelve a cancha sin
+> lote, recalcula los totales del lote, conserva el secado ya registrado y registra el retiro en
+> auditoría.
+
+> **CA23.** Dado que el lote está En recorrido y tiene un solo ingreso, cuando el usuario intenta
+> retirarlo o trasladarlo, entonces el sistema rechaza la operación mostrando "El lote {codigo} en
+> recorrido debe conservar al menos un ingreso".
 
 ---
 
@@ -170,7 +215,8 @@ inventario de producto terminado ni miden pérdidas (DR-15).
 
 > **CA01.** Dado que el lote está En recorrido y le corresponde la siguiente etapa de su ruta, cuando
 > el usuario registra su paso indicando el momento, entonces el sistema lo registra y muestra "Etapa
-> {etapa} registrada para el lote {codigo}".
+> {etapa} registrada para {nombre}", con el nombre del lote o de la parte, que es como la planta
+> identifica cada carga (RN-M06-14).
 
 > **CA02.** Dado que el lote ya registró su secado y todavía no tiene ruta, cuando el usuario intenta
 > registrar el paso siguiente sin elegirla, entonces el sistema rechaza la operación mostrando
@@ -182,7 +228,7 @@ inventario de producto terminado ni miden pérdidas (DR-15).
 
 > **CA04.** Dado que la etapa ya fue registrada para ese lote o esa parte, cuando el usuario intenta
 > registrarla de nuevo, entonces el sistema rechaza la operación mostrando "La etapa {etapa} ya fue
-> registrada para el lote {codigo}".
+> registrada para {nombre}".
 
 > **CA05.** Dado que el lote está Abierto, cuando el usuario intenta registrar una etapa, entonces el
 > sistema rechaza la operación mostrando "El lote debe iniciar su recorrido antes de registrar
@@ -349,8 +395,8 @@ lote; el usuario puede ajustarlas, siempre que sumen la unidad (DR-20).
 > entonces el sistema rechaza la operación mostrando "Cada parte debe tener un nombre distinto".
 
 > **CA04.** Dado que las fracciones no suman la unidad, cuando el usuario intenta confirmar,
-> entonces el sistema rechaza la operación mostrando "Las fracciones de las partes deben sumar el
-> total del lote".
+> entonces el sistema rechaza la operación mostrando "Las fracciones suman {suma} y deben sumar la
+> unidad".
 
 > **CA05.** Dado que el usuario indica más de seis partes, cuando intenta confirmar, entonces el
 > sistema rechaza la operación mostrando "Puede dividir el lote en seis partes como máximo".
@@ -367,7 +413,7 @@ lote; el usuario puede ajustarlas, siempre que sumen la unidad (DR-20).
 
 > **CA09.** Dado que llega un ingreso tardío a un lote dividido, cuando el usuario lo reparte,
 > entonces el sistema propone las fracciones del lote, permite editarlas y rechaza el reparto si no
-> suman la unidad, con el mensaje de CA04.
+> suman la unidad, mostrando "Las fracciones del reparto suman {suma} y deben sumar la unidad".
 
 > **CA10.** Dado que el usuario tiene rol de Supervisor de planta, cuando intenta dividir un lote,
 > entonces el sistema rechaza la operación mostrando "Acción no autorizada".

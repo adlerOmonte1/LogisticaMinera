@@ -8,11 +8,13 @@ Requiere el paquete `markdown` (pip install markdown) y Chrome o Chromium. El
 navegador se toma de la variable CHROME o de las rutas habituales. Sin salida
 explícita, el PDF queda junto al Markdown con el mismo nombre.
 
-Pensado para documentos de texto y tablas. Los diagramas Mermaid de los módulos
-tienen su propio generador (generar_pdf_requerimientos.py).
+Pensado para documentos de texto y tablas. Si el documento tiene bloques Mermaid
+—por ejemplo, ARQ-03—, se renderizan con la misma biblioteca que usa
+generar_pdf_requerimientos.py, que requiere conexión para descargarla.
 """
 
 import html
+import re
 import os
 import shutil
 import subprocess
@@ -30,6 +32,9 @@ NAVEGADORES = [
     *sorted(str(p) for p in Path("/opt/pw-browsers").glob("chromium-*/chrome-linux*/chrome")),
 ]
 
+MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
+BLOQUE_MERMAID = re.compile(r"```mermaid\n(.*?)```", re.S)
+
 ESTILO = """
 @page { size: A4; margin: 18mm 16mm; }
 body { font: 10pt/1.45 "DejaVu Sans", Arial, sans-serif; color: #222; }
@@ -43,6 +48,8 @@ tr { page-break-inside: avoid; }
 code { font-size: 8.5pt; background: #f3f3f3; padding: 0 2px; }
 hr { border: 0; border-top: 1px solid #ccc; }
 .pie { color: #777; font-size: 8pt; margin-top: 24px; }
+.mermaid { text-align: center; margin: 10px 0; page-break-inside: avoid; }
+.mermaid svg { max-width: 100%; height: auto; }
 """
 
 
@@ -59,17 +66,29 @@ def main():
     origen = Path(sys.argv[1]).resolve()
     destino = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else origen.with_suffix(".pdf")
 
-    cuerpo = markdown.markdown(origen.read_text(encoding="utf-8"), extensions=["tables", "sane_lists"])
+    texto = origen.read_text(encoding="utf-8")
+    # Cada bloque Mermaid se sustituye por una marca que markdown no altera y se repone después.
+    marcas = []
+    def marcar(m):
+        marcas.append(m.group(1))
+        return f"\n\nMERMAIDBLOQUE{len(marcas) - 1}FIN\n\n"
+    texto = BLOQUE_MERMAID.sub(marcar, texto)
+    cuerpo = markdown.markdown(texto, extensions=["tables", "sane_lists"])
+    for i, codigo in enumerate(marcas):
+        cuerpo = cuerpo.replace(f"<p>MERMAIDBLOQUE{i}FIN</p>", f'<div class="mermaid">{html.escape(codigo)}</div>')
+    script = (f'<script src="{MERMAID_CDN}"></script>'
+              '<script>mermaid.initialize({startOnLoad: true, theme: "neutral"});</script>') if marcas else ""
     documento = (
         f'<!doctype html><html lang="es"><head><meta charset="utf-8">'
         f"<title>{html.escape(origen.stem)}</title><style>{ESTILO}</style></head><body>{cuerpo}"
-        f'<p class="pie">Generado desde {html.escape(origen.name)} el {date.today():%d/%m/%Y}.</p></body></html>'
+        f'<p class="pie">Generado desde {html.escape(origen.name)} el {date.today():%d/%m/%Y}.</p>{script}</body></html>'
     )
     with tempfile.NamedTemporaryFile("w", suffix=".html", encoding="utf-8", delete=False) as tmp:
         tmp.write(documento)
     try:
         subprocess.run(
             [navegador(), "--headless", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
+             *(["--virtual-time-budget=30000"] if marcas else []),
              f"--print-to-pdf={destino}", f"file://{tmp.name}"],
             check=True, capture_output=True,
         )

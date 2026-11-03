@@ -4,9 +4,9 @@
 |---|---|---|
 | RS-M06-01 | El sistema registra lotes de proceso con `codigo` asignado por el servidor, `nombre` único, `id_tipo_mineral`, `fecha_apertura` no posterior a la fecha actual y `estado` con dominio cerrado {ABIERTO, EN_RECORRIDO, CERRADO} | RU-M06-01 |
 | RS-M06-02 | El sistema asigna ingresos a un lote mediante `id_lote` en el ingreso, admitiendo como máximo un lote por ingreso | RU-M06-01 |
-| RS-M06-03 | El sistema exige que el tipo de mineral del ingreso coincida con el del lote para permitir la asignación | RU-M06-01 |
+| RS-M06-03 | El sistema mantiene la lista de tipos de mineral de cada lote; ofrece aparte, agrupados por mineral, los ingresos de otros tipos, y al unificarlos exige la autorización, suma su mineral a la lista y marca el ingreso como «Otro mineral» | RU-M06-01, RU-M06-11 |
 | RS-M06-04 | El sistema admite asignar a un lote solo ingresos en estado `REGISTRADO`, e impide asignar los anulados y los que están En proceso | — (integridad con M03) |
-| RS-M06-05 | El sistema permite retirar un ingreso de un lote, o trasladarlo a otro, solo mientras ambos están en estado `ABIERTO` | RU-M06-01 |
+| RS-M06-05 | El sistema permite retirar un ingreso de un lote no `CERRADO`, o trasladarlo a otro, solo mientras ninguna parte del lote —o, en un ingreso tardío con secado propio, ninguna de sus partes— tenga registrado zarandeo o molienda, y rechaza el retiro que dejaría sin ingresos a un lote `EN_RECORRIDO` | RU-M06-01 |
 | RS-M06-06 | El sistema admite ingresos tardíos en un lote `EN_RECORRIDO`, los marca como tales y rechaza agregar ingresos a un lote `CERRADO` | RU-M06-08 |
 | RS-M06-07 | El sistema calcula y expone, por lote, el número de ingresos asignados y la suma de sus pesos netos, incluidos los tardíos y excluidos los anulados | RU-M06-05 |
 | RS-M06-08 | El sistema mantiene el catálogo cerrado de cuatro etapas —secado, zarandeo, molienda y ensacado— y el de tres rutas: zarandeo y ensacado; molienda y ensacado; zarandeo, molienda y ensacado | RU-M06-02, RU-M06-06 |
@@ -30,3 +30,5 @@
 | RS-M06-26 | El sistema rechaza agregar ingresos, registrar etapas o asociar bigbags en un lote `CERRADO` | RU-M06-10 |
 | RS-M06-27 | El sistema retira de su lote el ingreso anulado mientras el lote está `ABIERTO`, a pedido del servicio de registro | — (integridad con M03) |
 | RS-M06-28 | El sistema registra en auditoría la apertura, la asignación y el retiro de ingresos, el inicio del recorrido, la división, cada paso por etapa, los bigbags y el cierre del lote | — (integridad con M09) |
+| RS-M06-29 | El sistema agrega un tipo de mineral a un lote no Cerrado y lo quita solo si no tiene ingresos y el lote está Abierto, registrando ambos actos en auditoría | RU-M06-11 |
+| RS-M06-30 | El sistema presenta los ingresos y las toneladas del lote agrupados por tipo de mineral | RU-M06-11 |

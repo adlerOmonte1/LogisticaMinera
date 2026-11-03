@@ -7,9 +7,11 @@ ensacado. El cierre del lote con su destino forma parte de RF07 (DR-14), no es u
 |---|---|---|---|
 | Listar lotes | Consulta con filtros por estado, tipo de mineral y fecha | HU-M06-01 | `GET /api/v1/lotes/` |
 | Abrir lote | Alta con nombre, tipo de mineral y fecha de apertura | HU-M06-01 | `POST /api/v1/lotes/` |
+| Agregar otro mineral | Suma un tipo de mineral a la lista del lote | HU-M06-01 | `POST /api/v1/lotes/{id}/minerales/` |
+| Quitar un mineral | Retira de la lista, con baja lógica, un tipo sin ingresos, con el lote Abierto | HU-M06-01 | `POST /api/v1/lotes/{id}/minerales/{id_tipo}/quitar/` |
 | Consultar lote | Detalle con su estado, su composición, sus partes y su recorrido | HU-M06-01 | `GET /api/v1/lotes/{id}/` |
 | Asignar ingresos al lote | Incorpora uno o varios ingresos; en un lote En recorrido, como ingresos tardíos | HU-M06-01 | `POST /api/v1/lotes/{id}/ingresos/` |
-| Retirar un ingreso del lote | Quita el ingreso de un lote Abierto | HU-M06-01 | `DELETE /api/v1/lotes/{id}/ingresos/{id_ingreso}/` |
+| Retirar un ingreso del lote | Devuelve a cancha un ingreso cuyo mineral aún no pasó por zarandeo ni molienda | HU-M06-01 | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/retirar/` |
 | Iniciar el recorrido | Pasa el lote a En recorrido y registra la fecha de inicio | HU-M06-01 | `PATCH /api/v1/lotes/{id}/iniciar-recorrido/` |
 | Registrar paso por etapa | Anota el paso del lote o de una parte por una etapa, con la ruta cuando corresponde, y las horas de molienda o los bigbags si aplica | HU-M06-02 | `POST /api/v1/lotes/{id}/etapas/` |
 | Registrar secado de un ingreso tardío | Anota el secado propio del ingreso que llegó después del secado del lote y, si el lote está dividido, su reparto entre las partes | HU-M06-02, HU-M06-04 | `POST /api/v1/lotes/{id}/ingresos/{id_ingreso}/secado/` |
@@ -20,9 +22,9 @@ ensacado. El cierre del lote con su destino forma parte de RF07 (DR-14), no es u
 | Consultar trazabilidad de un ingreso | Etapas de la ruta recorridas por el lote o las partes del ingreso | HU-M06-03 | `GET /api/v1/ingresos/{id}/trazabilidad/` |
 | Listar etapas y rutas | Catálogos cerrados de las cuatro etapas y las tres rutas | HU-M06-02 | `GET /api/v1/etapas/`, `GET /api/v1/rutas/` |
 
-`DELETE` sobre la asignación no borra ningún registro del negocio: deshace el vínculo entre un
-ingreso y un lote Abierto. El ingreso permanece intacto, y la prohibición de borrado (D-07) se
-refiere a los ingresos, no a esta relación.
+Ninguna función usa `DELETE` (D-22). Retirar un ingreso deshace su vínculo con el lote sin tocar
+ningún otro dato del ingreso, y quitar un mineral marca su fila de la lista como retirada, con fecha y
+usuario, en lugar de borrarla.
 
 ## Responsabilidad y límites
 
@@ -39,7 +41,7 @@ destino y responde por dónde va el mineral de un ingreso.
 | Delega en | A través de | Qué obtiene |
 |---|---|---|
 | M03 Registro | Lectura de ingresos | El ingreso, su tipo de mineral, su peso neto y su estado |
-| M02 Catálogo | Lectura del catálogo | El tipo de mineral del lote |
+| M02 Catálogo | Lectura del catálogo | Los tipos de mineral del lote |
 | M09 Auditoría | Servicio de eventos | El registro de cada operación sobre el lote |
 
 **Lo que no hace.** No modifica el ingreso más allá de su vínculo con el lote; no calcula totales de
@@ -53,7 +55,7 @@ solo su destino, sin guía, factura ni precio (DR-14).
 | Función | Administrador | Administrativo | Supervisor de planta |
 |---|:---:|:---:|:---:|
 | Listar y consultar lotes | Sí | Sí | Sí |
-| Abrir lote, asignar y retirar ingresos, iniciar el recorrido | Sí | Sí | No |
+| Abrir lote, agregar o quitar minerales, asignar y retirar ingresos, iniciar el recorrido | Sí | Sí | No |
 | Dividir lote | Sí | Sí | No |
 | Registrar paso por etapa, secado de un ingreso tardío y bigbags | Sí | Sí | Sí |
 | Cerrar lote con su destino | Sí | No | No |
@@ -68,11 +70,11 @@ cierre con destino es del Administrador porque decide a dónde se entrega el min
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución de cada operación |
-| M02 | El tipo de mineral del lote |
+| M02 | Los tipos de mineral del lote |
 | M03 | Los ingresos que componen el lote, con su peso y su estado |
 | M09 | Registro de los eventos del lote |
 
 | Es requerido por | Para |
 |---|---|
-| M03 | El tipo de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
+| M03 | La lista de tipos de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
 | M07 | Mostrar el recorrido del proceso en el detalle de un ingreso |

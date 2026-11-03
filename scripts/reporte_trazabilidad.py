@@ -35,11 +35,10 @@ PRUEBA = re.compile(r"^\s*def (test_\w+)", re.M)
 CODIGO_RN = re.compile(r"^test_rn_m(\d\d)_(\d\d)", re.I)
 CODIGO_CA = re.compile(r"^test_hu_m(\d\d)_(\d\d)_ca(\d\d)", re.I)
 
-# Apps del mapa de módulos (ARQ-02 §4); busqueda y reportes se renombran en la
-# preparación del repositorio a consulta y consolidacion.
+# Apps del mapa de módulos (ARQ-02 §4).
 APPS_VIGENTES = {
     "accounts", "catalogo", "ingresos", "reconocimiento", "validacion", "trazabilidad",
-    "consulta", "consolidacion", "auditoria", "busqueda", "reportes",
+    "consulta", "consolidacion", "auditoria",
 }
 
 
@@ -66,7 +65,11 @@ def citados():
     fuera = defaultdict(int)
     for f in sorted(BACKEND.rglob("test_*.py")):
         partes = f.relative_to(BACKEND).parts
-        if partes[0] == "apps" and partes[1] not in APPS_VIGENTES:
+        # Solo las pruebas del proyecto: los entornos virtuales del backend
+        # también contienen archivos test_*.py de sus dependencias.
+        if partes[0] != "apps":
+            continue
+        if partes[1] not in APPS_VIGENTES:
             fuera[partes[1]] += len(PRUEBA.findall(f.read_text(encoding="utf-8")))
             continue
         for nombre in PRUEBA.findall(f.read_text(encoding="utf-8")):

@@ -183,9 +183,11 @@ Van en `utils/`. El dominio lanza excepciones propias; la capa HTTP las traduce 
 
 | Excepción de dominio | HTTP |
 |---|---|
-| `ReglaDeNegocioError` | 400 o 422 |
+| `ErrorDeValidacionDeDominio` (regla de negocio o dato inválido) | 400 |
 | `AccionNoAutorizada` | 403 |
-| `ConflictoDeConcurrencia` | 409 |
+| `ConflictoDeConcurrencia` (conflicto con el estado del recurso) | 409 |
+
+La tabla completa, con 401, 404 y 423, está en D-23 (`docs/00-arquitectura/decisiones_diseno.md`).
 
 `models/` y `services/` no importan nada de `rest_framework`. Si lo hacen, la regla de negocio
 queda atada al transporte HTTP.

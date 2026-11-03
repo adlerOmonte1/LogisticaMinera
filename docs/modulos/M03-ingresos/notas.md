@@ -61,13 +61,18 @@ Decisiones no obvias:
 ```python
 class ServicioIngreso:
     def __init__(self, reconocedor: ReconocedorTicket, validador: ValidadorConsistencia,
-                 generador: GeneradorCodigo, reloj: Reloj):
+                 generador: GeneradorCodigo, reloj: Reloj, auditoria: ServicioAuditoria):
         ...
 ```
 
-Las cuatro son interfaces. El servicio no importa el motor concreto ni las reglas: los recibe. Es lo
-que permite cambiar de motor cuando se cierre D-12 sin tocar este módulo, y probar el registro con
-dobles de prueba sin depender de un servicio externo.
+Las cuatro primeras son interfaces. El servicio no importa el motor concreto ni las reglas: los
+recibe. Es lo que permite cambiar de motor cuando se cierre D-12 sin tocar este módulo, y probar el
+registro con dobles de prueba sin depender de un servicio externo. `ServicioAuditoria` es el servicio
+concreto de M09 que todo servicio de escritura recibe para registrar su evento dentro de la misma
+transacción (ver las notas de M09).
+
+La imagen no necesita otra dependencia: se guarda por el `ImageField` del ingreso, que delega en el
+almacenamiento de Django configurado para el entorno (D-18).
 
 El reloj también se inyecta: las marcas de tiempo son el corazón del registro, y una prueba que no
 pueda fijar «ahora» no puede verificarlas.
@@ -88,6 +93,11 @@ mismo vehículo a la vez con taras distintas.
 `registrar_ingreso()` atiende también el registro sin foto: recibe el motivo en lugar de la imagen,
 no persiste valores reconocidos —no los hay— y aplica la misma validación. No existe un servicio
 aparte para ese caso; separarlo duplicaría las reglas del registro y tarde o temprano divergirían.
+
+`revertir_correccion()` toma el último evento `MODIFICAR` vigente del ingreso en M09, restaura sus
+`valores_anteriores` por el mismo camino que `corregir_ingreso()` —con la misma validación— y
+registra un evento nuevo que referencia al revertido (RN-M03-28, RN-M03-29). No hay tabla de
+versiones: la auditoría ya es el historial.
 
 `corregir_ingreso()` vuelve a leer la tara del vehículo corregido: si no la tiene, deja el ingreso En
 proceso (RN-M03-26). Antes de cambiar el tipo de mineral consulta el lote del ingreso a través del
@@ -174,7 +184,7 @@ En proceso del mismo vehículo (HU-M03-04 CA07).
 
 | Pendiente | Efecto |
 |---|---|
-| Medio de almacenamiento y retención de las imágenes (D-14) | Define `upload_to`, el respaldo y el acceso restringido de RNF-M03-11 |
+| Medio de almacenamiento y retención de las imágenes (D-14) | Define el backend de almacenamiento de Django, la retención y el respaldo. El código no cambia al cerrarse: la imagen se guarda por la API de almacenamiento de Django (D-18) |
 | Motor de reconocimiento (D-12) | No bloquea: el servicio depende de la interfaz. Sí condiciona RNF-M03-02 |
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede completarse el campo obligatorio de tipo de mineral; el alta desde el registro reduce el bloqueo |
 | Tratamiento del ingreso sin foto en la ficha de observación (P-03) | No cambia el sistema; condiciona cómo se usa el ingreso en la medición |

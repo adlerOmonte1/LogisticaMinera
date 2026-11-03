@@ -87,7 +87,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Solo informa mientras el backend conserve pruebas del diseño anterior.
-      # Tras la preparacion del repositorio (PLAN_DE_TRABAJO.md §8) se pasa a --estricto.
+      # Estricto desde la preparacion del repositorio (PLAN-02, F0): falla si una
+      # prueba cita un codigo que la documentacion no define.
       - name: Reglas y criterios con prueba
-        run: python3 scripts/reporte_trazabilidad.py | tee -a "$GITHUB_STEP_SUMMARY"
+        run: |
+          set -o pipefail
+          python3 scripts/reporte_trazabilidad.py --estricto | tee -a "$GITHUB_STEP_SUMMARY"

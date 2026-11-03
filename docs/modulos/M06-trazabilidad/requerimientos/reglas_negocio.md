@@ -7,9 +7,9 @@
 | Código | Regla | Consecuencia si se viola |
 |---|---|---|
 | RN-M06-01 | Un ingreso pertenece a un lote como máximo | Las mismas toneladas se contarían en dos cargas distintas |
-| RN-M06-02 | Todos los ingresos de un lote comparten el tipo de mineral del lote | Una carga mezclaría minerales que se procesan distinto, y el recorrido por etapas no describiría a todos sus ingresos |
+| RN-M06-02 | Un ingreso solo se asigna a un lote cuya lista de tipos de mineral incluye el suyo, o se unifica desde «Agregar de otro tipo de mineral» con autorización obligatoria, que suma su mineral a la lista y marca el ingreso como «Otro mineral» (DR-27) | La mezcla de minerales en una carga ocurriría sin que nadie la decidiera ni quedara constancia de quién la autorizó |
 | RN-M06-03 | Un ingreso anulado no se asigna a ningún lote. Si se anula estando asignado, se retira del lote Abierto; en un lote En recorrido o Cerrado permanece vinculado y deja de contar en sus totales | Un ingreso retirado del histórico seguiría aportando toneladas a una carga |
-| RN-M06-04 | Desde el inicio del recorrido no se retiran ni se trasladan ingresos del lote: solo se admiten ingresos tardíos (DR-22) | El recorrido ya registrado dejaría de corresponder al mineral que efectivamente lo hizo |
+| RN-M06-04 | Un ingreso se retira de su lote, o se traslada a otro, solo mientras su mineral no haya pasado por zarandeo ni molienda: ninguna parte del lote las registró o, si es un ingreso tardío con secado propio, ninguna de sus partes empezó su ruta. Un lote En recorrido conserva al menos un ingreso (DR-29) | Un zarandeo o una molienda ya registrados dejarían de corresponder al mineral que efectivamente los recorrió, o una carga en marcha quedaría sin ingresos |
 | RN-M06-05 | Solo un lote En recorrido registra etapas | Se anotaría el secado de una carga que aún se está reuniendo, o un paso en una carga ya cerrada |
 | RN-M06-06 | Las etapas se registran en orden: primero el secado común y después las etapas de la ruta, en el orden de esa ruta | El recorrido describiría una secuencia que la planta no puede haber ejecutado |
 | RN-M06-07 | Cada etapa se registra una sola vez por lote o por parte | Habría dos fechas para el mismo hecho y ninguna sería la de referencia |
@@ -28,6 +28,8 @@
 | RN-M06-20 | Solo el Administrador cierra un lote, solo cuando todo su mineral está ensacado y con destino obligatorio: venta o traslado (DR-14) | Se cerraría una carga con etapas pendientes o sin saber a dónde fue el mineral |
 | RN-M06-21 | Un lote Cerrado no admite ingresos, etapas ni bigbags | El resumen del cierre dejaría de corresponder al lote |
 | RN-M06-22 | La trazabilidad de un ingreso se expresa sobre las etapas de su ruta; en un lote dividido, sobre la unión de las rutas de sus partes; sin ruta decidida no se calcula la proporción (DR-16, DR-21) | Una carga que siguió el camino correcto aparecería incompleta, o se calcularía una proporción sobre una ruta inexistente |
+| RN-M06-23 | Un tipo de mineral solo se quita de un lote si no tiene ingresos en él y el lote está Abierto | Ingresos del lote quedarían sin el tipo que justificó su asignación |
+| RN-M06-24 | Toda cifra del lote —toneladas por tipo de mineral, estimación de las partes y de los bigbags— se calcula sobre los ingresos al consultarse, de modo que una corrección o su reversión en M03 se refleja sin acción adicional (DR-28) | Las cifras del lote quedarían desactualizadas tras corregir un ingreso |
 
 ## Nota sobre RN-M06-01 y RN-M06-11
 
@@ -39,12 +41,15 @@ integró a ninguna carga, o cuando su carga se dividió: el recorrido de las par
 
 ## Nota sobre RN-M06-04 y RN-M06-05
 
-Juntas fijan el momento en que la composición de la carga deja de ser revisable. Mientras el lote
-está Abierto, agrupar es una decisión de trabajo que puede corregirse. Con el inicio del recorrido,
-la composición se vuelve parte del hecho registrado: ningún ingreso vuelve a cancha, porque el
-recorrido ya anotado dejaría de describir al mineral que lo hizo. Lo único que se admite es sumar
-ingresos tardíos, que es lo que ocurre en la planta cuando llegan volquetes a una carga en marcha, y
-que el sistema registra señalados como tales (DR-19, DR-22).
+Juntas fijan el momento en que la composición de la carga deja de ser revisable. Agregar un ingreso
+al lote equivocado es un error posible del usuario, y mientras el mineral solo se ha reunido o
+secado todavía puede separarse: por eso el retiro se admite con el lote Abierto y también En
+recorrido, hasta el zarandeo o la molienda. Desde que el mineral pasa por una de esas etapas se
+transformó junto con el resto de la carga, y retirar el ingreso haría que el recorrido anotado dejara
+de describir al mineral que lo hizo. El secado ya registrado no se borra (D-07): describe lo que
+ocurrió con la carga, y el retiro queda en auditoría. Además del retiro, en un lote En recorrido se
+admite sumar ingresos tardíos, que es lo que ocurre en la planta cuando llegan volquetes a una carga
+en marcha, y que el sistema registra señalados como tales (DR-19, DR-29).
 
 ## Nota sobre RN-M06-09 y RN-M06-15
 

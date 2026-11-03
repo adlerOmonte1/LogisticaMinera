@@ -22,6 +22,10 @@ presentación**: garantizan que lo que se muestra no induzca a conclusiones fals
 | RN-M07-11 | El calendario ubica cada ingreso en el día de su fecha del pesaje, no en el de su registro | El calendario describiría cuándo se trabajó en el sistema y no cuándo llegaron los volquetes |
 | RN-M07-12 | El calendario cuenta los ingresos no anulados y suma solo los Registrados, con el mismo criterio que el listado y la consolidación | El mismo mes tendría dos totales distintos según la pantalla que se mire |
 | RN-M07-13 | La trazabilidad que muestra la consulta es la de M06, sin recalcularla | La consulta podría contradecir al módulo responsable del recorrido |
+| RN-M07-14 | El resumen del día y las toneladas de los últimos siete días cuentan y suman con el criterio del calendario: día de la fecha del pesaje, sin anulados en el conteo y solo Registrados en la suma | La pantalla de inicio daría para un día una cifra distinta de la del calendario y la consolidación |
+| RN-M07-15 | Los avisos se calculan al consultarse, no se almacenan, y solo muestran lo que el rol del usuario puede resolver | Un aviso guardado seguiría apareciendo después de resuelto, o el usuario recibiría pendientes que no le corresponde atender |
+| RN-M07-16 | La exportación contiene exactamente el conjunto filtrado del listado —todas sus páginas—, con los anulados y los En proceso señalados por su estado | El archivo diría algo distinto de la pantalla de la que salió |
+| RN-M07-17 | Solo el Administrativo y el Administrador exportan el listado, y cada exportación queda en auditoría | Los datos saldrían del sistema sin saber quién los sacó ni con qué criterio |
 
 ## Nota sobre RN-M07-01 y RN-M07-02
 
@@ -36,9 +40,10 @@ suma porque su peso neto todavía no existe.
 
 ## Nota sobre RN-M07-03
 
-Es la regla que distingue este módulo de un listado más. Recuperar el dato ya lo hace el listado de
-M03; lo que M07 aporta es poder **verificar** el dato contra su respaldo. Un detalle que mostrara
-solo los números dejaría al módulo sin propósito propio.
+Es la regla que distingue la consulta de un listado más. Recuperar el dato es lo mínimo de cualquier
+listado —y en este sistema el listado también es de M07 (D-19)—; lo que la consulta aporta es poder
+**verificar** el dato contra su respaldo. Un detalle que mostrara solo los números dejaría a la
+consulta sin propósito propio.
 
 ## Nota sobre RN-M07-05
 
@@ -46,6 +51,21 @@ Es la única regla del módulo motivada por el rendimiento y no por la correcci�
 criterios devuelve el histórico completo: funciona hoy, con pocos registros, y se degrada de forma
 continua hasta volverse inútil. Exigir un criterio evita esa degradación desde el principio, y no
 supone ningún obstáculo real, porque quien consulta siempre sabe al menos la fecha.
+
+## Nota sobre RN-M07-15
+
+Un aviso no es un mensaje que alguien envía: es una pregunta que el sistema se hace cada vez que el
+usuario lo consulta —¿hay ingresos sin destare?, ¿hay un lote con la etapa siguiente pendiente?—. Por
+eso no se marca como leído ni se archiva: desaparece cuando deja de ser cierto. Y como cada rol
+resuelve cosas distintas, el mismo cálculo se filtra por rol: avisar al Supervisor de un lote listo
+para cerrar le señalaría una tarea que no puede hacer.
+
+## Nota sobre RN-M07-16
+
+La exportación es del listado, no del mes: sale con los filtros que el usuario eligió e incluye los
+ingresos anulados y En proceso con su estado, igual que la pantalla. Quien necesite el total de
+producción del mes por tipo de mineral lo obtiene en la consolidación (M08), que tiene sus propias
+reglas de cómputo y su propia exportación.
 
 ## Nota sobre RN-M07-11 y RN-M07-12
 

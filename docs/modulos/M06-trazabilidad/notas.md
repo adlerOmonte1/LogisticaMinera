@@ -21,10 +21,11 @@ apps/trazabilidad/
 class LoteProceso(models.Model):
     codigo = models.CharField(max_length=20, unique=True, editable=False)
     nombre = models.CharField(max_length=80, unique=True)
-    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
+    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)  # el de apertura
+    minerales = models.ManyToManyField(TipoMineral, through="LoteMineral", related_name="+")
     fecha_apertura = models.DateField()
     fecha_inicio_recorrido = models.DateTimeField(null=True, editable=False)
-    ruta = models.CharField(max_length=10, choices=Ruta.choices, blank=True)  # sin dividir
+    ruta = models.CharField(max_length=30, choices=Ruta.choices, blank=True)  # sin dividir
     estado = models.CharField(max_length=12, choices=ESTADOS)  # ABIERTO, EN_RECORRIDO, CERRADO
     destino = models.CharField(max_length=10, choices=DESTINOS, blank=True)  # VENTA, TRASLADO
     observacion_cierre = models.TextField(blank=True)
@@ -33,12 +34,28 @@ class LoteProceso(models.Model):
                                        editable=False, related_name="+")
 
 
+class LoteMineral(models.Model):          # lista de tipos admitidos (DR-27)
+    lote = models.ForeignKey(LoteProceso, on_delete=models.PROTECT, related_name="lista_minerales")
+    tipo_mineral = models.ForeignKey(TipoMineral, on_delete=models.PROTECT)
+    autorizacion = models.TextField(blank=True)  # obligatoria si entra al unificar otro mineral
+    fecha_hora = models.DateTimeField(editable=False)
+    usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
+    fecha_retiro = models.DateTimeField(null=True, editable=False)  # baja logica al quitarlo (D-22)
+    usuario_retiro = models.ForeignKey(Usuario, null=True, on_delete=models.PROTECT,
+                                       editable=False, related_name="+")
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["lote", "tipo_mineral"],
+                                               condition=models.Q(fecha_retiro__isnull=True),
+                                               name="lote_mineral_vigente_unico")]
+
+
 class ParteLote(models.Model):
     lote = models.ForeignKey(LoteProceso, on_delete=models.PROTECT, related_name="partes")
     nombre = models.CharField(max_length=80)
     numerador = models.PositiveSmallIntegerField()
     denominador = models.PositiveSmallIntegerField()
-    ruta = models.CharField(max_length=10, choices=Ruta.choices)
+    ruta = models.CharField(max_length=30, choices=Ruta.choices)
 
 
 class RepartoIngreso(models.Model):       # porcion de un ingreso tardio en un lote dividido
@@ -69,9 +86,10 @@ class Bigbag(models.Model):
     usuario_registro = models.ForeignKey(Usuario, on_delete=models.PROTECT, editable=False)
 ```
 
-`Ruta` es un `TextChoices` con tres valores, y una constante del módulo asocia a cada ruta sus
-etapas en orden: zarandeo y ensacado; molienda y ensacado; zarandeo, molienda y ensacado. El secado
-no forma parte de ninguna ruta porque es común a todo el lote.
+`Ruta` es un `TextChoices` con tres valores —`ZARANDEO_ENSACADO`, `MOLIENDA_ENSACADO` y
+`ZARANDEO_MOLIENDA_ENSACADO`, con los nombres en pantalla «Zaranda», «Molido» y «Zarandeado y
+molido» (D-21)—, y una constante del módulo asocia a cada ruta sus etapas en orden. El secado no
+forma parte de ninguna ruta porque es común a todo el lote.
 
 Decisiones no obvias:
 
@@ -120,12 +138,22 @@ El secado de un ingreso tardío en un lote dividido crea a la vez el `PasoEtapa`
 sus `RepartoIngreso`. El serializer recibe las fracciones propuestas por la interfaz, que parte de
 las del lote (DR-20), y el servicio repite la comprobación de suma.
 
+### Retiro de ingresos
+
+`retirar_ingreso()` comprueba que ninguna parte del lote tenga registrado zarandeo o molienda —o, si
+el ingreso tiene secado propio, que ninguna de sus partes haya empezado su ruta— y que un lote
+`EN_RECORRIDO` conserve al menos un ingreso (RN-M06-04). Pone en nulo el `id_lote` del ingreso y no
+borra ningún paso: el secado del lote, y el secado propio del ingreso tardío con su reparto, quedan
+como hecho registrado y el retiro en auditoría (D-07). Las estimaciones de las partes no requieren
+ajuste, porque se calculan sobre los ingresos que pertenecen al lote al consultarse (RN-M06-24). El
+traslado a otro lote es el mismo retiro seguido de una asignación, dentro de una transacción.
+
 ### Composición, trazabilidad y resumen
 
 El detalle del lote necesita el número de ingresos y la suma de sus pesos netos. Se resuelve con una
 consulta agregada sobre `INGRESO`, no recorriendo los ingresos en Python (RNF-M06-02). La suma
-excluye los ingresos anulados (RN-M06-03): un ingreso retirado del histórico no aporta toneladas,
-aunque su vínculo con el lote se conserve si ya inició el recorrido.
+excluye los ingresos anulados (RN-M06-03): un ingreso anulado no aporta toneladas, aunque su vínculo
+con el lote se conserve si ya inició el recorrido.
 
 La asignación filtra por `estado="REGISTRADO"` y no por «distinto de anulado» (RN-M06-13). Con el
 segundo criterio, un ingreso En proceso —sin peso neto— entraría al lote y su suma trataría el nulo
@@ -189,13 +217,13 @@ de implementar y verificar que el personal reconoce las cargas, sus partes y su 
 | Depende de | Para |
 |---|---|
 | M01 | Autenticación y atribución de cada operación |
-| M02 | El tipo de mineral del lote |
+| M02 | Los tipos de mineral del lote |
 | M03 | Los ingresos que componen el lote, con su peso y su estado |
 | M09 | Registro de los eventos del lote |
 
 | Es requerido por | Para |
 |---|---|
-| M03 | El tipo de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
+| M03 | La lista de tipos de mineral del lote al corregir un ingreso, y el retiro del ingreso anulado de un lote Abierto |
 | M07 | Mostrar el recorrido del proceso en el detalle de un ingreso |
 
 ## Pendientes que afectan a este módulo
@@ -203,4 +231,3 @@ de implementar y verificar que el personal reconoce las cargas, sus partes y su 
 | Pendiente | Efecto |
 |---|---|
 | Valores del catálogo de tipos de mineral (DR-03) | Sin ellos no puede abrirse ningún lote |
-| Ajuste del mockup (plan, pendiente 3) | El mockup divide en toneladas y solo ofrece la venta como destino; esta documentación sigue DR-18 y DR-14 |

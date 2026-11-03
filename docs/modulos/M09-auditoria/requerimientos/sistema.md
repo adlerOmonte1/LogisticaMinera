@@ -13,7 +13,8 @@
 | RS-M09-09 | El sistema expone a los tres roles el historial de un ingreso, con sus propios eventos y los de su lote que lo afectan, ordenado cronológicamente | RU-M09-04 |
 | RS-M09-10 | El sistema informa cuando una consulta no tiene eventos que mostrar | RU-M09-04, RU-M09-05 |
 | RS-M09-11 | El sistema mantiene el catálogo de acciones auditables como un conjunto cerrado y compartido por todos los módulos | — (mantenibilidad) |
-| RS-M09-12 | El sistema guarda, en las modificaciones que lo exigen —corrección de un ingreso y cambio de tara—, el motivo escrito por el usuario en una columna propia del evento | — (integridad con M02 y M03) |
+| RS-M09-12 | El sistema guarda, en las operaciones que lo exigen —corrección de un ingreso y su reversión, anulación, cambio de tara y unificación de un ingreso de otro tipo de mineral—, el motivo o la autorización escritos por el usuario en una columna propia del evento | — (integridad con M02, M03 y M06) |
 | RS-M09-13 | El sistema guarda en cada evento de un lote los ingresos que afecta, para poder componer el historial de cada ingreso | — (integridad con M06) |
 | RS-M09-14 | El sistema expone al Administrador la consulta de todos los eventos, con filtros combinables por usuario, acción, y referencia o detalle, ordenados del más reciente al más antiguo | RU-M09-05 |
 | RS-M09-15 | El sistema no incluye en el historial de un ingreso eventos de usuarios, de catálogos ni accesos rechazados | — (confidencialidad) |
+| RS-M09-16 | El sistema no guarda ninguna contraseña, temporal o definitiva, en los valores de un evento | — (confidencialidad, integridad con M01) |

@@ -1,28 +1,30 @@
-"""Autorización del catálogo (ISP — solid-proyecto, backend-auth-permisos).
+"""Autorización del catálogo por acción. Las clases son las de M01, la única
+definición de la matriz (RN-M01-09); aquí solo se decide cuál aplica a cada
+acción del `ViewSet` (requerimientos/funcionales.md, matriz de permisos).
 
-Matriz de `requerimientos/funcionales.md`:
-- Consultar catálogos: los tres roles.
-- Crear, editar y desactivar: Administrador y Administrativo.
+- Consultar: los tres roles.
+- Crear, editar, dar de baja y reactivar: Administrador y Administrativo.
+- Crear un vehículo: los tres roles, porque el alta desde el registro y el
+  destare ocurren en planta (HU-M02-01 CA14, DR-17).
+- Modificar una tara registrada: solo el Administrador (HU-M02-01 CA09).
 """
 
-from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework.permissions import IsAuthenticated
 
-from apps.accounts.models import Rol
-from common.excepciones import AccionNoAutorizada
+from apps.accounts.permissions import (
+    PuedeDarAltaVehiculo,
+    PuedeGestionarCatalogo,
+    PuedeModificarTara,
+)
 
-ROLES_GESTION = (Rol.ADMINISTRADOR, Rol.ADMINISTRATIVO)
+LECTURA = ("list", "retrieve")
 
 
-class PuedeGestionarCatalogo(BasePermission):
-    """Lectura para cualquier usuario autenticado; escritura solo para los
-    roles de gestión. El rechazo se lanza como excepción para que el manejador
-    uniforme lo traduzca a 403 y lo registre en auditoría."""
-
-    def has_permission(self, request, view):
-        if not (request.user and request.user.is_authenticated):
-            return False
-        if request.method in SAFE_METHODS:
-            return True
-        if request.user.tiene_rol(*ROLES_GESTION):
-            return True
-        raise AccionNoAutorizada("Acción no autorizada")
+def permisos_de(accion: str, *, alta_abierta: bool = False) -> list:
+    if accion in LECTURA or accion is None:
+        return [IsAuthenticated()]
+    if accion == "create" and alta_abierta:
+        return [IsAuthenticated(), PuedeDarAltaVehiculo()]
+    if accion == "tara":
+        return [IsAuthenticated(), PuedeModificarTara()]
+    return [IsAuthenticated(), PuedeGestionarCatalogo()]

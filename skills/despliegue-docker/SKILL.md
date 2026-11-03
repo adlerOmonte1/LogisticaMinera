@@ -51,6 +51,11 @@ El motor de reconocimiento **no** es necesariamente un contenedor de este compos
 servicio externo, el backend lo consume por red, con sus credenciales en variables de entorno; si
 elige procesamiento local, sí se empaqueta como un servicio adicional o como parte de `backend`.
 
+**Configuración provisional (23/10/2026).** Hasta que se defina el servicio de alojamiento de la
+presentación, todo vive en el backend: las imágenes en el volumen `media`, montado en el contenedor
+del backend y usado por el almacenamiento de archivos de Django (D-14, D-18), y el reconocimiento con
+un adaptador local dentro del mismo contenedor (D-12).
+
 Nginx actúa además de reverse proxy: sirve los estáticos del frontend y enruta `/api/` al backend,
 de modo que el navegador ve un solo origen y no hay que abrir CORS en producción.
 
@@ -61,9 +66,13 @@ Un contenedor recreado sin volumen se lleva por delante tanto los registros como
 los tickets, que son el respaldo verificable de cada ingreso: sin la imagen, un ingreso deja de
 poder contrastarse contra el papel original.
 
-**Copias de seguridad.** Programa un volcado periódico de la base **y** del almacén de imágenes
-desde el primer día de producción, y verifica al menos una restauración de ambos antes de que
-empiece la operación real. Una copia que nunca se restauró no es una copia.
+**Copias de seguridad (D-20).** Desde la semana 1 el repositorio incluye un procedimiento de respaldo
+ejecutable a demanda en cualquier entorno: `pg_dump` de `db` y un archivo comprimido del volumen
+`media`, tomados en el mismo momento y con la misma marca de fecha, más el procedimiento inverso de
+restauración. Se verifica restaurando en un entorno limpio y comprobando que los ingresos conservan
+sus imágenes. La frecuencia, la retención y la ubicación fuera del servidor se fijan con el servicio
+de alojamiento de la presentación, y antes de la operación real debe existir una restauración
+probada de ambos. Una copia que nunca se restauró no es una copia.
 
 **Límite de tamaño de subida.** El servidor web y Django deben admitir el tamaño máximo de imagen
 declarado (10 MB, RS-M03-01: `DATA_UPLOAD_MAX_MEMORY_SIZE` en Django, `client_max_body_size` en

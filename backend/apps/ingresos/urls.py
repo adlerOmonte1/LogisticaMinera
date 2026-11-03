@@ -7,6 +7,6 @@ from apps.ingresos.views import IngresoViewSet
 app_name = "ingresos"
 
 router = DefaultRouter()
-router.register(r"", IngresoViewSet, basename="ingreso")
+router.register("", IngresoViewSet, basename="ingreso")
 
 urlpatterns = router.urls

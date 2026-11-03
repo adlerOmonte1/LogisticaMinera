@@ -10,6 +10,7 @@ venv/
 htmlcov/
 .pytest_cache/
 .env
+backend/media/
 
 # Node / Angular
 node_modules/
@@ -28,3 +29,6 @@ docs/03-pruebas/_build_req.html
 
 # Archivos temporales de Office
 ~$*
+
+# Respaldos locales (D-20)
+respaldos/
