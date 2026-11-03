@@ -2697,7 +2697,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const ayer = new Date(Date.now() - 86400000);",
+                  "const ayer = new Date(Date.now() - (2 + Math.floor(Math.random() * 360)) * 86400000);  // fecha pasada al azar: sin choques con V1 entre corridas",
                   "const p = n => String(n).padStart(2, '0');",
                   "pm.environment.set('fecha_f3', `${ayer.getFullYear()}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
                   "pm.environment.set('fecha_futura_f3', `${ayer.getFullYear() + 1}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
@@ -3016,7 +3016,7 @@
             "url": "{{base_url}}/ingresos/",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "raw": "{\n  \"borrador\": \"{{borrador_f3}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f3}}\",\n  \"hora\": \"08:15\",\n  \"peso_bruto_tn\": \"{{peso_f3}}\",\n  \"tipo_mineral\": {{id_mineral_f3}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -7854,6 +7854,1051 @@
         }
       ],
       "description": "Puerta de F5 (PLAN-02): lote simple hasta el cierre, retiro hasta el zarandeo, varios minerales con autorización, y división con un ingreso tardío y su reparto, que termina en CP07. Registra sus propios ingresos sin foto al empezar."
+    },
+    {
+      "name": "F6 · M07 Consulta",
+      "item": [
+        {
+          "name": "Preparación · Datos de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/tipos-mineral/?codigo=MOA"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('id_moa_f6', pm.response.json().results[0].id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ayer = new Date(Date.now() - 86400000); const p = n => String(n).padStart(2, '0');",
+                  "pm.environment.set('fecha_f6', `${ayer.getFullYear()}-${p(ayer.getMonth() + 1)}-${p(ayer.getDate())}`);",
+                  "pm.environment.set('anio_f6', ayer.getFullYear()); pm.environment.set('mes_f6', ayer.getMonth() + 1);",
+                  "pm.environment.set('dia_f6', ayer.getDate());",
+                  "const base = 20 + Math.floor(Math.random() * 700) / 100;",
+                  "['a', 'b', 'c'].forEach((l, k) => pm.environment.set(`peso_${l}_f6`, (base + k * 0.11).toFixed(2)));",
+                  "const az = 'ABCDEFGHJKLMNPQRSTUVWXYZ', dg = '0123456789';",
+                  "const al = (s, n) => Array.from({length: n}, () => s[Math.floor(Math.random() * s.length)]).join('');",
+                  "pm.environment.set('placa_f6', 'S' + al(az, 2) + '-' + al(dg, 3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Vehículo nuevo sin tara -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/catalogo/vehiculos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa_f6}}\",\n  \"tipo_titularidad\": \"PROPIO\",\n  \"capacidad_tn\": \"25.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('id_vehiculo_f6', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto a -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "TICKET_EXTRAVIADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_a_f6', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso a -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_a_f6}}\",\n  \"placa\": \"V2K-841\",\n  \"fecha\": \"{{fecha_f6}}\",\n  \"hora\": \"06:10\",\n  \"peso_bruto_tn\": \"{{peso_a_f6}}\",\n  \"tipo_mineral\": {{id_moa_f6}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('id_a_f6', pm.response.json().id);",
+                  "pm.environment.set('codigo_a_f6', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto b -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "TICKET_EXTRAVIADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_b_f6', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso b -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_b_f6}}\",\n  \"placa\": \"{{placa_f6}}\",\n  \"fecha\": \"{{fecha_f6}}\",\n  \"hora\": \"06:20\",\n  \"peso_bruto_tn\": \"{{peso_b_f6}}\",\n  \"tipo_mineral\": {{id_moa_f6}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('id_b_f6', pm.response.json().id);",
+                  "pm.environment.set('codigo_b_f6', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Borrador sin foto c -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/borradores/",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sin_foto",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "motivo_sin_respaldo",
+                  "value": "TICKET_EXTRAVIADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.environment.set('borrador_c_f6', pm.response.json().borrador);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Ingreso c -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrador\": \"{{borrador_c_f6}}\",\n  \"placa\": \"{{placa_f6}}\",\n  \"fecha\": \"{{fecha_f6}}\",\n  \"hora\": \"06:30\",\n  \"peso_bruto_tn\": \"{{peso_c_f6}}\",\n  \"tipo_mineral\": {{id_moa_f6}},\n  \"justificaciones\": {\"V1\": \"Corrida repetida de Postman con el mismo peso\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.environment.set('id_c_f6', pm.response.json().id);",
+                  "pm.environment.set('codigo_c_f6', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Anular el ingreso C -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/{{id_c_f6}}/anular/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba de consulta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA06 · Búsqueda sin criterios -> 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?placa=&fecha="
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Debe indicar al menos la placa o la fecha\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA12 · Rango inverso -> 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?placa=V2K&fecha_desde=2026-12-31&fecha_hasta=2026-01-01"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"La fecha inicial no puede ser posterior a la fecha final\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA02 y CA08 · Placa parcial con un ingreso En proceso -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?placa={{placa_f6}}&fecha={{fecha_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().results;",
+                  "pm.test(\"El ingreso En proceso, sin neto\", () => { const b = r.find(x => x.codigo === pm.environment.get(\"codigo_b_f6\")); pm.expect(b.estado).to.eql(\"EN_PROCESO\"); pm.expect(b.peso_neto_tn).to.eql(null); pm.expect(b.pendiente_destare).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA05 · El anulado aparece con su motivo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?placa={{placa_f6}}&fecha={{fecha_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().results.find(x => x.codigo === pm.environment.get(\"codigo_c_f6\"));",
+                  "pm.test(\"Anulado con motivo\", () => { pm.expect(c.estado).to.eql(\"ANULADO\"); pm.expect(c.motivo_anulacion).to.eql(\"Prueba de consulta\"); });",
+                  "pm.test(\"Del más reciente al más antiguo (CA01)\", () => { const f = pm.response.json().results.map(x => x.fecha_hora_pesaje); pm.expect(f).to.eql([...f].sort().reverse()); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA04 · Sin resultados -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?placa=ZZZ999&fecha={{fecha_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No se encontraron ingresos con los criterios indicados\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA03 · El anulado no suma -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?q={{codigo_c_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cuenta, no suma\", () => { const t = pm.response.json().totales; pm.expect(t.ingresos).to.eql(1); pm.expect(t.toneladas).to.eql(\"0.00\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA10 · Búsqueda por código -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?q={{codigo_a_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Encuentra el ingreso y suma su neto\", () => { const b = pm.response.json(); pm.expect(b.results[0].id).to.eql(Number(pm.environment.get(\"id_a_f6\"))); pm.expect(b.totales.registrados).to.eql(1); });",
+                  "pm.test(\"Sin respaldo, señalado en la lista (CA09)\", () => pm.expect(pm.response.json().results[0].sin_respaldo_fotografico).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA11 · Listado sin resultados -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/?q=NO-EXISTE-0000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay ingresos con estos filtros\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA04 a CA06 · Detalle completo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/{{id_a_f6}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test(\"Tres marcas distintas\", () => pm.expect(new Set([d.fecha_hora_pesaje, d.hora_inicio_registro, d.hora_fin_registro]).size).to.eql(3));",
+                  "pm.test(\"Sin foto con su motivo (HU-M07-01 CA09)\", () => { pm.expect(d.respaldo.tipo).to.eql(\"SIN_RESPALDO_FOTOGRAFICO\"); pm.expect(d.respaldo.motivo).to.eql(\"Ticket extraviado o dañado\"); });",
+                  "pm.test(\"Bloques presentes o ausentes, nunca omitidos\", () => { pm.expect(d.reconocimiento.disponible).to.eql(false); pm.expect(d.validaciones.disponible).to.eql(true); pm.expect(d.historial.length).to.be.above(0); });",
+                  "pm.test(\"Espera en cancha (HU-M07-01 CA11)\", () => pm.expect(d.trazabilidad.lote).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RN-M07-06 · El ticket sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/consulta/ingresos/{{id_ingreso_f3}}/ticket/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-01 · CA03 · El ticket con sesión -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/{{id_ingreso_f3}}/ticket/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es una imagen\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"image\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA15 · El Supervisor no exporta -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/exportar/?q={{codigo_a_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA14 · Nada que exportar -> 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/exportar/?q=NO-EXISTE-0000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay ingresos para exportar\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA13 · Exportar a CSV -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/ingresos/exportar/?fecha_desde={{fecha_f6}}&fecha_hasta={{fecha_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"text/csv\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/csv\"));",
+                  "pm.test(\"Encabezado y punto y coma\", () => pm.expect(pm.response.text()).to.include(\"Código;Fecha y hora del pesaje;Placa\"));",
+                  "pm.test(\"Incluye el anulado con su estado (RN-M07-16)\", () => pm.expect(pm.response.text()).to.include(pm.environment.get(\"codigo_c_f6\") + \";\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M09-01 · CA06 · La exportación queda en auditoría -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=EXPORTAR&usuario={{usuario_administrativo}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con el criterio y el número\", () => { const e = pm.response.json().results[0]; pm.expect(e.valores_nuevos.exportacion).to.eql(\"LISTADO_INGRESOS\"); pm.expect(e.valores_nuevos.cantidad).to.be.above(0); pm.expect(e.valores_nuevos.filtros.desde).to.eql(pm.environment.get(\"fecha_f6\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA16 · Cabecera con los dígitos finales -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/cabecera/?q={{codigo_a_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Abre el detalle\", () => pm.expect(pm.response.json()).to.eql({tipo: \"INGRESO\", id: Number(pm.environment.get(\"id_a_f6\")), codigo: pm.environment.get(\"codigo_a_f6\")}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-02 · CA17 · Cabecera sin código es placa -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/cabecera/?q=V2K"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Deriva a la placa\", () => pm.expect(pm.response.json()).to.eql({tipo: \"PLACA\", placa: \"V2K\"}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-03 · CA01 a CA04 · Calendario del día del pesaje -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/calendario/?anio={{anio_f6}}&mes={{mes_f6}}&dia={{dia_f6}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const d = b.dias.find(x => x.fecha === pm.environment.get(\"fecha_f6\"));",
+                  "pm.test(\"Marcas de En proceso y anulados\", () => { pm.expect(d.con_en_proceso).to.eql(true); pm.expect(d.con_anulados).to.eql(true); });",
+                  "pm.test(\"El día lista los ingresos de la corrida\", () => pm.expect(b.dia.ingresos.map(x => x.codigo)).to.include(pm.environment.get(\"codigo_a_f6\")));",
+                  "pm.test(\"Resumen del mes\", () => pm.expect(b.resumen).to.have.all.keys(\"ingresos\", \"toneladas\", \"dias_con_llegadas\", \"en_proceso\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-04 · CA11 · Inicio del Supervisor sin enlace a la consolidación -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/inicio/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cifra sin enlace\", () => pm.expect(pm.response.json().toneladas_hoy.enlace).to.eql(null));",
+                  "pm.test(\"Siete días\", () => pm.expect(pm.response.json().ultimos_siete_dias).to.have.lengthOf(7));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-04 · CA01 · Inicio del Administrativo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/inicio/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con enlace\", () => pm.expect(pm.response.json().toneladas_hoy.enlace).to.eql(\"/consolidacion\"));",
+                  "pm.test(\"Pendientes de destare con la placa nueva\", () => pm.expect(pm.response.json().pendientes_destare.placas).to.include(pm.environment.get(\"placa_f6\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-04 · CA06 y CA08 · Avisos del Supervisor -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/avisos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().avisos;",
+                  "pm.test(\"Aviso de destare del ingreso B\", () => pm.expect(a.some(x => x.tipo === \"DESTARE\" && x.titulo === pm.environment.get(\"codigo_b_f6\") + \" espera el destare\")).to.eql(true));",
+                  "pm.test(\"Sin cierre ni ingresos sin lote\", () => pm.expect(a.some(x => [\"LOTE_LISTO\", \"SIN_LOTE\"].includes(x.tipo))).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-04 · Avisos del Administrativo -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/avisos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ingresos sin lote\", () => pm.expect(pm.response.json().avisos.some(x => x.tipo === \"SIN_LOTE\")).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparación · Destare del vehículo nuevo -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/ingresos/destares/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo\": {{id_vehiculo_f6}},\n  \"tara_tn\": \"12.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M07-04 · CA10 · El aviso desaparece con el destare -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/avisos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ya no avisa el ingreso B\", () => pm.expect(pm.response.json().avisos.some(x => x.titulo === pm.environment.get(\"codigo_b_f6\") + \" espera el destare\")).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F6 · La consulta sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/consulta/ingresos/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Puerta de F6 (PLAN-02): búsqueda por placa y fecha, listado con totales, detalle completo, ticket detrás de la sesión, exportación CSV, cabecera, calendario, inicio y avisos por rol. Registra sus propios ingresos —uno Registrado, uno En proceso y uno anulado— con fecha de ayer. El ticket con imagen usa el ingreso de F3, así que corre en la regresión completa."
     }
   ]
 }
