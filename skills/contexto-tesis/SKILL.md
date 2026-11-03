@@ -221,6 +221,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-24 | El patrón de placa vive en `settings.PATRON_PLACA` y lo comparten M02 y V3; el alta rápida de tipo de mineral es el mismo `POST` con `desde_registro` |
 | D-25 | El borrador del registro viaja firmado por el servidor y no se guarda; correcciones y reversiones se reconstruyen desde la auditoría; `causa_fallo` en el reconocimiento |
 | D-26 | La carga de M06: lote, parte, secado propio del tardío y su porción por ruta; `fecha_asignacion_lote` en el ingreso; eventos del lote con la entidad `Lote` |
+| D-27 | Búsqueda y listado comparten `GET /consulta/ingresos/` (las claves `placa` o `fecha` lo hacen búsqueda); `Ingreso.objects.computables()` es el único criterio de toneladas |
 
 **Pendientes de cierre**
 

@@ -160,7 +160,7 @@ def pendientes(lote: LoteProceso) -> list[str]:
 def toneladas(lote: LoteProceso) -> Decimal:
     """RN-M06-24 y RNF-M06-03: una consulta agregada sobre los ingresos no
     anulados del lote, calculada al consultarse."""
-    total = Ingreso.objects.filter(lote=lote, estado=Ingreso.REGISTRADO).aggregate(t=Sum("peso_neto_tn"))["t"]
+    total = Ingreso.objects.computables().filter(lote=lote).aggregate(t=Sum("peso_neto_tn"))["t"]
     return total or Decimal("0.00")
 
 
