@@ -395,7 +395,9 @@ def test_hu_m03_03_ca05_el_anulado_conserva_datos_imagen_motivo_y_responsable(ap
     assert (d["estado"], d["motivo_anulacion"], d["anulado_por"]) == ("ANULADO", "Ingreso duplicado",
                                                                        administrador.username)
     assert d["peso_neto_tn"] == "18.00" and d["imagen_url"]
-    assert api.get(d["imagen_url"]).status_code == 200
+    imagen = api.get(d["imagen_url"])
+    assert imagen.status_code == 200
+    imagen.close()
 
 
 def test_hu_m03_03_ca07_auditoria_de_la_anulacion(api_como, administrador, ingreso):
