@@ -125,7 +125,8 @@ flowchart LR
 ### 4.1 Localizar y enderezar (`01_localizar.py`)
 
 Cada foto se registra contra un ticket de referencia (T017, frontal y limpio) por sus partes impresas:
-marco, títulos y etiquetas. SIFT encuentra puntos comunes, RANSAC descarta como ruido lo manuscrito,
+marco, títulos y etiquetas. SIFT encuentra puntos comunes, el emparejamiento exhaustivo los asocia (no FLANN: sus árboles aleatorios
+enderezaban distinto la misma foto en cada corrida y cambiaban la lectura), RANSAC descarta como ruido lo manuscrito,
 que cambia de un ticket a otro, y la homografía resultante lleva el ticket a 1500 × 773 px.
 
 Este método resiste el ticket rotado, inclinado, de cabeza, arrugado o con un borde fuera de la foto.
@@ -159,7 +160,7 @@ Un campo que no cumple su regla queda **sin valor y sin confianza**, nunca con u
 
 | Campo | Regla | Sin lectura cuando |
 |---|---|---|
-| Peso | Con separador y parte entera de 1 o 2 dígitos: toneladas (`13.400`, `13.4` y `13,4` dan 13,400 t). Sin separador y 4 o 5 dígitos: kilogramos (`15720` da 15,720 t). Un espacio junto al separador («13. 400») se une. **El peso bruto es el mayor número de la línea**, porque el cálculo de tara aparece en cualquier orden | Ningún número cumple la regla |
+| Peso | Con separador y parte entera de 1 o 2 dígitos: toneladas (`13.400`, `13.4` y `13,4` dan 13,40 t). Sin separador y 4 o 5 dígitos: kilogramos (`20410` da 20,41 t). El valor se propone en toneladas con dos decimales, como lo guarda el ingreso (`peso_bruto_tn`). Un espacio junto al separador («13. 400») se une. **El peso bruto es el mayor número de la línea**, porque el cálculo de tara aparece en cualquier orden | Ningún número cumple la regla |
 | Placa | Tres caracteres, guion opcional y tres dígitos. En los tres últimos se corrigen las confusiones de forma (O→0, S→5, B→8, I→1, Z→2, G→6). La parte numérica debe tener al menos dos dígitos reales: un nombre no es placa | No hay un patrón de placa en la zona |
 | Fecha | Día y mes de 1 o 2 dígitos, año de 2 o 4; el año de dos dígitos se completa a 20AA; la fecha debe existir | Falta una casilla o la fecha no existe |
 
@@ -190,7 +191,28 @@ repite cuatro veces por época con variaciones aleatorias que imitan la foto de 
 | Semilla | 2026 |
 | Equipo | RTX 5080 de 16 GB, PyTorch 2.11.0+cu128, Transformers 5.22.1 |
 
-### 5.3 Validación cruzada y modelo final
+### 5.3 Qué es el modelo y dónde corre
+
+- **Qué es.** TrOCR es una red neuronal (un *transformer* codificador y decodificador) de 334 millones
+  de parámetros, preentrenada por Microsoft para leer texto manuscrito. No se creó un modelo desde
+  cero: se hizo **aprendizaje por transferencia**, que ajusta un modelo existente a los tickets de la
+  Balanza. PyTorch y Transformers son las librerías que lo ejecutan; el modelo en sí es el archivo de
+  pesos. La localización por SIFT y las reglas de normalización son visión por computadora clásica y
+  reglas, no aprendizaje.
+- **Qué pesa.** 1,3 GB en precisión de 32 bits (`model.safetensors`). No se compila: PyTorch carga el
+  archivo y lo ejecuta en cualquier equipo con Python, en CPU o en GPU. Necesita unos 3 GB de memoria
+  libre.
+- **Dónde corre.** Solo en el servidor del backend. Los usuarios usan el sistema desde el navegador, y
+  ni su teléfono ni su computadora cargan el modelo.
+- **Dónde se guarda.** No está en GitHub: `datos/` está excluido de git, GitHub rechaza archivos de
+  más de 100 MB, y el modelo aprendió de las etiquetas de entrenamiento, entre ellas los nombres
+  escritos en el lugar de la placa, así que no debe publicarse. Para el despliegue hay que elegir un
+  almacenamiento privado (sección 10.1, S3).
+- **Cómo podría pesar menos.** Guardarlo en 16 bits lo reduce a unos 670 MB con una pérdida mínima. La
+  versión `small` de TrOCR pesa unos 250 MB, pero sin ajuste rindió la mitad que la `base`. Ambas
+  opciones deben medirse con la validación cruzada antes de adoptarse.
+
+### 5.4 Validación cruzada y modelo final
 
 - **Validación cruzada:** cinco entrenamientos; cada uno deja fuera un grupo y se evalúa con él. Así
   cada foto se lee una vez con un modelo que no la vio. Duración: unos 2 minutos por grupo en GPU.
@@ -237,6 +259,7 @@ La dispersión entre grupos, de 72 % a 86 %, es la esperable con seis o siete fo
 | Regla del peso: unir el espacio junto al separador | La primera corrida pasa de 74,0 % a 76,0 % sin reentrenar |
 | 12 épocas en lugar de 20 | Con 20 la pérdida llega a 0,000 y el modelo memoriza números de otros tickets |
 | Confianza del carácter más dudoso en lugar del promedio | Los errores que el umbral no resalta bajan de 19 a 6 |
+| Corrección de la confianza: una lectura con todos sus caracteres seguros salía con 0,00, porque su log-probabilidad 0 se confundía con relleno | Solo cambian falsas alarmas sobre lecturas correctas. Ninguna lectura equivocada tenía confianza 0,00, así que la exactitud y los 6 errores confiados se mantienen |
 
 ### 6.4 Tiempo por ticket
 
@@ -248,6 +271,27 @@ La dispersión entre grupos, de 72 % a 86 %, es la esperable con seis o siete fo
 
 El servidor en la nube no tendrá GPU. Con unos 5 s por ticket en CPU, el tiempo queda en el límite del
 criterio de D-15 para el procesamiento síncrono (sección 10).
+
+### 6.5 Primera prueba con tickets nuevos
+
+Cinco fotos de 2025 (P001 a P005), de tickets que el modelo no vio, leídas con `06_leer.py` en CPU y
+comparadas a ojo con el ticket:
+
+| Foto | Placa | Fecha | Peso bruto |
+|---|---|---|---|
+| P001 | Correcta | **Error confiado**: día «4» leído 14 (1,00) | **Error confiado**: 55,08 leído 55,03 (0,84) |
+| P002 | Correcta | Sin lectura, correcto: día tapado por un dedo | Correcto, resaltado (0,65) |
+| P003 | Error, resaltado (0,40) | Correcta | Correcto, resaltado (0,00) |
+| P004 | **Error confiado** (0,88) | Correcta | Correcto (0,93) |
+| P005 | Error, resaltado (0,56) | Correcta | Correcto, resaltado (0,55) |
+
+Resultado: 10 de 15 lecturas correctas y 3 errores con confianza ≥ 0,80, una proporción peor que la de
+la validación cruzada. Las tres placas equivocadas son de un vehículo que no aparece en el
+entrenamiento: el modelo la convierte en una placa que conoce. El peso de P003 (20,41 t) y el año 2025
+se leen bien pero con confianza baja, porque el entrenamiento solo tenía pesos de 12 a 17 t y de 51 a
+61 t, y solo el año 26. Confirma el riesgo de la sección 9: con 29 tickets y pocas placas, el modelo
+generaliza mal a valores nuevos. La salida es ampliar el entrenamiento con tickets variados y reservar
+otros, distintos, para validar.
 
 ## 7. Errores del modelo de 12 épocas
 
@@ -288,6 +332,7 @@ PyTorch 2.7 o superior con CUDA 12.8 o superior.
 | Validación cruzada | `.venv/Scripts/python.exe -u 04_ajustar.py --validacion --epocas 12 --sufijo=-e12` | 10 min |
 | Modelo final | `.venv/Scripts/python.exe -u 04_ajustar.py --final --epocas 12 --nombre trocr-ticket-v1` | 3 min |
 | Informe | `.venv/Scripts/python.exe 05_informe.py` | 1 min |
+| Fotos nuevas | `.venv/Scripts/python.exe 06_leer.py datos/pruebas/entrada --dispositivo cpu` | 7 s por foto en CPU |
 
 Para comparar con Tesseract se usa la herramienta existente del backend, dentro del contenedor, con
 las 32 fotos y `verdad.csv` copiados a una carpeta:
@@ -308,7 +353,26 @@ Windows.
 - `nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv,noheader` en cero indica que no
   hay entrenamiento en curso.
 
-### 8.4 Agregar tickets nuevos
+### 8.4 Probar fotos nuevas sin transcribirlas (`06_leer.py`)
+
+Para validar el entrenamiento con tickets que el modelo nunca vio, antes de tocar el backend:
+
+1. Copiar las fotos a `datos/pruebas/entrada/`, con cualquier nombre.
+2. Ejecutar `.venv/Scripts/python.exe 06_leer.py datos/pruebas/entrada --dispositivo cpu`.
+
+Por cada foto se muestra lo que el sistema propondría al usuario: placa, fecha y peso bruto con su
+confianza, «VERIFICAR» cuando la confianza no llega a 0,80, y «sin lectura» cuando el campo no cumple
+su regla. Si el ticket no se localiza, lo informa como lo haría el sistema. Las lecturas se acumulan
+en `datos/pruebas/lecturas.csv`, y el ticket enderezado y los recortes quedan en
+`datos/pruebas/salida/` para revisar por qué falló una lectura.
+
+Con `--dispositivo cpu` el tiempo es el de un servidor sin GPU: unos 7 s por foto, de los cuales
+1 a 2 s son la localización.
+
+Una foto de un ticket usado en el entrenamiento sale con confianza 1,00 porque el modelo ya la
+conoce. **Solo las fotos de tickets nuevos validan el entrenamiento.**
+
+### 8.5 Agregar tickets nuevos
 
 1. Copiar las fotos a `datos/originales/` con el número siguiente.
 2. Agregar sus filas a `inventario.csv` y `transcripcion.csv`, y corroborarlas.

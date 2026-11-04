@@ -2,26 +2,10 @@
 según `plantilla.json`, y arma una hoja con todos los recortes para revisarlos.
 Solo se recortan peso, placa, día, mes y año: lo demás del ticket no se lee."""
 
-import json
-from pathlib import Path
-
 import cv2
 import numpy as np
 
-BASE = Path(__file__).parent
-DATOS = BASE / "datos"
-CAMPOS = ("peso", "placa", "dia", "mes", "anio")
-
-
-def plantilla():
-    return {k: v for k, v in json.loads((BASE / "plantilla.json").read_text(encoding="utf-8")).items()
-            if not k.startswith("_")}
-
-
-def recortar(enderezado, zonas):
-    h, w = enderezado.shape[:2]
-    return {c: enderezado[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)]
-            for c, (x0, y0, x1, y1) in zonas.items()}
+from lab.cadena import DATOS, ZONAS as CAMPOS, plantilla, recortar
 
 
 def main():

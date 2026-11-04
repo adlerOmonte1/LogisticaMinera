@@ -7,7 +7,7 @@ devuelve None: sin lectura, nunca un valor estimado (RN-M04-03).
 
 import re
 from datetime import date
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 # Un número de peso: con separador (13.400, 13.4, 13,4), con espacio de miles
 # (15 720) o sin separador (15720).
@@ -32,7 +32,8 @@ def peso_bruto(texto: str) -> Decimal | None:
     («13. 400») es un hueco de la escritura, no otro número."""
     texto = re.sub(r"(\d)\s*([.,:])\s*(\d)", r"\1\2\3", texto or "")
     valores = [v for v in (a_toneladas(n) for n in _NUMERO.findall(texto)) if v is not None]
-    return max(valores).quantize(Decimal("0.001")) if valores else None
+    # En toneladas con dos decimales, como lo guarda el ingreso (peso_bruto_tn).
+    return max(valores).quantize(Decimal("0.01"), ROUND_HALF_UP) if valores else None
 
 
 def placa(texto: str) -> str | None:

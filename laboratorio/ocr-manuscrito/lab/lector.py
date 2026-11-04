@@ -73,11 +73,17 @@ class LectorTrOCR:
         puntajes = self.modelo.compute_transition_scores(
             salida.sequences, salida.scores, getattr(salida, "beam_indices", None), normalize_logits=False
         )
+        # Las posiciones de relleno, después del fin de la lectura, se reconocen por
+        # el token de relleno, no por su puntaje: un carácter leído con total
+        # seguridad también tiene log-probabilidad 0.
+        relleno = self.procesador.tokenizer.pad_token_id
+        generados = salida.sequences[:, -puntajes.shape[1]:]
         lecturas = []
-        for texto, fila in zip(textos, puntajes):
+        for texto, fila, ids in zip(textos, puntajes, generados):
             # La confianza de la lectura es la de su carácter más dudoso: un solo
             # dígito equivocado basta para que el peso o la placa estén mal.
-            probs = torch.exp(fila[torch.isfinite(fila) & (fila != 0)])
+            validos = (ids != relleno) & torch.isfinite(fila)
+            probs = torch.exp(fila[validos])
             conf = float(probs.min()) if len(probs) else 0.0
             lecturas.append(Lectura(texto.strip(), round(min(max(conf, 0.0), 1.0), 3)))
         return lecturas
