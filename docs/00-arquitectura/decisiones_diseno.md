@@ -460,6 +460,26 @@ abiertos.
 **Qué protege.** Que el recorrido anotado describa el mineral que de verdad lo hizo, incluido el que
 llegó tarde, y que cada operación del lote llegue al historial de cada ingreso que afecta.
 
+## D-27. Decisiones de construcción de la consulta de ingresos
+
+**Módulos afectados:** M03, M06, M07, M08 · **Fecha:** 02/11/2026
+
+Se toma durante la fase F6 de la implementación.
+
+| Aspecto | Decisión |
+|---|---|
+| Búsqueda y listado en un endpoint | `GET /consulta/ingresos/` es la búsqueda por placa y fecha cuando llega la clave `placa` o `fecha`, aunque esté vacía: entonces exige una de las dos (HU-M07-01 CA06) y, sin resultados, responde «No se encontraron ingresos con los criterios indicados». Sin esas claves es el listado, que sin fechas presenta el mes en curso hasta hoy (HU-M07-02 CA08) y, sin resultados, responde «No hay ingresos con estos filtros». Así se cumplen los dos criterios con una sola consulta, como pide la especificación |
+| Día del calendario | `GET /consulta/calendario/?anio&mes&dia` devuelve el mes y, con `dia`, la lista de ese día con su propio mensaje vacío (HU-M07-03 CA05) |
+| Búsqueda de la cabecera | `GET /consulta/cabecera/?q` responde `INGRESO` con su identificador, por el código completo o por sus dígitos finales, o `PLACA` con el texto para la búsqueda por placa (HU-M07-02 CA16 y CA17) |
+| Criterio único de toneladas | `Ingreso.objects.computables()` —solo Registrados— lo usan el lote (M06), el listado, el calendario, el inicio (M07) y lo usará el consolidado (M08) |
+| Respaldo del detalle | Tres estados: `IMAGEN`, `SIN_RESPALDO_FOTOGRAFICO` con su motivo y `NO_DISPONIBLE` cuando el almacén no tiene o no entrega el archivo (RN-M07-04) |
+| Avisos | Los textos y los roles son los de la maqueta: el destare y la advertencia V4 justificada hoy, para los tres roles; los lotes con su siguiente paso, para los tres; el lote listo para cerrar, solo para el Administrador; los ingresos sin lote, para el Administrativo y el Administrador |
+| CSV | UTF-8 con BOM, punto y coma, coma decimal y fecha `dd/mm/aaaa hh:mm`. El evento `EXPORTAR` guarda los filtros y el número de ingresos |
+| Rutas con identificador | Los identificadores de ingresos y lotes solo admiten dígitos: un identificador mal formado responde 404, no un error del servidor |
+
+**Qué protege.** Que el mismo periodo tenga un solo total de toneladas en cualquier pantalla, y que
+la búsqueda nunca recorra el histórico sin criterio.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04
