@@ -480,6 +480,25 @@ Se toma durante la fase F6 de la implementación.
 **Qué protege.** Que el mismo periodo tenga un solo total de toneladas en cualquier pantalla, y que
 la búsqueda nunca recorra el histórico sin criterio.
 
+## D-28. Decisiones de construcción de la consolidación y del piloto de motores
+
+**Módulos afectados:** M04, M08 · **Fecha:** 02/11/2026
+
+Se toma durante la fase F7 de la implementación.
+
+| Aspecto | Decisión |
+|---|---|
+| Cálculo | `GET /consolidacion/mensual/?anio&mes` agrega con `Ingreso.objects.computables()` (D-27): una consulta por tipo de mineral y dos de conteo, sin acumulado guardado |
+| Participación | Porcentaje de cada tipo sobre el total del mes, con dos decimales; el total suma exactamente las filas |
+| Mes en curso | Se informa «Total al corte de hoy, {dd/mm/aaaa}», con la expresión de la maqueta |
+| Avisos del resultado | `en_proceso` con la cantidad y los códigos, y `en_proceso_mensaje` con el texto de HU-M08-01 CA07; `anulados_excluidos` con su número (RS-M08-13) |
+| Archivo XLSX | Periodo, fecha de generación, una fila por tipo con ingresos, toneladas y participación, la fila de total, y los ingresos En proceso y anulados excluidos (RN-M08-07). Los valores son los mismos de la pantalla |
+| Formatos | Un exportador por formato en `EXPORTADORES`; añadir uno no toca el cálculo (RN-M08-06) |
+| Piloto de motores | `python manage.py piloto_motores CARPETA --motores ...` recibe las imágenes y un `verdad.csv` y produce el informe con exactitud por campo, tiempo por ticket y lecturas equivocadas que el umbral no habría resaltado. Costo y dependencia de conexión se completan a mano. D-12 y D-15 siguen provisionales hasta ejecutarlo con 20 a 30 tickets reales |
+
+**Qué protege.** Que el total del mes sea el mismo en la consolidación, el calendario y el listado, y
+que la elección del motor se haga con números medidos sobre tickets de la planta.
+
 ## D-15. Procesamiento del reconocimiento: síncrono por defecto — *pendiente de confirmar*
 
 **Módulos afectados:** M04

@@ -222,6 +222,7 @@ del dominio o la comparabilidad de la medición. Están en `docs/00-arquitectura
 | D-25 | El borrador del registro viaja firmado por el servidor y no se guarda; correcciones y reversiones se reconstruyen desde la auditoría; `causa_fallo` en el reconocimiento |
 | D-26 | La carga de M06: lote, parte, secado propio del tardío y su porción por ruta; `fecha_asignacion_lote` en el ingreso; eventos del lote con la entidad `Lote` |
 | D-27 | Búsqueda y listado comparten `GET /consulta/ingresos/` (las claves `placa` o `fecha` lo hacen búsqueda); `Ingreso.objects.computables()` es el único criterio de toneladas |
+| D-28 | Consolidado con el criterio único de toneladas y exportadores por formato; `piloto_motores` para cerrar D-12 y D-15 con tickets reales |
 
 **Pendientes de cierre**
 
