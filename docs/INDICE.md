@@ -1,7 +1,7 @@
 # Índice de la documentación
 
 Generado por `scripts/indexar_docs.py`; no se edita a mano.
-**157 archivos · 20748 líneas de texto.**
+**175 archivos · 21019 líneas de texto.**
 
 ## `Mockup/`
 
@@ -28,8 +28,8 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [GUIA_FRONTEND_ANGULAR.md](00-arquitectura/GUIA_FRONTEND_ANGULAR.md) | Guía del frontend — Angular en repositorio separado | 344 | 13 |
 | [GUIA_MARCO_DE_TRABAJO.md](00-arquitectura/GUIA_MARCO_DE_TRABAJO.md) | Guía definitiva del marco de trabajo | 912 | 34 |
 | [convenciones_codigo.md](00-arquitectura/convenciones_codigo.md) | Convenciones de códigos y nomenclatura | 94 | 4 |
-| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 491 | 31 |
-| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 438 | 23 |
+| [decisiones_diseno.md](00-arquitectura/decisiones_diseno.md) | Decisiones de diseño fijadas | 554 | 38 |
+| [modelo_datos_entidad_relacion.md](00-arquitectura/modelo_datos_entidad_relacion.md) | Modelo de datos — Entidad-Relación | 441 | 23 |
 
 ## `docs/00-tesis/`
 
@@ -58,7 +58,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [bitacora_puertas.md](03-pruebas/bitacora_puertas.md) | Bitácora de puertas de fase | 12 | 2 |
+| [bitacora_puertas.md](03-pruebas/bitacora_puertas.md) | Bitácora de puertas de fase | 16 | 4 |
 | [plan_de_pruebas.md](03-pruebas/plan_de_pruebas.md) | Plan de pruebas — Sistema web inteligente | 276 | 16 |
 
 ## `docs/03-pruebas/evidencias/F0/`
@@ -96,6 +96,49 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 | [newman.xml](03-pruebas/evidencias/F3/newman.xml) | — | — | 86 |
 | [pytest.txt](03-pruebas/evidencias/F3/pytest.txt) | — | — | 16 |
 | [trazabilidad.md](03-pruebas/evidencias/F3/trazabilidad.md) | — | 23 | 3 |
+
+## `docs/03-pruebas/evidencias/F4/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F4/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F4/newman.xml) | — | — | 97 |
+| [pytest.txt](03-pruebas/evidencias/F4/pytest.txt) | — | — | 17 |
+| [trazabilidad.md](03-pruebas/evidencias/F4/trazabilidad.md) | — | 23 | 3 |
+
+## `docs/03-pruebas/evidencias/F5/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F5/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F5/newman.xml) | — | — | 140 |
+| [pytest.txt](03-pruebas/evidencias/F5/pytest.txt) | — | — | 18 |
+| [trazabilidad.md](03-pruebas/evidencias/F5/trazabilidad.md) | — | 23 | 2 |
+
+## `docs/03-pruebas/evidencias/F6/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F6/calidad.txt) | — | — | 0 |
+| [newman.xml](03-pruebas/evidencias/F6/newman.xml) | — | — | 160 |
+| [pytest.txt](03-pruebas/evidencias/F6/pytest.txt) | — | — | 18 |
+| [trazabilidad.md](03-pruebas/evidencias/F6/trazabilidad.md) | — | 23 | 0 |
+
+## `docs/03-pruebas/evidencias/F7/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [calidad.txt](03-pruebas/evidencias/F7/calidad.txt) | — | — | 0 |
+| [ensayo_piloto.md](03-pruebas/evidencias/F7/ensayo_piloto.md) | Informe del piloto de motores de reconocimiento | 26 | 1 |
+| [newman.xml](03-pruebas/evidencias/F7/newman.xml) | — | — | 168 |
+| [pytest.txt](03-pruebas/evidencias/F7/pytest.txt) | — | — | 19 |
+| [trazabilidad.md](03-pruebas/evidencias/F7/trazabilidad.md) | — | 23 | 0 |
+
+## `docs/03-pruebas/evidencias/validacion_integral/`
+
+| Archivo | Título | Líneas | KB |
+|---|---|---:|---:|
+| [informe.md](03-pruebas/evidencias/validacion_integral/informe.md) | Informe de validación integral del backend (F0 a F7) | 80 | 5 |
 
 ## `docs/model-c4/`
 
@@ -373,7 +416,7 @@ Generado por `scripts/indexar_docs.py`; no se edita a mano.
 
 | Archivo | Título | Líneas | KB |
 |---|---|---:|---:|
-| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 325 | 23 |
+| [SKILL.md](../skills/contexto-tesis/SKILL.md) | Skill `contexto-tesis` | 328 | 23 |
 
 ## `skills/despliegue-docker/`
 
