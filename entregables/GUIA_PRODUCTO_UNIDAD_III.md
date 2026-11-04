@@ -416,9 +416,11 @@ resultado obtenido, severidad), en **GitHub Issues** con etiquetas `incidencia`,
 | DEF-003 | 24/10/2026 | Trazabilidad | `reporte_trazabilidad.py` recorría los entornos virtuales | Baja | Se limita a `backend/apps` | Cerrada |
 | DEF-004 | 25/10/2026 | M01 | La sesión expirada no se detectaba porque el mensaje de SimpleJWT venía traducido | Alta | Se compara la raíz «expir» | Cerrada |
 | DEF-005 | 25/10/2026 | Postman | La prueba del bloqueo fallaba por peticiones en paralelo | Media | Intentos encadenados en serie | Cerrada |
-| DEF-006 | 26/10/2026 | Pruebas | En el contenedor, pytest toma `config.settings.development` del entorno en lugar de la configuración de pruebas | Media | Pendiente: `--ds=config.settings.test` en `pytest.ini` | Abierta |
+| DEF-006 | 26/10/2026 | Pruebas | En el contenedor, pytest toma `config.settings.development` del entorno en lugar de la configuración de pruebas | Media | `--ds=config.settings.test` en `pytest.ini` | Cerrada |
 | DEF-007 | 02/11/2026 | CI de documentación | `validar_docs.py` falla en GitHub por enlaces a `.DS_Store` en el índice | Media | `indexar_docs.py` omite archivos ocultos | Corregida, por subir |
 | DEF-008 | 02/11/2026 | Repositorio | La rama `feature/M03-ingresos` contiene commits del alcance anterior | Baja | Renombrar o archivar la rama | Abierta |
+| DEF-009 | 02/11/2026 | Documentación de la API | Trece vistas de M06, M07 y M08 sin respuesta declarada generaban errores en el esquema OpenAPI | Baja | `@extend_schema(responses=OpenApiTypes.OBJECT)` en cada vista | Cerrada |
+| DEF-010 | 02/11/2026 | Pruebas | Dos pruebas abrían la imagen del ticket sin cerrarla (`ResourceWarning`) | Baja | Cierre explícito del archivo | Cerrada |
 
 Las incidencias que salgan esta semana del frontend se registran igual. Que haya incidencias
 abiertas no es malo: muestra un proceso vivo. Lo que resta es que no estén registradas.
@@ -481,7 +483,7 @@ cada una.
 > | Postman | 80 peticiones de F0 a F2, 261 aserciones, 0 fallos |
 > | Trazabilidad | M02 al 100 %: 30 criterios y 19 reglas con prueba |
 > | Decisiones tomadas | D-24: patrón de placa configurable y alta rápida desde el registro |
-> | Incidencias | DEF-006 (abierta) |
+> | Incidencias | DEF-008 (abierta) |
 > | Resultado de la puerta | Aprobada, observada: el catálogo es provisional hasta recibir el de la empresa |
 > | Capturas | Newman en verde, Swagger de `/catalogo/`, base con las tablas nuevas |
 > | Lecciones | La búsqueda exacta por placa se necesitará en M03; se adelantó aquí |

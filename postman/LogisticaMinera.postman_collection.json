@@ -8899,6 +8899,340 @@
         }
       ],
       "description": "Puerta de F6 (PLAN-02): búsqueda por placa y fecha, listado con totales, detalle completo, ticket detrás de la sesión, exportación CSV, cabecera, calendario, inicio y avisos por rol. Registra sus propios ingresos —uno Registrado, uno En proceso y uno anulado— con fecha de ayer. El ticket con imagen usa el ingreso de F3, así que corre en la regresión completa."
+    },
+    {
+      "name": "F7 · M08 Consolidacion",
+      "item": [
+        {
+          "name": "Preparación · Periodos de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/inicio/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hoy = new Date();",
+                  "pm.environment.set('anio_f7', hoy.getFullYear()); pm.environment.set('mes_f7', hoy.getMonth() + 1);",
+                  "const ayer = new Date(Date.now() - 86400000);",
+                  "pm.environment.set('anio_ayer_f7', ayer.getFullYear()); pm.environment.set('mes_ayer_f7', ayer.getMonth() + 1);",
+                  "const futuro = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);",
+                  "pm.environment.set('anio_fut_f7', futuro.getFullYear()); pm.environment.set('mes_fut_f7', futuro.getMonth() + 1);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-01 · CA06 · El Supervisor no consolida -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/?anio={{anio_f7}}&mes={{mes_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-01 · CA04 · Periodo futuro -> 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/?anio={{anio_fut_f7}}&mes={{mes_fut_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No se puede consolidar un periodo futuro\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-01 · CA03 · Mes sin ingresos -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/?anio=2001&mes=1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay ingresos registrados para el periodo indicado\"));",
+                  "pm.test(\"Sin filas, sin error\", () => pm.expect(pm.response.json().tipos_mineral).to.eql([]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-01 · CA01 y CA07 · Consolidado del mes de los ingresos de la corrida -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/?anio={{anio_ayer_f7}}&mes={{mes_ayer_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.environment.set('total_f7', b.total_toneladas);",
+                  "pm.test(\"Por tipo de mineral, con participación\", () => { pm.expect(b.tipos_mineral.length).to.be.above(0); b.tipos_mineral.forEach(f => pm.expect(f).to.have.all.keys(\"tipo_mineral\", \"codigo\", \"nombre\", \"ingresos\", \"toneladas\", \"participacion\")); });",
+                  "pm.test(\"La suma por tipo es el total (RNF-M08-03)\", () => pm.expect(b.tipos_mineral.reduce((s, f) => s + Math.round(Number(f.toneladas) * 100), 0)).to.eql(Math.round(Number(b.total_toneladas) * 100)));",
+                  "pm.test(\"Anulados excluidos informados (CA02)\", () => pm.expect(b.anulados_excluidos).to.be.a(\"number\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF-M07-12 · El calendario del mes coincide con el consolidado -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consulta/calendario/?anio={{anio_ayer_f7}}&mes={{mes_ayer_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mismo total exacto\", () => pm.expect(pm.response.json().resumen.toneladas).to.eql(pm.environment.get(\"total_f7\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-01 · CA09 · El mes en curso al corte de hoy -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/?anio={{anio_f7}}&mes={{mes_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Indica el corte\", () => pm.expect(pm.response.json().al_corte).to.include(\"Total al corte de hoy\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-02 · CA04 · El Supervisor no exporta -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_supervisor}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/exportar/?anio={{anio_ayer_f7}}&mes={{mes_ayer_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"Acción no autorizada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-02 · CA02 · Exportar un mes sin ingresos -> 400",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/exportar/?anio=2001&mes=1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Cuerpo uniforme\", () => pm.expect(pm.response.json()).to.have.all.keys(\"codigo\", \"mensaje\", \"detalles\"));",
+                  "pm.test(\"Mensaje literal\", () => pm.expect(pm.response.json().mensaje).to.eql(\"No hay ingresos registrados para el periodo indicado\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-02 · CA01 · Exportar a XLSX -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_administrativo}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/consolidacion/mensual/exportar/?anio={{anio_ayer_f7}}&mes={{mes_ayer_f7}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Hoja de cálculo\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"spreadsheetml\"));",
+                  "pm.test(\"Nombre del archivo con el periodo\", () => pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"consolidado_\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "HU-M08-02 · CA05 · La exportación queda en auditoría -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/auditoria/?accion=EXPORTAR&usuario={{usuario_administrativo}}&texto=CONSOLIDADO_MENSUAL"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con el periodo exportado\", () => { const e = pm.response.json().results[0]; pm.expect(e.entidad).to.eql(\"Consolidado\"); pm.expect(e.valores_nuevos.periodo).to.eql(`${pm.environment.get(\"anio_ayer_f7\")}-${String(pm.environment.get(\"mes_ayer_f7\")).padStart(2, \"0\")}`); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "F7 · Consolidado sin sesión -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/consolidacion/mensual/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Puerta de F7 (PLAN-02): consolidado mensual por tipo de mineral, comparación exacta con el calendario de M07 (RNF-M07-12), periodo futuro, mes sin ingresos y exportación XLSX auditada. Usa los ingresos que dejaron F3 a F6 con fecha de ayer."
     }
   ]
 }
