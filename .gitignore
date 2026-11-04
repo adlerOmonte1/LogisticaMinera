@@ -32,3 +32,6 @@ docs/03-pruebas/_build_req.html
 
 # Respaldos locales (D-20)
 respaldos/
+
+# Laboratorio de reconocimiento manuscrito: fotos con datos personales, recortes y modelos
+laboratorio/ocr-manuscrito/datos/

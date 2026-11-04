@@ -1,0 +1,8 @@
+{
+  "_comentario": "Zonas del ticket enderezado (1500 px de ancho), en fracciones del ancho y del alto: [x0, y0, x1, y1]. Calibradas sobre la referencia T017.",
+  "peso":  [0.105, 0.445, 0.435, 0.560],
+  "placa": [0.528, 0.445, 0.960, 0.560],
+  "dia":   [0.048, 0.800, 0.128, 0.905],
+  "mes":   [0.128, 0.800, 0.208, 0.905],
+  "anio":  [0.208, 0.800, 0.288, 0.905]
+}
