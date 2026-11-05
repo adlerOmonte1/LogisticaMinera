@@ -1,0 +1,8 @@
+# Laboratorio local de reconocimiento manuscrito (ver PLAN_EJECUCION.md, L0).
+# PyTorch se instala aparte, con el índice de CUDA 12.8 (cu128).
+# Al cerrar L7 se congela con: uv pip freeze > requirements.lock
+transformers>=4.46
+opencv-python-headless>=4.10
+pillow>=10.4
+numpy>=1.26
+torchvision  # aumentos de datos (se instala con PyTorch)

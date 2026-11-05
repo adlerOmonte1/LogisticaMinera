@@ -32,3 +32,9 @@ docs/03-pruebas/_build_req.html
 
 # Respaldos locales (D-20)
 respaldos/
+
+# Laboratorio de reconocimiento manuscrito: fotos con datos personales, recortes y modelos
+laboratorio/ocr-manuscrito/datos/
+
+# Modelo local entrenado del ticket (pesos de mas de 1 GB; se provisiona con obtener_modelo)
+backend/modelos/

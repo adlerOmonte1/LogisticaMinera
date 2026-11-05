@@ -249,15 +249,24 @@ def _datos_ocr(lineas):
     return d
 
 
-def test_el_adaptador_local_interpreta_las_tres_lineas_del_ticket():
+def test_el_adaptador_local_interpreta_el_ticket_de_la_balanza_dr_09():
+    """El ticket trae `Peso:` sin unidad, `Placa:` y la fecha en tres casillas bajo
+    `DIA MES AÑO`, con el año en dos dígitos (DR-09)."""
     adaptador = ReconocedorTesseract.__new__(ReconocedorTesseract)
-    lineas = adaptador._lineas(_datos_ocr([("BALANZA ELECTRONICA", 90), ("FECHA 15/03/2027", 95),
-                                           ("PLACA V2K-841", 88), ("P. BRUTO 29 800 kg", 70)]))
-    assert adaptador._placa(lineas).valor == "V2K-841"
-    assert adaptador._fecha(lineas).valor == "2027-03-15"
+    lineas = adaptador._lineas(_datos_ocr([("BALANZA", 90), ("Peso: 13.400 Placa: A5S-939", 70),
+                                           ("DIA MES AÑO", 95), ("15 07 26", 85)]))
+    assert adaptador._placa(lineas).valor == "A5S-939"
+    assert adaptador._fecha(lineas).valor == "2026-07-15"
     peso = adaptador._peso(lineas)
-    assert (peso.valor, peso.confianza) == ("29.80", 0.7)
+    assert (peso.valor, peso.confianza) == ("13.40", 0.7)
     assert adaptador._placa(adaptador._lineas(_datos_ocr([("NADA", 50)]))).valor is None
+
+
+def test_el_adaptador_local_toma_el_peso_bruto_de_una_linea_con_calculo_de_tara():
+    adaptador = ReconocedorTesseract.__new__(ReconocedorTesseract)
+    lineas = adaptador._lineas(_datos_ocr([("Peso: 16.650 - 55.080", 80), ("Placa: Viscacho", 80)]))
+    assert adaptador._peso(lineas).valor == "55.08"
+    assert adaptador._placa(lineas).valor is None  # un apodo no es placa (RN-M04-03)
 
 
 def test_fecha_proceso_se_guarda(reconocido):
