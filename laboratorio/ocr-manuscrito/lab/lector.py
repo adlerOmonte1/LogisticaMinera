@@ -57,9 +57,18 @@ class LectorTrOCR:
                 ids.append(i)
         return ids
 
-    @torch.inference_mode()
     def leer(self, imagenes: list[Image.Image], zona: str) -> list[Lectura]:
-        permitidos = self._permitidos[zona]
+        return self._leer(imagenes, [zona] * len(imagenes))
+
+    def leer_zonas(self, recortes: dict[str, Image.Image]) -> dict[str, Lectura]:
+        """Las cinco zonas de un ticket en una sola pasada del modelo, cada una con
+        su alfabeto: es lo que baja el tiempo por ticket en CPU."""
+        zonas = list(recortes)
+        return dict(zip(zonas, self._leer([recortes[z] for z in zonas], zonas)))
+
+    @torch.inference_mode()
+    def _leer(self, imagenes: list[Image.Image], zonas: list[str]) -> list[Lectura]:
+        permitidos = [self._permitidos[z] for z in zonas]
         pixeles = self.procesador(images=[i.convert("RGB") for i in imagenes], return_tensors="pt").pixel_values
         salida = self.modelo.generate(
             pixeles.to(self.dispositivo),
@@ -67,11 +76,12 @@ class LectorTrOCR:
             max_new_tokens=24,
             output_scores=True,
             return_dict_in_generate=True,
-            prefix_allowed_tokens_fn=lambda _b, _ids: permitidos,
+            prefix_allowed_tokens_fn=lambda b, _ids: permitidos[b],
         )
         textos = self.procesador.batch_decode(salida.sequences, skip_special_tokens=True)
         puntajes = self.modelo.compute_transition_scores(
-            salida.sequences, salida.scores, getattr(salida, "beam_indices", None), normalize_logits=False
+            # Con haz, los puntajes ya son log-probabilidades; sin haz son logits y se normalizan.
+            salida.sequences, salida.scores, getattr(salida, "beam_indices", None), normalize_logits=self.haces == 1
         )
         # Las posiciones de relleno, después del fin de la lectura, se reconocen por
         # el token de relleno, no por su puntaje: un carácter leído con total

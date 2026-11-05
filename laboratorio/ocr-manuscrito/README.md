@@ -333,6 +333,7 @@ PyTorch 2.7 o superior con CUDA 12.8 o superior.
 | Modelo final | `.venv/Scripts/python.exe -u 04_ajustar.py --final --epocas 12 --nombre trocr-ticket-v1` | 3 min |
 | Informe | `.venv/Scripts/python.exe 05_informe.py` | 1 min |
 | Fotos nuevas | `.venv/Scripts/python.exe 06_leer.py datos/pruebas/entrada --dispositivo cpu` | 7 s por foto en CPU |
+| Paquete para los equipos | `.venv/Scripts/python.exe 07_empaquetar.py` | 1 min; deja `datos/paquetes/trocr-ticket-v1.zip` (1,34 GB) |
 
 Para comparar con Tesseract se usa la herramienta existente del backend, dentro del contenedor, con
 las 32 fotos y `verdad.csv` copiados a una carpeta:
@@ -394,6 +395,14 @@ conoce. **Solo las fotos de tickets nuevos validan el entrenamiento.**
 ## 10. Lo que falta para llevarlo al sistema
 
 ### 10.1 Saneamiento (S1 a S5 del plan)
+
+**Estado al 04/11/2026:** S1 a S4 hechos en el backend. Catálogo de motores en `settings.RECONOCEDORES`,
+motor creado una vez por proceso, motor compuesto de respaldo (`RECONOCEDOR_ACTIVO=nube,trocr`),
+verificación de RN-M04-05 con `RECONOCIMIENTO_VENTANA_CONTROLADA`, adaptador `trocr_local.py`
+(decodificación simple, 2,6 a 3,4 s por ticket en el contenedor, 7,7 s la primera lectura),
+Tesseract corregido según DR-09 y `manage.py obtener_modelo`. Las 562 pruebas del backend pasan. En
+cada equipo: `docker compose exec backend python manage.py obtener_modelo --desde /app/modelos/trocr-ticket-v1.zip`
+con el paquete copiado a `backend/modelos/`. Falta S5.
 
 | Paso | Contenido |
 |---|---|
