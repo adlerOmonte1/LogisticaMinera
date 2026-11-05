@@ -6,10 +6,10 @@ no registra ingresos ni reconocimientos.
 
 from pathlib import Path
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.module_loading import import_string
 
-from apps.reconocimiento.motores import MOTORES
+from apps.reconocimiento.motores import crear
 from apps.reconocimiento.piloto import evaluar, informe, leer_conjunto
 
 
@@ -27,10 +27,10 @@ class Command(BaseCommand):
             raise CommandError(f"Falta {carpeta / 'verdad.csv'} (archivo;placa;fecha;peso_bruto_tn)")
         elegidos = {}
         for nombre in [m.strip() for m in motores.split(",") if m.strip()]:
-            if nombre not in MOTORES:
-                raise CommandError(f"Motor desconocido: {nombre}. Disponibles: {', '.join(MOTORES)}")
+            if nombre not in settings.RECONOCEDORES:
+                raise CommandError(f"Motor desconocido: {nombre}. Disponibles: {', '.join(settings.RECONOCEDORES)}")
             try:
-                elegidos[nombre] = import_string(MOTORES[nombre])()
+                elegidos[nombre] = crear(nombre)
             except Exception as exc:
                 raise CommandError(f"No se pudo cargar el motor {nombre}: {exc}")
         resultados = evaluar(elegidos, carpeta)

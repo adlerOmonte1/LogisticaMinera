@@ -1,0 +1,8 @@
+# Motor local entrenado (`RECONOCEDOR_ACTIVO=trocr`, D-12). Opcional: sin estas
+# dependencias el motor queda «no disponible» y el registro sigue manual.
+# Se instala con el índice de PyTorch para CPU, el que tendrá el servidor:
+#   pip install -r requirements/ocr-local.txt --extra-index-url https://download.pytorch.org/whl/cpu
+# Versiones del laboratorio (laboratorio/ocr-manuscrito/requirements.lock).
+torch==2.11.0
+transformers==5.22.1
+opencv-python-headless==5.0.0.93

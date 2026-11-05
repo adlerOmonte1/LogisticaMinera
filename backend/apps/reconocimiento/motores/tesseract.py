@@ -1,16 +1,17 @@
-"""Adaptador local provisional (D-12): OCR con Tesseract dentro del mismo
+"""Adaptador local de referencia (D-12): OCR con Tesseract dentro del mismo
 backend, sin servicio externo ni credenciales. Es el único archivo que importa
 `pytesseract` (RNF-M04-05).
 
-El ticket imprime tres líneas que interesan (DR-09): `FECHA dd/mm/aaaa`,
-`PLACA XXX-NNN` y `P. BRUTO 32 500 kg`. El adaptador busca cada una por su
-patrón; un campo que no encuentra queda sin valor y sin confianza (RN-M04-03).
+El ticket de la Balanza (DR-09) trae tres datos que interesan, escritos a mano
+junto a etiquetas impresas: `Peso: 13.400`, `Placa: A5S-939` y la fecha en tres
+casillas bajo `DIA MES AÑO`. El adaptador busca cada etiqueta y normaliza lo que
+sigue con las reglas comunes; un campo que no encuentra queda sin valor y sin
+confianza (RN-M04-03). Tesseract lee bien lo impreso y mal lo manuscrito: sirve
+como línea base del piloto, no como motor de operación.
 """
 
 import io
 import re
-from datetime import date
-from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 
@@ -22,10 +23,7 @@ from apps.reconocimiento.dominio import (
     CampoLeido,
     ResultadoReconocimiento,
 )
-
-_PLACA = re.compile(r"\b([A-Z0-9]{3})\s?[-–]\s?([A-Z0-9]{3})\b")
-_FECHA = re.compile(r"\b(\d{2})[/.-](\d{2})[/.-](\d{4})\b")
-_PESO = re.compile(r"(\d{1,3}(?:[ .,]\d{3})+|\d{4,6})\s*KG", re.IGNORECASE)
+from apps.reconocimiento.motores.comun import normalizacion as N
 
 
 class ReconocedorTesseract:
@@ -74,34 +72,34 @@ class ReconocedorTesseract:
     def _confianza(valor: float) -> float:
         return round(min(max(valor, 0.0), 1.0), 3)
 
+    @staticmethod
+    def _despues_de(etiqueta: str, texto: str) -> str | None:
+        m = re.search(rf"{etiqueta}\s*:?\s*(.*)", texto)
+        return m.group(1) if m else None
+
     def _placa(self, lineas) -> CampoLeido:
         for texto, conf in lineas:
-            if "PLACA" in texto:
-                m = _PLACA.search(texto.replace("PLACA", ""))
-                if m:
-                    return CampoLeido(PLACA, f"{m.group(1)}-{m.group(2)}", self._confianza(conf))
+            resto = self._despues_de("PLACA", texto)
+            if resto is not None and (valor := N.placa(resto)):
+                return CampoLeido(PLACA, valor, self._confianza(conf))
         return CampoLeido(PLACA)
-
-    def _fecha(self, lineas) -> CampoLeido:
-        for texto, conf in lineas:
-            m = _FECHA.search(texto)
-            if m:
-                try:
-                    valor = date(int(m.group(3)), int(m.group(2)), int(m.group(1))).isoformat()
-                except ValueError:
-                    continue
-                return CampoLeido(FECHA, valor, self._confianza(conf))
-        return CampoLeido(FECHA)
 
     def _peso(self, lineas) -> CampoLeido:
         for texto, conf in lineas:
-            if "BRUTO" in texto or "KG" in texto:
-                m = _PESO.search(texto)
-                if m:
-                    try:
-                        kg = Decimal(re.sub(r"[ .,]", "", m.group(1)))
-                    except InvalidOperation:
-                        continue
-                    toneladas = (kg / 1000).quantize(Decimal("0.01"))
-                    return CampoLeido(PESO_BRUTO, str(toneladas), self._confianza(conf))
+            resto = self._despues_de("PESO", texto)
+            if resto is not None:
+                # La placa puede quedar en la misma línea: el peso termina donde ella empieza.
+                resto = resto.split("PLACA")[0]
+                if (valor := N.peso_bruto(resto)) is not None:
+                    return CampoLeido(PESO_BRUTO, str(valor), self._confianza(conf))
         return CampoLeido(PESO_BRUTO)
+
+    def _fecha(self, lineas) -> CampoLeido:
+        """Las casillas quedan en la línea siguiente a la cabecera `DIA MES AÑO`."""
+        for i, (texto, _conf) in enumerate(lineas[:-1]):
+            if "DIA" in texto and "MES" in texto:
+                siguiente, conf = lineas[i + 1]
+                numeros = re.findall(r"\d{1,4}", siguiente)
+                if len(numeros) >= 3 and (valor := N.fecha(*numeros[:3])):
+                    return CampoLeido(FECHA, valor, self._confianza(conf))
+        return CampoLeido(FECHA)
