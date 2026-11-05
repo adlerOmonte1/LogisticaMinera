@@ -34,6 +34,10 @@ services:
       CORS_ALLOWED_ORIGINS: http://localhost:4200
       MEDIA_ROOT: /app/media
       TZ: America/Lima
+      # Motor del ticket (D-12): el modelo local entrenado, instalado en
+      # backend/modelos/ con `manage.py obtener_modelo`. Sin el modelo, el
+      # registro sigue manual (RN-M04-07).
+      RECONOCEDOR_ACTIVO: ${RECONOCEDOR_ACTIVO:-trocr}
     ports:
       - "8000:8000"
     volumes:

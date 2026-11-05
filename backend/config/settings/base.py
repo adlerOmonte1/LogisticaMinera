@@ -165,10 +165,32 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 PATRON_PLACA = env("PATRON_PLACA", default=r"^[A-Z0-9]{3}-[A-Z0-9]{3}$")
 
 # --- Reconocimiento del ticket (M04) -----------------------------------------
-# Motor activo (D-12): un adaptador de `apps/reconocimiento/motores/`. El
-# provisional es Tesseract dentro del mismo backend; las pruebas usan el
-# determinista. Umbral y tiempo de espera de HU-M04-01 y RNF-M04-02.
+# Catálogo de motores (D-12, RNF-M04-05): nombre -> adaptador. Agregar un motor
+# es escribir su adaptador en `apps/reconocimiento/motores/` y sumar aquí una
+# línea; el registro de ingresos no cambia.
+RECONOCEDORES = {
+    "determinista": "apps.reconocimiento.motores.determinista.ReconocedorDeterminista",
+    "tesseract": "apps.reconocimiento.motores.tesseract.ReconocedorTesseract",
+    "trocr": "apps.reconocimiento.motores.trocr_local.ReconocedorTrOCR",
+}
+# Motor activo: un nombre, o varios separados por coma en orden de respaldo
+# («nube,trocr»): si el primero no está disponible, lee el siguiente. Las pruebas
+# usan el determinista.
 RECONOCEDOR_ACTIVO = env("RECONOCEDOR_ACTIVO", default="tesseract")
+RECONOCIMIENTO_COMPOSICION = "apps.reconocimiento.motores.compuesto.ReconocedorConRespaldo"
+# Ventana de operación controlada (D-16): el motor y su versión quedan fijos
+# (RN-M04-05). Con esta marca, la verificación de Django rechaza más de un motor.
+RECONOCIMIENTO_VENTANA_CONTROLADA = env.bool("RECONOCIMIENTO_VENTANA_CONTROLADA", default=False)
 RECONOCIMIENTO_UMBRAL_CONFIANZA = env.float("RECONOCIMIENTO_UMBRAL_CONFIANZA", default=0.80)
 RECONOCIMIENTO_TIEMPO_ESPERA_S = env.int("RECONOCIMIENTO_TIEMPO_ESPERA_S", default=10)
+# Tiempo de cada motor dentro de un respaldo; el que no figura recibe una parte
+# igual del tiempo total.
+RECONOCIMIENTO_TIEMPO_POR_MOTOR = env.dict("RECONOCIMIENTO_TIEMPO_POR_MOTOR", cast={"value": float}, default={})
 OCR_IDIOMA = env("OCR_IDIOMA", default="eng")
+
+# Modelo local entrenado (laboratorio/ocr-manuscrito). No se versiona en git: se
+# provisiona con `manage.py obtener_modelo` y se verifica por su hash (RN-M04-04).
+TROCR_MODELO_DIR = env.path("TROCR_MODELO_DIR", default=BASE_DIR / "modelos" / "trocr-ticket-v1")
+TROCR_MODELO_SHA256 = env("TROCR_MODELO_SHA256", default="35598224867a")
+TROCR_HACES = env.int("TROCR_HACES", default=1)
+TROCR_HILOS = env.int("TROCR_HILOS", default=0)

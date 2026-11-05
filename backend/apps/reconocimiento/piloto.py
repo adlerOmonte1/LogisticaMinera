@@ -58,11 +58,20 @@ def leer_conjunto(carpeta: Path) -> list[Caso]:
     with open(carpeta / "verdad.csv", encoding="utf-8-sig") as f:
         filas = list(csv.DictReader(f, delimiter=";"))
     return [Caso(fila["archivo"], {PLACA: fila["placa"].strip().upper(), FECHA: fila["fecha"].strip(),
-                                    PESO_BRUTO: str(Decimal(fila["peso_bruto_tn"].replace(",", ".")))})
+                                    PESO_BRUTO: _peso(fila["peso_bruto_tn"])})
             for fila in filas]
 
 
+def _peso(texto: str) -> str:
+    texto = texto.strip().replace(",", ".")
+    return str(Decimal(texto)) if texto else ""
+
+
 def _coincide(campo, leido, verdadero) -> bool:
+    """Un campo sin valor verdadero —la placa escrita como nombre, una casilla
+    tapada— es correcto solo si el motor tampoco propone valor (RN-M04-03)."""
+    if not verdadero:
+        return leido is None
     if leido is None:
         return False
     if campo == PESO_BRUTO:
